@@ -1,7 +1,7 @@
 <template>
   <MainLayout>
     <div class="page">
-      <h2 class="page-title">Analytical</h2>
+      <h2 class="page-title">Analytical1</h2>
 
       <div class="panel">
         <div class="panel-header">
