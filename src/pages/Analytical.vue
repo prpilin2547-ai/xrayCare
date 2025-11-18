@@ -32,7 +32,7 @@
 
       <div class="panel">
         <div class="panel-header">
-          <h3>สรุปสถานะการแจ้งซ่อม</h3>
+          <h3>สรุปสถานะการแจ้งซ่อม </h3>
         </div>
         <div class="panel-body">
           <div class="panel-chart bar-chart">
