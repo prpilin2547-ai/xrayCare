@@ -21,7 +21,7 @@
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label orange">Pending</p>
+          <p class="card-label orange">PENDING</p>
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
