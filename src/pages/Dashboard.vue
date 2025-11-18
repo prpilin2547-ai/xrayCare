@@ -54,7 +54,9 @@
           <tbody v-if="hasMachines">
             <tr v-for="row in sampleRows" :key="row.no">
               <td>{{ row.no }}</td>
-              <td>{{ row.equipment }}</td>
+              <td class="equipment-cell" @click="goToDairyCheck(row.equipment)">
+                {{ row.equipment }}
+              </td>
               <td>{{ row.room }}</td>
               <td>{{ row.caretaker }}</td>
               <td class="status pending">รอดำเนินการ</td>
@@ -89,8 +91,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
+const router = useRouter()
 const hasMachines = ref(true)
 
 const displayDate = '10 Nov 2025'
@@ -101,6 +105,13 @@ const sampleRows = [
   { no: 3, equipment: 'Konica', room: '3', caretaker: 'เบญจรัตน์' },
   { no: 4, equipment: 'Toshiba', room: '4', caretaker: 'ขยัน' }
 ]
+function goToDairyCheck(equipmentName) {
+  router.push({
+    name: 'DairyCheckPage',
+    params: { equipmentName }
+  })
+}
+
 </script>
 
 <style scoped>
@@ -244,6 +255,17 @@ tbody tr:nth-child(even) {
 
 .status.pending {
   color: #f97316;
+}
+
+.equipment-cell {
+  cursor: pointer;
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.equipment-cell:hover {
+  color: #1d4ed8;
 }
 
 /* Monthly check box */
