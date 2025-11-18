@@ -196,12 +196,14 @@ import MainLayout from '../components/Layout/MainLayout.vue'
 
 .summary-strip {
   margin-top: 4px;
-  padding: 10px 14px;
+  padding: 10px 10px;
   border-radius: 12px;
   background: #fee2e2;
   display: flex;
   gap: 8px;
   font-size: 0.9rem;
+  width: 700px;
+
 }
 
 .summary-label {

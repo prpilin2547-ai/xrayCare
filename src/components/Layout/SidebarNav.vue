@@ -16,13 +16,7 @@
           <i class="fa-solid fa-laptop"></i>
           <span>Equipment</span>
         </li>
-        <li
-          :class="{ active: active === 'checklist' }"
-          @click="$emit('navigate', 'checklist')"
-        >
-          <i class="fa-solid fa-list-check"></i>
-          <span>Checklist</span>
-        </li>
+        
         <li
           :class="{ active: active === 'pm' }"
           @click="$emit('navigate', 'pm')"
