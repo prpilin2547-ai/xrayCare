@@ -1,6 +1,7 @@
 <template>
   <MainLayout>
     <div class="page">
+      <div class="gear-icon">⚙️</div>
       <h2 class="page-title">PM Schedule</h2>
 
       <div class="selected-date-card">
@@ -74,6 +75,12 @@ const daysGrid = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  width: 100%;          
+  max-width: 500px;     
+  margin: 0 auto;       
+  padding: 20px 0;
+  align-items: center;  
+  width: 100%;
 }
 
 .page-title {
@@ -88,7 +95,8 @@ const daysGrid = computed(() => {
   border: 1px solid #d1d5db;
   padding: 8px 12px;
   background: #f9fafb;
-  max-width: 260px;
+  width: 100%;       
+  max-width: 480px;
 }
 
 .date-icon {
@@ -152,7 +160,7 @@ const daysGrid = computed(() => {
 }
 
 .day-cell {
-  min-height: 40px;
+  min-height: 50px;
   border-radius: 10px;
   padding: 4px;
   display: flex;
@@ -184,12 +192,18 @@ const daysGrid = computed(() => {
   font-size: 0.7rem;
   background: #dbeafe;
   color: #1d4ed8;
+  white-space: nowrap; 
+  line-height: 1;
 }
 
 .gear-icon {
   position: absolute;
-  right: 12px;
-  bottom: 8px;
-  font-size: 1rem;
+  right: 0px;
+  bottom: 0px;
+  font-size: 1.5rem;
+  color: #6b7280;    
+  cursor: pointer;
+  margin-right: 20px; 
+  margin-bottom: 20px;
 }
 </style>
