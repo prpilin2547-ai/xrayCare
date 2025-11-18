@@ -1,7 +1,7 @@
 <template>
   <header class="topbar">
     <div class="topbar-left">
-      <span class="brand">x-raycare</span>
+      <span class="brand">x-raycare </span>
     </div>
     <div class="topbar-right">
       <i class="fa-solid fa-circle-user"></i>
