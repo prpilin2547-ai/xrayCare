@@ -13,42 +13,42 @@
           :class="{ active: active === 'equipment' }"
           @click="$emit('navigate', 'equipment')"
         >
-          <span class="icon">💻</span>
+          <i class="fa-solid fa-laptop"></i>
           <span>Equipment</span>
         </li>
         <li
           :class="{ active: active === 'checklist' }"
           @click="$emit('navigate', 'checklist')"
         >
-          <span class="icon">☑️</span>
+          <i class="fa-solid fa-list-check"></i>
           <span>Checklist</span>
         </li>
         <li
           :class="{ active: active === 'pm' }"
           @click="$emit('navigate', 'pm')"
         >
-          <span class="icon">🗓</span>
+          <i class="fa-solid fa-calendar"></i>
           <span>PM Schedule</span>
         </li>
         <li
           :class="{ active: active === 'export' }"
           @click="$emit('navigate', 'export')"
         >
-          <span class="icon">📄</span>
+          <i class="fa-solid fa-file-lines"></i>
           <span>Export PDF</span>
         </li>
         <li
           :class="{ active: active === 'analytical' }"
           @click="$emit('navigate', 'analytical')"
         >
-          <span class="icon">📊</span>
+          <i class="fa-solid fa-chart-simple"></i>
           <span>Analytical</span>
         </li>
         <li
           :class="{ active: active === 'request' }"
           @click="$emit('navigate', 'request')"
         >
-          <span class="icon">👥</span>
+          <i class="fa-solid fa-code-pull-request"></i>
           <span>Request</span>
         </li>
       </ul>
@@ -56,7 +56,7 @@
 
     <div class="sidebar-bottom">
       <button class="btn-logout" @click="$emit('navigate', 'logout')">
-        <span class="icon">⏻</span>
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Log out</span>
       </button>
     </div>

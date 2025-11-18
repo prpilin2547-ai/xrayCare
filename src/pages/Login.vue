@@ -27,7 +27,7 @@
               placeholder="Enter your password"
             />
             <button type="button" class="eye-btn" @click="togglePassword">
-              {{ showPassword ? '🙈' : '👁️' }}
+              <i :class="showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
             </button>
           </div>
         </div>

@@ -6,6 +6,9 @@ import Analytical from '../pages/Analytical.vue'
 import PMSchedule from '../pages/PMSchedule.vue'
 import ExportPdf from '../pages/ExportPdf.vue'
 import UserProfile from '../pages/UserProfile.vue'
+import RequestList from '../pages/RequestList.vue'
+import RequestForm from '../pages/RequestForm.vue'
+
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -15,8 +18,11 @@ const routes = [
   { path: '/analytics', component: Analytical },
   { path: '/pm-schedule', component: PMSchedule },
   { path: '/export-pdf', component: ExportPdf },
-  { path: '/profile', component: UserProfile }
+  { path: '/profile', component: UserProfile },
+  { path: '/requests', component: RequestList },
+  { path: '/requests/new', component: RequestForm }
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),

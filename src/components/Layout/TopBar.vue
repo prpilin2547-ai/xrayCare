@@ -4,7 +4,7 @@
       <span class="brand">x-raycare</span>
     </div>
     <div class="topbar-right">
-      <div class="avatar"></div>
+      <i class="fa-solid fa-circle-user"></i>
       <span class="user-text">Username ({{ role }})</span>
     </div>
   </header>
@@ -31,8 +31,8 @@ defineProps({
 }
 
 .brand {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
 }
 
 .topbar-right {

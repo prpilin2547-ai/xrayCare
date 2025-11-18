@@ -21,7 +21,7 @@
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label orange">รอดำเนินการ</p>
+          <p class="card-label orange">Pending</p>
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
@@ -248,13 +248,14 @@ tbody tr:nth-child(even) {
 
 /* Monthly check box */
 .monthly-box {
-  margin-top: 8px;
+  display: inline-flex;  /* ให้กล่องมีขนาดตามเนื้อหา */
+  width: 150px;           /* กันการขยายเอง */
   background: #fee2e2;
   border-radius: 14px;
-  padding: 8px 12px;
-  display: inline-flex;
+  padding: 4px 8px;      /* ลด padding ให้ดูพอดีกับข้อความ */
   align-items: center;
 }
+
 
 .monthly-left {
   display: flex;

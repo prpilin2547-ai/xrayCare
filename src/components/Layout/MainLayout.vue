@@ -36,6 +36,7 @@ const activeMenu = computed(() => {
   if (route.path.startsWith('/pm-schedule')) return 'pm'
   if (route.path.startsWith('/export-pdf')) return 'export'
   if (route.path.startsWith('/profile')) return 'profile'
+  if (route.path.startsWith('/requests')) return 'request'
   return ''
 })
 
@@ -47,7 +48,7 @@ const onNavigate = (menu) => {
     case 'pm':        router.push('/pm-schedule'); break
     case 'export':    router.push('/export-pdf'); break
     case 'analytical':router.push('/analytics'); break
-    case 'request':   router.push('/dashboard'); break // ยังเป็น mock
+    case 'request':   router.push('/requests'); break // ยังเป็น mock
     case 'profile':   router.push('/profile'); break
     case 'logout':    router.push('/login'); break
   }
