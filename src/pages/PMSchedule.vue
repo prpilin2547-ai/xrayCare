@@ -42,10 +42,6 @@
           </div>
         </div>
       </div>
-
-      <div class="gear-icon">
-        ⚙️
-      </div>
     </div>
   </MainLayout>
 </template>
