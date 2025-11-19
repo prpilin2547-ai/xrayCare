@@ -44,10 +44,9 @@
         >
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Request</span>
-        </li>
+        </li> 
       </ul>
     </nav>
-
     <div class="sidebar-bottom">
       <button class="btn-logout" @click="$emit('navigate', 'logout')">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
