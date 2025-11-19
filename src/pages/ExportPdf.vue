@@ -37,6 +37,8 @@
                 v-model="date"
                 type="text"
                 placeholder="DD/MM/YYYY"
+                maxlength="10"
+                @input="formatDate"
               />
               <span class="date-icon">📅</span>
             </div>
@@ -60,24 +62,49 @@ import MainLayout from '../components/Layout/MainLayout.vue'
 const machine = ref('')
 const checklistType = ref('')
 const date = ref('')
-</script>
 
+// 📍 เพิ่มฟังก์ชัน formatDate ตรงนี้
+const formatDate = () => {
+  // 1. ลบเครื่องหมาย / ที่มีอยู่เดิมออกทั้งหมด
+  let value = date.value.replace(/\//g, '');
+
+  // 2. จำกัดความยาวสูงสุดให้เหลือแค่ 8 ตัวเลข (DDMMYYYY)
+  value = value.substring(0, 8);
+
+  // 3. ใส่เครื่องหมาย / กลับเข้าไปในตำแหน่งที่ถูกต้อง (หลัง 2 ตัวแรกและ 4 ตัวแรก)
+  if (value.length > 2 && value.length <= 4) {
+    value = value.substring(0, 2) + '/' + value.substring(2);
+  } else if (value.length > 4) {
+    value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4);
+  }
+
+  // 4. อัปเดตค่า v-model (date) ด้วยค่าที่ถูกจัดรูปแบบแล้ว
+  date.value = value;
+}
+</script>
 <style scoped>
 .page {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  /* 📍 เพิ่ม: จัดกึ่งกลางองค์ประกอบลูกในแนวนอน */
+  align-items: center; 
 }
 
 .page-title {
   margin: 0;
+  max-width: 800px; /* 📍 ขยายความกว้าง */
+  margin: 0 auto;  /* 📍 จัดให้อยู่กึ่งกลาง */
+  text-align: center;
 }
 
 .form-panel {
-  max-width: 520px;
+  /* 📍 แก้ไข: เพิ่มขนาดกรอบให้ใหญ่ขึ้นตามต้องการ */
+  max-width: 600px; 
   background: #f3f4f6;
   border-radius: 16px;
   padding: 16px 18px;
+  margin: 0 auto;
 }
 
 .form {
@@ -141,8 +168,11 @@ select {
 
 .preview-wrapper {
   display: flex;
-  justify-content: flex-end;
-  max-width: 520px;
+  /* 📍 แก้ไข: จัดปุ่มให้อยู่เยื้องทางขวา */
+  justify-content: flex-end; 
+  /* 📍 แก้ไข: กำหนด max-width ให้เท่ากับ form-panel ที่ปรับแล้ว */
+  max-width: 600px; 
+  margin: 0 auto; /* เพื่อจัดกึ่งกลาง wrapper */
 }
 
 .btn-preview {
