@@ -201,7 +201,7 @@ const saveRemark = () => {
 // ⭐ ปุ่มถัดไป
 const goNext = () => {
   console.log('ข้อมูล checklist:', checklistItems.value)
-  router.push('/next-step') // ปรับตามเส้นทางของคุณ
+  router.push('/monthly-check') // ปรับตามเส้นทางของคุณ
 }
 </script>
 
