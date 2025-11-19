@@ -9,13 +9,13 @@
             </td>
           </tr>
 
-          <tr>
+          <!-- <tr>
             <td class="cell-label">วันที่</td>
             <td colspan="2">
               <input type="date" v-model="form.date" class="input-cell" />
             </td>
-          </tr>
-          <tr>
+          </tr> -->
+          <!-- <tr>
             <td class="cell-label">ผู้ทดสอบ</td>
             <td colspan="2">
               <input
@@ -25,7 +25,7 @@
                 :placeholder="currentUserName"
               />
             </td>
-          </tr>
+          </tr> -->
 
           <tr class="row-header-columns">
             <td>คุณภาพของภาพพิมพ์โดยทั่วไป</td>
@@ -134,6 +134,7 @@ const submitNext = () => {
 </script>
 
 <style scoped>
+@import './_formTableCommon.css';
 .content-panel {
   background: #ffffff;
   padding: 18px 22px 22px;

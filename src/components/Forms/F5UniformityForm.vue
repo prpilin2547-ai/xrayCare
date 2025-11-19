@@ -46,7 +46,7 @@
             </td>
           </tr>
 
-          <tr>
+          <!-- <tr>
             <td class="cell-label">วันที่</td>
             <td colspan="2">
               <input type="date" v-model="form.date" class="input-cell" />
@@ -62,7 +62,7 @@
                 :placeholder="currentUserName"
               />
             </td>
-          </tr>
+          </tr> -->
 
           <tr class="row-header-columns">
             <td>การประเมินภาพ</td>
