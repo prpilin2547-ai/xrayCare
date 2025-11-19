@@ -41,11 +41,8 @@
             <div v-if="cell.day === 18" class="tag">
               Monthly check
             </div>
-          </div>
-        </div>
-      </div>
-      
-      <div v-if="isPopupVisible" class="popup-overlay" @click="isPopupVisible = false">
+          </div> </div>
+      </div> <div v-if="isPopupVisible" class="popup-overlay" @click="isPopupVisible = false">
         <div 
           class="popup-box" 
           :style="{ top: popupPosition.top, left: popupPosition.left }"
@@ -53,26 +50,41 @@
         >
           <div class="popup-header">
             <h3 class="popup-title">Monthly Check</h3>
-            <span class="close-btn" @click="isPopupVisible = false">+</span>
+            <span class="add-btn" @click="openAddPopup($event)">+</span> 
           </div>
-
-          <div class="popup-content">
+          
+          <div class="popup-content"> 
             <p class="highlight-red">ทำประจำทุก 3 เดือน</p>
             <p>วันอังคารที่ 18 มกราคม 2022</p>
             <p class="maintenance-title">รายการ Maintenance</p>
             <ul>
-              <li>ควบคุมคุณภาพจอภาพ</li>
-              <li>ตรวจสอบเครื่องเอกซเรย์</li>
+              <li>การควบคุมคุณภาพจอภาพ</li>
+              <li>แบบบันทึกการตรวจสอบเครื่องเอกซเรย์</li>
               <li>ความสม่ำเสมอของภาพ</li>
               <li>ความคงที่ของค่าดัชนีปริมาณรังสี</li>
             </ul>
           </div>
+        </div> 
+      </div> <div v-if="isAddPopupVisible" class="add-popup-overlay">
+        <div 
+          class="add-popup-box" 
+          :style="{ top: addPopupPosition.top, left: addPopupPosition.left }"
+          @click.stop
+          @mouseleave="closeAddPopupOnMouseLeave" 
+          @mouseover="isAddPopupVisible = true" 
+        >
+          <div class="add-popup-header">
+            <span class="btn-action btn-cancel" @click="isAddPopupVisible = false">ยกเลิก</span>
+            <span class="btn-action btn-new">ใหม่</span>
+            <span class="btn-action btn-add">เพิ่ม</span>
+          </div>
+          <div class="add-popup-content">
+            <p class="add-popup-red-text">ตัวอักษรสีแดง</p> 
+            <input type="text" placeholder="ชื่อ" class="input-name" /> 
+          </div>
         </div>
-      </div>
-    </div>
-  </MainLayout>
+      </div> </div> </MainLayout>
 </template>
-
 <script setup>
 import { computed, ref, nextTick } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
@@ -81,54 +93,70 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 // January 2022 starts on Saturday (index 6), 31 days
 const daysGrid = computed(() => {
-  const cells = []
-  const startDay = 6
-  const totalDays = 31
+    const cells = []
+    const startDay = 6
+    const totalDays = 31
 
-  for (let i = 0; i < startDay; i++) {
-    cells.push({ key: `empty-${i}`, day: null })
-  }
-  for (let d = 1; d <= totalDays; d++) {
-    cells.push({ key: `day-${d}`, day: d })
-  }
-  return cells
+    for (let i = 0; i < startDay; i++) {
+        cells.push({ key: `empty-${i}`, day: null })
+    }
+    for (let d = 1; d <= totalDays; d++) {
+        cells.push({ key: `day-${d}`, day: d })
+    }
+    return cells
 })
 
-// 📍 2. เพิ่มตัวแปรและฟังก์ชันสำหรับ Pop-up
+// 📍 ตัวแปรสำหรับ Pop-up หลัก
 const isPopupVisible = ref(false)
 const popupPosition = ref({ top: '0px', left: '0px' })
 
-const togglePopup = (event) => {
-    // 1. ตรวจสอบสถานะก่อนสลับ
-    const wasVisible = isPopupVisible.value;
+// 📍 ตัวแปรสำหรับ Pop-up ซ้อน
+const isAddPopupVisible = ref(false) 
+const addPopupPosition = ref({ top: '0px', left: '0px' }) 
 
-    // 2. สลับการแสดงผล
+const togglePopup = (event) => {
+    const wasVisible = isPopupVisible.value;
     isPopupVisible.value = !wasVisible;
 
-    // 3. ถ้ากำลังจะเปิด Pop-up ให้คำนวณตำแหน่ง
     if (!wasVisible) {
         const targetElement = event.currentTarget;
         const rect = targetElement.getBoundingClientRect();
         
-        // ปรับตำแหน่งโดยอิงจากตำแหน่งวันที่ 18
-        // กำหนดตำแหน่งให้อยู่ด้านบนซ้ายของวันที่ 18 และปรับค่าชดเชย
-        
-        // ตำแหน่ง Top: ใช้ Top ของวันที่ 18 ลบด้วยความสูงที่ประมาณไว้ของ Pop-up (เช่น 400px) 
-        // ตำแหน่ง Left: ใช้ Left ของวันที่ 18 บวกกับความกว้างของวันที่ แล้วลบด้วยค่าชดเชยเพื่อให้ดูสมดุล
-        
-        // ใช้ nextTick เพื่อให้มั่นใจว่า DOM ของ Pop-up ถูกเรนเดอร์แล้ว ก่อนคำนวณตำแหน่งที่แม่นยำ
         nextTick(() => {
             const popupElement = document.querySelector('.popup-box');
             if (popupElement) {
-                // ปรับตำแหน่งให้เหมาะสมตามรูป (วางเยื้องไปทางซ้ายบนของวันที่ 18)
-                popupPosition.value.top = `${rect.top + window.scrollY - 320}px`; // ปรับให้สูงขึ้น
-                popupPosition.value.left = `${rect.left + window.scrollX - 250}px`; // ปรับให้เยื้องไปทางซ้าย
+                // ปรับตำแหน่งให้เหมาะสมตามรูป
+                popupPosition.value.top = `${rect.top + window.scrollY - 320}px`; 
+                popupPosition.value.left = `${rect.left + window.scrollX - 250}px`;
             }
         });
     }
 }
-</script>
 
+// 📍 ฟังก์ชันสำหรับเปิด Pop-up ใหม่
+const openAddPopup = (event) => {
+    isAddPopupVisible.value = true;
+    
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    nextTick(() => {
+        const popupElement = document.querySelector('.add-popup-box');
+        if (popupElement) {
+            addPopupPosition.value.top = `${rect.top + window.scrollY - 15}px`; 
+            addPopupPosition.value.left = `${rect.left + window.scrollX - 250}px`; 
+        }
+    });
+}
+
+// 📍 ฟังก์ชันสำหรับปิด Pop-up ใหม่ เมื่อเมาส์ออก
+const closeAddPopupOnMouseLeave = () => {
+    setTimeout(() => {
+        if (isAddPopupVisible.value) {
+            isAddPopupVisible.value = false;
+        }
+    }, 150); 
+}
+</script>
 <style scoped>
 .page {
   position: relative;
@@ -313,15 +341,6 @@ const togglePopup = (event) => {
     font-weight: bold;
     color: #333; /* Monthly Check สีดำ/เทาเข้ม */
 }
-
-.close-btn {
-    cursor: pointer;
-    font-size: 2rem;
-    color: #e24e42; /* สีแดงสำหรับปุ่มปิด */
-    transform: rotate(45deg); 
-    line-height: 1;
-}
-
 /* 📍 เพิ่มหรือแก้ไขโค้ดนี้ เพื่อให้ <p class="highlight-red"> เป็นสีแดงและตัวหนา */
 .popup-content .highlight-red {
     color: #e24e42; /* สีแดง */
@@ -364,5 +383,82 @@ const togglePopup = (event) => {
     left: 0;
     color: #333;
     font-weight: bold;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    /* ... โค้ดอื่นๆ ... */
+}
+
+/* 📍 แก้ไข/ยืนยัน: สไตล์สำหรับปุ่มบวก (+) ที่มุมขวาบน */
+.add-btn {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #e24e42; /* สีแดง */
+    line-height: 1;
+    /* 📍 สำคัญ: ต้องแน่ใจว่าไม่มีการ transform: rotate(45deg); ในคลาสนี้ */
+    transform: none; 
+}
+.add-popup-box {
+    position: absolute; /* 📍 ใช้ absolute เพื่อกำหนดตำแหน่งด้วย addPopupPosition */
+    width: 280px; 
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    padding: 10px;
+    z-index: 1002;
+    background-color: #f7f7f7; /* สีพื้นหลังอ่อน */
+    pointer-events: auto; /* ทำให้กล่องนี้รับ Event เมาส์ */
+}
+
+.add-popup-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px 8px 5px;
+}
+
+.btn-action {
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.btn-cancel {
+    color: #6b7280; /* ยกเลิก: สีเทา */
+}
+
+.btn-new {
+    color: #e24e42; /* ใหม่: สีแดง */
+}
+
+.btn-add {
+    color: #1d4ed8; /* เพิ่ม: สีน้ำเงิน (ถ้าต้องการสีแดงเหมือน "ใหม่" ให้เปลี่ยนเป็น #e24e42) */
+}
+
+.add-popup-content {
+    padding: 0 5px 10px 5px;
+}
+
+/* 📍 สไตล์สำหรับข้อความสีแดงใน Pop-up ใหม่ */
+.add-popup-red-text {
+    color: #e24e42; 
+    font-weight: bold;
+    margin: 5px 0 10px 0 !important;
+}
+
+.input-name {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 1rem;
+    box-sizing: border-box;
+    /* 📍 สีเทาในกรอบ */
+    color: #6b7280; 
 }
 </style>
