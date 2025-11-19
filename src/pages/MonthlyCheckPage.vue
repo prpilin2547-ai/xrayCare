@@ -1,7 +1,7 @@
 <template>
   <MainLayout>
     <div class="checklist-page">
-      <!-- หัวข้อ -->
+      <!-- หัวข้อ 3 เดือน -->
       <h1 class="page-title">CHECKLIST</h1>
 
       <!-- capsule ข้อมูลเครื่อง -->
@@ -13,8 +13,7 @@
         <div class="pill">ห้อง {{ selectedDevice.room }}</div>
         <div class="pill">วันที่ : {{ todayText }}</div>
         <div class="pill">ผู้ทดสอบ : {{ currentUserName }}</div>
-      </div>
-
+      </div>  
       <!-- layout หลัก: sidebar + content -->
       <div class="page-layout">
         <!-- ⭐ sidebar แบบฟอร์ม -->
@@ -158,6 +157,8 @@ const handleSave = (payloadF6) => {
 </script>
 
 <style scoped>
+@import '../components/Forms/_formTableCommon.css';
+
 .checklist-page {
   background: #ffffff;
   min-height: calc(100vh - 56px);

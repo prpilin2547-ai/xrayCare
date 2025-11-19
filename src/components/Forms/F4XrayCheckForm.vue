@@ -26,12 +26,12 @@
             <td>
               <input type="text" v-model="form.model" class="input-cell" />
             </td>
-            <td class="cell-label small">วันที่</td>
+            <!-- <td class="cell-label small">วันที่</td>
             <td>
               <input type="date" v-model="form.date" class="input-cell" />
-            </td>
+            </td> -->
           </tr>
-          <tr>
+          <!-- <tr>
             <td class="cell-label">ผู้ทดสอบ</td>
             <td colspan="3">
               <input
@@ -41,7 +41,7 @@
                 :placeholder="currentUserName"
               />
             </td>
-          </tr>
+          </tr> -->
 
           <tr class="row-header-columns">
             <td style="width: 40px">ลำดับที่</td>
