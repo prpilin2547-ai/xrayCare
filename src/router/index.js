@@ -9,9 +9,6 @@ import ExportPdf from '../pages/ExportPdf.vue'
 import UserProfile from '../pages/UserProfile.vue'
 import RequestList from '../pages/RequestList.vue'
 import RequestForm from '../pages/RequestForm.vue'
-import ChecklistNext from '../pages/ChecklistNext.vue'
-
-
 
 
 const routes = [
@@ -30,12 +27,7 @@ const routes = [
   { path: '/export-pdf', component: ExportPdf },
   { path: '/profile', component: UserProfile },
   { path: '/requests', component: RequestList },
-  { path: '/requests/new', component: RequestForm },
-  {
-    path: '/checklist-next',
-    name: 'ChecklistNext',
-    component: ChecklistNext
-  }
+  { path: '/requests/new', component: RequestForm }
 ]
 
 
