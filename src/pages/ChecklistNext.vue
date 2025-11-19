@@ -24,6 +24,7 @@
       <div class="content-panel">
         <p class="section-label">Dairy check</p>
 
+        <!-- ตารางเดิม: การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
@@ -64,7 +65,52 @@
           </table>
         </div>
 
-        <!-- ⭐ ปุ่มใหม่: ถัดไป สีเหลือง -->
+        <!-- ⭐ ตารางใหม่: แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
+        <div class="table-wrapper mt-24">
+          <table class="check-table">
+            <tbody>
+              <!-- หัวตาราง -->
+              <tr class="row-header-main">
+                <td colspan="3" class="text-center">
+                  แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
+                </td>
+              </tr>
+
+              <!-- หัวคอลัมน์ -->
+              <tr class="row-header-columns">
+                <td>รายการ</td>
+                <td class="text-center">ผ่าน</td>
+                <td class="text-center">ไม่ผ่าน</td>
+              </tr>
+
+              <!-- แถวรายการทดสอบ -->
+              <tr>
+                <td class="cell-label">
+                  ผลการทดสอบ
+                </td>
+                <td class="text-center">
+                  <input
+                    type="radio"
+                    name="plate-erase"
+                    value="pass"
+                    v-model="plateEraseResult"
+                  />
+                </td>
+                <td class="text-center">
+                  <input
+                    type="radio"
+                    name="plate-erase"
+                    value="fail"
+                    v-model="plateEraseResult"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- ⭐ จบตารางใหม่ -->
+
+        <!-- ปุ่มด้านล่างขวา -->
         <div class="actions">
           <button class="btn-remark" @click="openRemarkModal">
             หมายเหตุ
@@ -116,6 +162,7 @@
         </div>
       </div>
     </div>
+    
   </MainLayout>
 </template>
 
@@ -174,6 +221,9 @@ const checklistItems = ref([
   }
 ])
 
+// ⭐ ผลทดสอบการลบแผ่นเพลท (ผ่าน/ไม่ผ่าน)
+const plateEraseResult = ref('') // 'pass' | 'fail'
+
 // --- โมดอลหมายเหตุ ---
 const showRemarkModal = ref(false)
 const remarkText = ref('')
@@ -201,12 +251,12 @@ const saveRemark = () => {
 // ⭐ ปุ่มถัดไป
 const goNext = () => {
   console.log('ข้อมูล checklist:', checklistItems.value)
-  router.push('/next-step') // ปรับตามเส้นทางของคุณ
+  console.log('ผลการลบแผ่นเพลท:', plateEraseResult.value)
+  router.push('/monthly-check') // ปรับตามเส้นทางของคุณ
 }
 </script>
 
 <style scoped>
-/* เหมือนเดิมทุกอย่าง… */
 .checklist-page {
   background: #ffffff;
   min-height: calc(100vh - 56px);
@@ -280,6 +330,14 @@ const goNext = () => {
   font-weight: 600;
 }
 
+.cell-label {
+  width: 70%;
+}
+
+.text-center {
+  text-align: center;
+}
+
 .actions {
   margin-top: 20px;
   display: flex;
@@ -297,7 +355,7 @@ const goNext = () => {
 
 /* ⭐ ปุ่มถัดไป สีเหลือง */
 .btn-next {
-  background: #f7c948; /* สีเหลือง */
+  background: #f7c948;
   color: #111827;
   border: none;
   border-radius: 4px;
@@ -310,7 +368,12 @@ const goNext = () => {
   background: #e0b63f;
 }
 
-/* Modal เหมือนเดิม */
+/* ระยะห่างตารางใหม่จากตารางแรก */
+.mt-24 {
+  margin-top: 24px;
+}
+
+/* Modal */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -330,5 +393,95 @@ const goNext = () => {
   box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35);
 }
 
-/* ... (ส่วนอื่นเหมือนเดิมทั้งหมด) ... */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.input-textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.mt-12 {
+  margin-top: 12px;
+}
+
+.file-name {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-cancel,
+.btn-save-popup {
+  border-radius: 4px;
+  border: none;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.btn-save-popup {
+  background: #65d46e;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .checklist-page {
+    padding: 16px;
+  }
+
+  .pill-row {
+    gap: 8px;
+  }
+
+  .pill {
+    font-size: 0.8rem;
+  }
+}
 </style>

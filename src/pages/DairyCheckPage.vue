@@ -28,7 +28,7 @@
       <div class="content-panel">
         <p class="section-label">Dairy check</p>
 
-        <!-- ตารางบันทึกการตรวจ -->
+        <!-- ตารางบันทึกการตรวจ (ของเดิม) -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
@@ -71,6 +71,48 @@
             </tbody>
           </table>
         </div>
+
+        <!-- ⭐ ตารางใหม่ : แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
+        <div class="table-wrapper mt-24">
+          <table class="check-table">
+            <tbody>
+              <tr class="row-header-main">
+                <td colspan="3" class="text-center">
+                  แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
+                </td>
+              </tr>
+
+              <tr class="row-header-columns">
+                <td>รายการ</td>
+                <td class="text-center">ผ่าน</td>
+                <td class="text-center">ไม่ผ่าน</td>
+              </tr>
+
+              <tr>
+                <td class="cell-label">
+                  ผลการทดสอบ
+                </td>
+                <td class="text-center">
+                  <input
+                    type="radio"
+                    name="plate-erase"
+                    value="pass"
+                    v-model="plateEraseResult"
+                  />
+                </td>
+                <td class="text-center">
+                  <input
+                    type="radio"
+                    name="plate-erase"
+                    value="fail"
+                    v-model="plateEraseResult"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- ⭐ จบตารางการลบแผ่นเพลท -->
 
         <!-- ปุ่มด้านล่างขวา -->
         <div class="actions">
@@ -127,7 +169,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import MainLayout from '../components/Layout/MainLayout.vue'  // ⭐ เพิ่มแค่นี้
+import MainLayout from '../components/Layout/MainLayout.vue'
 
 /**
  * สมมติหน้านี้ถูกเรียกจาก dashboard พร้อมข้อมูลเครื่อง และชื่อ user
@@ -152,7 +194,7 @@ const router = useRouter()
 const route = useRoute()
 const equipment = route.params.equipment
 
-// อักษรย่อ user สำหรับ avatar
+// อักษรย่อ user สำหรับ avatar (ยังไม่ได้ใช้ใน template แต่เก็บไว้ได้)
 const initials = computed(() => {
   const parts = props.currentUserName.trim().split(' ')
   if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
@@ -169,7 +211,7 @@ const todayText = computed(() => {
   })
 })
 
-// รายการ checklist
+// รายการ checklist เดิม
 const checklistItems = ref([
   {
     id: 'powerCable',
@@ -193,6 +235,9 @@ const checklistItems = ref([
     result: ''
   }
 ])
+
+// ⭐ แบบบันทึกการลบแผ่นเพลท (ผ่าน / ไม่ผ่าน)
+const plateEraseResult = ref('') // 'pass' | 'fail' | ''
 
 // popup หมายเหตุ
 const showRemarkModal = ref(false)
@@ -232,7 +277,8 @@ const saveChecklist = () => {
     user: props.currentUserName,
     checklist: checklistItems.value,
     remark: remarkText.value
-    // remarkFile: remarkFile.value // ไว้ใช้ตอนต่อ backend
+    // ถ้าภายหลังอยากบันทึกผลลบแผ่นเพลทไป backend ด้วย:
+    // plateErase: plateEraseResult.value
   }
 
   console.log('ข้อมูลที่ต้องบันทึก (frontend เท่านั้น):', payload)
@@ -448,6 +494,11 @@ const saveChecklist = () => {
 
 .mt-12 {
   margin-top: 12px;
+}
+
+/* margin-top เพิ่มสำหรับตารางใหม่ */
+.mt-24 {
+  margin-top: 24px;
 }
 
 .file-name {

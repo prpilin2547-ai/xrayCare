@@ -10,6 +10,8 @@ import UserProfile from '../pages/UserProfile.vue'
 import RequestList from '../pages/RequestList.vue'
 import RequestForm from '../pages/RequestForm.vue'
 import ChecklistNext from '../pages/ChecklistNext.vue'
+import MonthlyCheckPage from '../pages/MonthlyCheckPage.vue'
+
 
 
 
@@ -35,7 +37,12 @@ const routes = [
     path: '/checklist-next',
     name: 'ChecklistNext',
     component: ChecklistNext
-  }
+  },
+  {
+  path: '/monthly-check',
+  name: 'MonthlyCheck',
+  component: MonthlyCheckPage
+}
 ]
 
 
