@@ -94,18 +94,9 @@ watch(
 
 // บันทึก (frontend-only) -> emit ให้ parent เผื่อใช้ -> เด้งไป /dashboard
 const emitSave = () => {
-  const payload = {
-    rows: structuredClone(localRows),
-    remark: remark.value
-  }
-
-  // 1) frontend "save" action (placeholder)
-  console.log('บันทึกข้อมูลเรียบร้อย (frontend)', payload)
-
-  // 2) emit ให้ parent หากต้องการให้ parent ทำงานเพิ่มเติม
-  emit('save', payload)
 
   // 3) redirect ไปหน้า Dashboard (frontend only)
   router.push('/dashboard')
 }
+
 </script>
