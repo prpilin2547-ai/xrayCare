@@ -14,6 +14,16 @@ import DashboardEN from '../page-engineer/DashboardEN.vue'
 import AnalyticalEN from '../page-engineer/AnalyticalEN.vue'
 import RequestEN from '../page-engineer/RequestEN.vue'
 import Adminuseraccount from '../pages-admin/Adminuseraccount.vue'
+import ChecklistNext from '../pages/ChecklistNext.vue'
+import MonthlyCheckPage from '../pages/MonthlyCheckPage.vue'
+import F10LightCheckPage from '../pages/F10LightCheckPage.vue' 
+import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue'
+import F12 from '../pages/F12.vue'
+import F9ProtectiveClothesForm from '../pages/F9ProtectiveClothesForm.vue'
+
+
+
+
 
 
 const routes = [
@@ -38,7 +48,41 @@ const routes = [
   { path: '/analyticalen', component: AnalyticalEN },
   { path: '/requesten', component: RequestEN },
   { path: '/adminuseraccount', component: Adminuseraccount }
+  { path: '/requests/new', component: RequestForm },
+  {
+    path: '/checklist-next',
+    name: 'ChecklistNext',
+    component: ChecklistNext
+  },
+  {
+  path: '/monthly-check',
+  name: 'MonthlyCheck',
+  component: MonthlyCheckPage
+},
+{   
+    path: '/monthly-check-light',
+    name: 'MonthlyCheckLight',
+    component: F10LightCheckPage,
+    props: true     // เพื่อส่งข้อมูลเครื่องจาก Dashboard ได้
+  },
+   {
+    path: '/monthly-check-all',
+    name: 'MonthlyCheckAll',
+    component: MonthlyCheckAll,
+    props: true      // ส่งค่า selectedDevice, currentUserName ได้
+  },
+  {
+    path: '/f12',
+    name: 'F12',
+    component: F12
+  },
+  {
+    path: '/f9',
+    name: 'F9ProtectiveClothesForm',
+    component: F9ProtectiveClothesForm
+  }
 ]
+
 
 
 const router = createRouter({

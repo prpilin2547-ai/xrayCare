@@ -3,122 +3,86 @@
   <MainLayout>
     <div class="checklist-page">
       <!-- หัวข้อ CHECKLIST -->
-      <h1 class="page-title">CHECKLIST</h1>
+      <h1 class="page-title">อัตราการถ่ายภาพซ้ำ</h1>
 
-      <!-- แถวแคปซูลสีส้มด้านบน (ชื่อเครื่อง / รุ่น / ห้อง / วันที่ / ผู้ทดสอบ) -->
+      <!-- แถวแคปซูลสีส้มด้านบน -->
       <div class="pill-row">
-        <div class="pill pill-main">
+        <!-- <div class="pill pill-main">
           {{ selectedDevice.name }}
-        </div>
-        <div class="pill">
+        </div> -->
+        <!-- <div class="pill">
           รุ่น {{ selectedDevice.model }}
-        </div>
-        <div class="pill">
+        </div> -->
+        <!-- <div class="pill">
           ห้อง {{ selectedDevice.room }}
-        </div>
+        </div> -->
         <div class="pill">
           วันที่ : {{ todayText }}
         </div>
         <div class="pill">
-          ผู้ทดสอบ : {{ currentUserName }}
+          ผู้บันทึก : {{ currentUserName }}
         </div>
       </div>
 
-      <!-- กล่องเนื้อหาขาวตรงกลาง (เหมือนกระดาษใน mockup) -->
+      <!-- กล่องเนื้อหาขาวตรงกลาง -->
       <div class="content-panel">
-        <p class="section-label">Dairy check</p>
-
-        <!-- ตารางบันทึกการตรวจ (ของเดิม) -->
+        <!-- ⭐ ตาราง : แบบบันทึก F12 อัตราการถ่ายภาพซ้ำ -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
-              <!-- แถวหัวบนสุด -->
+              <!-- หัวตารางหลัก -->
               <tr class="row-header-main">
-                <td colspan="3" class="text-center">
-                  แบบบันทึก : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
+                <td colspan="2" class="text-center">
+                  แบบบันทึก F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ
                 </td>
               </tr>
 
-              <!-- แถวหัวคอลัมน์ -->
+              <!-- หัวคอลัมน์ -->
               <tr class="row-header-columns">
-                <td>รายการ</td>
-                <td class="text-center">ผ่าน</td>
-                <td class="text-center">ไม่ผ่าน</td>
+                <td>สาเหตุการปฏิเสธภาพ/การถ่ายซ้ำ</td>
+                <td class="text-center">เลือก</td>
               </tr>
 
-              <!-- แถวรายการเช็ค -->
-              <tr v-for="item in checklistItems" :key="item.id">
+              <!-- รายการสาเหตุ 1–9 -->
+              <tr v-for="reason in repeatReasons" :key="reason.id">
                 <td class="cell-label">
-                  {{ item.label }}
+                  {{ reason.index }}. {{ reason.label }}
+                  <span v-if="reason.enLabel">({{ reason.enLabel }})</span>
+
+                  <!-- ถ้าเป็น "อื่นๆ" ให้มีช่องกรอก -->
+                  <div
+                    v-if="reason.id === 'other' && selectedReason === 'other'"
+                    class="mt-12"
+                  >
+                    <label class="field-label">ระบุสาเหตุเพิ่มเติม</label>
+                    <input
+                      type="text"
+                      class="input-text"
+                      v-model="otherReasonText"
+                      placeholder="กรอกสาเหตุอื่นๆ..."
+                    />
+                  </div>
                 </td>
+
                 <td class="text-center">
                   <input
                     type="radio"
-                    :name="`check-${item.id}`"
-                    value="pass"
-                    v-model="item.result"
-                  />
-                </td>
-                <td class="text-center">
-                  <input
-                    type="radio"
-                    :name="`check-${item.id}`"
-                    value="fail"
-                    v-model="item.result"
+                    name="repeat-reason"
+                    :value="reason.id"
+                    v-model="selectedReason"
                   />
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <!-- ⭐ ตารางใหม่ : แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
-        <div class="table-wrapper mt-24">
-          <table class="check-table">
-            <tbody>
-              <tr class="row-header-main">
-                <td colspan="3" class="text-center">
-                  แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
-                </td>
-              </tr>
-
-              <tr class="row-header-columns">
-                <td>รายการ</td>
-                <td class="text-center">ผ่าน</td>
-                <td class="text-center">ไม่ผ่าน</td>
-              </tr>
-
-              <tr>
-                <td class="cell-label">
-                  ผลการทดสอบ
-                </td>
-                <td class="text-center">
-                  <input
-                    type="radio"
-                    name="plate-erase"
-                    value="pass"
-                    v-model="plateEraseResult"
-                  />
-                </td>
-                <td class="text-center">
-                  <input
-                    type="radio"
-                    name="plate-erase"
-                    value="fail"
-                    v-model="plateEraseResult"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- ⭐ จบตารางการลบแผ่นเพลท -->
+        <!-- ⭐ จบตาราง F12 -->
 
         <!-- ปุ่มด้านล่างขวา -->
         <div class="actions">
-          <button class="btn-remark" @click="openRemarkModal">
+          <!-- <button class="btn-remark" @click="openRemarkModal">
             หมายเหตุ
-          </button>
+          </button> -->
           <button class="btn-save" @click="saveChecklist">
             บันทึก
           </button>
@@ -126,7 +90,7 @@
       </div>
     </div>
 
-    <!-- Popup หมายเหตุ (ทับทั้งหน้า) -->
+    <!-- Popup หมายเหตุ -->
     <div
       v-if="showRemarkModal"
       class="modal-backdrop"
@@ -154,12 +118,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" @click="closeRemarkModal">
-            ยกเลิก
-          </button>
-          <button class="btn-save-popup" @click="saveRemark">
-            บันทึก
-          </button>
+          <button class="btn-cancel" @click="closeRemarkModal">ยกเลิก</button>
+          <button class="btn-save-popup" @click="saveRemark">บันทึก</button>
         </div>
       </div>
     </div>
@@ -167,14 +127,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-/**
- * สมมติหน้านี้ถูกเรียกจาก dashboard พร้อมข้อมูลเครื่อง และชื่อ user
- * ถ้ายังไม่ได้ต่อจริง ให้ใช้ค่า default ไปก่อน
- */
 const props = defineProps({
   selectedDevice: {
     type: Object,
@@ -192,16 +148,7 @@ const props = defineProps({
 
 const router = useRouter()
 const route = useRoute()
-const equipment = route.params.equipment
 
-// อักษรย่อ user สำหรับ avatar (ยังไม่ได้ใช้ใน template แต่เก็บไว้ได้)
-const initials = computed(() => {
-  const parts = props.currentUserName.trim().split(' ')
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
-  return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
-})
-
-// วันที่วันนี้แบบอัตโนมัติ
 const todayText = computed(() => {
   const d = new Date()
   return d.toLocaleDateString('th-TH', {
@@ -211,79 +158,54 @@ const todayText = computed(() => {
   })
 })
 
-// รายการ checklist เดิม
-const checklistItems = ref([
-  {
-    id: 'powerCable',
-    label:
-      'สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ',
-    result: ''
-  },
-  {
-    id: 'lockBrake',
-    label: 'ระบบล็อกและเบรก : ทำงานได้อย่างถูกต้อง',
-    result: ''
-  },
-  {
-    id: 'tableTubeBucky',
-    label: 'เตียง หลอดเอกซเรย์ และบักกี้ : เคลื่อนที่ได้อย่างราบเรียบ',
-    result: ''
-  },
-  {
-    id: 'tubeWarmup',
-    label: 'X-ray tube warm-up : ด้วยค่าเทคนิคที่บริษัทแนะนำ',
-    result: ''
-  }
+// ⭐ F12 : รายการสาเหตุ
+const repeatReasons = ref([
+  { id: 'positioning', index: 1, label: 'การจัดท่าผู้ป่วย', enLabel: 'Positioning' },
+  { id: 'exposureError', index: 2, label: 'ปริมาณรังสีที่ไม่เหมาะสม', enLabel: 'Exposure error' },
+  { id: 'gridError', index: 3, label: 'ความผิดพลาดของกริด', enLabel: 'Grid error' },
+  { id: 'systemError', index: 4, label: 'ความผิดพลาดของระบบ', enLabel: 'System error' },
+  { id: 'artifact', index: 5, label: 'สิ่งแปลกปลอมในภาพ*', enLabel: 'Artifact' },
+  { id: 'patientMotion', index: 6, label: 'การเคลื่อนไหวของผู้ป่วย', enLabel: 'Patient motion' },
+  { id: 'testImage', index: 7, label: 'การทดสอบภาพ', enLabel: 'Test image' },
+  { id: 'studyCanceled', index: 8, label: 'ยกเลิกเคส', enLabel: 'Study canceled' },
+  { id: 'other', index: 9, label: 'อื่นๆ', enLabel: '' }
 ])
 
-// ⭐ แบบบันทึกการลบแผ่นเพลท (ผ่าน / ไม่ผ่าน)
-const plateEraseResult = ref('') // 'pass' | 'fail' | ''
+const selectedReason = ref('')
+const otherReasonText = ref('')
 
-// popup หมายเหตุ
 const showRemarkModal = ref(false)
 const remarkText = ref('')
 const remarkFile = ref(null)
 
-const remarkFileName = computed(() =>
-  remarkFile.value ? remarkFile.value.name : ''
-)
-
-const currentUserName = computed(() => props.currentUserName)
+const remarkFileName = computed(() => remarkFile.value?.name || '')
 
 const openRemarkModal = () => {
   showRemarkModal.value = true
 }
-
 const closeRemarkModal = () => {
   showRemarkModal.value = false
 }
 
-const onFileChange = (event) => {
-  const file = event.target.files[0]
-  remarkFile.value = file || null
+const onFileChange = (e) => {
+  remarkFile.value = e.target.files[0] || null
 }
 
 const saveRemark = () => {
-  // ตอนนี้แค่ log ดู ยังไม่มี backend
   console.log('หมายเหตุ:', remarkText.value)
   console.log('ไฟล์แนบ:', remarkFile.value)
-  showRemarkModal.value = false
+  closeRemarkModal()
 }
 
 const saveChecklist = () => {
-  const payload = {
+  console.log({
     device: props.selectedDevice,
     date: todayText.value,
-    user: props.currentUserName,
-    checklist: checklistItems.value,
+    reason: selectedReason.value,
+    otherText: otherReasonText.value,
     remark: remarkText.value
-    // ถ้าภายหลังอยากบันทึกผลลบแผ่นเพลทไป backend ด้วย:
-    // plateErase: plateEraseResult.value
-  }
+  })
 
-  console.log('ข้อมูลที่ต้องบันทึก (frontend เท่านั้น):', payload)
-
-  // เด้งกลับหน้า dashboard (ปรับ path ตาม router ของโปรเจกต์คุณ)
   router.push('/dashboard')
 }
 </script>
@@ -325,7 +247,7 @@ const saveChecklist = () => {
 
 .pill-main {
   background: #ffb480;
-  color: #047857; /* เขียวตัวเครื่องใน mockup */
+  color: #047857; /* เขียวตัวเครื่อง */
   font-weight: 700;
 }
 
@@ -334,14 +256,6 @@ const saveChecklist = () => {
   background: #ffffff;
   padding: 20px 24px 28px;
   box-shadow: 0 0 0 1px #e5e5e5;
-}
-
-/* หัวข้อ Dairy check */
-.section-label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 12px;
 }
 
 /* ตาราง */
@@ -377,7 +291,7 @@ const saveChecklist = () => {
   background: #f3f4f6;
 }
 
-/* สีพื้นสลับแถว (ให้ดูลอยเหมือนในภาพ) */
+/* สีพื้นสลับแถว ให้ดูลอย */
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
   background: #f9fafb;
 }
@@ -412,7 +326,7 @@ const saveChecklist = () => {
 }
 
 .btn-remark {
-  background: #ff6b81; /* แดงอมชมพูคล้าย mockup */
+  background: #ff6b81; /* แดงอมชมพู */
   color: #ffffff;
 }
 
@@ -427,6 +341,15 @@ const saveChecklist = () => {
 
 .btn-save:hover {
   background: #4fb759;
+}
+
+/* input text สำหรับ "อื่นๆ" */
+.input-text {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 6px 8px;
+  font-size: 0.9rem;
 }
 
 /* Popup หมายเหตุ */
@@ -494,11 +417,6 @@ const saveChecklist = () => {
 
 .mt-12 {
   margin-top: 12px;
-}
-
-/* margin-top เพิ่มสำหรับตารางใหม่ */
-.mt-24 {
-  margin-top: 24px;
 }
 
 .file-name {

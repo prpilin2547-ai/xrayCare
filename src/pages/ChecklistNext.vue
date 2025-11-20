@@ -1,11 +1,8 @@
 <template>
-  <!-- ใช้ MainLayout ครอบแทนการทำ sidebar / topbar เอง -->
   <MainLayout>
     <div class="checklist-page">
-      <!-- หัวข้อ CHECKLIST -->
       <h1 class="page-title">CHECKLIST</h1>
 
-      <!-- แถวแคปซูลสีส้มด้านบน (ชื่อเครื่อง / รุ่น / ห้อง / วันที่ / ผู้ทดสอบ) -->
       <div class="pill-row">
         <div class="pill pill-main">
           {{ selectedDevice.name }}
@@ -24,33 +21,28 @@
         </div>
       </div>
 
-      <!-- กล่องเนื้อหาขาวตรงกลาง (เหมือนกระดาษใน mockup) -->
       <div class="content-panel">
         <p class="section-label">Dairy check</p>
 
-        <!-- ตารางบันทึกการตรวจ (ของเดิม) -->
+        <!-- ตารางเดิม: การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
-              <!-- แถวหัวบนสุด -->
               <tr class="row-header-main">
                 <td colspan="3" class="text-center">
                   แบบบันทึก : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
                 </td>
               </tr>
 
-              <!-- แถวหัวคอลัมน์ -->
               <tr class="row-header-columns">
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
               </tr>
 
-              <!-- แถวรายการเช็ค -->
               <tr v-for="item in checklistItems" :key="item.id">
-                <td class="cell-label">
-                  {{ item.label }}
-                </td>
+                <td class="cell-label">{{ item.label }}</td>
+
                 <td class="text-center">
                   <input
                     type="radio"
@@ -59,6 +51,7 @@
                     v-model="item.result"
                   />
                 </td>
+
                 <td class="text-center">
                   <input
                     type="radio"
@@ -72,22 +65,25 @@
           </table>
         </div>
 
-        <!-- ⭐ ตารางใหม่ : แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
+        <!-- ⭐ ตารางใหม่: แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
         <div class="table-wrapper mt-24">
           <table class="check-table">
             <tbody>
+              <!-- หัวตาราง -->
               <tr class="row-header-main">
                 <td colspan="3" class="text-center">
                   แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
                 </td>
               </tr>
 
+              <!-- หัวคอลัมน์ -->
               <tr class="row-header-columns">
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
               </tr>
 
+              <!-- แถวรายการทดสอบ -->
               <tr>
                 <td class="cell-label">
                   ผลการทดสอบ
@@ -112,21 +108,22 @@
             </tbody>
           </table>
         </div>
-        <!-- ⭐ จบตารางการลบแผ่นเพลท -->
+        <!-- ⭐ จบตารางใหม่ -->
 
         <!-- ปุ่มด้านล่างขวา -->
         <div class="actions">
           <button class="btn-remark" @click="openRemarkModal">
             หมายเหตุ
           </button>
-          <button class="btn-save" @click="saveChecklist">
-            บันทึก
+
+          <button class="btn-next" @click="goNext">
+            ถัดไป
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Popup หมายเหตุ (ทับทั้งหน้า) -->
+    <!-- Popup หมายเหตุ -->
     <div
       v-if="showRemarkModal"
       class="modal-backdrop"
@@ -148,6 +145,7 @@
 
           <label class="field-label mt-12">แนบไฟล์รูปภาพ</label>
           <input type="file" accept="image/*" @change="onFileChange" />
+
           <p v-if="remarkFileName" class="file-name">
             ไฟล์ที่เลือก: {{ remarkFileName }}
           </p>
@@ -157,24 +155,22 @@
           <button class="btn-cancel" @click="closeRemarkModal">
             ยกเลิก
           </button>
+
           <button class="btn-save-popup" @click="saveRemark">
             บันทึก
           </button>
         </div>
       </div>
     </div>
+    
   </MainLayout>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-/**
- * สมมติหน้านี้ถูกเรียกจาก dashboard พร้อมข้อมูลเครื่อง และชื่อ user
- * ถ้ายังไม่ได้ต่อจริง ให้ใช้ค่า default ไปก่อน
- */
 const props = defineProps({
   selectedDevice: {
     type: Object,
@@ -191,17 +187,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const route = useRoute()
-const equipment = route.params.equipment
 
-// อักษรย่อ user สำหรับ avatar (ยังไม่ได้ใช้ใน template แต่เก็บไว้ได้)
-const initials = computed(() => {
-  const parts = props.currentUserName.trim().split(' ')
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
-  return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
-})
-
-// วันที่วันนี้แบบอัตโนมัติ
 const todayText = computed(() => {
   const d = new Date()
   return d.toLocaleDateString('th-TH', {
@@ -211,7 +197,6 @@ const todayText = computed(() => {
   })
 })
 
-// รายการ checklist เดิม
 const checklistItems = ref([
   {
     id: 'powerCable',
@@ -236,10 +221,10 @@ const checklistItems = ref([
   }
 ])
 
-// ⭐ แบบบันทึกการลบแผ่นเพลท (ผ่าน / ไม่ผ่าน)
-const plateEraseResult = ref('') // 'pass' | 'fail' | ''
+// ⭐ ผลทดสอบการลบแผ่นเพลท (ผ่าน/ไม่ผ่าน)
+const plateEraseResult = ref('') // 'pass' | 'fail'
 
-// popup หมายเหตุ
+// --- โมดอลหมายเหตุ ---
 const showRemarkModal = ref(false)
 const remarkText = ref('')
 const remarkFile = ref(null)
@@ -248,55 +233,36 @@ const remarkFileName = computed(() =>
   remarkFile.value ? remarkFile.value.name : ''
 )
 
-const currentUserName = computed(() => props.currentUserName)
-
 const openRemarkModal = () => {
   showRemarkModal.value = true
 }
-
 const closeRemarkModal = () => {
   showRemarkModal.value = false
 }
-
-const onFileChange = (event) => {
-  const file = event.target.files[0]
-  remarkFile.value = file || null
+const onFileChange = (e) => {
+  remarkFile.value = e.target.files[0]
 }
-
 const saveRemark = () => {
-  // ตอนนี้แค่ log ดู ยังไม่มี backend
   console.log('หมายเหตุ:', remarkText.value)
-  console.log('ไฟล์แนบ:', remarkFile.value)
+  console.log('ไฟล์:', remarkFile.value)
   showRemarkModal.value = false
 }
 
-const saveChecklist = () => {
-  const payload = {
-    device: props.selectedDevice,
-    date: todayText.value,
-    user: props.currentUserName,
-    checklist: checklistItems.value,
-    remark: remarkText.value
-    // ถ้าภายหลังอยากบันทึกผลลบแผ่นเพลทไป backend ด้วย:
-    // plateErase: plateEraseResult.value
-  }
-
-  console.log('ข้อมูลที่ต้องบันทึก (frontend เท่านั้น):', payload)
-
-  // เด้งกลับหน้า dashboard (ปรับ path ตาม router ของโปรเจกต์คุณ)
-  router.push('/dashboard')
+// ⭐ ปุ่มถัดไป
+const goNext = () => {
+  console.log('ข้อมูล checklist:', checklistItems.value)
+  console.log('ผลการลบแผ่นเพลท:', plateEraseResult.value)
+  router.push('/monthly-check') // ปรับตามเส้นทางของคุณ
 }
 </script>
 
 <style scoped>
-/* พื้นที่ทำงานหลักของหน้า (content ใน MainLayout) */
 .checklist-page {
   background: #ffffff;
   min-height: calc(100vh - 56px);
   padding: 24px 32px 32px;
 }
 
-/* หัวข้อ CHECKLIST */
 .page-title {
   font-size: 1.4rem;
   font-weight: 700;
@@ -305,7 +271,6 @@ const saveChecklist = () => {
   margin-bottom: 16px;
 }
 
-/* แถวแคปซูลด้านบน */
 .pill-row {
   display: flex;
   flex-wrap: wrap;
@@ -320,23 +285,19 @@ const saveChecklist = () => {
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 500;
-  white-space: nowrap;
 }
 
 .pill-main {
-  background: #ffb480;
-  color: #047857; /* เขียวตัวเครื่องใน mockup */
+  color: #047857;
   font-weight: 700;
 }
 
-/* กล่องเนื้อหากลาง (พื้นขาวเหมือนกระดาษ) */
 .content-panel {
   background: #ffffff;
   padding: 20px 24px 28px;
   box-shadow: 0 0 0 1px #e5e5e5;
 }
 
-/* หัวข้อ Dairy check */
 .section-label {
   font-size: 1rem;
   font-weight: 500;
@@ -344,45 +305,29 @@ const saveChecklist = () => {
   margin-bottom: 12px;
 }
 
-/* ตาราง */
 .table-wrapper {
-  border-radius: 0;
-  box-shadow: none;
-  overflow: hidden;
   border: 1px solid #d4d4d4;
 }
 
 .check-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
 }
 
 .check-table td {
   padding: 10px 12px;
-  vertical-align: top;
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* แถวหัวบนสุดสีฟ้า */
 .row-header-main td {
   font-weight: 700;
   background: #55b4ff;
   color: #ffffff;
 }
 
-/* หัวคอลัมน์ */
 .row-header-columns td {
-  font-weight: 600;
   background: #f3f4f6;
-}
-
-/* สีพื้นสลับแถว (ให้ดูลอยเหมือนในภาพ) */
-.check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
-  background: #f9fafb;
-}
-.check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
-  background: #e5e7eb;
+  font-weight: 600;
 }
 
 .cell-label {
@@ -393,7 +338,6 @@ const saveChecklist = () => {
   text-align: center;
 }
 
-/* ปุ่มด้านล่างขวา */
 .actions {
   margin-top: 20px;
   display: flex;
@@ -401,35 +345,35 @@ const saveChecklist = () => {
   gap: 10px;
 }
 
-.btn-remark,
-.btn-save {
+.btn-remark {
+  background: #ff6b81;
+  color: #ffffff;
   border: none;
   border-radius: 4px;
   padding: 8px 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
+}
+
+/* ⭐ ปุ่มถัดไป สีเหลือง */
+.btn-next {
+  background: #f7c948;
+  color: #111827;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 24px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.btn-remark {
-  background: #ff6b81; /* แดงอมชมพูคล้าย mockup */
-  color: #ffffff;
+.btn-next:hover {
+  background: #e0b63f;
 }
 
-.btn-remark:hover {
-  background: #e0556a;
+/* ระยะห่างตารางใหม่จากตารางแรก */
+.mt-24 {
+  margin-top: 24px;
 }
 
-.btn-save {
-  background: #65d46e;
-  color: #ffffff;
-}
-
-.btn-save:hover {
-  background: #4fb759;
-}
-
-/* Popup หมายเหตุ */
+/* Modal */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -496,11 +440,6 @@ const saveChecklist = () => {
   margin-top: 12px;
 }
 
-/* margin-top เพิ่มสำหรับตารางใหม่ */
-.mt-24 {
-  margin-top: 24px;
-}
-
 .file-name {
   font-size: 0.8rem;
   color: #6b7280;
@@ -532,7 +471,6 @@ const saveChecklist = () => {
   color: #ffffff;
 }
 
-/* responsive เล็กน้อย */
 @media (max-width: 768px) {
   .checklist-page {
     padding: 16px;
