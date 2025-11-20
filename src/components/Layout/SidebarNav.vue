@@ -44,10 +44,29 @@
         >
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Request</span>
+        </li> 
+        <li :class="{active: active === 'admindashboard'}" @click="$emit('navigate', 'admindashboard')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Admin Dashboard</span>
+        </li>
+        <li :class="{active: active === 'adminuseraccount'}" @click="$emit('navigate', 'adminuseraccount')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Admin UserAccount</span>
+        </li>
+        <li :class="{active: active === 'engineerdashboard'}" @click="$emit('navigate', 'engineerdashboard')">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Engineer Dashboard</span>
+        </li>
+        <li :class="{active: active === 'engineeranalytical'}" @click="$emit('navigate', 'engineeranalytical')">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>Engineer Analytical</span>
+        </li>
+        <li :class="{active: active === 'engineerrequest'}" @click="$emit('navigate', 'engineerrequest')">
+          <i class="fa-solid fa-code-pull-request"></i>
+          <span>Engineer Request</span>
         </li>
       </ul>
     </nav>
-
     <div class="sidebar-bottom">
       <button class="btn-logout" @click="$emit('navigate', 'logout')">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
