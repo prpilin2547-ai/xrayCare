@@ -28,6 +28,7 @@
               <td><input v-model="row.ei" class="form-control form-control-sm" /></td>
               <td><input v-model="row.ddi" class="form-control form-control-sm" /></td>
               <td><input v-model="row.pixelMean" class="form-control form-control-sm" /></td>
+
             </tr>
           </tbody>
         </table>
@@ -37,18 +38,15 @@
       <div class="mt-3 d-flex flex-column flex-md-row align-items-start gap-2">
         <div class="flex-grow-1">
           <label class="form-label small mb-1">หมายเหตุ</label>
-          <textarea
-            v-model="remark"
-            rows="2"
-            class="form-control form-control-sm"
-            placeholder="บันทึกรายละเอียดเพิ่มเติม..."
-          ></textarea>
+          <textarea v-model="remark" rows="2" class="form-control form-control-sm"
+            placeholder="บันทึกรายละเอียดเพิ่มเติม..."></textarea>
         </div>
         <div class="d-flex flex-column align-items-end gap-2 mt-2 mt-md-0">
           <!-- ✅ ปุ่มบันทึกสีเขียว -->
-          <button class="btn btn-success btn-sm fw-semibold" @click="emitSave">
+          <button type="button" class="btn btn-success btn-sm fw-semibold" @click="emitSave">
             บันทึก
           </button>
+
         </div>
       </div>
     </div>
@@ -57,6 +55,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   initial: Object,
@@ -64,6 +63,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save'])
+const router = useRouter()
 
 const createRows = () =>
   Array.from({ length: 4 }).map((_, idx) => ({
@@ -92,11 +92,20 @@ watch(
   }
 )
 
-// ฟอร์มสุดท้าย emit save ให้หน้า MonthlyCheckAll จัดการ router.push
+// บันทึก (frontend-only) -> emit ให้ parent เผื่อใช้ -> เด้งไป /dashboard
 const emitSave = () => {
-  emit('save', {
+  const payload = {
     rows: structuredClone(localRows),
     remark: remark.value
-  })
+  }
+
+  // 1) frontend "save" action (placeholder)
+  console.log('บันทึกข้อมูลเรียบร้อย (frontend)', payload)
+
+  // 2) emit ให้ parent หากต้องการให้ parent ทำงานเพิ่มเติม
+  emit('save', payload)
+
+  // 3) redirect ไปหน้า Dashboard (frontend only)
+  router.push('/dashboard')
 }
 </script>
