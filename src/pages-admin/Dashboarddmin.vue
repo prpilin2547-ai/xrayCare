@@ -8,7 +8,7 @@
       <div id="admin-section" class="section-container pb-3"> <!-- ลด padding ด้านล่าง -->
         
         <div class="dashboard-header-row">
-          <h2 class="page-title">Dashboard (Tech)</h2>
+          <h2 class="page-title">Dashboard (Tech) </h2>
           <div class="toggle-wrapper">
             <label class="toggle-label">
               <input type="checkbox" v-model="hasMachines" />
