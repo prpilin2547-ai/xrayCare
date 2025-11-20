@@ -12,7 +12,10 @@ import RequestForm from '../pages/RequestForm.vue'
 import ChecklistNext from '../pages/ChecklistNext.vue'
 import MonthlyCheckPage from '../pages/MonthlyCheckPage.vue'
 import F10LightCheckPage from '../pages/F10LightCheckPage.vue' 
-import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue' 
+import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue'
+import F12 from '../pages/F12.vue'
+import F9ProtectiveClothesForm from '../pages/F9ProtectiveClothesForm.vue'
+
 
 
 
@@ -56,6 +59,16 @@ const routes = [
     name: 'MonthlyCheckAll',
     component: MonthlyCheckAll,
     props: true      // ส่งค่า selectedDevice, currentUserName ได้
+  },
+  {
+    path: '/f12',
+    name: 'F12',
+    component: F12
+  },
+  {
+    path: '/f9',
+    name: 'F9ProtectiveClothesForm',
+    component: F9ProtectiveClothesForm
   }
 ]
 
