@@ -37,6 +37,11 @@ const activeMenu = computed(() => {
   if (route.path.startsWith('/export-pdf')) return 'export'
   if (route.path.startsWith('/profile')) return 'profile'
   if (route.path.startsWith('/requests')) return 'request'
+  if (route.path.startsWith('/admindashboard')) return 'admindashboard'
+  if (route.path.startsWith('/engineerdashboard')) return 'engineerdashboard'
+  if (route.path.startsWith('/analyticalen')) return 'engineeranalytical'
+  if (route.path.startsWith('/requesten')) return 'engineerrequest'
+  if (route.path.startsWith('/adminuseraccount')) return 'adminuseraccount'
   return ''
 })
 
@@ -50,7 +55,12 @@ const onNavigate = (menu) => {
     case 'analytical':router.push('/analytics'); break
     case 'request':   router.push('/requests'); break // ยังเป็น mock
     case 'profile':   router.push('/profile'); break
+    case 'admindashboard': router.push('/admindashboard'); break
+    case 'engineerdashboard': router.push('/engineerdashboard'); break
     case 'logout':    router.push('/login'); break
+    case 'engineeranalytical': router.push('/analyticalen'); break
+    case 'engineerrequest': router.push('/requesten'); break
+    case 'adminuseraccount': router.push('/adminuseraccount'); break
   }
 }
 </script>

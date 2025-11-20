@@ -1,9 +1,7 @@
 <template>
-  <MainLayout>
+    <MainLayout>
     <div class="page">
-      <h2 class="page-title">Analytical</h2>
-
-      <div class="panel">
+       <div class="panel">
         <div class="panel-header">
           <h3>สรุปสถานะการแจ้งซ่อม</h3>
         </div>
@@ -29,7 +27,6 @@
           </div>
         </div>
       </div>
-
       <div class="panel">
         <div class="panel-header">
           <h3>สรุปสถานะการแจ้งซ่อม</h3>
@@ -58,20 +55,15 @@
           </div>
         </div>
       </div>
-
       <div class="summary-strip">
         <span class="summary-label">สรุป :</span>
         <span class="summary-text">
           แสดงตัวอย่างพื้นที่สำหรับสรุปผลวิเคราะห์ เช่น อัตราการเกิดปัญหา, แนวโน้มคุณภาพ QC และ RFR
         </span>
       </div>
-    </div>
-  </MainLayout>
+    </div> 
+    </MainLayout>
 </template>
-
-<script setup>
-import MainLayout from '../components/Layout/MainLayout.vue'
-</script>
 
 <style scoped>
 .page {
@@ -82,6 +74,7 @@ import MainLayout from '../components/Layout/MainLayout.vue'
 
 .page-title {
   margin: 0;
+  gap: 18px;
 }
 
 .panel {
@@ -210,3 +203,7 @@ import MainLayout from '../components/Layout/MainLayout.vue'
   font-weight: 600;
 }
 </style>
+
+<script setup>
+import MainLayout from '../components/Layout/MainLayout.vue';
+</script>

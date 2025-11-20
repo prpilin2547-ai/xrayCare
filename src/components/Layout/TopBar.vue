@@ -12,7 +12,7 @@
 
 <script setup>
 defineProps({
-  role: {
+  role: { 
     type: String,
     default: 'Tech'
   }
