@@ -186,8 +186,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
+  initial: Object,
+  currentUserName: String,
   selectedDevice: {
     type: Object,
     default: () => ({
@@ -201,6 +204,9 @@ const props = defineProps({
     default: 'Demo User'
   }
 })
+
+const emit = defineEmits(['save'])
+const router = useRouter()
 
 const todayText = computed(() => {
   const d = new Date()
@@ -287,17 +293,18 @@ const saveRemark = () => {
 
 /* บันทึกฟอร์ม (frontend เท่านั้น) */
 const saveForm = () => {
-  const payload = {
-    device: props.selectedDevice,
-    date: todayText.value,
-    user: props.currentUserName,
-    header: formHeader.value,
-    measurements: measurements.value,
-    iavAvg: iavAvg.value,
-    ibgAvg: ibgAvg.value,
-    ilbd: ilbd.value,
-    remark: remarkText.value
-  }
+  // const payload = {
+  //   device: props.selectedDevice,
+  //   date: todayText.value,
+  //   user: props.currentUserName,
+  //   header: formHeader.value,
+  //   measurements: measurements.value,
+  //   iavAvg: iavAvg.value,
+  //   ibgAvg: ibgAvg.value,
+  //   ilbd: ilbd.value,
+  //   remark: remarkText.value
+  // }
+  router.push('/dashboard')
 
   console.log('📄 F10 Light Intensity Check payload:', payload)
   alert('บันทึกข้อมูลบนหน้าเว็บเรียบร้อย (ยังไม่ส่งเข้า backend)')
