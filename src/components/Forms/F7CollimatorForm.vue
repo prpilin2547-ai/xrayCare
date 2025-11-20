@@ -4,35 +4,11 @@
       <h5 class="card-title mb-3">
         แบบบันทึก F7-1 : การทดสอบ Collimator and Beam Alignment
       </h5>
-      <!-- <p class="text-muted mb-3">ความถี่ : ทุก 6 เดือน</p> -->
-
-      <!-- ข้อมูลทั่วไป -->
-      <div class="mb-3 row g-2">
-        <div class="col-md-6">
-          <label class="form-label small mb-1">เครื่องเอกซเรย์ชื่อ</label>
-          <input v-model="form.machineName" class="form-control form-control-sm" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label small mb-1">รุ่น</label>
-          <input v-model="form.machineModel" class="form-control form-control-sm" />
-        </div>
-      </div>
-
-      <div class="mb-3 row g-2">
-        <div class="col-md-6">
-          <label class="form-label small mb-1">วัน/เดือน/ปี ที่ทดสอบ</label>
-          <input v-model="form.testDate" class="form-control form-control-sm" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label small mb-1">ผู้ทดสอบ</label>
-          <input v-model="form.tester" class="form-control form-control-sm" />
-        </div>
-      </div>
 
       <!-- วิธีทดสอบ (radio) -->
       <div class="border rounded-3 p-3 mb-3">
-        <div class="mb-2 fw-semibold small">ผู้ทดสอบ :</div>
-        <div class="form-check small" v-for="opt in tubeOptions" :key="opt.value">
+        <div class="form-check small" v-for="(opt, idx) in tubeOptions" :key="opt.value">
+          <hr v-if="idx === 2" class="my-2" />
           <input
             class="form-check-input"
             type="radio"
@@ -46,40 +22,45 @@
         </div>
       </div>
 
-      <!-- ตารางความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ -->
+      <!-- ตารางความเหลื่อมล้ำ -->
+      <div class="mb-1 small">
+        ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)<br />
+        + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง  - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
+      </div>
+
       <div class="table-responsive mb-3">
         <table class="table table-bordered align-middle small mb-0">
-          <thead class="table-light">
+          <thead class="table-light text-center">
             <tr>
-              <th class="w-25">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ</th>
-              <th class="text-center">Pass</th>
-              <th class="text-center">Fail</th>
-              <th class="text-center">Note</th>
+              <th class="w-50 text-start">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ</th>
+              <th class="w-10">Pass</th>
+              <th class="w-10">Fail</th>
+              <th class="w-30"><em>Note</em></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in form.lightMismatch" :key="row.id">
               <td>
-                {{ row.label }} <span class="text-muted">cm</span>
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                  <span>{{ row.label }}</span>
+                  <div class="input-group input-group-sm" style="max-width: 140px;">
+                    <input
+                      v-model="row.value1"
+                      type="text"
+                      class="form-control form-control-sm text-end"
+                    />
+                    <span class="input-group-text small">cm</span>
+                  </div>
+                </div>
+              </td>
+
+              <td class="text-center">
+                <input type="checkbox" class="form-check-input" v-model="row.pass" />
               </td>
               <td class="text-center">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  :name="`lm-${row.id}`"
-                  value="pass"
-                  v-model="row.result"
-                />
+                <input type="checkbox" class="form-check-input" v-model="row.fail" />
               </td>
-              <td class="text-center">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  :name="`lm-${row.id}`"
-                  value="fail"
-                  v-model="row.result"
-                />
-              </td>
+
               <td>
                 <input
                   v-model="row.note"
@@ -93,42 +74,43 @@
       </div>
 
       <!-- Beam Alignment -->
-      <div class="table-responsive mb-3 mt-3">
+      <div class="mt-3 mb-1 small">
+        Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา
+      </div>
+
+      <div class="table-responsive mb-3">
         <table class="table table-bordered align-middle small mb-0">
-          <thead class="table-light">
-            <tr>
-              <th colspan="4">
-                Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา
-              </th>
-            </tr>
+          <thead class="table-light text-center">
             <tr>
               <th class="w-25">Beam Alignment</th>
-              <th class="text-center">Pass</th>
-              <th class="text-center">Fail</th>
-              <th class="text-center">Note</th>
+              <th class="w-10">Pass</th>
+              <th class="w-10">Fail</th>
+              <th class="w-55"><em>Note</em></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in form.beamAlignment" :key="row.id">
-              <td>{{ row.label }}</td>
-              <td class="text-center">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  :name="`ba-${row.id}`"
-                  value="pass"
-                  v-model="row.result"
-                />
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="beam-category"
+                    :value="row.id"
+                    v-model="form.selectedBeamCategory"
+                  />
+                  <span>{{ row.label }}</span>
+                </div>
               </td>
+
               <td class="text-center">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  :name="`ba-${row.id}`"
-                  value="fail"
-                  v-model="row.result"
-                />
+                <input type="checkbox" class="form-check-input" v-model="row.pass" />
               </td>
+
+              <td class="text-center">
+                <input type="checkbox" class="form-check-input" v-model="row.fail" />
+              </td>
+
               <td>
                 <input
                   v-model="row.note"
@@ -141,7 +123,7 @@
         </table>
       </div>
 
-      <!-- หมายเหตุ + ปุ่มถัดไป -->
+      <!-- หมายเหตุ -->
       <div class="mt-3 d-flex flex-column flex-md-row align-items-start gap-2">
         <div class="flex-grow-1">
           <label class="form-label small mb-1">หมายเหตุ</label>
@@ -178,23 +160,24 @@ const tubeOptions = [
   { value: 'coins', label: 'ทดสอบโดย Coins for x-ray to light-beam alignment test' }
 ]
 
-const form = () => ({
+const form = ref({
   machineName: '',
   machineModel: '',
   testDate: '',
   tester: props.currentUserName || '',
   tubeType: '',
   lightMismatch: [
-    { id: 'topLeft', label: 'ด้านบนโบก', result: '', note: '' },
-    { id: 'topRight', label: 'ด้านบนโทค', result: '', note: '' },
-    { id: 'left', label: 'ด้านขวา', result: '', note: '' },
-    { id: 'right', label: 'ด้านล่าง', result: '', note: '' }
+    { id: 'anode', label: 'ด้านแอโนด', value1: '', pass: false, fail: false, note: '' },
+    { id: 'cathode', label: 'ด้านแคโทด', value1: '', pass: false, fail: false, note: '' },
+    { id: 'top', label: 'ด้านบน', value1: '', pass: false, fail: false, note: '' },
+    { id: 'bottom', label: 'ด้านล่าง', value1: '', pass: false, fail: false, note: '' }
   ],
   beamAlignment: [
-    { id: 'lt1_5', label: '< 1.5°', result: '', note: '' },
-    { id: 'btw', label: '1.5° &lt; X &lt; 3°', result: '', note: '' },
-    { id: 'ge3', label: '≥ 3°', result: '', note: '' }
+    { id: 'lt1_5', label: '< 1.5°', pass: false, fail: false, note: '' },
+    { id: 'btw', label: '1.5° < X < 3°', pass: false, fail: false, note: '' },
+    { id: 'ge3', label: '≥ 3°', pass: false, fail: false, note: '' }
   ],
+  selectedBeamCategory: '',
   remark: ''
 })
 
