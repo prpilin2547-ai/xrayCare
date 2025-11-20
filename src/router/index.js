@@ -47,7 +47,7 @@ const routes = [
   { path: '/engineerdashboard', component: DashboardEN },
   { path: '/analyticalen', component: AnalyticalEN },
   { path: '/requesten', component: RequestEN },
-  { path: '/adminuseraccount', component: Adminuseraccount }
+  { path: '/adminuseraccount', component: Adminuseraccount },
   { path: '/requests/new', component: RequestForm },
   {
     path: '/checklist-next',
