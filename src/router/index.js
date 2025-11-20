@@ -10,6 +10,10 @@ import UserProfile from '../pages/UserProfile.vue'
 import RequestList from '../pages/RequestList.vue'
 import RequestForm from '../pages/RequestForm.vue'
 import Dashboarddmin from '../pages-admin/Dashboarddmin.vue'
+import DashboardEN from '../page-engineer/DashboardEN.vue'
+import AnalyticalEN from '../page-engineer/AnalyticalEN.vue'
+import RequestEN from '../page-engineer/RequestEN.vue'
+import Adminuseraccount from '../pages-admin/Adminuseraccount.vue'
 
 
 const routes = [
@@ -29,7 +33,11 @@ const routes = [
   { path: '/profile', component: UserProfile },
   { path: '/requests', component: RequestList },
   { path: '/requests/new', component: RequestForm },
-  { path: '/admindashboard', component: Dashboarddmin }
+  { path: '/admindashboard', component: Dashboarddmin },
+  { path: '/engineerdashboard', component: DashboardEN },
+  { path: '/analyticalen', component: AnalyticalEN },
+  { path: '/requesten', component: RequestEN },
+  { path: '/adminuseraccount', component: Adminuseraccount }
 ]
 
 
