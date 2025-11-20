@@ -12,6 +12,7 @@ import RequestForm from '../pages/RequestForm.vue'
 import ChecklistNext from '../pages/ChecklistNext.vue'
 import MonthlyCheckPage from '../pages/MonthlyCheckPage.vue'
 import F10LightCheckPage from '../pages/F10LightCheckPage.vue' 
+import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue' 
 
 
 
@@ -49,6 +50,12 @@ const routes = [
     name: 'MonthlyCheckLight',
     component: F10LightCheckPage,
     props: true     // เพื่อส่งข้อมูลเครื่องจาก Dashboard ได้
+  },
+   {
+    path: '/monthly-check-all',
+    name: 'MonthlyCheckAll',
+    component: MonthlyCheckAll,
+    props: true      // ส่งค่า selectedDevice, currentUserName ได้
   }
 ]
 
