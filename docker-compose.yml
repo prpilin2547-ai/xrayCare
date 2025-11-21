@@ -1,0 +1,39 @@
+version: "3.9"
+networks:
+  xraycare1:
+
+services:
+  api.xraycare:
+    container_name: xraycare_api
+    build:
+      context: .
+      dockerfile: api/api.xraycare/Dockerfile
+    restart: always
+    ports:
+      - "8001:80"
+    depends_on:
+      - postgres
+    networks:
+      - xraycare1
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=postgres;Username=xrayuser;Password=xraycare1234"
+
+  postgres:
+    image: postgres:16
+    container_name: xraycare_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: xrayuser
+      POSTGRES_PASSWORD: xraycare1234
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - xraycare1
+
+volumes:
+  postgres_data:
