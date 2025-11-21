@@ -20,7 +20,7 @@ import F10LightCheckPage from '../pages/F10LightCheckPage.vue'
 import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue'
 import F12 from '../pages/F12.vue'
 import F9ProtectiveClothesForm from '../pages/F9ProtectiveClothesForm.vue'
-
+import F11 from '../pages/F11.vue'
 
 
 
@@ -80,6 +80,11 @@ const routes = [
     path: '/f9',
     name: 'F9ProtectiveClothesForm',
     component: F9ProtectiveClothesForm
+  },
+  {
+    path: '/f11',
+    name: 'F11Page',
+    component: F11
   }
 ]
 
