@@ -1,7 +1,7 @@
 <template>
   <MainLayout>
     <div class="page">
-      <h2 class="page-title">Export PDF</h2>
+      <!-- เอา Export PDF ออกแล้ว -->
 
       <!-- หน้า 1 : ฟอร์ม -->
       <div v-if="!isPreviewVisible" class="form-section-wrapper">
@@ -33,6 +33,8 @@
                   <option value="1m">1 month</option>
                   <option value="3m">3 months</option>
                   <option value="6m">6 months</option>
+                  <option value="6m">แบบบันทึกผลการวัดความหนาผู้ป่วย</option>
+                  <option value="6m">แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์</option>
                 </select>
                 <span class="arrow">▼</span>
               </div>
@@ -115,27 +117,27 @@
           <!-- กระดาษ A4 ตามฟิกมา -->
           <div class="a4-paper">
             <h3 class="preview-title">
-              เอกสารการ Maintenance เครื่องเอกซเรย์รังสีวินิจฉัย
+              การ Maintenance เครื่องเอกซเรย์รังสีวินิจฉัย
             </h3>
 
-            <!-- แถบ pill 3 อัน -->
             <div class="info-chips-row">
-              <div class="info-chip">
-                {{ displayedMachine }}
-              </div>
-              <div class="info-chip">
-                {{ displayedChecklistType }}
-              </div>
-              <div class="info-chip">
-                ข้อมูล ณ วันที่ {{ displayedDate }}
-              </div>
+            <div class="info-chip">
+              X-ray machine: {{ displayedMachine }}
             </div>
+
+            <div class="info-chip">
+              Checklist type: {{ displayedChecklistType }}
+            </div>
+
+            <div class="info-chip">
+              ข้อมูล ณ วันที่ {{ displayedDate }}
+            </div>
+          </div>
 
             <!-- กล่องรายละเอียดใหญ่ -->
             <div class="detail-box">
-              <p class="detail-label">รายละเอียด</p>
               <div class="detail-area">
-                <!-- ถ้าอยากให้ว่างเหมือนฟิกมาจริง ๆ สามารถลบข้อความนี้ได้ -->
+                <p class="detail-label-inside">รายละเอียด</p>
                 <p class="placeholder-content">
                   [แสดงรายการตรวจสอบ Daily/Monthly ในรูปแบบตารางหรือรายการ]
                 </p>
@@ -145,12 +147,12 @@
             <!-- ลายเซ็นล่าง -->
             <div class="signature-section">
               <p class="signature-line">(..............................................)</p>
-              <p class="signature-label">ผู้ตรวจสอบ</p>
+              <p class="signature-label">ผู้ทดสอบ</p>
               <p class="signature-line">ตำแหน่ง..............................................</p>
             </div>
           </div>
 
-          <!-- ปุ่ม Export ด้านล่างขวาใกล้กระดาษ ตามฟิกมา -->
+          <!-- ปุ่ม Export ด้านล่างขวาใกล้กระดาษ -->
           <div class="export-btn-wrapper">
             <button class="btn-export" @click="exportFile">
               Export File
@@ -289,7 +291,6 @@ const selectDate = (dateObj) => {
 }
 
 const openCalendarFromInput = () => {
-  // ถ้ามีค่าวันที่แล้ว ให้ calendar กระโดดไปเดือนนั้น
   const parsed = parseDateString(date.value)
   if (parsed) {
     currentMonth.value = parsed.getMonth()
@@ -310,7 +311,6 @@ const onlyNumber = (e) => {
 }
 
 const formatDate = () => {
-  // ลบทุกอย่างที่ไม่ใช่ตัวเลข
   let value = date.value.replace(/\D/g, '')
   value = value.substring(0, 8) // DDMMYYYY
 
@@ -381,10 +381,9 @@ const displayedDate = computed(() => {
   padding: 20px 0;
 }
 
+/* page-title ถูกลบออกแล้ว แต่จะเก็บ style ไว้ได้ */
 .page-title {
-  margin: 0 0 10px 0;
-  font-size: 1.8rem;
-  color: #374151;
+  display: none;
 }
 
 .form-section-wrapper,
@@ -583,7 +582,7 @@ select {
   position: relative;
 }
 
-/* ลูกศรย้อนกลับ */
+/* ลูกศรย้อนกลับ – ขยับไปซ้ายอีก */
 .back-btn {
   width: 32px;
   height: 32px;
@@ -595,7 +594,10 @@ select {
   justify-content: center;
   font-size: 1rem;
   cursor: pointer;
-  margin-bottom: 8px;
+
+  position: absolute;
+  top: 10px;
+  left: -60px;
 }
 
 /* กระดาษ A4 */
@@ -606,15 +608,18 @@ select {
   border: 1px solid #d4d4d8;
   background-color: #ffffff;
   margin: 0 auto;
-  padding: 32px 40px 36px;
+  padding: 12px 40px 36px; /* padding-top น้อยลงให้หัวข้อขึ้นสูง */
 }
 
 .preview-title {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
+  /* ปรับขนาดตัวอักษรให้เล็กลง และบังคับให้อยู่บรรทัดเดียว */
+  font-size: 1rem;        /* เล็กลงจากเดิม (จะลอง 0.95rem ก็ได้) */
+  white-space: nowrap;    /* ไม่ให้ตัดบรรทัด */
 }
 
-/* แถบ pill */
+/* แถบข้อความ 3 บรรทัดด้านบน (เอากรอบ pill ออก) */
 .info-chips-row {
   display: flex;
   flex-direction: column;
@@ -623,22 +628,17 @@ select {
 }
 
 .info-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 14px;
-  border-radius: 999px;
-  border: 1px solid #9ca3af;
+  display: block;       /* ไม่ต้องเป็น pill แล้ว */
+  padding: 0;           /* ตัด padding ออก */
+  border: none;         /* ลบกรอบ */
+  border-radius: 0;     /* ลบโค้งมุม */
+  background: transparent; 
   font-size: 0.8rem;
 }
 
 /* กล่องรายละเอียดใหญ่ */
 .detail-box {
   margin-top: 10px;
-}
-
-.detail-label {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
 }
 
 .detail-area {
@@ -648,26 +648,32 @@ select {
   padding: 10px 12px;
 }
 
+.detail-label-inside {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
 .placeholder-content {
   font-size: 0.8rem;
   color: #6b7280;
 }
 
-/* ลายเซ็น */
+/* ลายเซ็น – ชิดขวาแต่ตัวอักษรกึ่งกลางตรงกัน */
 .signature-section {
   margin-top: 60px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.signature-line {
-  margin: 8px 0 2px;
-}
-
+.signature-line,
 .signature-label {
-  margin: 0;
+  width: 260px;
+  text-align: center;
+  margin: 4px 0;
 }
 
-/* ปุ่ม Export ด้านล่างขวาใกล้กระดาษ */
+/* ปุ่ม Export File – เพิ่มกรอบสีเทา */
 .export-btn-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -677,7 +683,7 @@ select {
 .btn-export {
   padding: 8px 24px;
   border-radius: 999px;
-  border: none;
+  border: 1px solid #d1d5db;
   background-color: #e5e7eb;
   font-size: 0.9rem;
   cursor: pointer;

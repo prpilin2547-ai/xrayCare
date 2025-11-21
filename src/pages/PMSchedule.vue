@@ -6,11 +6,8 @@
           <h2>PM Schedule</h2>
         </div>
 
-        <!-- กล่องเนื้อหากลางหน้า -->
         <div class="col-lg-6 col-md-8">
-          <!-- ตัดกรอบใหญ่รอบนอก เหลือแค่ wrapper โปร่งใส -->
           <div class="pm-card position-relative">
-
             <!-- การ์ดวันที่ด้านบน -->
             <div class="card date-card mb-3 mx-auto">
               <div class="date-inner">
@@ -57,113 +54,175 @@
                   class="day-cell"
                   :class="{
                     empty: !cell.day,
-                    today: isToday(cell.day),
-                    'has-monthly-check': isMonthlyCheckCell(cell)
+                    today: isToday(cell.day)
                   }"
+                  @click="cell.day && openDayPopup(cell)"
                 >
                   <div v-if="cell.day" class="day-number">
                     <span>{{ cell.day }}</span>
                   </div>
 
-                  <!-- ป้าย Monthly check -->
+                  <!-- แท็ก Monthly check (ฟ้า) -->
                   <div
-                    v-if="isMonthlyCheckCell(cell)"
-                    class="monthly-tag"
-                    @click.stop="openMonthlyPopup(getCellDate(cell))"
+                    v-if="hasMonthlyTag(cell)"
+                    class="monthly-tag monthly-tag-blue"
                   >
                     <span class="star">★</span>
-                    <span>Monthly check</span>
+                    <span>Monthly Check</span>
+                  </div>
+
+                  <!-- แท็ก Daily (แดง) วันที่ 20/11/2025 -->
+                  <div
+                    v-if="isDailySpecialCell(cell)"
+                    class="monthly-tag monthly-tag-red"
+                  >
+                    <span class="star">★</span>
+                    <span>Daily Check</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- ไอคอนตั้งค่า -->
-            <div class="settings-icon" @click.stop="openSettingsPopup">
-              ⚙️
-            </div>
-
+            <!-- overlay -->
             <div v-if="showAnyPopup" class="popup-overlay" @click="closeAllPopups"></div>
 
-            <!-- Popup Monthly + Add -->
-            <div v-if="showMonthlyPopup" class="popup-row" @click.stop>
-              <!-- กล่องส้ม Monthly Check -->
-              <div class="popup-box popup-monthly text-start">
+            <!-- Popup วัน (สีชมพู) + Add -->
+            <div v-if="showDayPopup" class="popup-row" @click.stop>
+              <div class="popup-box popup-day text-start">
                 <div class="popup-header d-flex justify-content-between align-items-center">
-                  <h5 class="mb-0 fw-bold">Monthly Check</h5>
-                  <button class="btn btn-danger btn-sm rounded-circle plus-btn" @click.stop="toggleAddPopup">+</button>
+                  <h5 class="mb-0 fw-bold">
+                    {{ dayPopupTitle }}
+                  </h5>
+                  <div class="d-flex align-items-center gap-2">
+                    <!-- settings -->
+                    <button
+                      class="icon-btn rounded-circle"
+                      @click.stop="openSettingsPopup"
+                    >
+                      ⚙️
+                    </button>
+
+                    <!-- ปุ่มลบทั้ง Monthly + events ของวันนั้น // NEW -->
+                    <button
+                      class="icon-btn icon-btn-red rounded-circle"
+                      @click.stop="clearDayData"
+                      title="ลบข้อมูลของวันนี้"
+                    >
+                      🗑
+                    </button>
+
+                    <!-- plus -->
+                    <button
+                      class="icon-btn icon-btn-red rounded-circle"
+                      @click.stop="toggleAddPopup"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
 
                 <hr class="popup-divider" />
 
                 <div class="popup-content">
-                  <p class="mb-1 text-danger fw-bold">
-                    {{ frequencyText }}
+                  <!-- บรรทัดความถี่ -->
+                  <p
+                    v-if="dayPopupFrequencyText"
+                    class="mb-1 text-danger fw-bold"
+                  >
+                    {{ dayPopupFrequencyText }}
                   </p>
 
-                  <p class="mb-2">
-                    {{ monthlyCheckFullText }}
+                  <!-- บรรทัดวัน-เดือน-ปี -->
+                  <p v-if="dayPopupDateText" class="mb-2">
+                    {{ dayPopupDateText }}
                   </p>
 
-                  <p class="fw-bold mb-1">รายการ maintenance</p>
-                  <ul class="mb-0 popup-list">
-                    <li v-for="(task, idx) in monthlyTasks" :key="idx">
-                     {{ task }}
-                    </li>
-                  </ul>
+                  <!-- กรณีพิเศษ Daily วันที่ 20/11/2025 -->
+                  <template v-if="isDailySpecial">
+                    <p class="fw-bold mb-1">รายการที่ไม่ได้ทำ</p>
+                    <ul class="mb-0 popup-list">
+                      <li v-for="(task, idx) in dayTasks" :key="idx">
+                        <span class="task-text">{{ task }}</span>
+                      </li>
+                    </ul>
+                  </template>
+
+                  <!-- กรณีอื่น ๆ -->
+                  <template v-else>
+                    <!-- ถ้ามีรายการจริง ๆ ก็แสดงหัวข้อ "รายการ" -->
+                    <p v-if="dayTasks.length" class="fw-bold mb-1">รายการ</p>
+
+                    <!-- ถ้ายังไม่มีรายการ และยังไม่ได้ตั้ง Monthly Check เลย ค่อยแสดง "ไม่มีรายการ" -->
+                    <p v-else-if="!dayPopupMonthlyType" class="mb-0">ไม่มีรายการ</p>
+
+                    <ul v-if="dayTasks.length" class="mb-0 popup-list">
+                      <li
+                        v-for="(task, idx) in dayTasks"
+                        :key="idx"
+                      >
+                        <span class="task-text">{{ task }}</span>
+                        <!-- ปุ่มลบ event ทีละรายการ // NEW -->
+                        <button
+                          class="item-delete-btn"
+                          @click.stop="removeEvent(idx)"
+                          title="ลบรายการนี้"
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    </ul>
+                  </template>
+
+                  <!-- กล่องเพิ่ม event -->
+                  <div v-if="showAddPopup" class="add-box mt-3">
+                    <input
+                      v-model="newEventText"
+                      type="text"
+                      class="form-control form-control-sm mb-2"
+                      placeholder="ชื่อรายการ"
+                      @keyup.enter="handleAddEvent"
+                    />
+                    <div class="d-flex justify-content-end gap-3">
+                      <span class="add-action text-danger" @click="cancelAdd">
+                        ยกเลิก
+                      </span>
+                      <span class="add-action text-secondary" @click="handleAddEvent">
+                        เพิ่ม
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- กล่อง Add ด้านบนสีชมพูอ่อน -->
-              <div v-if="showAddPopup" class="popup-box popup-add text-start" @click.stop>
-                <div class="add-header d-flex justify-content-between mb-2">
-                  <span class="add-action text-danger">ยกเลิก</span>
-                  <span class="add-action text-dark">ใหม่</span>
-                  <span class="add-action text-secondary">เพิ่ม</span>
+              <!-- Popup Settings รอบ Monthly -->
+              <div
+                v-if="showSettingsPopup"
+                class="popup-box popup-settings text-start"
+                @click.stop
+              >
+                <h5 class="fw-bold mb-2">รอบการทำ Monthly Check</h5>
+                <hr class="popup-divider" />
+                <div class="mb-3">
+                  <label class="form-label mb-1">Type</label>
+                  <select
+                    v-model="settingsType"
+                    class="form-select form-select-sm"
+                  >
+                    <option value="1m">1 month</option>
+                    <option value="3m">3 months</option>
+                    <option value="6m">6 months</option>
+                  </select>
                 </div>
-
-                <div class="add-body">
-                  <input
-                    type="text"
-                    class="form-control form-control-sm add-input"
-                    placeholder="ชื่อ"
-                  />
+                <div class="text-end">
+                  <span
+                    class="text-danger fw-semibold save-text"
+                    @click="handleSaveSettings"
+                  >
+                    Save
+                  </span>
                 </div>
               </div>
             </div>
-
-            <!-- Popup ตั้งค่า -->
-            <div v-if="showSettingsPopup" class="popup-box popup-settings text-start" @click.stop>
-              <h5 class="fw-bold mb-2">กำหนดรอบ Monthly Check</h5>
-              <hr class="popup-divider" />
-
-              <div class="mb-3">
-                <label class="form-label mb-1">Date</label>
-                <input
-                  type="text"
-                  v-model="settingsDate"
-                  class="form-control form-control-sm"
-                  placeholder="DD/MM/YYYY"
-                  @input="formatSettingsDate"
-                />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label mb-1">Type</label>
-                <select v-model="settingsType" class="form-select form-select-sm">
-                  <option value="1m">1 month</option>
-                  <option value="3m">3 months</option>
-                  <option value="6m">6 months</option>
-                </select>
-              </div>
-
-              <div class="text-end">
-                <span class="text-danger fw-semibold save-text" @click="handleSaveSettings">
-                  save
-                </span>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -172,7 +231,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 const today = new Date()
@@ -180,12 +239,29 @@ const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth())
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const weekdayFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+const weekdayFull = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday'
 ]
-const STORAGE_KEY = 'pm-schedule-monthly-configs'
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
 
 const headerDateText = computed(() => {
   const d = today.getDate()
@@ -193,69 +269,9 @@ const headerDateText = computed(() => {
   const y = today.getFullYear()
   return `${d} ${m} ${y}`
 })
-
 const headerWeekdayText = computed(() => weekdayFull[today.getDay()])
 
-/* ----------------- เก็บรอบ Monthly check หลายชุด ----------------- */
-/*
-  แต่ละ config = {
-    startDate: Date,
-    intervalMonths: 1 | 3 | 6,
-    type: '1m' | '3m' | '6m'
-  }
-*/
-const monthlyConfigs = ref([])
-watch(
-  monthlyConfigs,
-  (newVal) => {
-    const plain = newVal.map(cfg => ({
-      ...cfg,
-      startDate: cfg.startDate.toISOString() // แปลง Date -> string เก็บใน localStorage
-    }))
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(plain))
-  },
-  { deep: true }
-)
-onMounted(() => {
-  const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return
-
-  try {
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) {
-      monthlyConfigs.value = arr.map(cfg => ({
-        ...cfg,
-        startDate: new Date(cfg.startDate) // แปลงกลับ string -> Date
-      }))
-    }
-  } catch (e) {
-    console.error('Failed to parse monthly configs from storage', e)
-  }
-})
-
-
-/* วันที่ของ monthly check ที่ถูกคลิก และ config ที่ใช้รอบนั้น */
-const selectedMonthlyDate = ref(null)
-const selectedMonthlyConfig = ref(null)
-
-const frequencyText = computed(() => {
-  if (!selectedMonthlyConfig.value) return ''
-  const m = selectedMonthlyConfig.value.intervalMonths
-  if (m === 1) return 'ทำประจำทุก 1 เดือน'
-  if (m === 6) return 'ทำประจำทุก 6 เดือน'
-  return 'ทำประจำทุก 3 เดือน'
-})
-
-const monthlyCheckFullText = computed(() => {
-  if (!selectedMonthlyDate.value) return ''
-  const d = selectedMonthlyDate.value.getDate()
-  const w = weekdayFull[selectedMonthlyDate.value.getDay()]
-  const m = monthNames[selectedMonthlyDate.value.getMonth()]
-  const y = selectedMonthlyDate.value.getFullYear()
-  return `${w} ${d} ${m} ${y}`
-})
-
-/* ทำให้ปฏิทินมี 42 ช่อง (6 แถว x 7 วัน) ทุกเดือน */
+/* ---------- calendar cells ---------- */
 const calendarCells = computed(() => {
   const year = currentYear.value
   const month = currentMonth.value
@@ -301,50 +317,124 @@ const isToday = (day) => {
   )
 }
 
-/* ---------------- helper ของ Monthly Check ---------------- */
 const getCellDate = (cell) => {
   if (!cell.day) return null
   return new Date(currentYear.value, currentMonth.value, cell.day)
 }
 
-// คืน array ของ config ที่มี monthly check ตรงวันที่ date
-const getConfigsForDate = (date) => {
-  if (!date) return []
-  return monthlyConfigs.value.filter(cfg => {
-    const start = cfg.startDate
-    if (!start) return false
-    if (date < start) return false
-    if (date.getDate() !== start.getDate()) return false
-
-    const monthsDiff =
-      (date.getFullYear() - start.getFullYear()) * 12 +
-      (date.getMonth() - start.getMonth())
-
-    return monthsDiff % cfg.intervalMonths === 0
-  })
+const dateKey = (date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
-// ตรวจว่าช่องนั้นเป็นวันที่ต้องโชว์ Monthly check หรือไม่
-const isMonthlyCheckCell = (cell) => {
-  if (!cell.day || cell.isPadding || monthlyConfigs.value.length === 0) return false
-  const cellDate = getCellDate(cell)
-  return getConfigsForDate(cellDate).length > 0
-}
-
-/* ---------------- state ของ popup ต่าง ๆ ---------------- */
-const showMonthlyPopup = ref(false)
+/* ---------- state: popup วัน ---------- */
+const dayPopupDate = ref(null)
+const showDayPopup = ref(false)
 const showAddPopup = ref(false)
 const showSettingsPopup = ref(false)
 
 const showAnyPopup = computed(
-  () => showMonthlyPopup.value || showAddPopup.value || showSettingsPopup.value
+  () => showDayPopup.value || showSettingsPopup.value
 )
 
-const openMonthlyPopup = (date) => {
-  selectedMonthlyDate.value = date
-  const configs = getConfigsForDate(date)
-  selectedMonthlyConfig.value = configs[0] || null
-  showMonthlyPopup.value = true
+/* events ต่อวัน */
+const eventsByDate = ref({})
+const newEventText = ref('')
+
+/* รอบ monthly ต่อวัน */
+const monthlyTypeByDate = ref({}) // key: YYYY-MM-DD -> '1m' | '3m' | '6m'
+const settingsType = ref('1m')
+
+/* special date 20/11/2025 */
+const DAILY_SPECIAL = {
+  year: 2025,
+  month: 10, // November (0-based)
+  day: 20
+}
+
+const isDailySpecialDate = (date) => {
+  if (!date) return false
+  return (
+    date.getFullYear() === DAILY_SPECIAL.year &&
+    date.getMonth() === DAILY_SPECIAL.month &&
+    date.getDate() === DAILY_SPECIAL.day
+  )
+}
+
+/* tag helpers */
+const hasMonthlyTag = (cell) => {
+  const date = getCellDate(cell)
+  if (!date) return false
+  const key = dateKey(date)
+  return !!monthlyTypeByDate.value[key]
+}
+
+const isDailySpecialCell = (cell) => {
+  const date = getCellDate(cell)
+  return isDailySpecialDate(date)
+}
+
+/* computed สำหรับ popup วัน */
+const currentDayKey = computed(() =>
+  dayPopupDate.value ? dateKey(dayPopupDate.value) : null
+)
+
+const isDailySpecial = computed(() => isDailySpecialDate(dayPopupDate.value))
+
+const dayPopupMonthlyType = computed(() => {
+  if (!currentDayKey.value) return null
+  return monthlyTypeByDate.value[currentDayKey.value] || null
+})
+
+const dayPopupTitle = computed(() => {
+  if (isDailySpecial.value) return 'Daily Check'
+  if (dayPopupMonthlyType.value) return 'Monthly Check'
+  if (dayEvents.value.length) return 'รายการ'
+  return 'ไม่มีรายการ'
+})
+
+const dayPopupFrequencyText = computed(() => {
+  if (isDailySpecial.value) return 'ทำประจำทุกวัน'
+  if (!dayPopupMonthlyType.value) return ''
+  if (dayPopupMonthlyType.value === '1m') return 'ทำประจำทุก 1 เดือน'
+  if (dayPopupMonthlyType.value === '6m') return 'ทำประจำทุก 6 เดือน'
+  return 'ทำประจำทุก 3 เดือน'
+})
+
+const dayPopupDateText = computed(() => {
+  if (!dayPopupDate.value) return ''
+  const d = dayPopupDate.value.getDate()
+  const w = weekdayFull[dayPopupDate.value.getDay()]
+  const m = monthNames[dayPopupDate.value.getMonth()]
+  const y = dayPopupDate.value.getFullYear()
+  return `${w} ${d} ${m} ${y}`
+})
+
+const dayEvents = computed(() => {
+  if (!currentDayKey.value) return []
+  return eventsByDate.value[currentDayKey.value] || []
+})
+
+const dailySpecialTasks = [
+  'การควบคุมคุณภาพจอภาพ',
+  'ตรวจสอบเครื่องเอกซเรย์',
+  'ความสม่ำเสมอของภาพ',
+  'ความคงที่ของดัชนีปริมาณรังสี'
+]
+
+const dayTasks = computed(() => {
+  if (isDailySpecial.value) return dailySpecialTasks
+  return dayEvents.value
+})
+
+/* ---------- methods popup ---------- */
+const openDayPopup = (cell) => {
+  const date = getCellDate(cell)
+  if (!date) return
+  dayPopupDate.value = date
+  showDayPopup.value = true
   showAddPopup.value = false
   showSettingsPopup.value = false
 }
@@ -353,155 +443,86 @@ const toggleAddPopup = () => {
   showAddPopup.value = !showAddPopup.value
 }
 
-/* ---------------- popup ตั้งค่ารอบ ---------------- */
-const settingsDate = ref('')
-const settingsType = ref('3m')
-
-// string DD/MM/YYYY -> Date
-const parseSettingsDate = (str) => {
-  const [dd, mm, yyyy] = str.split('/')
-  const d = parseInt(dd, 10)
-  const m = parseInt(mm, 10) - 1
-  const y = parseInt(yyyy, 10)
-  if (!d || !mm || !y) return null
-  const date = new Date(y, m, d)
-  if (date.getFullYear() !== y || date.getMonth() !== m || date.getDate() !== d) {
-    return null
-  }
-  return date
-}
-
-const typeToMonths = (type) => {
-  if (type === '1m') return 1
-  if (type === '6m') return 6
-  return 3
-}
-
-const formatDateDisplay = (date) => {
-  const dd = String(date.getDate()).padStart(2, '0')
-  const mm = String(date.getMonth() + 1).padStart(2, '0')
-  const yy = date.getFullYear()
-  return `${dd}/${mm}/${yy}`
-}
-
-const openSettingsPopup = () => {
-  // default เปิดที่ 3 เดือน
-  settingsType.value = '3m'
-  const cfg = monthlyConfigs.value.find(c => c.type === '3m')
-  settingsDate.value = cfg ? formatDateDisplay(cfg.startDate) : ''
-
-  showSettingsPopup.value = true
-  showMonthlyPopup.value = false
+const cancelAdd = () => {
+  newEventText.value = ''
   showAddPopup.value = false
 }
 
-// เวลาเปลี่ยน type ใน select ให้ลองดึงวันที่เดิมของ type นั้นมาใส่
-watch(settingsType, (newType) => {
-  const cfg = monthlyConfigs.value.find(c => c.type === newType)
-  settingsDate.value = cfg ? formatDateDisplay(cfg.startDate) : ''
-})
+const handleAddEvent = () => {
+  if (!dayPopupDate.value) return
+  const text = newEventText.value.trim()
+  if (!text) return
+  const key = dateKey(dayPopupDate.value)
+  const old = eventsByDate.value[key] || []
+  eventsByDate.value = {
+    ...eventsByDate.value,
+    [key]: [...old, text]
+  }
+  newEventText.value = ''
+  showAddPopup.value = false
+}
+
+/* ลบ event ทีละรายการ // NEW */
+const removeEvent = (index) => {
+  if (!currentDayKey.value) return
+  const key = currentDayKey.value
+  const old = eventsByDate.value[key] || []
+  const next = old.filter((_, i) => i !== index)
+  eventsByDate.value = {
+    ...eventsByDate.value,
+    [key]: next
+  }
+}
+
+/* ลบข้อมูลทั้งวัน (events + monthly) // NEW */
+const clearDayData = () => {
+  if (!dayPopupDate.value) return
+  const date = dayPopupDate.value
+  const key = dateKey(date)
+
+  // ลบ event ของวันนั้นทั้งหมด
+  const { [key]: removedEvents, ...restEvents } = eventsByDate.value
+  eventsByDate.value = restEvents
+
+  // ถ้าเป็น Daily special ไม่ลบ state อะไรพิเศษ เพราะ Daily ใช้ค่าคงที่
+  if (!isDailySpecialDate(date)) {
+    const { [key]: removedType, ...restTypes } = monthlyTypeByDate.value
+    monthlyTypeByDate.value = restTypes
+  }
+}
+
+/* settings popup */
+const openSettingsPopup = () => {
+  if (!dayPopupDate.value) return
+  const key = dateKey(dayPopupDate.value)
+  settingsType.value = monthlyTypeByDate.value[key] || '1m'
+  showSettingsPopup.value = true
+}
 
 const handleSaveSettings = () => {
-  const date = parseSettingsDate(settingsDate.value)
-  if (!date) {
-    alert('กรุณากรอกวันที่ให้ถูกต้อง (DD/MM/YYYY)')
-    return
+  if (!dayPopupDate.value) return
+  const key = dateKey(dayPopupDate.value)
+  monthlyTypeByDate.value = {
+    ...monthlyTypeByDate.value,
+    [key]: settingsType.value
   }
-
-  const months = typeToMonths(settingsType.value)
-  const newCfg = {
-    startDate: date,
-    intervalMonths: months,
-    type: settingsType.value
-  }
-
-  const idx = monthlyConfigs.value.findIndex(c => c.type === settingsType.value)
-  if (idx >= 0) {
-    monthlyConfigs.value.splice(idx, 1, newCfg)
-  } else {
-    monthlyConfigs.value.push(newCfg)
-  }
-
-  selectedMonthlyDate.value = date
-  selectedMonthlyConfig.value = newCfg
-
-  closeAllPopups()
-}
-
-const closeAllPopups = () => {
-  showMonthlyPopup.value = false
-  showAddPopup.value = false
   showSettingsPopup.value = false
 }
 
-/* format วันที่ เป็น DD/MM/YYYY ขณะพิมพ์ */
-const formatSettingsDate = () => {
-  let v = settingsDate.value.replace(/\D/g, '')
-  if (v.length > 8) v = v.slice(0, 8)
-
-  const parts = []
-  if (v.length >= 2) {
-    parts.push(v.slice(0, 2))
-    if (v.length >= 4) {
-      parts.push(v.slice(2, 4))
-      if (v.length > 4) {
-        parts.push(v.slice(4))
-      }
-    } else if (v.length > 2) {
-      parts.push(v.slice(2))
-    }
-  } else if (v.length > 0) {
-    parts.push(v)
-  }
-
-  settingsDate.value = parts.join('/')
+const closeAllPopups = () => {
+  showDayPopup.value = false
+  showAddPopup.value = false
+  showSettingsPopup.value = false
 }
-
-const monthlyTasks = computed(() => {
-  // ถ้ายังไม่มี config ที่เลือก แสดงรายการของ 3 เดือนเป็นค่าเริ่มต้น
-  const cfg = selectedMonthlyConfig.value
-  const type = cfg ? cfg.type : '3m'
-
-  if (type === '1m') {
-    // 1 month
-    return [
-      'การตรวจสอบความสว่างแสงไฟ',
-      'แบบบันทึกอัตราการถ่ายภาพซ้ำ'
-    ]
-  }
-
-  if (type === '6m') {
-    // 6 months
-    return [
-      'การทดสอบ Collimator and Beam Alignment',
-      'การทดสอบ Collimator and Beam Alignment สำหรับกรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)',
-      'การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ DR',
-      'การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ CR',
-      'การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอ็กซ์'
-    ]
-  }
-
-  // 3 months (default)
-  return [
-    'การควบคุมคุณภาพจอภาพ',
-    'แบบบันทึกการตรวจสอบเครื่องเอกซเรย์',
-    'ความสม่ำเสมอของภาพ',
-    'ความคงที่ของค่าดัชนีปริมาณรังสี'
-  ]
-})
-
 </script>
 
-
 <style scoped>
-/* wrapper โปร่งใส ไม่มีกรอบ */
 .pm-card {
   background-color: transparent;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* การ์ดวันที่ด้านบน และการ์ดปฏิทิน ให้กว้างเท่ากัน */
 .date-card,
 .calendar-card {
   background-color: #ffffff;
@@ -512,7 +533,6 @@ const monthlyTasks = computed(() => {
   width: 100%;
 }
 
-/* padding แยกเพื่อให้สวย */
 .date-card {
   padding: 12px 24px;
 }
@@ -521,7 +541,6 @@ const monthlyTasks = computed(() => {
   padding: 16px 24px 20px;
 }
 
-/* layout icon + text */
 .date-inner {
   display: flex;
   align-items: center;
@@ -536,7 +555,6 @@ const monthlyTasks = computed(() => {
   text-align: left;
 }
 
-/* ปุ่มเลื่อนเดือน */
 .nav-btn {
   width: 28px;
   height: 28px;
@@ -547,7 +565,6 @@ const monthlyTasks = computed(() => {
   font-size: 0.9rem;
 }
 
-/* Grid ปฏิทิน – ช่องว่างเท่ากัน */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -569,10 +586,12 @@ const monthlyTasks = computed(() => {
   flex-direction: column;
   align-items: center;
   position: relative;
+  cursor: pointer;
 }
 
 .day-cell.empty {
   background-color: transparent;
+  cursor: default;
 }
 
 .day-number span {
@@ -589,7 +608,7 @@ const monthlyTasks = computed(() => {
   justify-content: center;
 }
 
-/* แท็ก Monthly check – ย่อให้เล็กลง */
+/* แท็กในปฏิทิน */
 .monthly-tag {
   position: absolute;
   bottom: 2px;
@@ -597,12 +616,10 @@ const monthlyTasks = computed(() => {
   transform: translateX(-50%) scale(0.9);
   padding: 1px 6px;
   border-radius: 999px;
-  background-color: #1d4ed8;
   color: #ffffff;
   font-size: 0.6rem;
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
   white-space: nowrap;
 }
 
@@ -611,16 +628,15 @@ const monthlyTasks = computed(() => {
   font-size: 0.6rem;
 }
 
-/* ไอคอนตั้งค่า – ชิดขอบล่างขวา */
-.settings-icon {
-  position: absolute;
-  right: -10px;
-  bottom: -6px;
-  font-size: 1.8rem;
-  cursor: pointer;
+.monthly-tag-blue {
+  background-color: #1d4ed8;
 }
 
-/* popup overlay */
+.monthly-tag-red {
+  background-color: #dc2626;
+}
+
+/* overlay */
 .popup-overlay {
   position: fixed;
   inset: 0;
@@ -628,7 +644,7 @@ const monthlyTasks = computed(() => {
   z-index: 900;
 }
 
-/* กล่อง popup base */
+/* popup base */
 .popup-box {
   border-radius: 18px;
   padding: 14px 16px;
@@ -637,7 +653,6 @@ const monthlyTasks = computed(() => {
   position: relative;
 }
 
-/* ตำแหน่ง row popup */
 .popup-row {
   position: absolute;
   left: 50%;
@@ -648,25 +663,14 @@ const monthlyTasks = computed(() => {
   z-index: 1000;
 }
 
-/* กล่องส้ม Monthly Check */
-.popup-monthly {
-  background-color: #ffb981;
-  width: 340px;
-}
-
-/* หัวลูกศรชี้ขึ้น */
-.popup-monthly::before {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: 40px;
-  border-width: 0 10px 10px 10px;
-  border-style: solid;
-  border-color: transparent transparent #ffb981 transparent;
+/* popup วันสีชมพู */
+.popup-day {
+  background-color: #f7c4d2;
+  width: 360px;
 }
 
 .popup-divider {
-  border-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.9);
   opacity: 0.9;
   margin: 8px 0 10px;
 }
@@ -686,6 +690,9 @@ const monthlyTasks = computed(() => {
   margin-bottom: 4px;
   position: relative;
   padding-left: 12px;
+  display: flex;             /* NEW */
+  align-items: center;       /* NEW */
+  justify-content: space-between; /* NEW */
 }
 
 .popup-list li::before {
@@ -694,50 +701,55 @@ const monthlyTasks = computed(() => {
   left: 0;
 }
 
-/* ปุ่ม + */
-.plus-btn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
+/* ข้อความรายการ */
+.task-text {
+  flex: 1;
+  margin-right: 8px;
+}
+
+/* ปุ่มไอคอน */
+.icon-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background-color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-/* กล่อง Add สีชมพูอ่อน */
-.popup-add {
-  background-color: #f7eeee;
-  width: 340px;
-}
-
-/* input ด้านใน */
-.popup-add .add-input {
-  width: 100%;
-  height: 44px;
   font-size: 0.9rem;
+  cursor: pointer;
 }
 
-.add-body {
-  margin-top: 8px;
+.icon-btn-red {
+  background-color: #dc2626;
+  color: #ffffff;
 }
 
-/* กล่อง Settings */
+/* ปุ่มลบใน list */
+.item-delete-btn {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* กล่อง Add */
+.add-box {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.add-action {
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* popup settings */
 .popup-settings {
   background-color: #f7eeee;
-  width: 340px;
-  position: absolute;
-  right: -10px;
-  bottom: -40px;
-}
-
-.popup-settings::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  right: 40px;
-  border-width: 10px 10px 0 10px;
-  border-style: solid;
-  border-color: #f7eeee transparent transparent transparent;
+  width: 260px;
 }
 
 .save-text {
