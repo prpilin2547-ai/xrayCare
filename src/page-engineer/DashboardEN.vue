@@ -30,7 +30,7 @@
             <div class="request-section">
                 <div class="d-flex align-items-center mb-3">
                     <span class="title-dot me-2">●</span>
-                    <h3 class="fw-600 m-2">Request</h3>
+                    <h3 class="fw-600 m-2">REQUESTS</h3>
                 </div>
 
                 <div class="table-responsive">
@@ -46,7 +46,7 @@
                         <tbody class="bg-white">
                             <tr v-for="(item, index) in repairRequests" :key="item.id">
                                 <td>{{ index + 1 }}</td>
-                                <td class="text-start ps-4">{{ item.name }}</td>
+                                <td class="text-center">{{ item.name }}</td>
                                 <td>{{ item.room }}</td>
                                 <td class="text-warning-custom">{{ item.status }}</td>
                             </tr>

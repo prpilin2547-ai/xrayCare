@@ -42,25 +42,27 @@ const activeMenu = computed(() => {
   if (route.path.startsWith('/analyticalen')) return 'engineeranalytical'
   if (route.path.startsWith('/requesten')) return 'engineerrequest'
   if (route.path.startsWith('/adminuseraccount')) return 'adminuseraccount'
+  if (route.path.startsWith('/qc-forms')) return 'additionalforms'
   return ''
 })
 
 const onNavigate = (menu) => {
   switch (menu) {
-    case 'dashboard': router.push('/dashboard'); break
-    case 'equipment': router.push('/machines/create'); break
-    case 'checklist': router.push('/dashboard'); break // ยังเป็น mock
-    case 'pm':        router.push('/pm-schedule'); break
-    case 'export':    router.push('/export-pdf'); break
-    case 'analytical':router.push('/analytics'); break
-    case 'request':   router.push('/requests'); break // ยังเป็น mock
-    case 'profile':   router.push('/profile'); break
-    case 'admindashboard': router.push('/admindashboard'); break
-    case 'engineerdashboard': router.push('/engineerdashboard'); break
-    case 'logout':    router.push('/login'); break
+    case 'dashboard':          router.push('/dashboard'); break
+    case 'equipment':          router.push('/machines/create'); break
+    case 'checklist':          router.push('/dashboard'); break // ยังเป็น mock
+    case 'pm':                 router.push('/pm-schedule'); break
+    case 'export':             router.push('/export-pdf'); break
+    case 'analytical':         router.push('/analytics'); break
+    case 'request':            router.push('/requests'); break // ยังเป็น mock
+    case 'profile':            router.push('/profile'); break
+    case 'admindashboard':     router.push('/admindashboard'); break
+    case 'engineerdashboard':  router.push('/engineerdashboard'); break
     case 'engineeranalytical': router.push('/analyticalen'); break
-    case 'engineerrequest': router.push('/requesten'); break
-    case 'adminuseraccount': router.push('/adminuseraccount'); break
+    case 'engineerrequest':    router.push('/requesten'); break
+    case 'adminuseraccount':   router.push('/adminuseraccount'); break
+    case 'additionalforms':    router.push('/qc-forms'); break
+    case 'logout':             router.push('/login'); break
   }
 }
 </script>

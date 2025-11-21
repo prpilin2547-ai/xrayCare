@@ -21,6 +21,10 @@ import MonthlyCheckAll from '../pages/MonthlyCheckAll.vue'
 import F12 from '../pages/F12.vue'
 import F9ProtectiveClothesForm from '../pages/F9ProtectiveClothesForm.vue'
 import F11 from '../pages/F11.vue'
+import F13 from '../pages/F13.vue'
+import QCFormsHub from '../pages/QCFormsHub.vue'
+
+
 
 
 
@@ -85,6 +89,16 @@ const routes = [
     path: '/f11',
     name: 'F11Page',
     component: F11
+  },
+  {
+    path: '/f13',
+    name: 'F13',
+    component: F13
+  },
+  {
+    path: '/qc-forms',
+    name: 'QCFormsHub',
+    component: QCFormsHub
   }
 ]
 
