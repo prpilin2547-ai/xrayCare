@@ -31,15 +31,24 @@
         <table class="table user-table text-center">
           <thead>
             <tr>
-              <th style="width: 30%;">Username</th>
-              <th style="width: 40%;">Password</th>
-              <th style="width: 30%;">Action</th>
+              <th style="width: 25%;">Username</th>
+              <!-- ข้อ 1: เพิ่มคอลัมน์ Position -->
+              <th style="width: 25%;">Position</th>
+              <th style="width: 30%;">Password</th>
+              <th style="width: 20%;">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in filteredUsers" :key="user.id">
               <!-- 1. Username -->
               <td>{{ user.username }}</td>
+
+              <!-- ข้อ 1: แสดง Position เป็นกล่องสี -->
+              <td>
+                <span class="position-badge" :class="getPositionClass(user.position)">
+                  {{ user.position }}
+                </span>
+              </td>
               
               <!-- 2. Password (Display / Edit Mode) -->
               <td>
@@ -73,7 +82,7 @@
             </tr>
             
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="3" class="text-center py-4 text-muted">No user found.</td>
+              <td colspan="4" class="text-center py-4 text-muted">No user found.</td>
             </tr>
           </tbody>
         </table>
@@ -94,14 +103,31 @@
                    :class="{ 'is-invalid': errors.username }"
                    v-model="newUser.username">
           </div>
+
+          <!-- ข้อ 2: เพิ่ม Position ในหน้า Sign Up -->
+          <div class="mb-3">
+            <label class="form-label">Position</label>
+            <select
+              class="form-select"
+              :class="{ 'is-invalid': errors.position }"
+              v-model="newUser.position"
+            >
+              <option value="" disabled>Select Position</option>
+              <option value="Admin">Admin</option>
+              <option value="Radiological Technologist">Radiological Technologist</option>
+              <option value="Engineer">Engineer</option>
+            </select>
+          </div>
           
           <div class="mb-3">
             <label class="form-label">Password</label>
             <div class="input-group">
+              <!-- ข้อ 3: ยังใช้ input-group เหมือนเดิม แต่เราจะซ่อนไอคอน reveal ของ browser ด้วย CSS ด้านล่าง -->
               <input :type="newUser.showPass ? 'text' : 'password'" 
                      class="form-control" 
                      :class="{ 'is-invalid': errors.password }"
                      v-model="newUser.password">
+              <!-- ไอคอนตาข้างนอก (คงไว้) -->
               <span class="input-group-text cursor-pointer" @click="newUser.showPass = !newUser.showPass">
                 <i class="bi" :class="newUser.showPass ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
               </span>
@@ -115,6 +141,7 @@
                      class="form-control" 
                      :class="{ 'is-invalid': errors.confirmPassword }"
                      v-model="newUser.confirmPassword">
+              <!-- ไอคอนตาข้างนอก (คงไว้) -->
               <span class="input-group-text cursor-pointer" @click="newUser.showConfirm = !newUser.showConfirm">
                 <i class="bi" :class="newUser.showConfirm ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
               </span>
@@ -141,15 +168,15 @@ const showModal = ref(false);
 // เริ่มต้น users เป็น array ว่างก่อน แล้วค่อยโหลดจาก onMounted เพื่อป้องกันค่า default แสดงก่อน
 const users = ref([]);
 
-// --- ข้อมูลเริ่มต้น (Default Mock Data) - ไม่มี showPassword: true ---
+// --- ข้อมูลเริ่มต้น (Default Mock Data) - เพิ่ม position (ข้อ 1) ---
 const defaultUsers = [
-  { id: 1, username: 'xxxxxxxxx', password: 'password123' },
-  { id: 2, username: 'yyyyyyyyy', password: 'securepass' },
-  { id: 3, username: 'zzzzzzzzz', password: 'userpass01' },
-  { id: 4, username: 'ทดสอบก', password: 'password007' },
+  { id: 1, username: 'xxxxxxxxx', password: 'password123', position: 'Admin' },
+  { id: 2, username: 'yyyyyyyyy', password: 'securepass', position: 'Radiological Technologist' },
+  { id: 3, username: 'zzzzzzzzz', password: 'userpass01', position: 'Engineer' },
+  { id: 4, username: 'ทดสอบก', password: 'password007', position: 'Radiological Technologist' },
 ];
 
-// --- Load Data Logic (แก้ปัญหาข้อ 1 & 3) ---
+// --- Load Data Logic ---
 const loadUsers = () => {
   const storedUsers = localStorage.getItem('xray_users');
   let parsedUsers = [];
@@ -164,10 +191,11 @@ const loadUsers = () => {
     parsedUsers = defaultUsers;
   }
 
-  // สำคัญ: เมื่อโหลดข้อมูลมาแล้ว ต้อง Force ให้ showPassword เป็น false และ isEditing เป็น false เสมอ
-  // เพื่อแก้ปัญหาข้อ 1 (เข้ามาแล้วต้องปิดตา) และป้องกันสถานะค้าง
+  // เมื่อโหลดข้อมูลมาแล้ว ต้องเซ็ตค่า showPassword / isEditing / tempPassword ให้เป็นค่าเริ่มต้นเสมอ
+  // ถ้า record เก่าไม่มี position ให้ default เป็น Radiological Technologist
   users.value = parsedUsers.map(u => ({
     ...u,
+    position: u.position || 'Radiological Technologist',
     showPassword: false, 
     isEditing: false,
     tempPassword: ''
@@ -179,19 +207,19 @@ onMounted(() => {
   loadUsers();
 });
 
-// --- Save Data Logic (แก้ปัญหาข้อ 2 & 3) ---
-// Watcher นี้จะทำงานทุกครั้งที่มีการ เพิ่ม/ลบ/แก้ไข ข้อมูลใน users
+// --- Save Data Logic ---
 watch(users, (newUsers) => {
-  // บันทึกเฉพาะข้อมูลที่จำเป็น (ไม่บันทึกสถานะ UI เช่น showPassword)
-  const dataToSave = newUsers.map(({ id, username, password }) => ({ id, username, password }));
+  // บันทึกเฉพาะข้อมูลที่จำเป็น (รวม position ด้วย)
+  const dataToSave = newUsers.map(({ id, username, password, position }) => ({ id, username, password, position }));
   localStorage.setItem('xray_users', JSON.stringify(dataToSave));
 }, { deep: true });
 
-// --- New User Form State ---
+// --- New User Form State (เพิ่ม position ตามข้อ 2) ---
 const newUser = ref({
     username: '',
     password: '',
     confirmPassword: '',
+    position: '',
     showPass: false,
     showConfirm: false
 });
@@ -199,7 +227,8 @@ const newUser = ref({
 const errors = ref({
     username: false,
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
+    position: false
 });
 
 // --- Computed ---
@@ -210,11 +239,24 @@ const filteredUsers = computed(() => {
     );
 });
 
+// helper สำหรับ class ของ position badge (ข้อ 1)
+const getPositionClass = (position) => {
+  switch (position) {
+    case 'Admin':
+      return 'position-admin';
+    case 'Engineer':
+      return 'position-engineer';
+    case 'Radiological Technologist':
+    default:
+      return 'position-rt';
+  }
+};
+
 // --- Methods ---
 
 const openModal = () => {
-    newUser.value = { username: '', password: '', confirmPassword: '', showPass: false, showConfirm: false };
-    errors.value = { username: false, password: false, confirmPassword: false };
+    newUser.value = { username: '', password: '', confirmPassword: '', position: '', showPass: false, showConfirm: false };
+    errors.value = { username: false, password: false, confirmPassword: false, position: false };
     showModal.value = true;
 };
 
@@ -223,10 +265,11 @@ const closeModal = () => {
 };
 
 const createAccount = () => {
-    errors.value = { username: false, password: false, confirmPassword: false };
+    errors.value = { username: false, password: false, confirmPassword: false, position: false };
     let isValid = true;
 
     if (!newUser.value.username) { errors.value.username = true; isValid = false; }
+    if (!newUser.value.position) { errors.value.position = true; isValid = false; }
     if (!newUser.value.password) { errors.value.password = true; isValid = false; }
     if (!newUser.value.confirmPassword || newUser.value.confirmPassword !== newUser.value.password) {
         errors.value.confirmPassword = true;
@@ -238,6 +281,7 @@ const createAccount = () => {
             id: Date.now(),
             username: newUser.value.username,
             password: newUser.value.password,
+            position: newUser.value.position,
             showPassword: false, // สร้างใหม่ก็ต้องปิดตา
             isEditing: false,
             tempPassword: ''
@@ -246,10 +290,9 @@ const createAccount = () => {
     }
 };
 
-// Delete Logic (ข้อ 3: ลบแล้วต้องหายไปเลย)
+// Delete Logic
 const deleteUser = (id) => {
     if(confirm('คุณต้องการลบบัญชีผู้ใช้นี้ใช่หรือไม่?')) {
-        // การ filter ออกจะทำให้ users.value เปลี่ยน -> trigger watch -> บันทึกลง localStorage
         users.value = users.value.filter(u => u.id !== id);
     }
 };
@@ -259,7 +302,7 @@ const toggleVisibility = (user) => {
     user.showPassword = !user.showPassword;
 };
 
-// Edit Logic (ข้อ 2: แก้ไขแล้วจำค่าใหม่)
+// Edit Logic
 const startEdit = (user) => {
     user.tempPassword = ''; // เคลียร์ค่าเพื่อให้กรอกใหม่
     user.isEditing = true;
@@ -269,7 +312,6 @@ const saveEdit = (user) => {
     if (user.tempPassword.trim()) {
         user.password = user.tempPassword; // อัปเดตค่าจริง
         user.isEditing = false;
-        // users.value เปลี่ยน -> trigger watch -> บันทึกลง localStorage ทันที
     } else {
         alert("Password cannot be empty!");
     }
@@ -340,6 +382,25 @@ const cancelEdit = (user) => {
     width: 140px;
 }
 
+/* ข้อ 1: style ของ Position badge */
+.position-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.position-admin {
+    background-color: #6200EA; /* ม่วง */
+}
+.position-rt {
+    background-color: #0d6efd; /* น้ำเงิน */
+}
+.position-engineer {
+    background-color: #ff9800; /* ส้ม */
+}
+
 /* Icons */
 .action-icon {
     cursor: pointer;
@@ -372,11 +433,13 @@ const cancelEdit = (user) => {
 
 .modal-card {
     background: white;
-    padding: 30px;
+    padding: 35px;
     border-radius: 15px;
     width: 400px;
     position: relative;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    /* ข้อ 4: ขยายกล่อง Sign Up ลงล่าง (เพิ่มความสูงขั้นต่ำ) */
+    min-height: 430px;
 }
 
 .close-modal-btn {
@@ -412,5 +475,11 @@ const cancelEdit = (user) => {
 .btn-create-account:hover {
     background-color: #38006b;
     color: white;
+}
+
+/* ข้อ 3: ซ่อนปุ่ม reveal password ที่อยู่ในกล่องฟ้าของ browser (เช่น Edge) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
 </style>
