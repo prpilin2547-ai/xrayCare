@@ -180,18 +180,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-// ------------- ข้อมูลในตาราง (ตัวอย่าง) -------------
-const items = ref([
-  {
-    id: 1,
-    equipment: 'X-ray general รุ่น xxx ห้อง 1',
-    detail: 'ระบบล็อกและเบรก',
-    statusText: 'รอซ่อม'
+const STORAGE_KEY = 'repair_items'
+// default ข้อมูลเริ่มต้น (กรณียังไม่เคยมีใน localStorage)
+const defaultItems = [
+    {
+     id: 1,
+     equipment: 'X-ray general รุ่น xxx ห้อง 1',
+     detail: 'ระบบล็อกและเบรก',
+     statusText: 'รอซ่อม'
+    }
+]
+
+// ------------- ข้อมูลในตาราง (อ่านจาก localStorage) -------------
+const items = ref([...defaultItems])
+
+onMounted(() => {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
+      items.value = JSON.parse(stored)
+    } catch (e) {
+      items.value = [...defaultItems]
+    }
   }
-])
+})
+
+// บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
+watch(
+  items,
+  newItems => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
+  },
+  { deep: true }
+)
 
 // item ที่ถูกเลือก (null = โหมดตาราง)
 const selectedItem = ref(null)
