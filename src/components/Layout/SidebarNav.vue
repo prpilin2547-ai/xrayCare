@@ -45,25 +45,49 @@
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Request</span>
         </li> 
-        <li :class="{active: active === 'admindashboard'}" @click="$emit('navigate', 'admindashboard')">
+        <li
+          :class="{active: active === 'admindashboard'}"
+          @click="$emit('navigate', 'admindashboard')"
+        >
           <i class="fa-solid fa-chart-line"></i>
           <span>Admin Dashboard</span>
         </li>
-        <li :class="{active: active === 'adminuseraccount'}" @click="$emit('navigate', 'adminuseraccount')">
+        <li
+          :class="{active: active === 'adminuseraccount'}"
+          @click="$emit('navigate', 'adminuseraccount')"
+        >
           <i class="fa-solid fa-chart-line"></i>
           <span>Admin UserAccount</span>
         </li>
-        <li :class="{active: active === 'engineerdashboard'}" @click="$emit('navigate', 'engineerdashboard')">
+        <li
+          :class="{active: active === 'engineerdashboard'}"
+          @click="$emit('navigate', 'engineerdashboard')"
+        >
           <i class="fa-solid fa-chart-line"></i>
           <span>Engineer Dashboard</span>
         </li>
-        <li :class="{active: active === 'engineeranalytical'}" @click="$emit('navigate', 'engineeranalytical')">
+        <li
+          :class="{active: active === 'engineeranalytical'}"
+          @click="$emit('navigate', 'engineeranalytical')"
+        >
           <i class="fa-solid fa-chart-simple"></i>
           <span>Engineer Analytical</span>
         </li>
-        <li :class="{active: active === 'engineerrequest'}" @click="$emit('navigate', 'engineerrequest')">
+        <li
+          :class="{active: active === 'engineerrequest'}"
+          @click="$emit('navigate', 'engineerrequest')"
+        >
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Engineer Request</span>
+        </li>
+
+        <!-- เมนูใหม่ Additional Forms -->
+        <li
+          :class="{ active: active === 'additionalforms' }"
+          @click="$emit('navigate', 'additionalforms')"
+        >
+          <i class="fa-solid fa-list-check"></i>
+          <span>Additional Forms</span>
         </li>
       </ul>
     </nav>
@@ -86,6 +110,7 @@ defineProps({
 </script>
 
 <style scoped>
+/* (สไตล์เดิมทั้งหมดของคุณ ไม่ได้แก้ไข) */
 .sidebar {
   width: 220px;
   background: #f3f3f3;
