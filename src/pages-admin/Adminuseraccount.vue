@@ -5,7 +5,7 @@
       <!-- Page Title -->
       <div class="page-title-section">
         <div class="blue-dot"></div>
-        <h3 class="fw-bold m-0">User Management</h3>
+        <h3 class="fw-bold m-0">User Management </h3>
       </div>
 
       <!-- Top Controls: Search & Add User -->
