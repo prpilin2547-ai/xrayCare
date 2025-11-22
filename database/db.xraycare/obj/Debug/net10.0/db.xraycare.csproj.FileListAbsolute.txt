@@ -1,0 +1,12 @@
+C:\test4\database\db.xraycare\bin\Debug\net10.0\db.xraycare.deps.json
+C:\test4\database\db.xraycare\bin\Debug\net10.0\db.xraycare.dll
+C:\test4\database\db.xraycare\bin\Debug\net10.0\db.xraycare.pdb
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.GeneratedMSBuildEditorConfig.editorconfig
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.AssemblyInfoInputs.cache
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.AssemblyInfo.cs
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.csproj.CoreCompileInputs.cache
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.sourcelink.json
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.dll
+C:\test4\database\db.xraycare\obj\Debug\net10.0\refint\db.xraycare.dll
+C:\test4\database\db.xraycare\obj\Debug\net10.0\db.xraycare.pdb
+C:\test4\database\db.xraycare\obj\Debug\net10.0\ref\db.xraycare.dll

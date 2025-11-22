@@ -53,9 +53,9 @@
           </thead>
           <tbody v-if="hasMachines">
             <tr v-for="row in sampleRows" :key="row.no">
-              <td>{{ row.no }}</td>
+              <td>{{ row.rid }}</td>
               <td class="equipment-cell" @click="goToDairyCheck(row.equipment)">
-                {{ row.equipment }}
+                {{ row.machine_name }}
               </td>
               <td>{{ row.room }}</td>
               <td>{{ row.caretaker }}</td>
@@ -90,21 +90,71 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+import common from '../js/Commonfunction.js'
 
 const router = useRouter()
 const hasMachines = ref(true)
 
+onMounted(() => {
+  if (hasMachines.value) {
+    //getallmachines()
+  }
+})
+
 const displayDate = '10 Nov 2025'
 
-const sampleRows = [
-  { no: 1, equipment: 'Shimazu', room: '1', caretaker: 'ศุภกร' },
-  { no: 2, equipment: 'Carestream', room: '2', caretaker: 'พรไพลิน' },
-  { no: 3, equipment: 'Konica', room: '3', caretaker: 'เบญจรัตน์' },
-  { no: 4, equipment: 'Toshiba', room: '4', caretaker: 'ขยัน' }
-]
+const sampleRows = ref([
+  {
+    no: 1,
+    rid: '001',
+    equipment: 'XRay-Alpha',
+    machine_name: 'X-Ray Machine (BrandA/ModelX)',
+    room: 'Room 101',
+    caretaker: 'John Doe'
+  },
+  {
+    no: 2,
+    rid: '002',
+    equipment: 'XRay-Beta',
+    machine_name: 'X-Ray Machine (BrandB/ModelY)',
+    room: 'Room 102',
+    caretaker: 'Jane Smith'
+  },
+  {
+    no: 3,
+    rid: '003',
+    equipment: 'XRay-Gamma',
+    machine_name: 'X-Ray Machine (BrandC/ModelZ)',
+    room: 'Room 103',
+    caretaker: 'Mike Johnson'
+  },
+  {
+    no: 4,
+    rid: '004',
+    equipment: 'XRay-Delta',
+    machine_name: 'X-Ray Machine (BrandD/ModelW)',
+    room: 'Room 104',
+    caretaker: 'Emily Davis'
+  }
+])
+
+// function getallmachines() {
+//   common.CallWebAPI(
+//     'api/Xraycare/GetAllMachines',
+//     'GET',
+//     null,
+//     (data) => {
+//       sampleRows.value = data;
+//       console.log('Fetched machines:', data)
+//     },
+//     (error) => {
+//       console.error('Error fetching machines:', error)
+//     }
+//   )
+// }
 function goToDairyCheck(equipmentName) {
   router.push({
     name: 'DairyCheckPage',
