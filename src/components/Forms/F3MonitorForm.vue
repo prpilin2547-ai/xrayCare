@@ -10,7 +10,7 @@
           </tr>
 
           <!-- กำหนดวันที่ตรวจได้ -->
-          <tr>
+          <!-- <tr>
             <td class="cell-label">วันที่ตรวจ</td>
             <td colspan="2">
               <input
@@ -19,7 +19,7 @@
                 class="input-cell"
               />
             </td>
-          </tr>
+          </tr> -->
 
           <!-- ถ้าอยากให้กรอกผู้ทดสอบเองด้วยก็ใช้ช่องนี้ -->
           <!--
@@ -99,8 +99,9 @@
         class="btn btn-warning"
         @click="submitNext"
       >
-        บันทึก
+        ถัดไป
       </button>
+      <!-- เปลี่ยนเป็นุ่มถัดไปก่อนนะคะ -->
     </div>
   </div>
 </template>

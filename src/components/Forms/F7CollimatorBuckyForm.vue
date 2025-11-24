@@ -133,6 +133,19 @@
           class="form-control form-control-sm mb-3"
           placeholder="บันทึกรายละเอียดเพิ่มเติม..."
         ></textarea>
+        <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
+      </div>
+      <br>
 
         <div class="d-flex justify-content-end">
           <button class="btn btn-warning btn-sm fw-semibold" @click="submitNext">
@@ -142,7 +155,6 @@
       </div>
 
     </div>
-  </div>
 </template>
 
 <script setup>
