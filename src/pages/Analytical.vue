@@ -65,12 +65,173 @@
           แสดงตัวอย่างพื้นที่สำหรับสรุปผลวิเคราะห์ เช่น อัตราการเกิดปัญหา, แนวโน้มคุณภาพ QC และ RFR
         </span>
       </div>
+
+      <!-- ========== HISTORY SECTION ========== -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>ประวัติการทำรายการ</h3>
+        </div>
+
+        <div class="panel-body history-body">
+          <!-- Search Filters -->
+          <div class="history-filters">
+            <input
+              v-model="filters.device"
+              class="history-input"
+              placeholder="ค้นหาตามชื่อเครื่อง..."
+            />
+
+            <select v-model="filters.form" class="history-input">
+              <option value="">เลือกแบบบันทึก</option>
+              <option>dairy check</option>
+              <option>monthly check(1 month)</option>
+              <option>monthly check(3 month)</option>
+              <option>monthly check(6 month)</option>
+            </select>
+
+            <input
+              type="date"
+              v-model="filters.date"
+              class="history-input"
+            />
+
+            <button class="history-btn" @click="searchHistory">
+              ค้นหา
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive mt-2">
+            <table class="table table-bordered small history-table">
+              <thead class="table-light text-center">
+                <tr>
+                  <th>วันที่</th>
+                  <th>ผู้ทำ</th>
+                  <th>เครื่อง</th>
+                  <th>แบบบันทึก</th>
+                  <th>ผล</th>
+                  <th>รายละเอียด</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in history" :key="item.id">
+                  <td>{{ item.timestamp }}</td>
+                  <td>{{ item.user }}</td>
+                  <td>{{ item.device }}</td>
+                  <td class="fw-bold">{{ item.form }}</td>
+                  <td>
+                    <span :class="item.status === 'Pass' ? 'tag-pass' : 'tag-fail'">
+                      {{ item.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-outline-primary"
+                      @click="openDetail(item)"
+                    >
+                      ดูเพิ่มเติม
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="history-pagination">
+            <button class="page-btn" @click="prevPage" :disabled="page === 1">
+              ‹
+            </button>
+            <span>หน้า {{ page }}</span>
+            <button class="page-btn" @click="nextPage">
+              ›
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Modal -->
+      <div v-if="modal.open" class="modal-backdrop">
+        <div class="modal-card">
+          <h3 class="modal-title">รายละเอียดการทำรายการ</h3>
+
+          <p><strong>วันที่:</strong> {{ modal.data.timestamp }}</p>
+          <p><strong>ผู้ทำ:</strong> {{ modal.data.user }}</p>
+          <p><strong>เครื่อง:</strong> {{ modal.data.device }}</p>
+          <p><strong>แบบบันทึก:</strong> {{ modal.data.form }}</p>
+          <p><strong>ผล:</strong> {{ modal.data.status }}</p>
+
+          <div class="modal-section">
+            <strong>ข้อมูลที่บันทึก</strong>
+            <pre class="modal-json">{{ modal.data.values }}</pre>
+          </div>
+
+          <button class="modal-close" @click="modal.open = false">
+            ปิด
+          </button>
+        </div>
+      </div>
+      <!-- ========== END HISTORY SECTION ========== -->
     </div>
   </MainLayout>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const filters = ref({
+  device: '',
+  form: '',
+  date: ''
+})
+
+const page = ref(1)
+
+// ตัวอย่างข้อมูล dummy (ภายหลังสามารถเชื่อม API จริงได้)
+const history = ref([
+  {
+    id: 1,
+    timestamp: '2025-02-01 10:20',
+    user: 'John Doe',
+    device: 'X-Ray Model A / Room 101',
+    form: 'F3',
+    status: 'Pass',
+    values: '{ "brightness": 220, "contrast": 180 }'
+  },
+  {
+    id: 2,
+    timestamp: '2025-02-03 09:10',
+    user: 'Jane Smith',
+    device: 'X-Ray Model B / Room 102',
+    form: 'F7-1',
+    status: 'Fail',
+    values: '{ "alignment": "3.5°", "limit": "3°" }'
+  }
+])
+
+const modal = ref({
+  open: false,
+  data: {}
+})
+
+const openDetail = (item) => {
+  modal.value.data = item
+  modal.value.open = true
+}
+
+// ตอนนี้แค่ mock ไว้ ภายหลังคุณเปลี่ยนมา call API ได้
+const searchHistory = () => {
+  console.log('ค้นหาด้วย filter:', filters.value)
+}
+
+const nextPage = () => {
+  page.value++
+}
+
+const prevPage = () => {
+  if (page.value > 1) page.value--
+}
 </script>
 
 <style scoped>
@@ -203,10 +364,111 @@ import MainLayout from '../components/Layout/MainLayout.vue'
   gap: 8px;
   font-size: 0.9rem;
   width: 700px;
-
 }
 
 .summary-label {
   font-weight: 600;
+}
+
+/* ========== HISTORY SECTION STYLES ========== */
+.history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.history-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.history-input {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+}
+
+.history-btn {
+  background: var(--purple-main);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tag-pass {
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.tag-fail {
+  background: #ef4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.history-pagination {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 6px;
+}
+
+.page-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-card {
+  background: white;
+  width: 480px;
+  max-width: 90vw;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+
+.modal-json {
+  background: #f3f4f6;
+  padding: 8px;
+  border-radius: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+}
+
+.modal-close {
+  margin-top: 14px;
+  padding: 8px 14px;
+  background: var(--purple-main);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
 }
 </style>
