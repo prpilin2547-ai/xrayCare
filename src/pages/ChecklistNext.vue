@@ -24,12 +24,12 @@
       <div class="content-panel">
         <p class="section-label">Dairy check</p>
 
-        <!-- ตารางเดิม: การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ -->
+        <!-- ตาราง : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
               <tr class="row-header-main">
-                <td colspan="3" class="text-center">
+                <td colspan="4" class="text-center">
                   แบบบันทึก : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
                 </td>
               </tr>
@@ -38,6 +38,7 @@
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
+                <td class="text-center">หมายเหตุ</td>
               </tr>
 
               <tr v-for="item in checklistItems" :key="item.id">
@@ -60,18 +61,34 @@
                     v-model="item.result"
                   />
                 </td>
+
+                <td>
+                  <textarea
+                    class="input-textarea"
+                    v-model="item.remark"
+                    placeholder="บันทึกหมายเหตุ..."
+                  ></textarea>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    @change="onItemFileChange($event, item)"
+                  />
+                  <p v-if="item.fileName" class="file-name">
+                    ไฟล์ที่เลือก: {{ item.fileName }}
+                  </p>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- ⭐ ตารางใหม่: แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
+        <!-- ⭐ ตาราง : แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
         <div class="table-wrapper mt-24">
           <table class="check-table">
             <tbody>
               <!-- หัวตาราง -->
               <tr class="row-header-main">
-                <td colspan="3" class="text-center">
+                <td colspan="4" class="text-center">
                   แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
                 </td>
               </tr>
@@ -81,6 +98,7 @@
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
+                <td class="text-center">หมายเหตุ</td>
               </tr>
 
               <!-- แถวรายการทดสอบ -->
@@ -104,65 +122,41 @@
                     v-model="plateEraseResult"
                   />
                 </td>
+                <td>
+                  <textarea
+                    class="input-textarea"
+                    v-model="plateEraseRemark"
+                    placeholder="บันทึกหมายเหตุ..."
+                  ></textarea>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    @change="onPlateEraseFileChange"
+                  />
+                  <p v-if="plateEraseFileName" class="file-name">
+                    ไฟล์ที่เลือก: {{ plateEraseFileName }}
+                  </p>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <!-- ⭐ จบตารางใหม่ -->
+        <!-- ⭐ จบตาราง -->
 
         <!-- ปุ่มด้านล่างขวา -->
         <div class="actions">
-          <button class="btn-remark" @click="openRemarkModal">
-            หมายเหตุ
+          <!-- ปุ่มผ่านทั้งหมด ใช้สไตล์เดิมของปุ่มหมายเหตุ -->
+          <button class="btn-remark" @click="markAllPass">
+            ผ่านทั้งหมด
           </button>
 
+          <!-- ปุ่มสีเหลือง: ถัดไป (เหมือนเดิม) -->
           <button class="btn-next" @click="goNext">
             ถัดไป
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Popup หมายเหตุ -->
-    <div
-      v-if="showRemarkModal"
-      class="modal-backdrop"
-      @click.self="closeRemarkModal"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>หมายเหตุ</h3>
-          <button class="close-btn" @click="closeRemarkModal">×</button>
-        </div>
-
-        <div class="modal-body">
-          <label class="field-label">รายละเอียดเพิ่มเติม</label>
-          <textarea
-            v-model="remarkText"
-            class="input-textarea"
-            placeholder="กรอกรายละเอียด..."
-          ></textarea>
-
-          <label class="field-label mt-12">แนบไฟล์รูปภาพ</label>
-          <input type="file" accept="image/*" @change="onFileChange" />
-
-          <p v-if="remarkFileName" class="file-name">
-            ไฟล์ที่เลือก: {{ remarkFileName }}
-          </p>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="closeRemarkModal">
-            ยกเลิก
-          </button>
-
-          <button class="btn-save-popup" @click="saveRemark">
-            บันทึก
-          </button>
-        </div>
-      </div>
-    </div>
-    
   </MainLayout>
 </template>
 
@@ -197,62 +191,90 @@ const todayText = computed(() => {
   })
 })
 
+// เพิ่ม remark + file ให้แต่ละรายการ
 const checklistItems = ref([
   {
     id: 'powerCable',
     label:
       'สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'lockBrake',
     label: 'ระบบล็อกและเบรก : ทำงานได้อย่างถูกต้อง',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'tableTubeBucky',
     label: 'เตียง หลอดเอกซเรย์ และบักกี้ : เคลื่อนที่ได้อย่างราบเรียบ',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'tubeWarmup',
     label: 'X-ray tube warm-up : ด้วยค่าเทคนิคที่บริษัทแนะนำ',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   }
 ])
 
-// ⭐ ผลทดสอบการลบแผ่นเพลท (ผ่าน/ไม่ผ่าน)
-const plateEraseResult = ref('') // 'pass' | 'fail'
-
-// --- โมดอลหมายเหตุ ---
-const showRemarkModal = ref(false)
-const remarkText = ref('')
-const remarkFile = ref(null)
-
-const remarkFileName = computed(() =>
-  remarkFile.value ? remarkFile.value.name : ''
+// ผลและ remark การลบแผ่นเพลท
+const plateEraseResult = ref('') // pass | fail
+const plateEraseRemark = ref('')
+const plateEraseFile = ref(null)
+const plateEraseFileName = computed(() =>
+  plateEraseFile.value ? plateEraseFile.value.name : ''
 )
 
-const openRemarkModal = () => {
-  showRemarkModal.value = true
-}
-const closeRemarkModal = () => {
-  showRemarkModal.value = false
-}
-const onFileChange = (e) => {
-  remarkFile.value = e.target.files[0]
-}
-const saveRemark = () => {
-  console.log('หมายเหตุ:', remarkText.value)
-  console.log('ไฟล์:', remarkFile.value)
-  showRemarkModal.value = false
+// เปลี่ยนไฟล์ของแต่ละรายการ checklist
+const onItemFileChange = (event, item) => {
+  const file = event.target.files[0] || null
+  item.file = file
+  item.fileName = file ? file.name : ''
 }
 
-// ⭐ ปุ่มถัดไป
+// เปลี่ยนไฟล์ของการลบแผ่นเพลท
+const onPlateEraseFileChange = (event) => {
+  const file = event.target.files[0] || null
+  plateEraseFile.value = file
+}
+
+// ปุ่ม "ผ่านทั้งหมด"
+const markAllPass = () => {
+  checklistItems.value.forEach((item) => {
+    item.result = 'pass'
+  })
+  plateEraseResult.value = 'pass'
+}
+
+// ปุ่มถัดไป → ไปหน้า MonthlyCheckPage.vue
 const goNext = () => {
-  console.log('ข้อมูล checklist:', checklistItems.value)
-  console.log('ผลการลบแผ่นเพลท:', plateEraseResult.value)
-  router.push('/monthly-check') // ปรับตามเส้นทางของคุณ
+  const payload = {
+    device: props.selectedDevice,
+    date: todayText.value,
+    user: props.currentUserName,
+    checklist: checklistItems.value,
+    plateErase: {
+      result: plateEraseResult.value,
+      remark: plateEraseRemark.value,
+      fileName: plateEraseFileName.value
+    }
+  }
+
+  console.log('payload ก่อนไปหน้า MonthlyCheckPage:', payload)
+
+  // เปลี่ยน path ให้ตรงกับ route ของ MonthlyCheckPage.vue ในโปรเจกต์คุณ
+  router.push('/monthly-check')
 }
 </script>
 
@@ -353,7 +375,7 @@ const goNext = () => {
   padding: 8px 24px;
 }
 
-/* ⭐ ปุ่มถัดไป สีเหลือง */
+/* ปุ่มถัดไป สีเหลือง (เหมือนเดิม) */
 .btn-next {
   background: #f7c948;
   color: #111827;
@@ -373,7 +395,7 @@ const goNext = () => {
   margin-top: 24px;
 }
 
-/* Modal */
+/* Modal styles เดิม (ยังคงไว้ แม้ไม่ได้ใช้แล้ว) */
 .modal-backdrop {
   position: fixed;
   inset: 0;

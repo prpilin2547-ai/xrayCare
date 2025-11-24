@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/api/">
+    <Project Path="api/api.xraycare/api.xraycare.csproj" />
+  </Folder>
+  <Folder Name="/database/">
+    <Project Path="database/db.xraycare/db.xraycare.csproj" />
+  </Folder>
+</Solution>

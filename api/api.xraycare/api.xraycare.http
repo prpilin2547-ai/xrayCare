@@ -1,0 +1,6 @@
+@api.xraycare_HostAddress = http://localhost:5120
+
+GET {{api.xraycare_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

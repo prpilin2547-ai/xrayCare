@@ -19,17 +19,7 @@
       <div class="page-layout">
         <!-- ⭐ sidebar แบบฟอร์ม -->
         <aside class="form-sidebar">
-          <div class="sidebar-section-label">3 MONTH</div>
-          <div
-            v-for="tab in formTabs3M"
-            :key="tab.id"
-            :class="['form-tab', { active: activeForm === tab.id }]"
-            @click="activeForm = tab.id"
-          >
-            <div class="form-code">{{ tab.code }}</div>
-            <div class="form-title">{{ tab.title }}</div>
-          </div>
-
+          <!-- เอาเฉพาะส่วน 3 MONTH ออก เหลือแค่ 6 MONTH -->
           <div class="sidebar-section-label mt-3">6 MONTH</div>
           <div
             v-for="tab in formTabs6M"
@@ -48,36 +38,9 @@
             {{ sectionTitle }}
           </p>
 
-          <!-- ==== BLOCK 3 MONTH ==== -->
-          <F3MonitorForm
-            v-if="activeForm === 'F3'"
-            :initial="formF3"
-            :current-user-name="currentUserName"
-            @next="handleNext('F3', $event)"
-          />
-          <F4XrayCheckForm
-            v-else-if="activeForm === 'F4'"
-            :initial="formF4"
-            :current-user-name="currentUserName"
-            @next="handleNext('F4', $event)"
-          />
-          <F5UniformityForm
-            v-else-if="activeForm === 'F5'"
-            :initial="formF5"
-            :current-user-name="currentUserName"
-            @next="handleNext('F5', $event)"
-          />
-          <!-- ❗ F6 เปลี่ยนให้ emit next -->
-          <F6EIConsistencyForm
-            v-else-if="activeForm === 'F6'"
-            :initial="formF6"
-            :current-user-name="currentUserName"
-            @next="handleNext('F6', $event)"
-          />
-
-          <!-- ==== BLOCK 6 MONTH ==== -->
+          <!-- ==== BLOCK 6 MONTH เท่านั้น ==== -->
           <F7CollimatorForm
-            v-else-if="activeForm === 'F7_1'"
+            v-if="activeForm === 'F7_1'"
             :initial="formF7_1"
             :current-user-name="currentUserName"
             @next="handleNext('F7_1', $event)"
@@ -115,11 +78,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-import F3MonitorForm from '../components/forms/F3MonitorForm.vue'
-import F4XrayCheckForm from '../components/forms/F4XrayCheckForm.vue'
-import F5UniformityForm from '../components/forms/F5UniformityForm.vue'
-import F6EIConsistencyForm from '../components/forms/F6EIConsistencyForm.vue'
-
 import F7CollimatorForm from '../components/forms/F7CollimatorForm.vue'
 import F7CollimatorBuckyForm from '../components/forms/F7CollimatorBuckyForm.vue'
 import F8CRDarkNoiseForm from '../components/forms/F8CRDarkNoiseForm.vue'
@@ -151,51 +109,34 @@ const todayText = computed(() => {
   })
 })
 
-/* sidebar tab config */
-const formTabs3M = [
-  { id: 'F3', code: 'F3', title: 'Display monitor' },
-  { id: 'F4', code: 'F4', title: 'ตรวจสอบเครื่องเอกซเรย์' },
-  { id: 'F5', code: 'F5', title: 'Measured Uniformity' },
-  { id: 'F6', code: 'F6', title: 'Consistency of EI' }
-]
-
+/* sidebar tab config: เหลือเฉพาะ 6 เดือน */
 const formTabs6M = [
   { id: 'F7_1', code: 'F7-1', title: 'Collimator & Beam Alignment' },
   { id: 'F7_2', code: 'F7-2', title: 'Collimator (DR กับ Bucky)' },
   { id: 'F8_1', code: 'F8-1', title: 'Dark Noise – CR' },
-  { id: 'F8_2', code: 'F8-2', title: 'Dark Noise – DR' } // ✅ ไม่มี F9 แล้ว
+  { id: 'F8_2', code: 'F8-2', title: 'Dark Noise – DR' }
 ]
 
-const activeForm = ref('F3')
+/* เริ่มต้นที่ฟอร์ม 6 เดือนตัวแรก */
+const activeForm = ref('F7_1')
 
-/* title 3/6 month ด้านบน */
+/* title ด้านบน: ตอนนี้เป็น 6 เดือนตลอด */
 const sectionTitle = computed(() => {
-  if (['F3', 'F4', 'F5', 'F6'].includes(activeForm.value)) {
-    return 'Monthly check (3 month)'
-  }
   return 'Monthly check (6 month)'
 })
 
-/* state เก็บผลแต่ละแบบบันทึก */
-const formF3 = ref(null)
-const formF4 = ref(null)
-const formF5 = ref(null)
-const formF6 = ref(null)
+/* state เก็บผลแต่ละแบบบันทึก (เฉพาะ 6 เดือน) */
 const formF7_1 = ref(null)
 const formF7_2 = ref(null)
 const formF8_1 = ref(null)
 const formF8_2 = ref(null)
 
-/* ลำดับ next ทั้งหมด (ฟอร์มสุดท้ายคือ F8_2) */
-const order = ['F3', 'F4', 'F5', 'F6', 'F7_1', 'F7_2', 'F8_1', 'F8_2']
+/* ลำดับ next เฉพาะฟอร์ม 6 เดือน */
+const order = ['F7_1', 'F7_2', 'F8_1', 'F8_2']
 
 const handleNext = (fromId, payload) => {
   // เก็บค่าฟอร์มปัจจุบัน
-  if (fromId === 'F3') formF3.value = payload
-  else if (fromId === 'F4') formF4.value = payload
-  else if (fromId === 'F5') formF5.value = payload
-  else if (fromId === 'F6') formF6.value = payload
-  else if (fromId === 'F7_1') formF7_1.value = payload
+  if (fromId === 'F7_1') formF7_1.value = payload
   else if (fromId === 'F7_2') formF7_2.value = payload
   else if (fromId === 'F8_1') formF8_1.value = payload
 
@@ -213,17 +154,13 @@ const handleSave = (payloadF8_2) => {
     device: props.selectedDevice,
     date: todayText.value,
     user: props.currentUserName,
-    F3: formF3.value,
-    F4: formF4.value,
-    F5: formF5.value,
-    F6: formF6.value,
     F7_1: formF7_1.value,
     F7_2: formF7_2.value,
     F8_1: formF8_1.value,
     F8_2: formF8_2.value
   }
 
-  console.log('📦 Monthly check (3+6 month, F8-2 is final):', allPayload)
+  console.log('📦 Monthly check (6 month only):', allPayload)
 
   router.push('/dashboard')
 }

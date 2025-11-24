@@ -1,11 +1,8 @@
 <template>
-  <!-- ใช้ MainLayout ครอบแทนการทำ sidebar / topbar เอง -->
   <MainLayout>
     <div class="checklist-page">
-      <!-- หัวข้อ CHECKLIST -->
       <h1 class="page-title">CHECKLIST</h1>
 
-      <!-- แถวแคปซูลสีส้มด้านบน (ชื่อเครื่อง / รุ่น / ห้อง / วันที่ / ผู้ทดสอบ) -->
       <div class="pill-row">
         <div class="pill pill-main">
           {{ selectedDevice.name }}
@@ -24,60 +21,54 @@
         </div>
       </div>
 
-      <!-- กล่องเนื้อหาขาวตรงกลาง (เหมือนกระดาษใน mockup) -->
       <div class="content-panel">
         <p class="section-label">Dairy check</p>
 
-        <!-- ตารางบันทึกการตรวจ (ของเดิม) -->
+        <!-- ตารางหลัก -->
         <div class="table-wrapper">
           <table class="check-table">
             <tbody>
-              <!-- แถวหัวบนสุด -->
               <tr class="row-header-main">
-                <td colspan="3" class="text-center">
+                <td colspan="4" class="text-center">
                   แบบบันทึก : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
                 </td>
               </tr>
 
-              <!-- แถวหัวคอลัมน์ -->
               <tr class="row-header-columns">
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
+                <td class="text-center">หมายเหตุ</td>
               </tr>
 
-              <!-- แถวรายการเช็ค -->
               <tr v-for="item in checklistItems" :key="item.id">
                 <td class="cell-label">
                   {{ item.label }}
                 </td>
                 <td class="text-center">
-                  <input
-                    type="radio"
-                    :name="`check-${item.id}`"
-                    value="pass"
-                    v-model="item.result"
-                  />
+                  <input type="radio" :name="`check-${item.id}`" value="pass" v-model="item.result" />
                 </td>
                 <td class="text-center">
-                  <input
-                    type="radio"
-                    :name="`check-${item.id}`"
-                    value="fail"
-                    v-model="item.result"
-                  />
+                  <input type="radio" :name="`check-${item.id}`" value="fail" v-model="item.result" />
+                </td>
+                <td>
+                  <textarea class="input-textarea" v-model="item.remark" placeholder="บันทึกหมายเหตุ..."></textarea>
+                  <input type="file" accept="image/*" @change="onItemFileChange($event, item)" />
+                  <p v-if="item.fileName" class="file-name">
+                    ไฟล์ที่เลือก: {{ item.fileName }}
+                  </p>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- ⭐ ตารางใหม่ : แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์ -->
+        <!-- ตารางลบแผ่นเพลท -->
         <div class="table-wrapper mt-24">
           <table class="check-table">
             <tbody>
               <tr class="row-header-main">
-                <td colspan="3" class="text-center">
+                <td colspan="4" class="text-center">
                   แบบบันทึก : การลบแผ่นเพลท แผนกเอกซเรย์
                 </td>
               </tr>
@@ -86,78 +77,41 @@
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
+                <td class="text-center">หมายเหตุ</td>
               </tr>
 
               <tr>
-                <td class="cell-label">
-                  ผลการทดสอบ
+                <td class="cell-label">ผลการทดสอบ</td>
+                <td class="text-center">
+                  <input type="radio" name="plate-erase" value="pass" v-model="plateEraseResult" />
                 </td>
                 <td class="text-center">
-                  <input
-                    type="radio"
-                    name="plate-erase"
-                    value="pass"
-                    v-model="plateEraseResult"
-                  />
+                  <input type="radio" name="plate-erase" value="fail" v-model="plateEraseResult" />
                 </td>
-                <td class="text-center">
-                  <input
-                    type="radio"
-                    name="plate-erase"
-                    value="fail"
-                    v-model="plateEraseResult"
-                  />
+                <td>
+                  <textarea class="input-textarea" v-model="plateEraseRemark" placeholder="บันทึกหมายเหตุ..."></textarea>
+                  <input type="file" accept="image/*" @change="onPlateEraseFileChange" />
+                  <p v-if="plateEraseFileName" class="file-name">
+                    ไฟล์ที่เลือก: {{ plateEraseFileName }}
+                  </p>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <!-- ⭐ จบตารางการลบแผ่นเพลท -->
 
-        <!-- ปุ่มด้านล่างขวา -->
+        <!-- ปุ่ม -->
         <div class="actions">
-          <button class="btn-remark" @click="openRemarkModal">
-            หมายเหตุ
+          <button class="btn-remark" @click="markAllPass">
+            ผ่านทั้งหมด
           </button>
-          <button class="btn-save" @click="saveChecklist">
-            บันทึก
+
+          <!-- ⭐ ปุ่มถัดไปทำงานเฉพาะวันที่ครบ 3 เดือน ⭐ -->
+          <button v-if="isExactly3Months" class="btn btn-warning" @click="goNext">
+            ถัดไป
           </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Popup หมายเหตุ (ทับทั้งหน้า) -->
-    <div
-      v-if="showRemarkModal"
-      class="modal-backdrop"
-      @click.self="closeRemarkModal"
-    >
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>หมายเหตุ</h3>
-          <button class="close-btn" @click="closeRemarkModal">×</button>
-        </div>
-
-        <div class="modal-body">
-          <label class="field-label">รายละเอียดเพิ่มเติม</label>
-          <textarea
-            v-model="remarkText"
-            class="input-textarea"
-            placeholder="กรอกรายละเอียด..."
-          ></textarea>
-
-          <label class="field-label mt-12">แนบไฟล์รูปภาพ</label>
-          <input type="file" accept="image/*" @change="onFileChange" />
-          <p v-if="remarkFileName" class="file-name">
-            ไฟล์ที่เลือก: {{ remarkFileName }}
-          </p>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="closeRemarkModal">
-            ยกเลิก
-          </button>
-          <button class="btn-save-popup" @click="saveRemark">
+          <button v-else class="btn-save" @click="saveChecklist">
             บันทึก
           </button>
         </div>
@@ -171,10 +125,6 @@ import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-/**
- * สมมติหน้านี้ถูกเรียกจาก dashboard พร้อมข้อมูลเครื่อง และชื่อ user
- * ถ้ายังไม่ได้ต่อจริง ให้ใช้ค่า default ไปก่อน
- */
 const props = defineProps({
   selectedDevice: {
     type: Object,
@@ -191,83 +141,97 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const route = useRoute()
-const equipment = route.params.equipment
 
-// อักษรย่อ user สำหรับ avatar (ยังไม่ได้ใช้ใน template แต่เก็บไว้ได้)
-const initials = computed(() => {
-  const parts = props.currentUserName.trim().split(' ')
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
-  return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
+// วันเริ่มต้นที่กำหนด
+const startDate = ref(new Date("2025-08-21"))
+
+// วันนี้
+const today = ref(new Date())
+
+// แสดงวันที่บน UI
+const todayText = computed(() =>
+  today.value.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' })
+)
+
+// วันครบ 3 เดือน
+const threeMonthDate = computed(() => {
+  const d = new Date(startDate.value)
+  d.setMonth(d.getMonth() + 3)
+  return d
 })
 
-// วันที่วันนี้แบบอัตโนมัติ
-const todayText = computed(() => {
-  const d = new Date()
-  return d.toLocaleDateString('th-TH', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
+// วันนี้ตรงกับวันที่ครบ 3 เดือนหรือไม่
+const isExactly3Months = computed(() => {
+  const t = today.value
+  const m = threeMonthDate.value
+  return (
+    t.getFullYear() === m.getFullYear() &&
+    t.getMonth() === m.getMonth() &&
+    t.getDate() === m.getDate()
+  )
 })
 
-// รายการ checklist เดิม
+function goNext() {
+  router.push('/monthly-check')
+}
+
+// checklist
 const checklistItems = ref([
   {
     id: 'powerCable',
-    label:
-      'สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ',
-    result: ''
+    label: 'สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ',
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'lockBrake',
     label: 'ระบบล็อกและเบรก : ทำงานได้อย่างถูกต้อง',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'tableTubeBucky',
     label: 'เตียง หลอดเอกซเรย์ และบักกี้ : เคลื่อนที่ได้อย่างราบเรียบ',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   },
   {
     id: 'tubeWarmup',
     label: 'X-ray tube warm-up : ด้วยค่าเทคนิคที่บริษัทแนะนำ',
-    result: ''
+    result: '',
+    remark: '',
+    file: null,
+    fileName: ''
   }
 ])
 
-// ⭐ แบบบันทึกการลบแผ่นเพลท (ผ่าน / ไม่ผ่าน)
-const plateEraseResult = ref('') // 'pass' | 'fail' | ''
-
-// popup หมายเหตุ
-const showRemarkModal = ref(false)
-const remarkText = ref('')
-const remarkFile = ref(null)
-
-const remarkFileName = computed(() =>
-  remarkFile.value ? remarkFile.value.name : ''
+const plateEraseResult = ref('')
+const plateEraseRemark = ref('')
+const plateEraseFile = ref(null)
+const plateEraseFileName = computed(() =>
+  plateEraseFile.value ? plateEraseFile.value.name : ''
 )
 
-const currentUserName = computed(() => props.currentUserName)
-
-const openRemarkModal = () => {
-  showRemarkModal.value = true
+const onItemFileChange = (event, item) => {
+  const file = event.target.files[0] || null
+  item.file = file
+  item.fileName = file ? file.name : ''
 }
 
-const closeRemarkModal = () => {
-  showRemarkModal.value = false
+const onPlateEraseFileChange = (event) => {
+  const file = event.target.files[0] || null
+  plateEraseFile.value = file
 }
 
-const onFileChange = (event) => {
-  const file = event.target.files[0]
-  remarkFile.value = file || null
-}
-
-const saveRemark = () => {
-  // ตอนนี้แค่ log ดู ยังไม่มี backend
-  console.log('หมายเหตุ:', remarkText.value)
-  console.log('ไฟล์แนบ:', remarkFile.value)
-  showRemarkModal.value = false
+const markAllPass = () => {
+  checklistItems.value.forEach((item) => { item.result = 'pass' })
+  plateEraseResult.value = 'pass'
 }
 
 const saveChecklist = () => {
@@ -276,27 +240,25 @@ const saveChecklist = () => {
     date: todayText.value,
     user: props.currentUserName,
     checklist: checklistItems.value,
-    remark: remarkText.value
-    // ถ้าภายหลังอยากบันทึกผลลบแผ่นเพลทไป backend ด้วย:
-    // plateErase: plateEraseResult.value
+    plateErase: {
+      result: plateEraseResult.value,
+      remark: plateEraseRemark.value,
+      fileName: plateEraseFileName.value
+    }
   }
 
-  console.log('ข้อมูลที่ต้องบันทึก (frontend เท่านั้น):', payload)
-
-  // เด้งกลับหน้า dashboard (ปรับ path ตาม router ของโปรเจกต์คุณ)
+  console.log('ข้อมูลที่ต้องบันทึก:', payload)
   router.push('/dashboard')
 }
 </script>
 
 <style scoped>
-/* พื้นที่ทำงานหลักของหน้า (content ใน MainLayout) */
 .checklist-page {
   background: #ffffff;
   min-height: calc(100vh - 56px);
   padding: 24px 32px 32px;
 }
 
-/* หัวข้อ CHECKLIST */
 .page-title {
   font-size: 1.4rem;
   font-weight: 700;
@@ -305,7 +267,6 @@ const saveChecklist = () => {
   margin-bottom: 16px;
 }
 
-/* แถวแคปซูลด้านบน */
 .pill-row {
   display: flex;
   flex-wrap: wrap;
@@ -325,18 +286,16 @@ const saveChecklist = () => {
 
 .pill-main {
   background: #ffb480;
-  color: #047857; /* เขียวตัวเครื่องใน mockup */
+  color: #047857;
   font-weight: 700;
 }
 
-/* กล่องเนื้อหากลาง (พื้นขาวเหมือนกระดาษ) */
 .content-panel {
   background: #ffffff;
   padding: 20px 24px 28px;
   box-shadow: 0 0 0 1px #e5e5e5;
 }
 
-/* หัวข้อ Dairy check */
 .section-label {
   font-size: 1rem;
   font-weight: 500;
@@ -344,7 +303,6 @@ const saveChecklist = () => {
   margin-bottom: 12px;
 }
 
-/* ตาราง */
 .table-wrapper {
   border-radius: 0;
   box-shadow: none;
@@ -364,23 +322,21 @@ const saveChecklist = () => {
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* แถวหัวบนสุดสีฟ้า */
 .row-header-main td {
   font-weight: 700;
   background: #55b4ff;
   color: #ffffff;
 }
 
-/* หัวคอลัมน์ */
 .row-header-columns td {
   font-weight: 600;
   background: #f3f4f6;
 }
 
-/* สีพื้นสลับแถว (ให้ดูลอยเหมือนในภาพ) */
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
   background: #f9fafb;
 }
+
 .check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
   background: #e5e7eb;
 }
@@ -393,7 +349,6 @@ const saveChecklist = () => {
   text-align: center;
 }
 
-/* ปุ่มด้านล่างขวา */
 .actions {
   margin-top: 20px;
   display: flex;
@@ -412,7 +367,7 @@ const saveChecklist = () => {
 }
 
 .btn-remark {
-  background: #ff6b81; /* แดงอมชมพูคล้าย mockup */
+  background: #ff6b81;
   color: #ffffff;
 }
 
@@ -429,7 +384,6 @@ const saveChecklist = () => {
   background: #4fb759;
 }
 
-/* Popup หมายเหตุ */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -496,7 +450,6 @@ const saveChecklist = () => {
   margin-top: 12px;
 }
 
-/* margin-top เพิ่มสำหรับตารางใหม่ */
 .mt-24 {
   margin-top: 24px;
 }
@@ -532,7 +485,6 @@ const saveChecklist = () => {
   color: #ffffff;
 }
 
-/* responsive เล็กน้อย */
 @media (max-width: 768px) {
   .checklist-page {
     padding: 16px;
