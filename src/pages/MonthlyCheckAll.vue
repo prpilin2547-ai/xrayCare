@@ -20,7 +20,7 @@
         <!-- ⭐ sidebar แบบฟอร์ม -->
         <aside class="form-sidebar">
           <!-- เอาเฉพาะส่วน 3 MONTH ออก เหลือแค่ 6 MONTH -->
-          <div class="sidebar-section-label mt-3">6 MONTH</div>
+          <!-- <div class="sidebar-section-label mt-3">6 MONTH</div> -->
           <div
             v-for="tab in formTabs6M"
             :key="tab.id"
