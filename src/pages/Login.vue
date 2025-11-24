@@ -1,7 +1,10 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <div class="login-avatar"></div>
+      <div class="login-avatar">
+  <i class="fa-solid fa-circle-user"></i>
+</div>
+
 
       <h1 class="login-title">Login</h1>
       <p class="login-subtitle">Welcome To X-ray care</p>
@@ -181,4 +184,19 @@ input:focus {
 .btn-login:hover {
   background: #4c2faf;
 }
+.login-avatar {
+  width: 80px;     /* ขนาดเดิมของ avatar */
+  height: 80px;
+  border-radius: 999px;
+  background: none; /* เอาพื้นหลังเดิมออกถ้ามี */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-avatar i {
+  font-size: 80px;  /* ไอคอนใหญ่เท่า avatar */
+  color: #4b5563;   /* เทาเข้ม ดูเหมือน user icon */
+}
+
 </style>
