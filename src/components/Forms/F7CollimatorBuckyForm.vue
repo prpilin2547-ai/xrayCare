@@ -124,30 +124,41 @@
         </table>
       </div>
 
-      <!-- หมายเหตุ -->
-      <div class="mt-3 d-flex flex-column flex-md-row align-items-start gap-2">
-        <div class="flex-grow-1">
-          <label class="form-label small mb-1">หมายเหตุ</label>
-          <textarea
-            v-model="form.remark"
-            rows="2"
+      <!-- หมายเหตุ + ปุ่ม ถัดไป (ใต้ textarea, ขวาสุด) -->
+      <div class="mt-3">
+        <label class="form-label small mb-1">หมายเหตุ</label>
+        <textarea
+          v-model="form.remark"
+          rows="2"
+          class="form-control form-control-sm mb-3"
+          placeholder="บันทึกรายละเอียดเพิ่มเติม..."
+        ></textarea>
+        <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
             class="form-control form-control-sm"
-            placeholder="บันทึกรายละเอียดเพิ่มเติม..."
-          ></textarea>
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
         </div>
-        <div class="d-flex flex-column align-items-end gap-2 mt-2 mt-md-0">
+      </div>
+      <br>
+
+        <div class="d-flex justify-content-end">
           <button class="btn btn-warning btn-sm fw-semibold" @click="submitNext">
             ถัดไป
           </button>
         </div>
       </div>
+
     </div>
-  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-
 
 const props = defineProps({
   initial: Object,

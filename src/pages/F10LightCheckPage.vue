@@ -21,10 +21,10 @@
 
         <!-- หัวข้อฟอร์มตามแบบบันทึก -->
         <div class="form-header-grid">
-          <div class="field-row">
+          <!-- <div class="field-row">
             <span>วันที่ :</span>
             <input v-model="formHeader.date" class="input-underline" type="text" />
-          </div>
+          </div> -->
           <div class="field-row">
             <span>หน่วยงาน :</span>
             <input v-model="formHeader.department" class="input-underline" type="text" />

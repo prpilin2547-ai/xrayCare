@@ -84,21 +84,36 @@
 
                             <td><input v-model="form.resultPv" class="form-control form-control-sm" /></td>
                             <td><input v-model="form.resultPvsd" class="form-control form-control-sm" /></td>
-                            <td><button @click="addform">เพิ่มข้อมูล</button></td>
+                            <td><button @click="addform">เพิ่มอุปกรณ์</button></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- หมายเหตุ + ปุ่มถัดไป -->
-            <div class="mt-3 d-flex flex-column flex-md-row align-items-start gap-2">
-                <div class="flex-grow-1">
-                    <label class="form-label small mb-1">หมายเหตุ</label>
-                    <textarea v-model="remark" rows="2" class="form-control form-control-sm"
-                        placeholder="บันทึกรายละเอียดเพิ่มเติม..."></textarea>
-                </div>
+            <!-- หมายเหตุ + ปุ่มถัดไป (ใต้ textarea, ขวาสุด) -->
+            <div class="mt-3">
+                <label class="form-label small mb-1">หมายเหตุ</label>
+                <textarea
+                    v-model="remark"
+                    rows="2"
+                    class="form-control form-control-sm mb-3"
+                    placeholder="บันทึกรายละเอียดเพิ่มเติม..."
+                ></textarea>
 
-                <div class="d-flex flex-column align-items-end gap-2 mt-2 mt-md-0">
+                <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
+      </div> <br>
+
+                <div class="d-flex justify-content-end">
                     <!-- ปุ่มถัดไป สีเหลือง -->
                     <button class="btn btn-warning btn-sm fw-semibold" @click="submitNext">
                         ถัดไป
@@ -106,7 +121,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <script setup>
@@ -136,7 +150,6 @@ const form = ({
     resultPv: '',
     resultPvsd: ''
 })
-
 
 const addform = () => {
     formarr.value.push({
@@ -177,7 +190,9 @@ const resetform = () => {
     form.resultPv = '';
     form.resultPvsd = '';
 }
+
 const remark = ref('')
+
 const delrow = (id) => {
     formarr.value = formarr.value.filter(row => row.id !== id);
 };

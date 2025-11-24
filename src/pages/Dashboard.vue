@@ -3,12 +3,12 @@
     <div class="page">
       <div class="dashboard-header-row">
         <h2 class="page-title">Dashboard</h2>
-        <div class="toggle-wrapper">
+        <!-- <div class="toggle-wrapper">
           <label class="toggle-label">
             <input type="checkbox" v-model="hasMachines" />
             <span>แสดงตัวอย่างเมื่อมีเครื่องลงทะเบียนแล้ว</span>
           </label>
-        </div>
+        </div> -->
       </div>
 
       <div class="cards-row">
@@ -35,7 +35,8 @@
           <span class="dot-blue"></span>
           <span class="checklist-text">CHECKLIST</span>
         </div>
-        <button class="btn-add">
+        <!-- ทำปุ่มบวกให้คลิกได้และไปหน้า MachinesCreate -->
+        <button class="btn-add" @click="goToMachinesCreate">
           <span class="btn-add-icon">＋</span>
         </button>
       </div>
@@ -49,17 +50,39 @@
               <th>Room</th>
               <th>Caretaker</th>
               <th>Status</th>
+              <!-- เพิ่มหัวคอลัมน์ปุ่ม CHECK -->
+              <th>CHECK</th>
             </tr>
           </thead>
           <tbody v-if="hasMachines">
             <tr v-for="row in sampleRows" :key="row.no">
-              <td>{{ row.no }}</td>
-              <td class="equipment-cell" @click="goToDairyCheck(row.equipment)">
-                {{ row.equipment }}
+              <td>{{ row.rid }}</td>
+              <!-- เอา @click ออกจากชื่อเครื่อง -->
+              <td>
+                {{ row.machine_name }}
               </td>
               <td>{{ row.room }}</td>
               <td>{{ row.caretaker }}</td>
               <td class="status pending">รอดำเนินการ</td>
+              <!-- ปุ่ม CHECK สำหรับไปหน้า DairyCheckPage พร้อมสไตล์สีฟ้า -->
+              <td>
+                <button
+                  @click="goToDairyCheck(row.equipment)"
+                  style="
+                    background: #2563eb;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 4px 12px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+                  "
+                >
+                  CHECK
+                </button>
+              </td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -69,52 +92,110 @@
               <td>-</td>
               <td>-</td>
               <td>-</td>
+              <!-- คอลัมน์ CHECK ตอนยังไม่มีข้อมูล -->
+              <td>-</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="monthly-box">
-        <div class="monthly-left">
-          <span class="monthly-icon">📅</span>
-          <div>
-            <p class="monthly-title">Monthly check</p>
-            <p class="monthly-date">
+      <!-- <div class="monthly-box">
+        <div class="monthly-left"> -->
+          <!-- <span class="monthly-icon">📅</span> -->
+          <!-- <div> -->
+            <!-- <p class="monthly-title">Monthly check</p> -->
+            <!-- <p class="monthly-date">
               {{ hasMachines ? '15 Nov 2025' : '-' }}
-            </p>
-          </div>
+            </p> -->
+          <!-- </div> -->
         </div>
-      </div>
-    </div>
+      <!-- </div>
+    </div> -->
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+import common from '../js/Commonfunction.js'
 
 const router = useRouter()
 const hasMachines = ref(true)
 
+onMounted(() => {
+  if (hasMachines.value) {
+    //getallmachines()
+  }
+})
+
 const displayDate = '10 Nov 2025'
 
-const sampleRows = [
-  { no: 1, equipment: 'Shimazu', room: '1', caretaker: 'ศุภกร' },
-  { no: 2, equipment: 'Carestream', room: '2', caretaker: 'พรไพลิน' },
-  { no: 3, equipment: 'Konica', room: '3', caretaker: 'เบญจรัตน์' },
-  { no: 4, equipment: 'Toshiba', room: '4', caretaker: 'ขยัน' }
-]
+const sampleRows = ref([
+  {
+    no: 1,
+    rid: '001',
+    equipment: 'XRay-Alpha',
+    machine_name: 'X-Ray Machine (BrandA/ModelX)',
+    room: 'Room 101',
+    caretaker: 'John Doe'
+  },
+  {
+    no: 2,
+    rid: '002',
+    equipment: 'XRay-Beta',
+    machine_name: 'X-Ray Machine (BrandB/ModelY)',
+    room: 'Room 102',
+    caretaker: 'Jane Smith'
+  },
+  {
+    no: 3,
+    rid: '003',
+    equipment: 'XRay-Gamma',
+    machine_name: 'X-Ray Machine (BrandC/ModelZ)',
+    room: 'Room 103',
+    caretaker: 'Mike Johnson'
+  },
+  {
+    no: 4,
+    rid: '004',
+    equipment: 'XRay-Delta',
+    machine_name: 'X-Ray Machine (BrandD/ModelW)',
+    room: 'Room 104',
+    caretaker: 'Emily Davis'
+  }
+])
+
+// function getallmachines() {
+//   common.CallWebAPI(
+//     'api/Xraycare/GetAllMachines',
+//     'GET',
+//     null,
+//     (data) => {
+//       sampleRows.value = data;
+//       console.log('Fetched machines:', data)
+//     },
+//     (error) => {
+//       console.error('Error fetching machines:', error)
+//     }
+//   )
+// }
 function goToDairyCheck(equipmentName) {
   router.push({
     name: 'DairyCheckPage',
     params: { equipmentName }
+    
   })
+}
+
+function goToMachinesCreate() {
+  router.push('/machines/create')
 }
 
 </script>
 
 <style scoped>
+/* เดิมทั้งหมด ไม่แก้ไข */
 .page {
   display: flex;
   flex-direction: column;

@@ -9,13 +9,21 @@
             </td>
           </tr>
 
+          <!-- กำหนดวันที่ตรวจได้ -->
           <!-- <tr>
-            <td class="cell-label">วันที่</td>
+            <td class="cell-label">วันที่ตรวจ</td>
             <td colspan="2">
-              <input type="date" v-model="form.date" class="input-cell" />
+              <input
+                type="date"
+                v-model="form.date"
+                class="input-cell"
+              />
             </td>
           </tr> -->
-          <!-- <tr>
+
+          <!-- ถ้าอยากให้กรอกผู้ทดสอบเองด้วยก็ใช้ช่องนี้ -->
+          <!--
+          <tr>
             <td class="cell-label">ผู้ทดสอบ</td>
             <td colspan="2">
               <input
@@ -25,7 +33,8 @@
                 :placeholder="currentUserName"
               />
             </td>
-          </tr> -->
+          </tr>
+          -->
 
           <tr class="row-header-columns">
             <td>คุณภาพของภาพพิมพ์โดยทั่วไป</td>
@@ -58,7 +67,7 @@
       </table>
     </div>
 
-    <!-- หมายเหตุ + ถัดไป -->
+    <!-- หมายเหตุ + ปุ่มด้านล่าง -->
     <div class="remark-actions">
       <div class="remark-box">
         <label class="field-label">หมายเหตุ (F3)</label>
@@ -75,25 +84,45 @@
         </p>
       </div>
 
-      <button class="btn-next" @click="submitNext">
+      <!-- ปุ่มจะสลับข้อความตามว่า ครบ 6 เดือนจากการบันทึกล่าสุดหรือยัง
+           และใช้วันที่ที่กำหนดในฟอร์มเป็นตัวเช็ค -->
+      <button
+        v-if="isSixMonthsFromLast"
+        class="btn btn-warning"
+        @click="submitNext"
+      >
         ถัดไป
       </button>
+
+      <button
+        v-else
+        class="btn btn-warning"
+        @click="submitNext"
+      >
+        ถัดไป
+      </button>
+      <!-- เปลี่ยนเป็นุ่มถัดไปก่อนนะคะ -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   initial: Object,
-  currentUserName: String
+  currentUserName: String,
+  // วันที่บันทึกล่าสุดของหน้า F3 เช่น '2025-01-01'
+  lastRecordDate: {
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits(['next'])
 
 const defaultForm = () => ({
-  date: '',
+  date: '', // ใช้เป็นวันที่ตรวจรอบนี้
   tester: props.currentUserName || '',
   items: [
     { id: 'smear', label: 'ภาพไม่มีรอยเบลอ (Smear)', result: '' },
@@ -111,7 +140,8 @@ const defaultForm = () => ({
     { id: 'uniformity', label: 'กลุ่มช่องเท่ากันมีความสม่ำเสมอ', result: '' },
     {
       id: 'qualityCont',
-      label: 'จำนวนตัวอักษรที่มองเห็นได้ (อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")',
+      label:
+        'จำนวนตัวอักษรที่มองเห็นได้ (อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")',
       result: ''
     }
   ],
@@ -122,12 +152,49 @@ const defaultForm = () => ({
 
 const form = ref(props.initial || defaultForm())
 
+// ---------- เช็คครบ 6 เดือนจากวันที่บันทึกล่าสุด โดยใช้ "วันที่ที่กำหนดในฟอร์ม" ----------
+
+// แปลง lastRecordDate เป็น Date (ถ้ามี)
+const lastDate = computed(() => {
+  if (props.lastRecordDate) {
+    return new Date(props.lastRecordDate)
+  }
+  // ถ้าไม่เคยมีการบันทึกมาก่อน ให้คืน null
+  return null
+})
+
+// วันที่ที่จะใช้เปรียบเทียบ (ถ้า user เลือกในฟอร์มใช้วันนั้น, ถ้าไม่เลือกใช้วันนี้)
+const currentCheckDate = computed(() => {
+  if (form.value.date) {
+    // form.date จะเป็นรูปแบบ 'YYYY-MM-DD'
+    return new Date(form.value.date)
+  }
+  return new Date()
+})
+
+// true เมื่อ currentCheckDate ห่างจาก lastDate เป็น 6, 12, 18,... เดือน
+const isSixMonthsFromLast = computed(() => {
+  const start = lastDate.value
+  const current = currentCheckDate.value
+
+  // ถ้ายังไม่เคยบันทึก (ไม่มี lastDate) ให้ยังเป็นโหมด "บันทึก" ก่อน
+  if (!start) return false
+
+  const monthsDiff =
+    (current.getFullYear() - start.getFullYear()) * 12 +
+    (current.getMonth() - start.getMonth())
+
+  return monthsDiff >= 0 && monthsDiff % 6 === 0
+})
+
+// ---------- อัพโหลดไฟล์ ----------
 const onFileChange = (e) => {
   const file = e.target.files[0]
   form.value.file = file || null
   form.value.fileName = file ? file.name : ''
 }
 
+// กดปุ่ม (ทั้ง "ถัดไป" และ "บันทึก" ใช้ handler เดียว)
 const submitNext = () => {
   emit('next', form.value)
 }
