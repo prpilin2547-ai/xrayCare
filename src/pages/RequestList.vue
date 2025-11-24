@@ -3,11 +3,12 @@
         <div class="page">
             <!-- ================== VIEW 1 : ตารางระบบแจ้งซ่อม ================== -->
             <div v-if="!selectedItem">
-                <!-- หัวข้อระบบแจ้งซ่อม + ปุ่มบวก -->
+                <!-- หัวข้อระบบแจ้งซ่อม + ปุ่มเพิ่มรายการ -->
                 <div class="section-header">
                     <span class="section-title">ระบบแจ้งซ่อม</span>
-                    <button type="button" class="btn-add" @click="openModal">
-                        <span class="plus-icon">＋</span>
+                    <button type="button" class="btn btn-danger d-flex align-items-center gap-2" @click="openModal">
+                        <i class="bi bi-plus-lg"></i>
+                        เพิ่มรายการ
                     </button>
                 </div>
 
@@ -18,6 +19,7 @@
                             <tr>
                                 <th>ลำดับ</th>
                                 <th>อุปกรณ์</th>
+                                <th>ห้องตรวจ</th>
                                 <th>รายละเอียด</th>
                                 <th>สถานะ</th>
                             </tr>
@@ -27,36 +29,39 @@
                                 @click="openDetail(item)">
                                 <!-- ใช้ index + 1 เป็นลำดับแทน id -->
                                 <td>{{ index + 1 }}</td>
-                                <td>{{ item.equipment }}</td>
+                                <td>{{ getEquipmentText(item) }}</td>
+                                <td>{{ getRoomText(item) }}</td>
                                 <td>{{ item.detail }}</td>
                                 <td class="status" :class="getStatusCellClass(item.statusText)">
                                     {{ item.statusText }}
                                 </td>
                             </tr>
                         </tbody>
-
                     </table>
                 </div>
             </div>
 
             <!-- ================== VIEW 2 : รายละเอียดแจ้งซ่อม (แสดงอย่างเดียว) ================== -->
             <div v-else class="repair-detail-page">
-                <!-- ปุ่มกากบาทสีแดง มุมขวาบน (ข้อ 2) -->
-                <button class="btn-close-detail" @click="closeDetail">×</button>
-
-                <!-- Header Title -->
+                <!-- Header Title + ปุ่มกากบาท -->
                 <div class="page-header">
                     <div class="blue-dot"></div>
                     <h2 class="page-title">รายละเอียดแจ้งซ่อม</h2>
+                    <i class="bi bi-x-circle close-modal-btn" @click="closeDetail"></i>
                 </div>
+
+
 
                 <!-- Main Content Box -->
                 <div class="main-box">
                     <!-- Orange Header -->
                     <div class="box-header">
                         <div class="header-label">อุปกรณ์</div>
-                        <div class="header-value">{{ selectedItem.equipment }}</div>
+                        <div class="header-value">
+                            {{ getEquipmentWithRoom(selectedItem) }}
+                        </div>
                     </div>
+
 
                     <!-- Grey Body -->
                     <div class="box-body">
@@ -76,8 +81,14 @@
                             </ul>
                         </div>
 
-                        <!-- แสดงสถานะ (อ่านอย่างเดียว) -->
                         <div class="inner-actions">
+                            <!-- ปุ่มไฟล์ภาพ (เพิ่มใหม่) -->
+                            <button v-if="selectedItem && selectedItem.imageData" class="btn btn-file shadow-sm"
+                                @click="openImageModal(selectedItem.imageData)">
+                                ไฟล์ภาพ
+                                <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
+                            </button>
+
                             <div class="status-display">
                                 <div class="btn-status-base shadow-sm" :class="detailStatusClass">
                                     {{ selectedItem.statusText }}
@@ -87,7 +98,26 @@
                     </div>
                 </div>
             </div>
-            <!-- ================== END VIEW 2 ================== -->
+        </div>
+
+        <!-- Image Modal (เพิ่มใหม่) -->
+        <div v-if="showImageModal" class="modal-overlay">
+            <div class="modal-card image-modal-card">
+                <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
+                    <h5 class="m-0">รูปภาพ</h5>
+                    <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
+                </div>
+                <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
+                    style="min-height: 300px">
+                    <div class="text-center">
+                        <img v-if="previewImageSrc" :src="previewImageSrc" alt="Request Image"
+                            class="img-fluid shadow-sm mb-3" />
+                        <p class="text-muted">
+                            รูปภาพที่อัปโหลดไว้ในรายการแจ้งซ่อม
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </MainLayout>
 
@@ -117,6 +147,19 @@
                             </div>
                         </div>
 
+                        <!-- ห้องตรวจ (ใหม่) -->
+                        <div class="row mt-3">
+                            <label class="label">ห้องตรวจ :</label>
+                            <div class="field">
+                                <select v-model="selectedRoom" class="pill-btn form-control form-control-sm">
+                                    <option value="">เลือกห้องตรวจ</option>
+                                    <option v-for="room in roomOptions" :key="room" :value="room">
+                                        {{ room }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- รายละเอียด -->
                         <div class="mt-3">
                             <label class="label">รายละเอียด :</label>
@@ -133,13 +176,22 @@
                                 <input ref="fileInput" type="file" accept="image/*" class="hidden-file form-control"
                                     @change="onFileSelected" />
                                 <div v-if="fileName" class="file-name">
-                                    {{ fileName }}
+                                    <!-- คลิกชื่อไฟล์เพื่อพรีวิว -->
+                                    <span v-if="uploadedImageData" class="file-link"
+                                        @click="openImageModal(uploadedImageData)">
+                                        {{ fileName }}
+                                    </span>
+                                    <span v-else>{{ fileName }}</span>
+
+                                    <!-- ปุ่มกากบาทลบไฟล์ -->
+                                    <button type="button" class="file-remove" @click="clearFile">
+                                        ×
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @click="closeModal">ปิด</button>
                     <button class="btn btn-primary" @click="submitForm">บันทึก</button>
@@ -163,21 +215,31 @@ const fileName = ref('')
 
 const detail = ref('')
 const selectedEquipment = ref('')
+const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
 const selectedItem = ref(null)
 
-// list อุปกรณ์
+// เพิ่มใหม่
+const uploadedImageData = ref('')      // เก็บ dataURL ของรูปที่อัปโหลด
+const showImageModal = ref(false)      // คุม modal รูป
+const previewImageSrc = ref('')        // src ที่จะแสดงใน modal
+
+// list อุปกรณ์ (เอาคำว่า "ห้อง X" ออกแล้ว)
 const equipmentOptions = [
-    'X-ray general รุ่น xxx ห้อง 1',
-    'X-ray general รุ่น yyyy ห้อง 2',
-    'X-ray general รุ่น zzzz ห้อง 3',
-    'X-ray general รุ่น aaaa ห้อง 4'
+    'X-ray general รุ่น xxx',
+    'X-ray general รุ่น yyyy',
+    'X-ray general รุ่น zzzz',
+    'X-ray general รุ่น aaaa'
 ]
+
+// list ห้องตรวจ
+const roomOptions = ['ห้อง 1', 'ห้อง 2', 'ห้อง 3', 'ห้อง 4']
 
 // default ข้อมูลเริ่มต้นในตาราง
 const defaultItems = [
     {
         id: 1,
-        equipment: 'X-ray general รุ่น xxx ห้อง 1',
+        equipment: 'X-ray general รุ่น xxx',
+        room: 'ห้อง 1',
         detail: 'ระบบล็อกและเบรก',
         statusText: 'รอซ่อม'
     }
@@ -211,10 +273,31 @@ watch(
     { deep: true }
 )
 
-// แสดงเฉพาะรายการที่ยังไม่ "ดำเนินการแล้ว" (ข้อ 1)
+// แสดงเฉพาะรายการที่ยังไม่ "ดำเนินการแล้ว"
 const activeItems = computed(() =>
     items.value.filter(i => i.statusText !== 'ดำเนินการแล้ว')
 )
+
+// helper แสดงชื่ออุปกรณ์ (ตัดคำว่า "ห้อง X" ออกกรณีเป็นข้อมูลเก่า)
+const getEquipmentText = (item) => {
+    if (item.room) return item.equipment
+    return item.equipment.replace(/\s*ห้อง\s*\d+\s*$/, '')
+}
+
+// helper แสดงห้องตรวจ (รองรับข้อมูลเก่าที่ยังไม่ได้แยก room)
+const getRoomText = (item) => {
+    if (item.room) return item.room
+    const match = item.equipment.match(/ห้อง\s*\d+/)
+    return match ? match[0] : ''
+}
+
+// *** ใหม่: ใช้สำหรับกล่องสีส้ม ***
+const getEquipmentWithRoom = (item) => {
+    if (!item) return ''
+    const equip = getEquipmentText(item)
+    const room  = getRoomText(item)
+    return room ? `${equip} ${room}` : equip
+}
 
 // เปิด modal
 const openModal = () => {
@@ -229,7 +312,18 @@ const closeModal = () => {
 // เลือกไฟล์ภาพ
 const onFileSelected = (event) => {
     const file = event.target.files[0]
-    fileName.value = file ? file.name : ''
+    if (!file) {
+        fileName.value = ''
+        uploadedImageData.value = ''
+        return
+    }
+
+    fileName.value = file.name
+    const reader = new FileReader()
+    reader.onload = e => {
+        uploadedImageData.value = e.target.result // เก็บเป็น base64
+    }
+    reader.readAsDataURL(file)
 }
 
 // เปิดหน้ารายละเอียดเมื่อคลิกในตาราง
@@ -237,14 +331,14 @@ const openDetail = (item) => {
     selectedItem.value = item
 }
 
-// ปิดหน้ารายละเอียดด้วยปุ่มกากบาท (ข้อ 2)
+// ปิดหน้ารายละเอียดด้วยปุ่มกากบาท
 const closeDetail = () => {
     selectedItem.value = null
 }
 
 // เพิ่มข้อมูลใหม่ + กลับไปตาราง
 const submitForm = () => {
-    if (!selectedEquipment.value || !detail.value) {
+    if (!selectedEquipment.value || !selectedRoom.value || !detail.value) {
         return
     }
 
@@ -255,19 +349,46 @@ const submitForm = () => {
     items.value.push({
         id: newId,
         equipment: selectedEquipment.value,
+        room: selectedRoom.value,
         detail: detail.value,
-        statusText: 'รอซ่อม' // สถานะเริ่มต้น
+        statusText: 'รอซ่อม',                // สถานะเริ่มต้น
+        imageData: uploadedImageData.value || null // เก็บรูปไปกับ item
     })
 
     // เคลียร์ฟอร์ม
     selectedEquipment.value = ''
+    selectedRoom.value = ''
     detail.value = ''
     fileName.value = ''
+    uploadedImageData.value = ''
     if (fileInput.value) {
         fileInput.value.value = ''
     }
 
     closeModal()
+}
+
+// ลบไฟล์ที่อัปโหลด (กากบาท)
+const clearFile = (event) => {
+    event.stopPropagation()
+    fileName.value = ''
+    uploadedImageData.value = ''
+    if (fileInput.value) {
+        fileInput.value.value = ''
+    }
+}
+
+// เปิด modal รูปภาพ
+const openImageModal = (imageSrc) => {
+    if (!imageSrc) return
+    previewImageSrc.value = imageSrc
+    showImageModal.value = true
+}
+
+// ปิด modal รูปภาพ
+const closeImageModal = () => {
+    showImageModal.value = false
+    previewImageSrc.value = ''
 }
 
 // สีพื้นหลังของสถานะในตาราง
@@ -308,46 +429,25 @@ const detailStatusClass = computed(() => {
     font-weight: 600;
 }
 
-.btn-add {
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    border: none;
-    background: #ef4444;
-    color: #ffffff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.plus-icon {
-    font-size: 1rem;
-    line-height: 1;
-}
-
-/* ปุ่มกากบาทสีแดงบนหน้ารายละเอียด (ข้อ 2) */
 .repair-detail-page {
     position: relative;
 }
 
-.btn-close-detail {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    border: none;
-    background: #ef4444;
-    color: #ffffff;
+/* ปุ่มกากบาทมุมขวาบน */
+.close-modal-btn {
+    margin-left: auto;
+    /* ดันไปชิดขวาในแถวเดียวกับหัวข้อ */
     cursor: pointer;
-    font-size: 1.1rem;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: #dc3545;
+    font-size: 1.5rem;
+    transition: 0.2s;
 }
+
+
+.close-modal-btn:hover {
+    transform: scale(1.1);
+}
+
 
 /* ตาราง */
 .table-wrapper {
@@ -484,7 +584,6 @@ ul.content-list li::before {
     padding: 0 25px;
     white-space: nowrap;
     pointer-events: none;
-    /* กดไม่ได้ */
 }
 
 /* สีสถานะใช้ร่วมกับ RequestEN */
@@ -498,5 +597,72 @@ ul.content-list li::before {
 
 .status-completed {
     background-color: #8be296;
+}
+
+/* ปุ่มไฟล์ภาพ */
+.btn-file {
+    background-color: #9ebd6e;
+    border: 1px solid #333;
+    color: black;
+    width: 140px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+/* กล่องชื่อไฟล์ + ปุ่มกากบาท */
+.file-name {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.file-link {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.file-remove {
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* modal แสดงรูปภาพ – ให้ลอยอยู่ด้านขวา ไม่บังหน้าระบบแจ้งซ่อม */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50vw;
+    max-width: 600px;
+    height: 100vh;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.image-modal-card {
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.section-header button {
+    padding: 6px 14px;
+    font-size: 0.9rem;
 }
 </style>
