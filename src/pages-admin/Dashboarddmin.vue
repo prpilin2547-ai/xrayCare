@@ -5,7 +5,7 @@
       <!-- ========================================= -->
       <!-- PART 1: ADMIN DASHBOARD (ด้านบน) -->
       <!-- ========================================= -->
-      <div id="admin-section" class="section-container pb-3"> <!-- ลด padding ด้านล่าง -->
+      <div id="admin-section" class="section-container pb-3">
         
         <div class="dashboard-header-row">
           <h2 class="page-title">Dashboard (Tech) </h2>
@@ -43,9 +43,7 @@
             <span class="dot-blue"></span>
             <span class="header-text-blue">CHECKLIST</span>
           </div>
-          <button class="btn-add">
-            <span class="btn-add-icon">＋</span>
-          </button>
+          <!-- ปุ่มบวกสีแดงถูกลบออกตามข้อ 1 -->
         </div>
 
         <!-- Checklist Table (Admin มีกล่องขาว table-card) -->
@@ -63,8 +61,9 @@
               </thead>
               <tbody v-if="hasMachines">
                 <tr v-for="row in adminChecklistRows" :key="row.no">
+                  <!-- เอา @click ออกตามข้อ 2 -->
                   <td>{{ row.no }}</td>
-                  <td class="equipment-cell" @click="goToDairyCheck(row.equipment)">
+                  <td class="equipment-cell">
                     {{ row.equipment }}
                   </td>
                   <td>{{ row.room }}</td>
@@ -95,13 +94,11 @@
         </div>
 
       </div>
-      
-      <!-- ลบเส้นประ (hr) ออกตามข้อ 2 -->
 
       <!-- ========================================= -->
       <!-- PART 2: ENGINEER DASHBOARD (ด้านล่าง) -->
       <!-- ========================================= -->
-      <div id="engineer-section" class="section-container pt-0"> <!-- ลด padding ด้านบนให้ชิดกัน -->
+      <div id="engineer-section" class="section-container pt-0">
         
         <h2 class="page-title mb-3">Dashboard (Engineer)</h2>
 
@@ -129,7 +126,7 @@
           </div>
         </div>
 
-        <!-- Request Header (แก้ข้อ 1: ใช้ Style สีฟ้าเหมือน Checklist) -->
+        <!-- Request Header -->
         <div class="section-header-blue mt-4 mb-3">
           <div class="left">
             <span class="dot-blue"></span>
@@ -138,12 +135,10 @@
         </div>
 
         <!-- Request Table (Engineer) -->
-        <!-- แก้ข้อ 4: ลบ class "table-card" ออก เพื่อเอากล่องขาวออก -->
         <div class="table-responsive">
           <table class="table table-bordered border-dark request-table">
             <thead>
               <tr>
-                <!-- แก้ข้อ 5: จัดกึ่งกลาง (text-center) อยู่ใน CSS แล้ว -->
                 <th style="width: 10%;">ลำดับ</th>
                 <th style="width: 40%;">อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
                 <th style="width: 20%;">ห้องตรวจ</th>
@@ -153,7 +148,6 @@
             <tbody class="bg-white">
               <tr v-for="(item, index) in engineerRequests" :key="item.id">
                 <td>{{ index + 1 }}</td>
-                <!-- ชื่ออุปกรณ์จัดชิดซ้ายเหมือนเดิมเพื่อความสวยงาม หรือจะกลางก็ได้ตามใจชอบ แต่ตามโจทย์คือกลางทั้งหมด -->
                 <td class="text-center">{{ item.name }}</td> 
                 <td>{{ item.room }}</td>
                 <td class="text-warning-custom">{{ item.status }}</td>
@@ -164,24 +158,18 @@
 
       </div>
 
-      <!-- แก้ข้อ 3: ลบปุ่มเลื่อนขึ้นลงสีม่วงออก (Floating Buttons removed) -->
-
     </div>
   </MainLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
-const router = useRouter();
-
-// --- Shared State ---
+// ข้อมูลทั้งหมดเป็น mock data อยู่ในฝั่ง frontend เท่านั้น ไม่มีการเรียก backend
 const displayDate = '10 Nov 2025';
 const hasMachines = ref(true);
 
-// --- Admin Data ---
 const adminChecklistRows = [
   { no: 1, equipment: 'Shimazu', room: '1', caretaker: 'ศุภกร' },
   { no: 2, equipment: 'Carestream', room: '2', caretaker: 'พรไพลิน' },
@@ -189,18 +177,12 @@ const adminChecklistRows = [
   { no: 4, equipment: 'Toshiba', room: '4', caretaker: 'ขยัน' }
 ];
 
-// --- Engineer Data ---
 const engineerRequests = ref([
   { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'อยู่ระหว่างดำเนินการ' },
   { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'อยู่ระหว่างดำเนินการ' },
   { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'อยู่ระหว่างดำเนินการ' },
   { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'อยู่ระหว่างดำเนินการ' },
 ]);
-
-// --- Methods ---
-function goToDairyCheck(equipmentName) {
-  console.log('Go to:', equipmentName);
-}
 </script>
 
 <style scoped>
@@ -272,7 +254,7 @@ function goToDairyCheck(equipmentName) {
 
 .card-value { margin: 0; font-size: 1.4rem; font-weight: 700; }
 
-/* --- Section Header Blue Style (ใช้ร่วมกันทั้ง Admin/Engineer) --- */
+/* --- Section Header Blue Style --- */
 .section-header-blue {
   display: flex;
   justify-content: space-between;
@@ -283,21 +265,13 @@ function goToDairyCheck(equipmentName) {
   width: 10px; 
   height: 10px; 
   border-radius: 50%; 
-  background: #3b82f6; /* สีฟ้า */
+  background: #3b82f6;
 }
 .header-text-blue { 
   font-weight: 600; 
   font-size: 1.1rem; 
-  color: #000; /* สีดำปกติตามรูป หรือถ้าอยากได้ฟ้าให้เปลี่ยนเป็น #3b82f6 */
+  color: #000;
 }
-
-/* Add Button */
-.btn-add {
-  width: 32px; height: 32px; border-radius: 50%; border: none;
-  background: #ef4444; color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-.btn-add-icon { font-size: 1.2rem; line-height: 1; }
 
 /* Table Styling (General) */
 .table-card {
@@ -312,10 +286,14 @@ thead tr { border-bottom: 1px solid #e5e7eb; }
 tbody tr:nth-child(even) { background: #f9fafb; }
 
 .status.pending { color: #f97316; font-weight: 500; }
-.equipment-cell { cursor: pointer; color: #2563eb; text-decoration: underline; }
+
+/* ปรับตามข้อ 2: ตัด cursor: pointer ออก แต่คงสีฟ้า + ขีดเส้นใต้เดิม */
+.equipment-cell {
+  color: #2563eb;
+  text-decoration: underline;
+}
 
 /* --- Request Table Specifics (Engineer) --- */
-/* แก้ข้อ 5: จัดกึ่งกลางทั้งหมด */
 .request-table th, 
 .request-table td { 
     text-align: center !important; 
