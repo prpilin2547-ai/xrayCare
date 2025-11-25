@@ -10,7 +10,7 @@
           </tr>
 
           <!-- header info -->
-          <tr>
+          <!-- <tr>
             <td class="cell-label">เครื่องเอกซเรย์ที่ห้อง</td>
             <td colspan="3">
               <input
@@ -20,12 +20,12 @@
                 placeholder="เช่น ห้อง X-ray 1"
               />
             </td>
-          </tr>
+          </tr> -->
           <tr>
-            <td class="cell-label">รุ่น</td>
+            <!-- <td class="cell-label">รุ่น</td>
             <td>
               <input type="text" v-model="form.model" class="input-cell" />
-            </td>
+            </td> -->
             <!-- <td class="cell-label small">วันที่</td>
             <td>
               <input type="date" v-model="form.date" class="input-cell" />

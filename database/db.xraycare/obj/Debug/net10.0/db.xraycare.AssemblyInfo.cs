@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("db.xraycare")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d767d11bca64abb926eeffe73b15decfb951090d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6695d9079eb3c3257c4ada36dc9ff1a6ab1f19d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("db.xraycare")]
 [assembly: System.Reflection.AssemblyTitleAttribute("db.xraycare")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

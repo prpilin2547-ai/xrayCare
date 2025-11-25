@@ -1,71 +1,137 @@
 <template>
   <MainLayout>
     <div class="page">
-      <!-- เอา Export PDF ออกแล้ว -->
-
-      <!-- หน้า 1 : ฟอร์ม -->
+      <!-- ฟอร์มหน้าแรก -->
       <div v-if="!isPreviewVisible" class="form-section-wrapper">
+        <!-- แถบบาร์ด้านบน -->
+        <div class="page-header">
+          <span class="page-header-title">
+            X-ray Maintenance Checklist
+          </span>
+        </div>
+
+        <!-- กล่องฟอร์ม (ติดกับหัวข้อเลย) -->
         <div class="form-panel">
           <form class="form">
             <!-- X-ray machine -->
-            <div class="form-group">
-              <label for="machine">X-ray machine</label>
-              <div class="select-wrapper">
-                <select id="machine" v-model="machine">
-                  <option value="" disabled>
-                    ชื่อรุ่น/ชื่อเครื่อง X-ray/หมายเลขห้อง
-                  </option>
-                  <option value="shimazu-aaa">x-ray shimazu รุ่น AAA ห้อง 1</option>
-                  <option value="shimazu-bbb">x-ray shimazu รุ่น BBB ห้อง 2</option>
-                  <option value="shimazu-ccc">x-ray shimazu รุ่น CCC ห้อง 3</option>
-                </select>
-                <span class="arrow">▼</span>
-              </div>
-            </div>
+           <!-- Checklist type -->
+        <div class="form-group">
+        <label for="checklistType">Checklist type</label>
+        <div class="input-shell">
+        <div class="select-wrapper">
+        <select id="checklistType" v-model="checklistType">
+        <option value="" disabled>Checklist type</option>
+
+        <!-- ระยะเวลา -->
+        <option value="daily">Daily</option>
+        <option value="1m">1 month</option>
+        <option value="3m">3 months</option>
+        <option value="6m">6 months</option>
+
+        <!-- รายการตามที่แจ้ง -->
+        <option value="xrayCare">
+          การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
+        </option>
+        <option value="erasureIP">
+          การลบแผ่นเพลท (Erasure of Imaging Plate)
+        </option>
+        <option value="displayQC">
+          การควบคุมคุณภาพจอภาพ (Display monitor)
+        </option>
+        <option value="xrayRecord">
+          แบบบันทึกการตรวจสอบเครื่องเอกซเรย์
+        </option>
+        <option value="uniformity">
+          ความสม่ำเสมอของภาพ (Measured Uniformity)
+        </option>
+        <option value="exposureIndex">
+          ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)
+        </option>
+        <option value="collimatorAlignment">
+          การทดสอบ Collimator and Beam Alignment
+        </option>
+        <option value="collimatorAlignmentDrBucky">
+          การทดสอบ Collimator and Beam Alignment
+          สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)
+        </option>
+        <option value="darkNoiseCR">
+          การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR
+        </option>
+        <option value="darkNoiseDR">
+          การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ DR
+        </option>
+        <option value="leadApron">
+          การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ
+        </option>
+        <option value="lightBox">
+          แบบบันทึกการตรวจสอบความสว่างแสงไฟ
+        </option>
+        <option value="patientThickness">
+          แบบบันทึกผลการวัดความหนาผู้ป่วย
+        </option>
+        <option value="repeatRate">
+          แบบบันทึกอัตราการถ่ายภาพซ้ำ
+        </option>
+        <option value="usgBmode">
+          แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test
+        </option>
+      </select>
+      <span class="arrow">▾</span>
+    </div>
+  </div>
+</div>
 
             <!-- Checklist type -->
             <div class="form-group">
               <label for="checklistType">Checklist type</label>
-              <div class="select-wrapper">
-                <select id="checklistType" v-model="checklistType">
-                  <option value="" disabled>Checklist type</option>
-                  <option value="daily">Daily</option>
-                  <option value="1m">1 month</option>
-                  <option value="3m">3 months</option>
-                  <option value="6m">6 months</option>
-                  <option value="6m">แบบบันทึกผลการวัดความหนาผู้ป่วย</option>
-                  <option value="6m">แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์</option>
-                </select>
-                <span class="arrow">▼</span>
+              <div class="input-shell">
+                <div class="select-wrapper">
+                  <select id="checklistType" v-model="checklistType">
+                    <option value="" disabled>Checklist type</option>
+                    <option value="daily">Daily</option>
+                    <option value="1m">1 month</option>
+                    <option value="3m">3 months</option>
+                    <option value="6m">6 months</option>
+                    <option value="thickness">แบบบันทึกผลการวัดความหนาผู้ป่วย</option>
+                    <option value="usg">แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์</option>
+                  </select>
+                  <span class="arrow">▾</span>
+                </div>
               </div>
             </div>
 
             <!-- Date -->
             <div class="form-group">
               <label for="date">Date</label>
-              <div class="date-wrapper">
-                <input
-                  id="date"
-                  v-model="date"
-                  type="text"
-                  placeholder="DD/MM/YYYY"
-                  maxlength="10"
-                  @input="formatDate"
-                  @keypress="onlyNumber"
-                />
-                <span class="date-icon" @click.stop="openCalendarFromInput">
-                  📅
-                </span>
+              <div class="input-shell">
+                <div class="date-wrapper">
+                  <input
+                    id="date"
+                    v-model="date"
+                    type="text"
+                    placeholder="DD/MM/YYYY"
+                    maxlength="10"
+                    @input="formatDate"
+                    @keypress="onlyNumber"
+                  />
+                  <button
+                    type="button"
+                    class="date-icon"
+                    @click.stop="openCalendarFromInput"
+                  >
+                    📅
+                  </button>
+                </div>
               </div>
             </div>
           </form>
-        </div>
 
-        <!-- ปุ่มตัวอย่างไฟล์ -->
-        <div class="preview-wrapper">
-          <button class="btn-preview" @click="showPreview">
-            ตัวอย่างไฟล์
-          </button>
+          <!-- ปุ่มตัวอย่างไฟล์ -->
+          <div class="preview-wrapper">
+            <button class="btn-primary" @click="showPreview">
+              ตัวอย่างไฟล์
+            </button>
+          </div>
         </div>
       </div>
 
@@ -106,7 +172,7 @@
         </div>
       </div>
 
-      <!-- หน้า 2 : ตัวอย่างไฟล์ / พรีวิว -->
+      <!-- หน้า 2 : พรีวิว -->
       <div v-if="isPreviewVisible" class="preview-section-wrapper">
         <div class="preview-inner">
           <!-- ลูกศรย้อนกลับ -->
@@ -114,25 +180,28 @@
             ←
           </button>
 
-          <!-- กระดาษ A4 ตามฟิกมา -->
+          <!-- กระดาษ A4 -->
           <div class="a4-paper">
             <h3 class="preview-title">
               การ Maintenance เครื่องเอกซเรย์รังสีวินิจฉัย
             </h3>
 
             <div class="info-chips-row">
-            <div class="info-chip">
-              X-ray machine: {{ displayedMachine }}
-            </div>
+              <div class="info-chip">
+                <span class="info-label">X-ray machine</span>
+                <span class="info-value">{{ displayedMachine }}</span>
+              </div>
 
-            <div class="info-chip">
-              Checklist type: {{ displayedChecklistType }}
-            </div>
+              <div class="info-chip">
+                <span class="info-label">Checklist type</span>
+                <span class="info-value">{{ displayedChecklistType }}</span>
+              </div>
 
-            <div class="info-chip">
-              ข้อมูล ณ วันที่ {{ displayedDate }}
+              <div class="info-chip">
+                <span class="info-label">ข้อมูล ณ วันที่</span>
+                <span class="info-value">{{ displayedDate }}</span>
+              </div>
             </div>
-          </div>
 
             <!-- กล่องรายละเอียดใหญ่ -->
             <div class="detail-box">
@@ -144,7 +213,7 @@
               </div>
             </div>
 
-            <!-- ลายเซ็นล่าง -->
+            <!-- ลายเซ็น -->
             <div class="signature-section">
               <p class="signature-line">(..............................................)</p>
               <p class="signature-label">ผู้ทดสอบ</p>
@@ -152,9 +221,9 @@
             </div>
           </div>
 
-          <!-- ปุ่ม Export ด้านล่างขวาใกล้กระดาษ -->
+          <!-- ปุ่ม Export -->
           <div class="export-btn-wrapper">
-            <button class="btn-export" @click="exportFile">
+            <button class="btn-primary btn-shadow" @click="exportFile">
               Export File
             </button>
           </div>
@@ -168,7 +237,6 @@
 import { ref, computed } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-// ------------------ form state ------------------
 const machine = ref('')
 const checklistType = ref('')
 const date = ref('')
@@ -176,7 +244,6 @@ const date = ref('')
 const isPreviewVisible = ref(false)
 const isCalendarVisible = ref(false)
 
-// ------------------ calendar state ------------------
 const today = new Date()
 const currentMonth = ref(today.getMonth())
 const currentYear = ref(today.getFullYear())
@@ -201,7 +268,6 @@ const currentMonthYear = computed(() => {
   return `${monthNames[currentMonth.value]} ${currentYear.value}`
 })
 
-// helper: แปลง string DD/MM/YYYY -> Date | null
 const parseDateString = (str) => {
   const parts = str.split('/')
   if (parts.length !== 3) return null
@@ -225,7 +291,6 @@ const daysGrid = computed(() => {
   const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
   const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
 
-  // ช่องว่างก่อนต้นเดือน
   for (let i = 0; i < firstDayOfMonth; i++) {
     cells.push({
       key: `empty-${i}`,
@@ -235,7 +300,6 @@ const daysGrid = computed(() => {
     })
   }
 
-  // วันที่ในเดือน
   for (let d = 1; d <= daysInMonth; d++) {
     const dateObj = new Date(currentYear.value, currentMonth.value, d)
 
@@ -261,7 +325,6 @@ const daysGrid = computed(() => {
     })
   }
 
-  // เติมช่องว่างท้ายเดือนให้ครบ 6 แถว
   const totalCells = 42
   const cellsToFill = totalCells - cells.length
   for (let i = 0; i < cellsToFill; i++) {
@@ -302,7 +365,6 @@ const openCalendarFromInput = () => {
   isCalendarVisible.value = true
 }
 
-// ------------- input date: numeric only + format DD/MM/YYYY -------------
 const onlyNumber = (e) => {
   const char = String.fromCharCode(e.which)
   if (!/[0-9]/.test(char)) {
@@ -312,7 +374,7 @@ const onlyNumber = (e) => {
 
 const formatDate = () => {
   let value = date.value.replace(/\D/g, '')
-  value = value.substring(0, 8) // DDMMYYYY
+  value = value.substring(0, 8)
 
   if (value.length > 2 && value.length <= 4) {
     value = value.substring(0, 2) + '/' + value.substring(2)
@@ -322,13 +384,13 @@ const formatDate = () => {
       '/' +
       value.substring(2, 4) +
       '/' +
+      
       value.substring(4)
   }
 
   date.value = value
 }
 
-// ------------- preview & export -------------
 const showPreview = () => {
   isPreviewVisible.value = true
 }
@@ -341,7 +403,6 @@ const exportFile = () => {
   alert('Exporting PDF file...')
 }
 
-// ------------- computed for preview -------------
 const machineOptions = {
   'shimazu-aaa': 'x-ray shimazu รุ่น AAA',
   'shimazu-bbb': 'x-ray shimazu รุ่น BBB',
@@ -352,7 +413,9 @@ const checklistTypeOptions = {
   daily: 'Daily Check',
   '1m': '1 month',
   '3m': '3 months',
-  '6m': '6 months'
+  '6m': '6 months',
+  thickness: 'แบบบันทึกผลการวัดความหนาผู้ป่วย',
+  usg: 'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์'
 }
 
 const displayedMachine = computed(() => {
@@ -373,47 +436,89 @@ const displayedDate = computed(() => {
 </script>
 
 <style scoped>
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  align-items: center;
-  padding: 20px 0;
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* page-title ถูกลบออกแล้ว แต่จะเก็บ style ไว้ได้ */
-.page-title {
-  display: none;
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px 32px;
+  /* พื้นหลังเดิมที่เป็นเทา + gradient */
+  /* background: radial-gradient(circle at top, #e0e7ff 0, #f4f4f5 50%, #ffffff 100%); */
+
+  /* เปลี่ยนเป็นพื้นหลังขาวล้วน */
+  background: radial-gradient(circle at top, #e0e7ff 0, #ffffff 40%, #ffffff 100%);
+}
+
+
+/* --------- Header bar --------- */
+.page-header {
+  max-width: 640px;
+  width: 100%;
+  margin: 15 auto;              /* ชิดบนสุดของ page-section */
+  padding: 12px 24px;
+  border-radius: 24px 24px 0 0; /* โค้งเฉพาะด้านบน */
+  background: #5b32d6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 10px 18px rgba(91, 50, 214, 0.35);
+}
+
+.page-header-title {
+  font-size: 0.95rem;
 }
 
 .form-section-wrapper,
 .preview-section-wrapper {
-  max-width: 600px;
+  max-width: 640px;
   width: 100%;
 }
 
-/* กล่องฟอร์มเทาโค้งมนกลางหน้า */
+/* กล่องฟอร์มต่อเนื่องกับหัวข้อ (ไม่มีช่องว่าง) */
 .form-panel {
-  max-width: 600px;
-  background: #e5e7eb;
-  border-radius: 20px;
-  padding: 40px 32px 60px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 0 0 24px 24px;   /* โค้งเฉพาะด้านล่าง ให้ต่อกับ .page-header */
+  padding: 32px 26px 26px;
   margin: 0 auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(12px);
 }
+
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.9rem;
-  margin-bottom: 4px;
-  color: #374151;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #4b5563;
   font-weight: 600;
+}
+
+.input-shell {
+  border-radius: 18px;
+  padding: 3px 4px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+}
+
+.input-shell:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.35);
+  background: #ffffff;
 }
 
 /* select */
@@ -423,13 +528,18 @@ const displayedDate = computed(() => {
 
 select {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  border: none;
   padding: 10px 32px 10px 14px;
   font-size: 0.9rem;
-  background: white;
-  appearance: none;
+  background: transparent;
   cursor: pointer;
+  outline: none;
+  color: #111827;
+}
+
+select:disabled {
+  cursor: not-allowed;
 }
 
 .arrow {
@@ -437,59 +547,100 @@ select {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   pointer-events: none;
-  color: #4b5563;
+  color: #6b7280;
 }
 
 /* date input */
 .date-wrapper {
   display: flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding-right: 12px;
-  background: white;
+  border-radius: 14px;
+  padding-right: 2px;
 }
 
 .date-wrapper input {
   border: none;
   outline: none;
-  border-radius: 999px;
-  padding: 10px 14px;
+  border-radius: 14px;
+  padding: 10px 12px 10px 14px;
   font-size: 0.9rem;
   flex: 1;
+  background: transparent;
+  color: #111827;
+}
+
+.date-wrapper input::placeholder {
+  color: #9ca3af;
 }
 
 .date-icon {
-  font-size: 1.1rem;
-  opacity: 0.7;
+  border: none;
+  background: #eef2ff;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-right: 4px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-/* ปุ่มตัวอย่างไฟล์ ขวา */
+.date-icon:hover {
+  transform: translateY(-1px);
+  background: #e0e7ff;
+  box-shadow: 0 6px 14px rgba(129, 140, 248, 0.5);
+}
+
+/* ปุ่ม primary */
+.btn-primary {
+  padding: 9px 26px;
+  border-radius: 999px;
+  border: none;
+  background-image: linear-gradient(135deg, #4f46e5, #8b5cf6);
+  color: #f9fafb;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(55, 48, 163, 0.4);
+}
+
+.btn-shadow {
+  box-shadow: 0 12px 30px rgba(31, 41, 55, 0.28);
+}
+
+/* ปุ่มตัวอย่างไฟล์ */
 .preview-wrapper {
-  margin-top: 14px;
+  margin-top: 18px;
   display: flex;
   justify-content: flex-end;
-  max-width: 600px;
-  width: 100%;
-}
-
-.btn-preview {
-  padding: 8px 22px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background-color: #e5e7eb;
-  font-size: 0.9rem;
-  cursor: pointer;
 }
 
 /* ป็อปอัพปฏิทิน */
 .calendar-popup-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(15, 23, 42, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -498,31 +649,44 @@ select {
 
 .calendar-popup-box {
   background: #ffffff;
-  border-radius: 18px;
-  padding: 16px 18px;
+  border-radius: 20px;
+  padding: 16px 18px 18px;
   width: 320px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 22px 50px rgba(15, 23, 42, 0.4),
+    0 0 0 1px rgba(148, 163, 184, 0.4);
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .month-title {
   font-weight: 600;
+  font-size: 0.9rem;
+  color: #111827;
 }
 
 .nav-btn {
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  border: 1px solid #d4d4d4;
-  background-color: #ffffff;
+  border: none;
+  background-color: #eef2ff;
   font-size: 0.85rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.nav-btn:hover {
+  background-color: #e0e7ff;
+  transform: translateY(-1px);
 }
 
 /* grid ปฏิทิน */
@@ -558,6 +722,12 @@ select {
   border-radius: 999px;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.day-number span:hover {
+  background-color: #e5e7eb;
 }
 
 /* วันนี้ */
@@ -567,37 +737,43 @@ select {
 
 /* วันที่เลือก */
 .day-cell.is-selected .day-number span {
-  background-color: #6366f1;
+  background-color: #4f46e5;
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 /* ---------------- preview หน้า 2 ---------------- */
 .preview-section-wrapper {
-  max-width: 650px;
+  max-width: 680px;
   width: 100%;
-  margin-top: 12px;
 }
 
 .preview-inner {
   position: relative;
 }
 
-/* ลูกศรย้อนกลับ – ขยับไปซ้ายอีก */
+/* ลูกศรย้อนกลับ */
 .back-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
-  border: 1px solid #d1d5db;
+  border: none;
   background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   cursor: pointer;
-
   position: absolute;
-  top: 10px;
-  left: -60px;
+  top: -38px;
+  left: 2px;
+  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.3);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.back-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.38);
 }
 
 /* กระดาษ A4 */
@@ -605,60 +781,79 @@ select {
   width: 100%;
   max-width: 595px;
   min-height: 842px;
-  border: 1px solid #d4d4d8;
-  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
   margin: 0 auto;
-  padding: 12px 40px 36px; /* padding-top น้อยลงให้หัวข้อขึ้นสูง */
+  padding: 20px 40px 36px;
+  box-shadow:
+    0 26px 60px rgba(15, 23, 42, 0.28),
+    0 0 0 1px rgba(148, 163, 184, 0.4);
 }
 
 .preview-title {
   text-align: center;
   margin-bottom: 18px;
-  /* ปรับขนาดตัวอักษรให้เล็กลง และบังคับให้อยู่บรรทัดเดียว */
-  font-size: 1rem;        /* เล็กลงจากเดิม (จะลอง 0.95rem ก็ได้) */
-  white-space: nowrap;    /* ไม่ให้ตัดบรรทัด */
+  font-size: 1.02rem;
+  white-space: nowrap;
+  color: #111827;
+  font-weight: 700;
 }
 
-/* แถบข้อความ 3 บรรทัดด้านบน (เอากรอบ pill ออก) */
+/* แถบข้อมูลด้านบน */
 .info-chips-row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 18px;
 }
 
 .info-chip {
-  display: block;       /* ไม่ต้องเป็น pill แล้ว */
-  padding: 0;           /* ตัด padding ออก */
-  border: none;         /* ลบกรอบ */
-  border-radius: 0;     /* ลบโค้งมุม */
-  background: transparent; 
-  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  font-size: 0.78rem;
+}
+
+.info-label {
+  color: #6b7280;
+}
+
+.info-value {
+  color: #111827;
+  font-weight: 500;
 }
 
 /* กล่องรายละเอียดใหญ่ */
 .detail-box {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .detail-area {
-  border-radius: 10px;
-  border: 1px solid #9ca3af;
+  border-radius: 14px;
+  border: 1px dashed #9ca3af;
   min-height: 380px;
   padding: 10px 12px;
+  background: #fefefe;
 }
 
 .detail-label-inside {
   font-size: 0.85rem;
   margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .placeholder-content {
   font-size: 0.8rem;
   color: #6b7280;
+  margin-top: 6px;
 }
 
-/* ลายเซ็น – ชิดขวาแต่ตัวอักษรกึ่งกลางตรงกัน */
+/* ลายเซ็น */
 .signature-section {
   margin-top: 60px;
   display: flex;
@@ -671,30 +866,34 @@ select {
   width: 260px;
   text-align: center;
   margin: 4px 0;
+  font-size: 0.78rem;
 }
 
-/* ปุ่ม Export File – เพิ่มกรอบสีเทา */
+/* ปุ่ม Export */
 .export-btn-wrapper {
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
-.btn-export {
-  padding: 8px 24px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background-color: #e5e7eb;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
+/* --------- responsive --------- */
+@media (max-width: 640px) {
+  .form-panel {
+    padding: 24px 18px 20px;
+  }
 
-.page-top {
-  padding-top: 16px !important;
-}
+  .a4-paper {
+    padding: 16px 18px 26px;
+    min-height: 700px;
+  }
 
-.page-top h2 {
-  margin-top: 0;
-  margin-bottom: 0;
+  .preview-title {
+    white-space: normal;
+  }
+
+  .page-header {
+    padding: 8px 12px;
+  }
 }
 </style>
+

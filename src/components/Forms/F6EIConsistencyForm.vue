@@ -16,24 +16,24 @@
             </td>
           </tr>
           <tr>
-            <td class="cell-label">หมายเลขห้อง / หมายเลขเครื่อง</td>
+            <!-- <td class="cell-label">หมายเลขห้อง / หมายเลขเครื่อง</td>
             <td colspan="3">
               <input
                 type="text"
                 v-model="form.roomNumber"
                 class="input-cell"
               />
-            </td>
+            </td> -->
           </tr>
           <tr>
-            <td class="cell-label">ชื่อเครื่องเอกซเรย์ / รุ่น</td>
+            <!-- <td class="cell-label">ชื่อเครื่องเอกซเรย์ / รุ่น</td>
             <td colspan="3">
               <input
                 type="text"
                 v-model="form.deviceName"
                 class="input-cell"
               />
-            </td>
+            </td> -->
           </tr>
           <tr>
             <td class="cell-label">Baseline EI (±10%)</td>
