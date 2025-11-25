@@ -384,6 +384,7 @@ const formatDate = () => {
       '/' +
       value.substring(2, 4) +
       '/' +
+      
       value.substring(4)
   }
 
