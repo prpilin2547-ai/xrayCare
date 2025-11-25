@@ -6,7 +6,7 @@
         <!-- แถบบาร์ด้านบน -->
         <div class="page-header">
           <span class="page-header-title">
-            X-ray Maintenance Checklist
+            Export Report
           </span>
         </div>
 
@@ -24,17 +24,16 @@
                     :class="{ 'select-placeholder': !machine }"
                   >
                     <option value="" disabled>
-                    ชื่อรุ่น/ชื่อเครื่อง X-ray/หมายเลขห้อง
+                      ชื่อรุ่น/ชื่อเครื่อง X-ray/หมายเลขห้อง
                     </option>
-                  <option
-                    v-for="(label, value) in machineOptions"
-                    :key="value"
-                    :value="value"
-                  >
-                    {{ label }}
-                  </option>
-              </select>
-
+                    <option
+                      v-for="(label, value) in machineOptions"
+                      :key="value"
+                      :value="value"
+                    >
+                      {{ label }}
+                    </option>
+                  </select>
                   <span class="arrow">▾</span>
                 </div>
               </div>
@@ -242,10 +241,10 @@
                 ลงชื่อ................................................ผู้ทดสอบ
               </p>
               <p class="signature-line">
-                (................................................)
+                  (...........................................................................)
               </p>
               <p class="signature-line">
-                ตำแหน่ง................................................
+                ตำแหน่ง.............................................................
               </p>
             </div>
           </div>
@@ -292,7 +291,6 @@ const monthNames = [
   'September',
   'October',
   'November',
-  'December'
 ]
 
 const currentMonthYear = computed(() => {
@@ -304,7 +302,7 @@ const machineOptions = {
   'shimazu-aaa-room1': 'X-ray shimazu รุ่น AAA ห้อง 1',
   'shimazu-bbb-room2': 'X-ray shimazu รุ่น BBB ห้อง 2',
   'shimazu-ccc-room3': 'X-ray shimazu รุ่น CCC ห้อง 3',
-  'shimazu-ddd-room4': 'X-ray shimazu รุ่น DDD ห้อง 4'
+  'shimazu-ddd-room4': 'X-ray shimazu รุ่น DDD ห้อง 4',
 }
 
 // ---------- Checklist groups & items ----------
@@ -315,13 +313,13 @@ const checklistGroups = [
     items: [
       {
         id: 'daily-care-xray',
-        label: 'การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์'
+        label: 'การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
       },
       {
         id: 'daily-erasure-ip',
-        label: 'การลบแผ่นเพลท (Erasure of Imaging Plate)'
-      }
-    ]
+        label: 'การลบแผ่นเพลท (Erasure of Imaging Plate)',
+      },
+    ],
   },
   {
     id: '1m',
@@ -329,13 +327,13 @@ const checklistGroups = [
     items: [
       {
         id: '1m-lightbox',
-        label: 'แบบบันทึกการตรวจสอบความสว่างแสงไฟ'
+        label: 'แบบบันทึกการตรวจสอบความสว่างแสงไฟ',
       },
       {
         id: '1m-repeat-rate',
-        label: 'แบบบันทึกอัตราการถ่ายภาพซ้ำ'
-      }
-    ]
+        label: 'แบบบันทึกอัตราการถ่ายภาพซ้ำ',
+      },
+    ],
   },
   {
     id: '3m',
@@ -343,22 +341,22 @@ const checklistGroups = [
     items: [
       {
         id: '3m-display-qc',
-        label: 'การควบคุมคุณภาพจอภาพ (Display monitor)'
+        label: 'การควบคุมคุณภาพจอภาพ (Display monitor)',
       },
       {
         id: '3m-record-xray',
-        label: 'การบันทึกการตรวจสอบเครื่องเอกซเรย์'
+        label: 'การบันทึกการตรวจสอบเครื่องเอกซเรย์',
       },
       {
         id: '3m-uniformity',
-        label: 'ความสม่ำเสมอของภาพ (Measured Uniformity)'
+        label: 'ความสม่ำเสมอของภาพ (Measured Uniformity)',
       },
       {
         id: '3m-exposure-index',
         label:
-          'ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)'
-      }
-    ]
+          'ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)',
+      },
+    ],
   },
   {
     id: '6m',
@@ -366,27 +364,27 @@ const checklistGroups = [
     items: [
       {
         id: '6m-collimator',
-        label: 'การทดสอบ collimator and beam alignment'
+        label: 'การทดสอบ collimator and beam alignment',
       },
       {
         id: '6m-collimator-bucky',
         label:
-          'การทดสอบ collimator and beam alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)'
+          'การทดสอบ collimator and beam alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)',
       },
       {
         id: '6m-dark-noise-cr',
-        label: 'การทดสอบสัญญาณรบกวนมืด ระบบ CR'
+        label: 'การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR',
       },
       {
         id: '6m-dark-noise-dr',
-        label: 'การทดสอบสัญญาณรบกวนมืด ระบบ DR'
+        label: 'การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ DR',
       },
       {
         id: '6m-lead-apron',
         label:
-          'การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์'
-      }
-    ]
+          'การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์',
+      },
+    ],
   },
   {
     id: 'thickness',
@@ -394,21 +392,22 @@ const checklistGroups = [
     items: [
       {
         id: 'thickness-main',
-        label: 'แบบบันทึกผลการวัดความหนาผู้ป่วย'
-      }
-    ]
+        label: 'แบบบันทึกผลการวัดความหนาผู้ป่วย',
+      },
+    ],
   },
   {
     id: 'usg-bmode',
-    label: 'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test',
+    label:
+      'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test',
     items: [
       {
         id: 'usg-bmode-main',
         label:
-          'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test'
-      }
-    ]
-  }
+          'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test',
+      },
+    ],
+  },
 ]
 
 // ---------- date helper ----------
@@ -435,12 +434,12 @@ const daysGrid = computed(() => {
   const firstDayOfMonth = new Date(
     currentYear.value,
     currentMonth.value,
-    1
+    1,
   ).getDay()
   const daysInMonth = new Date(
     currentYear.value,
     currentMonth.value + 1,
-    0
+    0,
   ).getDate()
 
   for (let i = 0; i < firstDayOfMonth; i++) {
@@ -448,7 +447,7 @@ const daysGrid = computed(() => {
       key: `empty-${i}`,
       day: null,
       isToday: false,
-      isSelected: false
+      isSelected: false,
     })
   }
 
@@ -473,7 +472,7 @@ const daysGrid = computed(() => {
       day: d,
       date: dateObj,
       isToday,
-      isSelected
+      isSelected,
     })
   }
 
@@ -484,7 +483,7 @@ const daysGrid = computed(() => {
       key: `empty-post-${i}`,
       day: null,
       isToday: false,
-      isSelected: false
+      isSelected: false,
     })
   }
 
@@ -572,7 +571,7 @@ const toggleGroup = (groupId) => {
   if (allSelected) {
     // ถ้าเลือกครบทุกอันแล้ว -> กดอีกทีให้เอาออกทั้งหมดในหัวข้อนั้น
     checklistType.value = checklistType.value.filter(
-      (id) => !group.items.some((item) => item.id === id)
+      (id) => !group.items.some((item) => item.id === id),
     )
   } else {
     // ถ้ายังไม่ครบ -> กดแล้วให้เลือกทุกรายการในหัวข้อนั้น
@@ -590,9 +589,7 @@ const toggleGroup = (groupId) => {
 const selectedGroupLabels = computed(() => {
   const labels = []
   checklistGroups.forEach((group) => {
-    const hasSelected = group.items.some((item) =>
-      isItemSelected(item.id)
-    )
+    const hasSelected = group.items.some((item) => isItemSelected(item.id))
     if (hasSelected) labels.push(group.label)
   })
   return labels
@@ -658,7 +655,6 @@ const previewTitle = computed(() => {
   flex-direction: column;
   align-items: center;
   padding: 12px 16px 32px;
-  /* ลบพื้นหลัง gradient ออก ให้เป็นสีขาวล้วน */
   background: #ffffff;
 }
 
@@ -746,19 +742,54 @@ select {
   color: #111827;
 }
 
+/* สีตัวเลือกใน dropdown */
+select option {
+  color: #111827;       /* ตัวเลือกปกติเป็นสีดำเข้ม */
+}
+
+/* placeholder (option ที่ disabled) ให้เป็นสีเทาอ่อน */
+select option[disabled] {
+  color: #9ca3af;
+}
+
+
 select:disabled {
   cursor: not-allowed;
 }
 
+/* ให้ select ของ X-ray machine เวลาเป็น placeholder เป็นสีเดียวกัน */
+select.select-placeholder {
+  color: #9ca3af;
+}
+
+/* ซ่อนลูกศรมาตรฐานของ browser */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none !important;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+
 .arrow {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.7rem;
+  font-size: 0.95rem;     /* ใหญ่ขึ้น */
+  font-weight: 700;       /* หนาขึ้น */
+  color: #4f46e5;         /* สีม่วงชัด ๆ */
   pointer-events: none;
-  color: #6b7280;
+  background: #f3e8ff;    /* พื้นหลังวงรีอ่อน ๆ */
+  border-radius: 999px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.35);
 }
+
 
 /* ---------- custom multi-select ---------- */
 .multiselect-trigger {
@@ -777,9 +808,10 @@ select:disabled {
   align-items: center;
 }
 
+/* placeholder ของ Checklist type (multiselect) */
 .placeholder {
   font-size: 0.9rem;
-  color: #9ca3af; /* เดิมเป็น #6b7280 แก้ให้ตรงกับ Date */
+  color: #9ca3af; /* ให้ตรงกับ Date */
 }
 
 .chip-list {
@@ -1204,27 +1236,34 @@ select:disabled {
   margin-top: 6px;
 }
 
-/* ลายเซ็น ด้านล่างขวาสุด */
 .signature-section {
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-end;   /* ให้กลุ่มลายเซ็นอยู่ด้านขวาเหมือนเดิม */
 }
 
 .signature-line {
   width: 260px;
-  text-align: center;
+  text-align: left;        /* เดิมเป็น center */
   margin: 4px 0;
   font-size: 0.78rem;
+  /* ถ้าอยากให้ไม่ชิดซ้ายมาก เพิ่มได้ */
+  /* padding-left: 4px; */
 }
+
 
 /* ปุ่ม Export */
 .export-btn-wrapper {
   display: flex;
   justify-content: flex-end;
   margin-top: 14px;
+  max-width: 595px;   /* เท่ากับ .a4-paper */
+  width: 100%;
+  margin-left: auto;  /* กรอบปุ่มอยู่กึ่งกลางกับกระดาษ */
+  margin-right: auto;
 }
+
 
 /* --------- responsive --------- */
 @media (max-width: 640px) {
@@ -1240,14 +1279,5 @@ select:disabled {
   .preview-title {
     white-space: normal;
   }
-
-  .page-header {
-    padding: 8px 12px;
-  }
-
-  /* ให้สีเทาแบบเดียวกับ placeholder ของ Date */
-  select.select-placeholder {
-    color: #9ca3af;
-  }
 }
-</style>
+</style> 
