@@ -3,12 +3,10 @@
     <div class="page">
       <!-- ================== VIEW 1 : ตารางระบบแจ้งซ่อม ================== -->
       <div v-if="!selectedItem">
-        <!-- หัวข้อระบบแจ้งซ่อม -->
         <div class="section-header">
           <span class="section-title">ระบบแจ้งซ่อม</span>
         </div>
 
-        <!-- ตารางแจ้งซ่อม -->
         <div class="table-wrapper">
           <table class="table">
             <thead>
@@ -18,16 +16,22 @@
                 <th>ห้องตรวจ</th>
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
+                <th>รายละเอียด</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in items" :key="item.id" class="clickable-row" @click="openDetail(item)">
+              <tr v-for="item in items" :key="item.id">
                 <td>{{ item.id }}</td>
                 <td>{{ getEquipmentText(item) }}</td>
                 <td>{{ getRoomText(item) }}</td>
                 <td>{{ item.detail }}</td>
                 <td class="status" :class="getStatusCellClass(item.statusText)">
                   {{ item.statusText }}
+                </td>
+                <td>
+                  <span class="detail-link" @click="openDetail(item)">
+                    ตรวจสอบ
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -37,18 +41,13 @@
 
       <!-- ================== VIEW 2 : รายละเอียดแจ้งซ่อม ================== -->
       <div v-else class="repair-detail-page">
-        <!-- Header Title -->
         <div class="page-header">
           <div class="blue-dot"></div>
           <h2 class="page-title">รายละเอียดแจ้งซ่อม</h2>
-          <!-- ปุ่มกากบาทมุมขวาบน -->
           <i class="bi bi-x-circle close-modal-btn" @click="closeDetail"></i>
         </div>
 
-
-        <!-- Main Content Box -->
         <div class="main-box">
-          <!-- Orange Header -->
           <div class="box-header">
             <div class="header-label">อุปกรณ์</div>
             <div class="header-value">
@@ -56,10 +55,7 @@
             </div>
           </div>
 
-
-          <!-- Grey Body -->
           <div class="box-body">
-            <!-- Details -->
             <div class="mb-3">
               <strong>รายละเอียด</strong>
               <ul class="content-list">
@@ -67,7 +63,6 @@
               </ul>
             </div>
 
-            <!-- Remarks (ตัวอย่าง fix ไว้ตามภาพ) -->
             <div class="mb-3">
               <strong>หมายเหตุ</strong>
               <ul class="content-list">
@@ -75,21 +70,21 @@
               </ul>
             </div>
 
-            <!-- Action Area inside Box -->
             <div class="inner-actions">
-              <!-- ปุ่มไฟล์ภาพ -->
               <button class="btn btn-file shadow-sm" @click="openImageModal">
                 ไฟล์ภาพ
                 <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
               </button>
 
-              <!-- ปุ่มสถานะแบบ Dropdown -->
               <div class="status-dropdown">
-                <button class="btn-status-base shadow-sm dropdown-toggle" :class="statusClass" @click="toggleDropdown">
+                <button
+                  class="btn-status-base shadow-sm dropdown-toggle"
+                  :class="statusClass"
+                  @click="toggleDropdown"
+                >
                   {{ currentStatus }}
                 </button>
 
-                <!-- เมนูตัวเลือก -->
                 <ul v-if="dropdownOpen" class="dropdown-menu-custom">
                   <li @click="selectStatus('รอซ่อม')">รอซ่อม</li>
                   <li @click="selectStatus('อยู่ระหว่างดำเนินการ')">อยู่ระหว่างดำเนินการ</li>
@@ -97,8 +92,10 @@
                 </ul>
               </div>
 
-              <!-- (code แก้ไขสถานะเดิม เก็บไว้ตามที่มี) -->
-              <div v-if="isEditingStatus" class="status-selector-container bg-white border border-dark p-2 shadow-sm">
+              <div
+                v-if="isEditingStatus"
+                class="status-selector-container bg-white border border-dark p-2 shadow-sm"
+              >
                 <ul class="list-unstyled m-0">
                   <li>
                     <div class="dropdown-item p-2" @click="changeStatus('รอซ่อม')">
@@ -121,25 +118,31 @@
           </div>
         </div>
 
-        <!-- Footer Action Buttons -->
         <div class="footer-actions">
           <button class="btn btn-save shadow-sm" @click="saveData">
             บันทึก
           </button>
         </div>
 
-        <!-- Image Modal -->
         <div v-if="showImageModal" class="modal-overlay">
           <div class="modal-card image-modal-card">
-            <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
+            <div
+              class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center"
+            >
               <h5 class="m-0">รูปภาพ</h5>
               <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
             </div>
-            <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
-              style="min-height: 300px">
+            <div
+              class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
+              style="min-height: 300px"
+            >
               <div class="text-center">
-                <img v-if="currentImageSrc" :src="currentImageSrc" alt="Request Image"
-                  class="img-fluid shadow-sm mb-3" />
+                <img
+                  v-if="currentImageSrc"
+                  :src="currentImageSrc"
+                  alt="Request Image"
+                  class="img-fluid shadow-sm mb-3"
+                />
                 <p class="text-muted" v-if="currentImageSrc">
                   รูปภาพที่ส่งมาจากนักรังสี
                 </p>
@@ -157,10 +160,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 const dropdownOpen = ref(false)
+const selectedItem = ref(null)
+
+const currentStatus = ref('รอซ่อม')
+const isEditingStatus = ref(false)
+const showImageModal = ref(false)
+const currentImageSrc = ref('')
+
+// ข้อมูล mock ฝั่ง Engineer (frontend-only)
+const items = ref([
+  {
+    id: 1,
+    equipment: 'X-ray general รุ่น xxx',
+    room: 'ห้อง 1',
+    detail: 'ระบบล็อกและเบรก',
+    statusText: 'รอซ่อม'
+  }
+])
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
@@ -171,87 +191,37 @@ const selectStatus = (status) => {
   dropdownOpen.value = false
 }
 
-const STORAGE_KEY = 'repair_items'
-
-// default ข้อมูลเริ่มต้น (อุปกรณ์ไม่มีคำว่า "ห้อง", แยก room ต่างหาก)
-const defaultItems = [
-  {
-    id: 1,
-    equipment: 'X-ray general รุ่น xxx',
-    room: 'ห้อง 1',
-    detail: 'ระบบล็อกและเบรก',
-    statusText: 'รอซ่อม'
-  }
-]
-
-// ------------- ข้อมูลในตาราง (อ่านจาก localStorage) -------------
-const items = ref([...defaultItems])
-
-onMounted(() => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    try {
-      items.value = JSON.parse(stored)
-    } catch (e) {
-      items.value = [...defaultItems]
-    }
-  }
-})
-
-// บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
-watch(
-  items,
-  newItems => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
-  },
-  { deep: true }
-)
-
-// item ที่ถูกเลือก (null = โหมดตาราง)
-const selectedItem = ref(null)
-
-// สถานะปัจจุบันของงานที่เปิดดู
-const currentStatus = ref('รอซ่อม')
-const isEditingStatus = ref(false)
-const showImageModal = ref(false)
-const currentImageSrc = ref('')
-
-// เปิดหน้ารายละเอียดจากการคลิกตาราง
 const openDetail = (item) => {
   selectedItem.value = item
   currentStatus.value = item.statusText
   isEditingStatus.value = false
 }
-// ปิดหน้ารายละเอียดด้วยปุ่มกากบาท
+
 const closeDetail = () => {
-  selectedItem.value = null          // กลับไปหน้าระบบแจ้งซ่อม
-  dropdownOpen.value = false         // ปิดเมนู dropdown ถ้าเปิดอยู่
-  isEditingStatus.value = false      // กัน state ค้าง (แม้ตอนนี้แทบไม่ใช้แล้ว)
-  showImageModal.value = false       // เผื่อเคยเปิด modal รูป
+  selectedItem.value = null
+  dropdownOpen.value = false
+  isEditingStatus.value = false
+  showImageModal.value = false
 }
 
-// helper แสดงชื่ออุปกรณ์ (ตัด "ห้อง X" สำหรับข้อมูลเก่า)
 const getEquipmentText = (item) => {
   if (item.room) return item.equipment
   return item.equipment.replace(/\s*ห้อง\s*\d+\s*$/, '')
 }
 
-// helper แสดงห้องตรวจ
 const getRoomText = (item) => {
   if (item.room) return item.room
   const match = item.equipment.match(/ห้อง\s*\d+/)
   return match ? match[0] : ''
 }
 
-// *** ใหม่: ใช้สำหรับกล่องสีส้ม ***
 const getEquipmentWithRoom = (item) => {
   if (!item) return ''
   const equip = getEquipmentText(item)
-  const room  = getRoomText(item)
+  const room = getRoomText(item)
   return room ? `${equip} ${room}` : equip
 }
 
-// class สีของปุ่มสถานะ
 const statusClass = computed(() => {
   if (currentStatus.value === 'รอซ่อม') return 'status-waiting'
   if (currentStatus.value === 'อยู่ระหว่างดำเนินการ') return 'status-progress'
@@ -259,18 +229,15 @@ const statusClass = computed(() => {
   return 'status-waiting'
 })
 
-// toggle โหมดแก้ไขสถานะ (โค้ดเดิม)
 const toggleEditStatus = () => {
   isEditingStatus.value = !isEditingStatus.value
 }
 
-// เลือกสถานะในกล่องด้านล่าง (โค้ดเดิม)
 const changeStatus = (status) => {
   currentStatus.value = status
   isEditingStatus.value = false
 }
 
-// modal รูปภาพ (ใช้รูปจาก Request)
 const openImageModal = () => {
   if (selectedItem.value && selectedItem.value.imageData) {
     currentImageSrc.value = selectedItem.value.imageData
@@ -285,7 +252,6 @@ const closeImageModal = () => {
   currentImageSrc.value = ''
 }
 
-// บันทึกแล้วอัปเดตตาราง + กลับไปหน้าระบบแจ้งซ่อม
 const saveData = () => {
   if (selectedItem.value) {
     selectedItem.value.statusText = currentStatus.value
@@ -304,12 +270,10 @@ const getStatusCellClass = (status) => {
 </script>
 
 <style scoped>
-/* เพิ่มแถบสีเทาเมื่อเอาเมาส์ไปวาง */
 .status-selector-container .dropdown-item:hover {
   background-color: #e5e5e5 !important;
 }
 
-/* ---------- จากโค้ดเดิม ---------- */
 .page {
   padding-top: 8px;
 }
@@ -326,7 +290,6 @@ const getStatusCellClass = (status) => {
   font-weight: 600;
 }
 
-/* ตาราง */
 .table-wrapper {
   max-width: 800px;
 }
@@ -353,16 +316,13 @@ tbody td {
   background: #e5e5e5;
 }
 
-.status.pending {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.clickable-row {
+/* ลิงก์ "ตรวจสอบ" */
+.detail-link {
+  color: #2563eb;
+  text-decoration: underline;
   cursor: pointer;
 }
 
-/* Page Header */
 .page-header {
   display: flex;
   align-items: center;
@@ -383,7 +343,6 @@ tbody td {
   margin: 0;
 }
 
-/* Main Box */
 .main-box {
   border: 1px solid #000;
   background-color: #d9d9d9;
@@ -392,7 +351,6 @@ tbody td {
   margin-top: 40px;
 }
 
-/* Box Header */
 .box-header {
   background-color: #ffcc99;
   border-bottom: 1px solid #000;
@@ -418,7 +376,6 @@ tbody td {
   font-weight: 400;
 }
 
-/* Box Body */
 .box-body {
   padding: 30px;
   position: relative;
@@ -426,7 +383,6 @@ tbody td {
   height: 450px;
 }
 
-/* Lists */
 ul.content-list {
   list-style-type: none;
   padding-left: 10px;
@@ -441,7 +397,6 @@ ul.content-list li::before {
   margin-left: -1em;
 }
 
-/* Buttons Area */
 .inner-actions {
   position: absolute;
   bottom: 150px;
@@ -476,7 +431,6 @@ ul.content-list li::before {
   white-space: nowrap;
 }
 
-/* Status Colors */
 .status-waiting {
   background-color: #ff5c5c;
 }
@@ -489,7 +443,6 @@ ul.content-list li::before {
   background-color: #8be296;
 }
 
-/* กล่องเลือกสถานะ */
 .status-selector-container {
   position: absolute;
   bottom: 60px;
@@ -497,7 +450,6 @@ ul.content-list li::before {
   z-index: 20;
 }
 
-/* Footer Buttons */
 .footer-actions {
   margin-top: 80px;
   display: flex;
@@ -514,7 +466,6 @@ ul.content-list li::before {
   font-size: 1.1rem;
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -540,7 +491,6 @@ ul.content-list li::before {
   cursor: pointer;
 }
 
-/* ปุ่ม dropdown */
 .status-dropdown {
   position: relative;
 }
@@ -549,7 +499,6 @@ ul.content-list li::before {
   cursor: pointer;
 }
 
-/* กล่องตัวเลือกด้านล่าง */
 .dropdown-menu-custom {
   position: absolute;
   top: 52px;
@@ -578,16 +527,13 @@ ul.content-list li::before {
   position: relative;
 }
 
-/* ปุ่มกากบาทมุมขวาบน */
 .close-modal-btn {
   margin-left: auto;
-  /* ให้ปุ่มไปชิดขวาในบรรทัดเดียวกับหัวข้อ */
   cursor: pointer;
   color: #dc3545;
   font-size: 1.5rem;
   transition: 0.2s;
 }
-
 
 .close-modal-btn:hover {
   transform: scale(1.1);
