@@ -1,101 +1,121 @@
 <template>
   <MainLayout>
-    <div class="page">
+    <div class="page" @click="closeFloatingUI">
       <!-- ฟอร์มหน้าแรก -->
       <div v-if="!isPreviewVisible" class="form-section-wrapper">
         <!-- แถบบาร์ด้านบน -->
         <div class="page-header">
           <span class="page-header-title">
-            X-ray Maintenance Checklist
+            Export Report
           </span>
         </div>
 
         <!-- กล่องฟอร์ม (ติดกับหัวข้อเลย) -->
-        <div class="form-panel">
+        <div class="form-panel" @click.stop>
           <form class="form">
             <!-- X-ray machine -->
-           <!-- Checklist type -->
-        <div class="form-group">
-        <label for="checklistType">Checklist type</label>
-        <div class="input-shell">
-        <div class="select-wrapper">
-        <select id="checklistType" v-model="checklistType">
-        <option value="" disabled>Checklist type</option>
-
-        <!-- ระยะเวลา -->
-        <option value="daily">Daily</option>
-        <option value="1m">1 month</option>
-        <option value="3m">3 months</option>
-        <option value="6m">6 months</option>
-
-        <!-- รายการตามที่แจ้ง -->
-        <option value="xrayCare">
-          การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
-        </option>
-        <option value="erasureIP">
-          การลบแผ่นเพลท (Erasure of Imaging Plate)
-        </option>
-        <option value="displayQC">
-          การควบคุมคุณภาพจอภาพ (Display monitor)
-        </option>
-        <option value="xrayRecord">
-          แบบบันทึกการตรวจสอบเครื่องเอกซเรย์
-        </option>
-        <option value="uniformity">
-          ความสม่ำเสมอของภาพ (Measured Uniformity)
-        </option>
-        <option value="exposureIndex">
-          ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)
-        </option>
-        <option value="collimatorAlignment">
-          การทดสอบ Collimator and Beam Alignment
-        </option>
-        <option value="collimatorAlignmentDrBucky">
-          การทดสอบ Collimator and Beam Alignment
-          สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)
-        </option>
-        <option value="darkNoiseCR">
-          การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR
-        </option>
-        <option value="darkNoiseDR">
-          การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ DR
-        </option>
-        <option value="leadApron">
-          การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ
-        </option>
-        <option value="lightBox">
-          แบบบันทึกการตรวจสอบความสว่างแสงไฟ
-        </option>
-        <option value="patientThickness">
-          แบบบันทึกผลการวัดความหนาผู้ป่วย
-        </option>
-        <option value="repeatRate">
-          แบบบันทึกอัตราการถ่ายภาพซ้ำ
-        </option>
-        <option value="usgBmode">
-          แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test
-        </option>
-      </select>
-      <span class="arrow">▾</span>
-    </div>
-  </div>
-</div>
-
-            <!-- Checklist type -->
             <div class="form-group">
-              <label for="checklistType">Checklist type</label>
+              <label for="xrayMachine">X-ray machine</label>
               <div class="input-shell">
                 <div class="select-wrapper">
-                  <select id="checklistType" v-model="checklistType">
-                    <option value="" disabled>Checklist type</option>
-                    <option value="daily">Daily</option>
-                    <option value="1m">1 month</option>
-                    <option value="3m">3 months</option>
-                    <option value="6m">6 months</option>
-                    <option value="thickness">แบบบันทึกผลการวัดความหนาผู้ป่วย</option>
-                    <option value="usg">แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์</option>
+                  <select
+                    id="xrayMachine"
+                    v-model="machine"
+                    :class="{ 'select-placeholder': !machine }"
+                  >
+                    <option value="" disabled>
+                      ชื่อรุ่น/ชื่อเครื่อง X-ray/หมายเลขห้อง
+                    </option>
+                    <option
+                      v-for="(label, value) in machineOptions"
+                      :key="value"
+                      :value="value"
+                    >
+                      {{ label }}
+                    </option>
                   </select>
                   <span class="arrow">▾</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Checklist type (multi-select) -->
+            <div class="form-group">
+              <label for="checklistTypeDisplay">Checklist type</label>
+              <div class="input-shell" @click.stop>
+                <!-- กล่องกดเลือก -->
+                <div
+                  id="checklistTypeDisplay"
+                  class="select-wrapper multiselect-trigger"
+                  @click="toggleChecklistDropdown"
+                >
+                  <div class="multiselect-display">
+                    <!-- แสดงคำว่า Checklist type ตอนยังไม่เลือกอะไร -->
+                    <span
+                      v-if="!selectedGroupLabels.length"
+                      class="placeholder"
+                    >
+                      Checklist type
+                    </span>
+
+                    <!-- แสดงหัวข้อที่เลือกแล้ว -->
+                    <div v-else class="chip-list">
+                      <span
+                        v-for="label in selectedGroupLabels"
+                        :key="label"
+                        class="chip"
+                      >
+                        {{ label }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="arrow">▾</span>
+                </div>
+
+                <!-- รายการใน dropdown -->
+                <div
+                  v-if="isChecklistDropdownOpen"
+                  class="multiselect-dropdown"
+                >
+                  <div
+                    v-for="group in checklistGroups"
+                    :key="group.id"
+                    class="multi-group"
+                  >
+                    <!-- หัวข้อหลัก: Daily check / 1 Month / ... -->
+                    <button
+                      type="button"
+                      class="multi-group-header"
+                      @click="toggleGroup(group.id)"
+                    >
+                      <span
+                        class="checkbox"
+                        :class="{ 'checkbox-checked': isGroupFullySelected(group.id) }"
+                      ></span>
+                      <span class="group-label">
+                        {{ group.label }}
+                      </span>
+                    </button>
+
+                    <!-- รายการย่อยในหัวข้อนั้น -->
+                    <div class="multi-items">
+                      <button
+                        v-for="item in group.items"
+                        :key="item.id"
+                        type="button"
+                        class="multi-item"
+                        @click="toggleItem(item.id)"
+                      >
+                        <span
+                          class="checkbox"
+                          :class="{ 'checkbox-checked': isItemSelected(item.id) }"
+                        ></span>
+                        <span class="item-label">
+                          {{ item.label }}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -182,42 +202,50 @@
 
           <!-- กระดาษ A4 -->
           <div class="a4-paper">
-            <h3 class="preview-title">
-              การ Maintenance เครื่องเอกซเรย์รังสีวินิจฉัย
-            </h3>
+            <div class="paper-body">
+              <h3 class="preview-title">
+                {{ previewTitle }}
+              </h3>
 
-            <div class="info-chips-row">
-              <div class="info-chip">
-                <span class="info-label">X-ray machine</span>
-                <span class="info-value">{{ displayedMachine }}</span>
+              <div class="info-chips-row">
+                <div class="info-chip">
+                  <span class="info-label">X-ray machine</span>
+                  <span class="info-value">{{ displayedMachine }}</span>
+                </div>
+
+                <div class="info-chip">
+                  <span class="info-label">Checklist type</span>
+                  <span class="info-value">{{ displayedChecklistType }}</span>
+                </div>
+
+                <div class="info-chip">
+                  <span class="info-label">ข้อมูล ณ วันที่</span>
+                  <span class="info-value">{{ displayedDate }}</span>
+                </div>
               </div>
 
-              <div class="info-chip">
-                <span class="info-label">Checklist type</span>
-                <span class="info-value">{{ displayedChecklistType }}</span>
-              </div>
-
-              <div class="info-chip">
-                <span class="info-label">ข้อมูล ณ วันที่</span>
-                <span class="info-value">{{ displayedDate }}</span>
-              </div>
-            </div>
-
-            <!-- กล่องรายละเอียดใหญ่ -->
-            <div class="detail-box">
-              <div class="detail-area">
-                <p class="detail-label-inside">รายละเอียด</p>
-                <p class="placeholder-content">
-                  [แสดงรายการตรวจสอบ Daily/Monthly ในรูปแบบตารางหรือรายการ]
-                </p>
+              <!-- กล่องรายละเอียดใหญ่ -->
+              <div class="detail-box">
+                <div class="detail-area">
+                  <p class="detail-label-inside">รายละเอียด</p>
+                  <p class="placeholder-content">
+                    [แสดงรายการตรวจสอบ Daily/Monthly ในรูปแบบตารางหรือรายการ]
+                  </p>
+                </div>
               </div>
             </div>
 
             <!-- ลายเซ็น -->
             <div class="signature-section">
-              <p class="signature-line">(..............................................)</p>
-              <p class="signature-label">ผู้ทดสอบ</p>
-              <p class="signature-line">ตำแหน่ง..............................................</p>
+              <p class="signature-line">
+                ลงชื่อ................................................ผู้ทดสอบ
+              </p>
+              <p class="signature-line">
+                  (...........................................................................)
+              </p>
+              <p class="signature-line">
+                ตำแหน่ง.............................................................
+              </p>
             </div>
           </div>
 
@@ -238,11 +266,13 @@ import { ref, computed } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 const machine = ref('')
-const checklistType = ref('')
+// checklistType เก็บ id ของ "รายการย่อย" ที่เลือก (เลือกได้หลายค่า)
+const checklistType = ref([])
 const date = ref('')
 
 const isPreviewVisible = ref(false)
 const isCalendarVisible = ref(false)
+const isChecklistDropdownOpen = ref(false)
 
 const today = new Date()
 const currentMonth = ref(today.getMonth())
@@ -261,13 +291,126 @@ const monthNames = [
   'September',
   'October',
   'November',
-  'December'
 ]
 
 const currentMonthYear = computed(() => {
   return `${monthNames[currentMonth.value]} ${currentYear.value}`
 })
 
+// ---------- X-ray machine options ----------
+const machineOptions = {
+  'shimazu-aaa-room1': 'X-ray shimazu รุ่น AAA ห้อง 1',
+  'shimazu-bbb-room2': 'X-ray shimazu รุ่น BBB ห้อง 2',
+  'shimazu-ccc-room3': 'X-ray shimazu รุ่น CCC ห้อง 3',
+  'shimazu-ddd-room4': 'X-ray shimazu รุ่น DDD ห้อง 4',
+}
+
+// ---------- Checklist groups & items ----------
+const checklistGroups = [
+  {
+    id: 'daily',
+    label: 'Daily check',
+    items: [
+      {
+        id: 'daily-care-xray',
+        label: 'การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
+      },
+      {
+        id: 'daily-erasure-ip',
+        label: 'การลบแผ่นเพลท (Erasure of Imaging Plate)',
+      },
+    ],
+  },
+  {
+    id: '1m',
+    label: '1 Month',
+    items: [
+      {
+        id: '1m-lightbox',
+        label: 'แบบบันทึกการตรวจสอบความสว่างแสงไฟ',
+      },
+      {
+        id: '1m-repeat-rate',
+        label: 'แบบบันทึกอัตราการถ่ายภาพซ้ำ',
+      },
+    ],
+  },
+  {
+    id: '3m',
+    label: '3 Months',
+    items: [
+      {
+        id: '3m-display-qc',
+        label: 'การควบคุมคุณภาพจอภาพ (Display monitor)',
+      },
+      {
+        id: '3m-record-xray',
+        label: 'การบันทึกการตรวจสอบเครื่องเอกซเรย์',
+      },
+      {
+        id: '3m-uniformity',
+        label: 'ความสม่ำเสมอของภาพ (Measured Uniformity)',
+      },
+      {
+        id: '3m-exposure-index',
+        label:
+          'ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)',
+      },
+    ],
+  },
+  {
+    id: '6m',
+    label: '6 Months',
+    items: [
+      {
+        id: '6m-collimator',
+        label: 'การทดสอบ collimator and beam alignment',
+      },
+      {
+        id: '6m-collimator-bucky',
+        label:
+          'การทดสอบ collimator and beam alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)',
+      },
+      {
+        id: '6m-dark-noise-cr',
+        label: 'การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR',
+      },
+      {
+        id: '6m-dark-noise-dr',
+        label: 'การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ DR',
+      },
+      {
+        id: '6m-lead-apron',
+        label:
+          'การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์',
+      },
+    ],
+  },
+  {
+    id: 'thickness',
+    label: 'แบบบันทึกผลการวัดความหนาผู้ป่วย',
+    items: [
+      {
+        id: 'thickness-main',
+        label: 'แบบบันทึกผลการวัดความหนาผู้ป่วย',
+      },
+    ],
+  },
+  {
+    id: 'usg-bmode',
+    label:
+      'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test',
+    items: [
+      {
+        id: 'usg-bmode-main',
+        label:
+          'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์ : B-mode QC Test',
+      },
+    ],
+  },
+]
+
+// ---------- date helper ----------
 const parseDateString = (str) => {
   const parts = str.split('/')
   if (parts.length !== 3) return null
@@ -288,15 +431,23 @@ const selectedDate = computed(() => parseDateString(date.value))
 
 const daysGrid = computed(() => {
   const cells = []
-  const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+  const firstDayOfMonth = new Date(
+    currentYear.value,
+    currentMonth.value,
+    1,
+  ).getDay()
+  const daysInMonth = new Date(
+    currentYear.value,
+    currentMonth.value + 1,
+    0,
+  ).getDate()
 
   for (let i = 0; i < firstDayOfMonth; i++) {
     cells.push({
       key: `empty-${i}`,
       day: null,
       isToday: false,
-      isSelected: false
+      isSelected: false,
     })
   }
 
@@ -321,7 +472,7 @@ const daysGrid = computed(() => {
       day: d,
       date: dateObj,
       isToday,
-      isSelected
+      isSelected,
     })
   }
 
@@ -332,7 +483,7 @@ const daysGrid = computed(() => {
       key: `empty-post-${i}`,
       day: null,
       isToday: false,
-      isSelected: false
+      isSelected: false,
     })
   }
 
@@ -390,6 +541,66 @@ const formatDate = () => {
   date.value = value
 }
 
+// ---------- Multi-select logic ----------
+const toggleChecklistDropdown = () => {
+  isChecklistDropdownOpen.value = !isChecklistDropdownOpen.value
+}
+
+const isItemSelected = (id) => checklistType.value.includes(id)
+
+const toggleItem = (id) => {
+  if (isItemSelected(id)) {
+    checklistType.value = checklistType.value.filter((v) => v !== id)
+  } else {
+    checklistType.value = [...checklistType.value, id]
+  }
+}
+
+const isGroupFullySelected = (groupId) => {
+  const group = checklistGroups.find((g) => g.id === groupId)
+  if (!group) return false
+  return group.items.every((item) => isItemSelected(item.id))
+}
+
+const toggleGroup = (groupId) => {
+  const group = checklistGroups.find((g) => g.id === groupId)
+  if (!group) return
+
+  const allSelected = isGroupFullySelected(groupId)
+
+  if (allSelected) {
+    // ถ้าเลือกครบทุกอันแล้ว -> กดอีกทีให้เอาออกทั้งหมดในหัวข้อนั้น
+    checklistType.value = checklistType.value.filter(
+      (id) => !group.items.some((item) => item.id === id),
+    )
+  } else {
+    // ถ้ายังไม่ครบ -> กดแล้วให้เลือกทุกรายการในหัวข้อนั้น
+    const newIds = [...checklistType.value]
+    group.items.forEach((item) => {
+      if (!newIds.includes(item.id)) {
+        newIds.push(item.id)
+      }
+    })
+    checklistType.value = newIds
+  }
+}
+
+// label ที่จะเอาไปแสดงในช่องสี่เหลี่ยม
+const selectedGroupLabels = computed(() => {
+  const labels = []
+  checklistGroups.forEach((group) => {
+    const hasSelected = group.items.some((item) => isItemSelected(item.id))
+    if (hasSelected) labels.push(group.label)
+  })
+  return labels
+})
+
+// ปิด dropdown เมื่อคลิกพื้นหลัง
+const closeFloatingUI = () => {
+  isChecklistDropdownOpen.value = false
+}
+
+// ---------- preview / export ----------
 const showPreview = () => {
   isPreviewVisible.value = true
 }
@@ -402,27 +613,16 @@ const exportFile = () => {
   alert('Exporting PDF file...')
 }
 
-const machineOptions = {
-  'shimazu-aaa': 'x-ray shimazu รุ่น AAA',
-  'shimazu-bbb': 'x-ray shimazu รุ่น BBB',
-  'shimazu-ccc': 'x-ray shimazu รุ่น CCC'
-}
-
-const checklistTypeOptions = {
-  daily: 'Daily Check',
-  '1m': '1 month',
-  '3m': '3 months',
-  '6m': '6 months',
-  thickness: 'แบบบันทึกผลการวัดความหนาผู้ป่วย',
-  usg: 'แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์'
-}
-
+// ---------- computed สำหรับแสดงผล ----------
 const displayedMachine = computed(() => {
   return machineOptions[machine.value] || 'X-ray machine (ไม่ได้เลือก)'
 })
 
 const displayedChecklistType = computed(() => {
-  return checklistTypeOptions[checklistType.value] || 'Checklist type (ไม่ได้เลือก)'
+  if (!selectedGroupLabels.value.length) {
+    return 'Checklist type (ไม่ได้เลือก)'
+  }
+  return selectedGroupLabels.value.join(', ')
 })
 
 const displayedDate = computed(() => {
@@ -432,11 +632,21 @@ const displayedDate = computed(() => {
   if (!monthName) return 'ไม่ระบุวันที่'
   return `${day} ${monthName} ${year}`
 })
+
+// หัวข้อด้านบนของ A4 ให้ตรงกับ Checklist type
+const previewTitle = computed(() => {
+  if (!selectedGroupLabels.value.length) {
+    return 'Checklist type (ไม่ได้เลือก)'
+  }
+  // แสดงทีละหัวข้อ เช่น "Daily check / 1 Month / 3 Months"
+  return selectedGroupLabels.value.join(' / ')
+})
 </script>
 
 <style scoped>
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
 }
 
 .page {
@@ -445,21 +655,16 @@ const displayedDate = computed(() => {
   flex-direction: column;
   align-items: center;
   padding: 12px 16px 32px;
-  /* พื้นหลังเดิมที่เป็นเทา + gradient */
-  /* background: radial-gradient(circle at top, #e0e7ff 0, #f4f4f5 50%, #ffffff 100%); */
-
-  /* เปลี่ยนเป็นพื้นหลังขาวล้วน */
-  background: radial-gradient(circle at top, #e0e7ff 0, #ffffff 40%, #ffffff 100%);
+  background: #ffffff;
 }
-
 
 /* --------- Header bar --------- */
 .page-header {
   max-width: 640px;
   width: 100%;
-  margin: 15 auto;              /* ชิดบนสุดของ page-section */
+  margin: 15 auto;
   padding: 12px 24px;
-  border-radius: 24px 24px 0 0; /* โค้งเฉพาะด้านบน */
+  border-radius: 24px 24px 0 0;
   background: #5b32d6;
   display: flex;
   align-items: center;
@@ -479,10 +684,10 @@ const displayedDate = computed(() => {
   width: 100%;
 }
 
-/* กล่องฟอร์มต่อเนื่องกับหัวข้อ (ไม่มีช่องว่าง) */
+/* กล่องฟอร์มต่อเนื่องกับหัวข้อ */
 .form-panel {
   background: rgba(255, 255, 255, 0.96);
-  border-radius: 0 0 24px 24px;   /* โค้งเฉพาะด้านล่าง ให้ต่อกับ .page-header */
+  border-radius: 0 0 24px 24px;
   padding: 32px 26px 26px;
   margin: 0 auto;
   box-shadow:
@@ -490,7 +695,6 @@ const displayedDate = computed(() => {
     0 0 0 1px rgba(148, 163, 184, 0.25);
   backdrop-filter: blur(12px);
 }
-
 
 .form {
   display: flex;
@@ -512,6 +716,7 @@ const displayedDate = computed(() => {
   background: #f9fafb;
   border: 1px solid transparent;
   transition: all 0.18s ease;
+  position: relative;
 }
 
 .input-shell:focus-within {
@@ -520,7 +725,7 @@ const displayedDate = computed(() => {
   background: #ffffff;
 }
 
-/* select */
+/* select ปกติ */
 .select-wrapper {
   position: relative;
 }
@@ -537,18 +742,188 @@ select {
   color: #111827;
 }
 
+/* สีตัวเลือกใน dropdown */
+select option {
+  color: #111827;       /* ตัวเลือกปกติเป็นสีดำเข้ม */
+}
+
+/* placeholder (option ที่ disabled) ให้เป็นสีเทาอ่อน */
+select option[disabled] {
+  color: #9ca3af;
+}
+
+
 select:disabled {
   cursor: not-allowed;
 }
 
+/* ให้ select ของ X-ray machine เวลาเป็น placeholder เป็นสีเดียวกัน */
+select.select-placeholder {
+  color: #9ca3af;
+}
+
+/* ซ่อนลูกศรมาตรฐานของ browser */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none !important;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+
 .arrow {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.7rem;
+  font-size: 0.95rem;     /* ใหญ่ขึ้น */
+  font-weight: 700;       /* หนาขึ้น */
+  color: #4f46e5;         /* สีม่วงชัด ๆ */
   pointer-events: none;
-  color: #6b7280;
+  background: #f3e8ff;    /* พื้นหลังวงรีอ่อน ๆ */
+  border-radius: 999px;
+  padding: 2px 6px;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.35);
+}
+
+
+/* ---------- custom multi-select ---------- */
+.multiselect-trigger {
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.multiselect-display {
+  width: 100%;
+  padding: 6px 32px 6px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* placeholder ของ Checklist type (multiselect) */
+.placeholder {
+  font-size: 0.9rem;
+  color: #9ca3af; /* ให้ตรงกับ Date */
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  font-size: 0.78rem;
+  color: #4f46e5;
+  font-weight: 500;
+  border: 1px solid rgba(129, 140, 248, 0.65);
+}
+
+/* dropdown */
+.multiselect-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+  padding: 8px 10px 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.multi-group + .multi-group {
+  border-top: 1px solid #f3f4f6;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.multi-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  padding: 4px 4px 4px 2px;
+  cursor: pointer;
+}
+
+.group-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.multi-items {
+  margin-top: 4px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.multi-item {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+}
+
+.multi-item:hover {
+  background: #f3f4ff;
+}
+
+.item-label {
+  font-size: 0.8rem;
+  text-align: left;
+  color: #374151;
+}
+
+/* checkbox style */
+.checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  margin-top: 2px;
+  box-sizing: border-box;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #ffffff;
+}
+
+.checkbox-checked {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+}
+
+.checkbox-checked::after {
+  content: '✓';
 }
 
 /* date input */
@@ -788,6 +1163,15 @@ select:disabled {
   box-shadow:
     0 26px 60px rgba(15, 23, 42, 0.28),
     0 0 0 1px rgba(148, 163, 184, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* เนื้อหาด้านบนให้ดันลงมา เหลือที่สำหรับลายเซ็นด้านล่าง */
+.paper-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .preview-title {
@@ -852,28 +1236,34 @@ select:disabled {
   margin-top: 6px;
 }
 
-/* ลายเซ็น */
 .signature-section {
-  margin-top: 60px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-end;   /* ให้กลุ่มลายเซ็นอยู่ด้านขวาเหมือนเดิม */
 }
 
-.signature-line,
-.signature-label {
+.signature-line {
   width: 260px;
-  text-align: center;
+  text-align: left;        /* เดิมเป็น center */
   margin: 4px 0;
   font-size: 0.78rem;
+  /* ถ้าอยากให้ไม่ชิดซ้ายมาก เพิ่มได้ */
+  /* padding-left: 4px; */
 }
+
 
 /* ปุ่ม Export */
 .export-btn-wrapper {
   display: flex;
   justify-content: flex-end;
   margin-top: 14px;
+  max-width: 595px;   /* เท่ากับ .a4-paper */
+  width: 100%;
+  margin-left: auto;  /* กรอบปุ่มอยู่กึ่งกลางกับกระดาษ */
+  margin-right: auto;
 }
+
 
 /* --------- responsive --------- */
 @media (max-width: 640px) {
@@ -889,10 +1279,5 @@ select:disabled {
   .preview-title {
     white-space: normal;
   }
-
-  .page-header {
-    padding: 8px 12px;
-  }
 }
-</style>
-
+</style> 

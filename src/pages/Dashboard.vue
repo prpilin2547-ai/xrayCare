@@ -99,18 +99,18 @@
         </table>
       </div>
 
-      <!-- <div class="monthly-box">
-        <div class="monthly-left"> -->
+      <!-- <div class="monthly-box"> -->
+        <!-- <div class="monthly-left"> -->
           <!-- <span class="monthly-icon">📅</span> -->
-          <!-- <div> -->
-            <!-- <p class="monthly-title">Monthly check</p> -->
-            <!-- <p class="monthly-date">
+          <!-- <div>
+            <p class="monthly-title">Monthly check</p>
+            <p class="monthly-date">
               {{ hasMachines ? '15 Nov 2025' : '-' }}
-            </p> -->
-          <!-- </div> -->
+            </p>
+          </div> -->
         </div>
-      <!-- </div>
-    </div> -->
+      <!-- </div> -->
+    <!-- </div> -->
   </MainLayout>
 </template>
 
@@ -184,7 +184,6 @@ function goToDairyCheck(equipmentName) {
   router.push({
     name: 'DairyCheckPage',
     params: { equipmentName }
-    
   })
 }
 

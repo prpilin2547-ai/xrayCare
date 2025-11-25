@@ -21,9 +21,12 @@
               </div>
             </div>
 
+
             <!-- การ์ดปฏิทิน -->
             <div class="card calendar-card mx-auto mb-3">
-              <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+              <div
+                class="calendar-header d-flex justify-content-between align-items-center mb-3"
+              >
                 <button class="nav-btn rounded-circle" @click="goPrevMonth">
                   &lt;
                 </button>
@@ -62,34 +65,63 @@
                     <span>{{ cell.day }}</span>
                   </div>
 
-                  <!-- แท็ก Monthly check (ฟ้า) -->
+                  <!-- stack แท็กต่าง ๆ ใต้ตัวเลขวัน -->
                   <div
-                    v-if="hasMonthlyTag(cell)"
-                    class="monthly-tag monthly-tag-blue"
+                    v-if="
+                      hasMonthlyTag(cell) ||
+                      isDailySpecialCell(cell) ||
+                      getCustomTagLabel(cell)
+                    "
+                    class="tag-stack"
                   >
-                    <span class="star">★</span>
-                    <span>Monthly Check</span>
-                  </div>
+                    <!-- Monthly check (ฟ้า) -->
+                    <div
+                      v-if="hasMonthlyTag(cell)"
+                      class="tag-pill monthly-tag-blue"
+                    >
+                      <span class="star">★</span>
+                      <span>Monthly Check</span>
+                    </div>
 
-                  <!-- แท็ก Daily (แดง) วันที่ 20/11/2025 -->
-                  <div
-                    v-if="isDailySpecialCell(cell)"
-                    class="monthly-tag monthly-tag-red"
-                  >
-                    <span class="star">★</span>
-                    <span>Daily Check</span>
+                    <!-- Daily check (แดง) -->
+                    <div
+                      v-if="isDailySpecialCell(cell)"
+                      class="tag-pill monthly-tag-red"
+                    >
+                      <span class="star">★</span>
+                      <span>Daily Check</span>
+                    </div>
+
+                    <!-- custom event (เขียว) 7 ตัวอักษรแรก + ... -->
+                    <div
+                      v-if="getCustomTagLabel(cell)"
+                      class="tag-pill custom-tag"
+                    >
+                      <span class="star">★</span>
+                      <span>{{ getCustomTagLabel(cell) }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- overlay -->
-            <div v-if="showAnyPopup" class="popup-overlay" @click="closeAllPopups"></div>
+            <!-- overlay ทั้งหมด -->
+            <div
+              v-if="showAnyPopup"
+              class="popup-overlay"
+              @click="closeAllPopups"
+            ></div>
 
             <!-- Popup วัน (สีชมพู) + Add -->
-            <div v-if="showDayPopup" class="popup-row" @click.stop>
-              <div class="popup-box popup-day text-start">
-                <div class="popup-header d-flex justify-content-between align-items-center">
+            <div
+              v-if="showDayPopup"
+              class="popup-row"
+              @click="closeAllPopups"
+            >
+              <div class="popup-box popup-day text-start" @click.stop>
+                <div
+                  class="popup-header d-flex justify-content-between align-items-center"
+                >
                   <h5 class="mb-0 fw-bold">
                     {{ dayPopupTitle }}
                   </h5>
@@ -102,7 +134,7 @@
                       ⚙️
                     </button>
 
-                    <!-- ปุ่มลบทั้ง Monthly + events ของวันนั้น // NEW -->
+                    <!-- ปุ่มลบทั้ง Daily / Monthly + events ของวันนั้น -->
                     <button
                       class="icon-btn icon-btn-red rounded-circle"
                       @click.stop="clearDayData"
@@ -137,9 +169,9 @@
                     {{ dayPopupDateText }}
                   </p>
 
-                  <!-- กรณีพิเศษ Daily วันที่ 20/11/2025 -->
+                  <!-- กรณีพิเศษ Daily -->
                   <template v-if="isDailySpecial">
-                    <p class="fw-bold mb-1">รายการที่ไม่ได้ทำ</p>
+                    <p class="fw-bold mb-1">รายการที่ยังไม่ได้ทำ</p>
                     <ul class="mb-0 popup-list">
                       <li v-for="(task, idx) in dayTasks" :key="idx">
                         <span class="task-text">{{ task }}</span>
@@ -147,24 +179,22 @@
                     </ul>
                   </template>
 
-                  <!-- กรณีอื่น ๆ -->
+                  <!-- กรณีอื่น ๆ (Monthly / Event ทั่วไป) -->
                   <template v-else>
-                    <!-- ถ้ามีรายการจริง ๆ ก็แสดงหัวข้อ "รายการ" -->
-                    <p v-if="dayTasks.length" class="fw-bold mb-1">รายการ</p>
+                    <p v-if="dayTasks.length" class="fw-bold mb-1">
+                      รายละเอียด
+                    </p>
 
-                    <!-- ถ้ายังไม่มีรายการ และยังไม่ได้ตั้ง Monthly Check เลย ค่อยแสดง "ไม่มีรายการ" -->
-                    <p v-else-if="!dayPopupMonthlyType" class="mb-0">ไม่มีรายการ</p>
+                    <p v-else-if="!dayPopupMonthlyType" class="mb-0">
+                      ไม่มีรายการ
+                    </p>
 
                     <ul v-if="dayTasks.length" class="mb-0 popup-list">
-                      <li
-                        v-for="(task, idx) in dayTasks"
-                        :key="idx"
-                      >
+                      <li v-for="(task, idx) in dayTasks" :key="idx">
                         <span class="task-text">{{ task }}</span>
-                        <!-- ปุ่มลบ event ทีละรายการ // NEW -->
                         <button
                           class="item-delete-btn"
-                          @click.stop="removeEvent(idx)"
+                          @click.stop="removeTask(idx)"
                           title="ลบรายการนี้"
                         >
                           ✕
@@ -173,33 +203,37 @@
                     </ul>
                   </template>
 
-                  <!-- กล่องเพิ่ม event -->
+                  <!-- กล่องเพิ่ม event (textarea หลายบรรทัด) -->
                   <div v-if="showAddPopup" class="add-box mt-3">
-                    <input
+                    <textarea
                       v-model="newEventText"
-                      type="text"
+                      rows="2"
                       class="form-control form-control-sm mb-2"
                       placeholder="ชื่อรายการ"
-                      @keyup.enter="handleAddEvent"
-                    />
+                    ></textarea>
                     <div class="d-flex justify-content-end gap-3">
                       <span class="add-action text-danger" @click="cancelAdd">
                         ยกเลิก
                       </span>
-                      <span class="add-action text-secondary" @click="handleAddEvent">
+                      <span
+                        class="add-action text-secondary"
+                        @click="handleAddEvent"
+                      >
                         เพิ่ม
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Popup Settings รอบ Monthly -->
-              <div
-                v-if="showSettingsPopup"
-                class="popup-box popup-settings text-start"
-                @click.stop
-              >
+            <!-- Popup Settings รอบ Monthly กลางจอ -->
+            <div
+              v-if="showSettingsPopup"
+              class="settings-modal"
+              @click="closeAllPopups"
+            >
+              <div class="popup-box popup-settings text-start" @click.stop>
                 <h5 class="fw-bold mb-2">รอบการทำ Monthly Check</h5>
                 <hr class="popup-divider" />
                 <div class="mb-3">
@@ -223,6 +257,7 @@
                 </div>
               </div>
             </div>
+            <!-- จบส่วน Settings -->
           </div>
         </div>
       </div>
@@ -231,7 +266,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 const today = new Date()
@@ -262,6 +297,12 @@ const monthNames = [
   'November',
   'December'
 ]
+
+/** key สำหรับเก็บใน localStorage */
+const STORAGE_EVENTS_KEY = 'pmEventsByDate'
+const STORAGE_RULES_KEY = 'pmMonthlyRules'
+const STORAGE_HIDDEN_MONTHLY_KEY = 'pmHiddenMonthlyTasks'
+const STORAGE_DAILY_DISABLED_KEY = 'pmDisabledDailyDates'
 
 const headerDateText = computed(() => {
   const d = today.getDate()
@@ -339,36 +380,100 @@ const showAnyPopup = computed(
   () => showDayPopup.value || showSettingsPopup.value
 )
 
-/* events ต่อวัน */
+/* events ต่อวัน (custom เพิ่มเอง) */
 const eventsByDate = ref({})
 const newEventText = ref('')
 
-/* รอบ monthly ต่อวัน */
-const monthlyTypeByDate = ref({}) // key: YYYY-MM-DD -> '1m' | '3m' | '6m'
+/* key: YYYY-MM-DD -> array ของข้อความ task ที่ไม่ต้องแสดงในวันนั้น */
+const hiddenMonthlyTasksByDate = ref({})
+
+/* key: YYYY-MM-DD -> true ถ้าวันนั้นปิด Daily Check แล้ว */
+const disabledDailyDates = ref({})
+
+/* รอบ monthly: ใช้เป็น "กฎ" โดย key = วันที่เริ่มทำรอบนั้น */
+const monthlyTypeByStartDate = ref({}) // key: YYYY-MM-DD -> '1m' | '3m' | '6m'
 const settingsType = ref('1m')
 
-/* special date 20/11/2025 */
-const DAILY_SPECIAL = {
-  year: 2025,
-  month: 10, // November (0-based)
-  day: 20
+/* วัน Daily Check พิเศษ: 28 November 2025 */
+const DAILY_SPECIAL_DATES = [
+  { year: 2025, month: 10, day: 28 } // 28 November 2025 (month index 0-based)
+]
+
+/* รายการที่ต้องทำสำหรับ Monthly ในแต่ละรอบ */
+const MONTHLY_TASKS_MAP = {
+  '1m': [
+    '-การตรวจสอบความสว่างแสงไฟ',
+    '-แบบบันทึกอัตราการถ่ายภาพซ้ำ'
+  ],
+  '3m': [
+    '-การควบคุมคุณภาพจอภาพ',
+    '-แบบบันทึกการตรวจสอบเครื่องเอกซเรย์',
+    '-ความสม่ำเสมอของภาพ',
+    '-ความคงที่ของค่าดัชนีปริมาณรังสี'
+  ],
+  '6m': [
+    '-การทดสอบ Collimator and Beam Alignment',
+    '-การทดสอบ Collimator and Beam Alignment สำหรับกรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)',
+    '-การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ DR',
+    '-การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ CR',
+    '-การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์'
+  ]
 }
 
+/* ---------- helpers ---------- */
 const isDailySpecialDate = (date) => {
   if (!date) return false
-  return (
-    date.getFullYear() === DAILY_SPECIAL.year &&
-    date.getMonth() === DAILY_SPECIAL.month &&
-    date.getDate() === DAILY_SPECIAL.day
+
+  const dateYear = date.getFullYear()
+  const dateMonth = date.getMonth()
+  const dateDay = date.getDate()
+
+  const isBaseSpecial = DAILY_SPECIAL_DATES.some(
+    (s) => s.year === dateYear && s.month === dateMonth && s.day === dateDay
   )
+
+  if (!isBaseSpecial) return false
+
+  const key = dateKey(date)
+  return !disabledDailyDates.value[key]
+}
+
+/** หาว่าที่ date นี้มี Monthly รอบไหนบ้าง จากกฎที่เคยตั้งไว้ */
+const getMonthlyTypeForDate = (date) => {
+  if (!date) return null
+  const dateDay = date.getDate()
+  const dateMonth = date.getMonth()
+  const dateYear = date.getFullYear()
+
+  const entries = Object.entries(monthlyTypeByStartDate.value)
+  for (const [startKey, type] of entries) {
+    const [y, m, d] = startKey.split('-').map((v) => parseInt(v, 10))
+    const startYear = y
+    const startMonth = m - 1
+    const startDay = d
+
+    const startDate = new Date(startYear, startMonth, startDay)
+
+    if (date < startDate) continue
+    if (dateDay !== startDay) continue
+
+    const diffMonths =
+      (dateYear - startYear) * 12 + (dateMonth - startMonth)
+
+    if (diffMonths < 0) continue
+
+    if (type === '1m' && diffMonths % 1 === 0) return type
+    if (type === '3m' && diffMonths % 3 === 0) return type
+    if (type === '6m' && diffMonths % 6 === 0) return type
+  }
+  return null
 }
 
 /* tag helpers */
 const hasMonthlyTag = (cell) => {
   const date = getCellDate(cell)
   if (!date) return false
-  const key = dateKey(date)
-  return !!monthlyTypeByDate.value[key]
+  return !!getMonthlyTypeForDate(date)
 }
 
 const isDailySpecialCell = (cell) => {
@@ -376,7 +481,22 @@ const isDailySpecialCell = (cell) => {
   return isDailySpecialDate(date)
 }
 
-/* computed สำหรับ popup วัน */
+/* ป้ายสรุป custom event สีเขียว: แสดง 7 ตัวแรก + ... */
+const getCustomTagLabel = (cell) => {
+  const date = getCellDate(cell)
+  if (!date) return ''
+  const key = dateKey(date)
+  const list = eventsByDate.value[key] || []
+  if (!list.length) return ''
+
+  const firstText = (list[0] || '').trim()
+  if (!firstText) return ''
+
+  if (firstText.length <= 7) return firstText
+  return firstText.slice(0, 7) + '...'
+}
+
+/* ---------- computed สำหรับ popup วัน ---------- */
 const currentDayKey = computed(() =>
   dayPopupDate.value ? dateKey(dayPopupDate.value) : null
 )
@@ -384,14 +504,29 @@ const currentDayKey = computed(() =>
 const isDailySpecial = computed(() => isDailySpecialDate(dayPopupDate.value))
 
 const dayPopupMonthlyType = computed(() => {
-  if (!currentDayKey.value) return null
-  return monthlyTypeByDate.value[currentDayKey.value] || null
+  if (!dayPopupDate.value) return null
+  return getMonthlyTypeForDate(dayPopupDate.value)
+})
+
+const dayEvents = computed(() => {
+  if (!currentDayKey.value) return []
+  return eventsByDate.value[currentDayKey.value] || []
+})
+
+const monthlyTasksForCurrentDay = computed(() => {
+  if (!dayPopupMonthlyType.value) return []
+
+  const base = MONTHLY_TASKS_MAP[dayPopupMonthlyType.value] || []
+  if (!currentDayKey.value) return base
+
+  const hidden = hiddenMonthlyTasksByDate.value[currentDayKey.value] || []
+  return base.filter((text) => !hidden.includes(text))
 })
 
 const dayPopupTitle = computed(() => {
   if (isDailySpecial.value) return 'Daily Check'
   if (dayPopupMonthlyType.value) return 'Monthly Check'
-  if (dayEvents.value.length) return 'รายการ'
+  if (dayEvents.value.length) return 'รายละเอียด'
   return 'ไม่มีรายการ'
 })
 
@@ -412,21 +547,16 @@ const dayPopupDateText = computed(() => {
   return `${w} ${d} ${m} ${y}`
 })
 
-const dayEvents = computed(() => {
-  if (!currentDayKey.value) return []
-  return eventsByDate.value[currentDayKey.value] || []
-})
-
+/* รายการที่ไม่ได้ทำของ Daily Check */
 const dailySpecialTasks = [
-  'การควบคุมคุณภาพจอภาพ',
-  'ตรวจสอบเครื่องเอกซเรย์',
-  'ความสม่ำเสมอของภาพ',
-  'ความคงที่ของดัชนีปริมาณรังสี'
+  '-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
+  '-การลบแผ่นเพลท (Erasure of Imaging Plate)'
 ]
 
+/* รวมรายการของวันนั้น */
 const dayTasks = computed(() => {
   if (isDailySpecial.value) return dailySpecialTasks
-  return dayEvents.value
+  return [...monthlyTasksForCurrentDay.value, ...dayEvents.value]
 })
 
 /* ---------- methods popup ---------- */
@@ -436,7 +566,6 @@ const openDayPopup = (cell) => {
   dayPopupDate.value = date
   showDayPopup.value = true
   showAddPopup.value = false
-  showSettingsPopup.value = false
 }
 
 const toggleAddPopup = () => {
@@ -462,49 +591,80 @@ const handleAddEvent = () => {
   showAddPopup.value = false
 }
 
-/* ลบ event ทีละรายการ // NEW */
-const removeEvent = (index) => {
+const removeTask = (idx) => {
   if (!currentDayKey.value) return
   const key = currentDayKey.value
+
+  if (isDailySpecial.value) {
+    return
+  }
+
+  const monthlyVisible = monthlyTasksForCurrentDay.value
+
+  if (idx < monthlyVisible.length) {
+    const taskText = monthlyVisible[idx]
+    const hidden = hiddenMonthlyTasksByDate.value[key] || []
+
+    if (!hidden.includes(taskText)) {
+      hiddenMonthlyTasksByDate.value = {
+        ...hiddenMonthlyTasksByDate.value,
+        [key]: [...hidden, taskText]
+      }
+    }
+    return
+  }
+
+  const eventIdx = idx - monthlyVisible.length
   const old = eventsByDate.value[key] || []
-  const next = old.filter((_, i) => i !== index)
+  const next = old.filter((_, i) => i !== eventIdx)
   eventsByDate.value = {
     ...eventsByDate.value,
     [key]: next
   }
 }
 
-/* ลบข้อมูลทั้งวัน (events + monthly) // NEW */
+/* ลบข้อมูลทั้งวัน (รองรับ Daily + Monthly) */
 const clearDayData = () => {
   if (!dayPopupDate.value) return
   const date = dayPopupDate.value
   const key = dateKey(date)
 
-  // ลบ event ของวันนั้นทั้งหมด
   const { [key]: removedEvents, ...restEvents } = eventsByDate.value
   eventsByDate.value = restEvents
 
-  // ถ้าเป็น Daily special ไม่ลบ state อะไรพิเศษ เพราะ Daily ใช้ค่าคงที่
-  if (!isDailySpecialDate(date)) {
-    const { [key]: removedType, ...restTypes } = monthlyTypeByDate.value
-    monthlyTypeByDate.value = restTypes
+  if (isDailySpecialDate(date)) {
+    disabledDailyDates.value = {
+      ...disabledDailyDates.value,
+      [key]: true
+    }
+
+    const { [key]: removedHidden, ...restHidden } = hiddenMonthlyTasksByDate.value
+    hiddenMonthlyTasksByDate.value = restHidden
+
+    return
   }
+
+  const { [key]: removedType, ...restTypes } = monthlyTypeByStartDate.value
+  monthlyTypeByStartDate.value = restTypes
+
+  const { [key]: removedHidden2, ...restHidden2 } = hiddenMonthlyTasksByDate.value
+  hiddenMonthlyTasksByDate.value = restHidden2
 }
 
 /* settings popup */
 const openSettingsPopup = () => {
   if (!dayPopupDate.value) return
-  const key = dateKey(dayPopupDate.value)
-  settingsType.value = monthlyTypeByDate.value[key] || '1m'
+  const currentType = getMonthlyTypeForDate(dayPopupDate.value)
+  settingsType.value = currentType || '1m'
   showSettingsPopup.value = true
 }
 
 const handleSaveSettings = () => {
   if (!dayPopupDate.value) return
-  const key = dateKey(dayPopupDate.value)
-  monthlyTypeByDate.value = {
-    ...monthlyTypeByDate.value,
-    [key]: settingsType.value
+  const startKey = dateKey(dayPopupDate.value)
+  monthlyTypeByStartDate.value = {
+    ...monthlyTypeByStartDate.value,
+    [startKey]: settingsType.value
   }
   showSettingsPopup.value = false
 }
@@ -514,6 +674,99 @@ const closeAllPopups = () => {
   showAddPopup.value = false
   showSettingsPopup.value = false
 }
+
+/* ---------- localStorage ---------- */
+onMounted(() => {
+  try {
+    const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY)
+    if (savedEvents) {
+      eventsByDate.value = JSON.parse(savedEvents)
+    }
+  } catch (e) {
+    console.error('Cannot load events from storage', e)
+  }
+
+  try {
+    const savedRules = localStorage.getItem(STORAGE_RULES_KEY)
+    if (savedRules) {
+      monthlyTypeByStartDate.value = JSON.parse(savedRules)
+    }
+  } catch (e) {
+    console.error('Cannot load monthly rules from storage', e)
+  }
+
+  try {
+    const savedHiddenMonthly = localStorage.getItem(STORAGE_HIDDEN_MONTHLY_KEY)
+    if (savedHiddenMonthly) {
+      hiddenMonthlyTasksByDate.value = JSON.parse(savedHiddenMonthly)
+    }
+  } catch (e) {
+    console.error('Cannot load hidden monthly tasks from storage', e)
+  }
+
+  try {
+    const savedDisabledDaily = localStorage.getItem(STORAGE_DAILY_DISABLED_KEY)
+    if (savedDisabledDaily) {
+      disabledDailyDates.value = JSON.parse(savedDisabledDaily)
+    }
+  } catch (e) {
+    console.error('Cannot load disabled daily dates from storage', e)
+  }
+})
+
+watch(
+  eventsByDate,
+  (val) => {
+    try {
+      localStorage.setItem(STORAGE_EVENTS_KEY, JSON.stringify(val))
+    } catch (e) {
+      console.error('Cannot save events to storage', e)
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  monthlyTypeByStartDate,
+  (val) => {
+    try {
+      localStorage.setItem(STORAGE_RULES_KEY, JSON.stringify(val))
+    } catch (e) {
+      console.error('Cannot save monthly rules to storage', e)
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  hiddenMonthlyTasksByDate,
+  (val) => {
+    try {
+      localStorage.setItem(
+        STORAGE_HIDDEN_MONTHLY_KEY,
+        JSON.stringify(val)
+      )
+    } catch (e) {
+      console.error('Cannot save hidden monthly tasks to storage', e)
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  disabledDailyDates,
+  (val) => {
+    try {
+      localStorage.setItem(
+        STORAGE_DAILY_DISABLED_KEY,
+        JSON.stringify(val)
+      )
+    } catch (e) {
+      console.error('Cannot save disabled daily dates to storage', e)
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>
@@ -608,12 +861,20 @@ const closeAllPopups = () => {
   justify-content: center;
 }
 
-/* แท็กในปฏิทิน */
-.monthly-tag {
+/* stack แท็กทั้งหมดให้ไม่ทับกัน */
+.tag-stack {
   position: absolute;
   bottom: 2px;
   left: 50%;
-  transform: translateX(-50%) scale(0.9);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* pill base ทั้งฟ้า แดง เขียว */
+.tag-pill {
   padding: 1px 6px;
   border-radius: 999px;
   color: #ffffff;
@@ -623,7 +884,7 @@ const closeAllPopups = () => {
   white-space: nowrap;
 }
 
-.monthly-tag .star {
+.tag-stack .star {
   margin-right: 4px;
   font-size: 0.6rem;
 }
@@ -634,6 +895,10 @@ const closeAllPopups = () => {
 
 .monthly-tag-red {
   background-color: #dc2626;
+}
+
+.custom-tag {
+  background-color: #16a34a;
 }
 
 /* overlay */
@@ -689,16 +954,14 @@ const closeAllPopups = () => {
   font-size: 0.9rem;
   margin-bottom: 4px;
   position: relative;
-  padding-left: 12px;
-  display: flex;             /* NEW */
-  align-items: center;       /* NEW */
-  justify-content: space-between; /* NEW */
+  padding-left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .popup-list li::before {
-  content: '–';
-  position: absolute;
-  left: 0;
+  content: '';
 }
 
 /* ข้อความรายการ */
@@ -756,6 +1019,16 @@ const closeAllPopups = () => {
   cursor: pointer;
 }
 
+/* กล่อง settings กลางจอ */
+.settings-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .page-top {
   padding-top: 1px !important;
 }
@@ -764,4 +1037,5 @@ const closeAllPopups = () => {
   margin-top: 0;
   margin-bottom: 0px;
 }
+
 </style>
