@@ -55,7 +55,7 @@
                       v-if="!selectedItemLabels.length"
                       class="placeholder"
                     >
-                      Checklist type
+                      Checklist 
                     </span>
 
                     <!-- แสดงหัวข้อที่เลือกแล้ว -->
