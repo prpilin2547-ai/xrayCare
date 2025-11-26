@@ -193,23 +193,45 @@ const defaultItems = [
 
 // ------------- ข้อมูลในตาราง (อ่านจาก localStorage) -------------
 const items = ref([...defaultItems])
+const isUpdating = ref(false) // Flag to prevent recursive updates
 
-onMounted(() => {
+const loadItems = () => {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     try {
+      isUpdating.value = true
       items.value = JSON.parse(stored)
+      // Reset flag after DOM update cycle to ensure watcher doesn't trigger
+      setTimeout(() => {
+        isUpdating.value = false
+      }, 0)
     } catch (e) {
       items.value = [...defaultItems]
     }
   }
+}
+
+onMounted(() => {
+  loadItems()
+  window.addEventListener('storage', (event) => {
+    if (event.key === STORAGE_KEY) {
+      loadItems()
+    }
+  })
+  window.addEventListener('storage-local-update', loadItems)
 })
 
 // บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
 watch(
   items,
   newItems => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
+    if (isUpdating.value) return // Skip if updating from storage
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
+      window.dispatchEvent(new Event('storage-local-update'))
+    } catch (error) {
+      console.error('Error saving to localStorage:', error)
+    }
   },
   { deep: true }
 )
@@ -371,9 +393,12 @@ tbody td {
 
 /* ✅ ลิงก์ "ตรวจสอบ" */
 .detail-link {
-  color: #2563eb;              /* น้ำเงิน */
-  text-decoration: underline;  /* ขีดเส้นใต้ */
-  cursor: pointer;             /* เมาส์เป็นรูปมือ */
+  color: #2563eb;
+  /* น้ำเงิน */
+  text-decoration: underline;
+  /* ขีดเส้นใต้ */
+  cursor: pointer;
+  /* เมาส์เป็นรูปมือ */
 }
 
 /* Page Header */

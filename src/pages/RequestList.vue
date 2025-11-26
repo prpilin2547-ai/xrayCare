@@ -56,8 +56,6 @@
                     <i class="bi bi-x-circle close-modal-btn" @click="closeDetail"></i>
                 </div>
 
-
-
                 <!-- Main Content Box -->
                 <div class="main-box">
                     <!-- Orange Header -->
@@ -67,7 +65,6 @@
                             {{ getEquipmentWithRoom(selectedItem) }}
                         </div>
                     </div>
-
 
                     <!-- Grey Body -->
                     <div class="box-body">
@@ -138,6 +135,13 @@
                 </div>
 
                 <div class="form-container modal-body">
+                    <!-- Alert แจ้งเตือน -->
+                    <div v-if="showError" class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>
+                            กรุณากรอกข้อมูลให้ครบถ้วน
+                        </div>
+                    </div>
                     <!-- ฟอร์ม -->
                     <div @submit.prevent="submitForm">
                         <!-- อุปกรณ์ -->
@@ -223,6 +227,7 @@ const detail = ref('')
 const selectedEquipment = ref('')
 const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
 const selectedItem = ref(null)
+const showError = ref(false) // Validation alert
 
 // เพิ่มใหม่
 const uploadedImageData = ref('')      // เก็บ dataURL ของรูปที่อัปโหลด
@@ -253,28 +258,86 @@ const defaultItems = [
 
 // items ใช้ร่วมกับ Engineer (ผ่าน localStorage)
 const items = ref([...defaultItems])
+const isUpdating = ref(false) // Flag to prevent recursive updates
 
-onMounted(() => {
-    // โหลดข้อมูลจาก localStorage (ถ้ามี)
+const loadItems = () => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
         try {
+            isUpdating.value = true
             items.value = JSON.parse(stored)
+            // Reset flag after DOM update cycle to ensure watcher doesn't trigger
+            setTimeout(() => {
+                isUpdating.value = false
+            }, 0)
         } catch (e) {
             items.value = [...defaultItems]
         }
     }
+}
+
+onMounted(() => {
+    loadItems()
+
+    // Listen for storage changes from other tabs/windows
+    window.addEventListener('storage', (event) => {
+        if (event.key === STORAGE_KEY) {
+            loadItems()
+        }
+    })
+
+    // Listen for local updates (same window)
+    window.addEventListener('storage-local-update', loadItems)
 
     modal = new Modal(modalEl.value, {
         backdrop: 'static'
     })
 })
 
+// ฟังก์ชันทำความสะอาดข้อมูลเก่า
+const cleanupOldData = (itemsToClean) => {
+    // ลบข้อมูลรูปภาพของรายการที่ดำเนินการแล้ว
+    const cleaned = itemsToClean.map(item => {
+        if (item.statusText === 'ดำเนินการแล้ว' && item.imageData) {
+            return { ...item, imageData: null }
+        }
+        return item
+    })
+
+    // จำกัดจำนวนรายการทั้งหมดไว้ที่ 50 รายการ (เก็บรายการล่าสุด)
+    if (cleaned.length > 50) {
+        return cleaned.slice(-50)
+    }
+
+    return cleaned
+}
+
 // sync items -> localStorage (ใช้ร่วมกับ RequestEN)
 watch(
     items,
     newItems => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
+        if (isUpdating.value) return // Skip if updating from storage
+        try {
+            const cleanedItems = cleanupOldData(newItems)
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedItems))
+            // อัพเดท items ด้วยข้อมูลที่ทำความสะอาดแล้ว (ไม่ทำให้เกิด loop เพราะมี isUpdating check)
+            if (cleanedItems.length !== newItems.length) {
+                items.value = cleanedItems
+            }
+            window.dispatchEvent(new Event('storage-local-update'))
+        } catch (error) {
+            console.error('Error saving to localStorage:', error)
+            // ถ้าเกิน quota ให้ลองลบข้อมูลรูปภาพทั้งหมด
+            if (error.name === 'QuotaExceededError') {
+                try {
+                    const itemsWithoutImages = newItems.map(item => ({ ...item, imageData: null }))
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itemsWithoutImages))
+                    alert('พื้นที่เก็บข้อมูลเต็ม รูปภาพบางส่วนถูกลบเพื่อประหยัดพื้นที่')
+                } catch (e) {
+                    alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลบรายการเก่าออก')
+                }
+            }
+        }
     },
     { deep: true }
 )
@@ -312,10 +375,11 @@ const openModal = () => {
 
 // ปิด modal
 const closeModal = () => {
+    showError.value = false
     modal.hide()
 }
 
-// เลือกไฟล์ภาพ
+// เลือกไฟล์ภาพ + บีบอัดรูป
 const onFileSelected = (event) => {
     const file = event.target.files[0]
     if (!file) {
@@ -325,9 +389,41 @@ const onFileSelected = (event) => {
     }
 
     fileName.value = file.name
+
+    // บีบอัดรูปภาพก่อนเก็บ
     const reader = new FileReader()
     reader.onload = e => {
-        uploadedImageData.value = e.target.result // เก็บเป็น base64
+        const img = new Image()
+        img.onload = () => {
+            // สร้าง canvas เพื่อ resize
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+
+            // กำหนดขนาดสูงสุด (800px)
+            const maxSize = 800
+            let width = img.width
+            let height = img.height
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height = (height * maxSize) / width
+                    width = maxSize
+                }
+            } else {
+                if (height > maxSize) {
+                    width = (width * maxSize) / height
+                    height = maxSize
+                }
+            }
+
+            canvas.width = width
+            canvas.height = height
+            ctx.drawImage(img, 0, 0, width, height)
+
+            // บีบอัดที่ 70% quality
+            uploadedImageData.value = canvas.toDataURL('image/jpeg', 0.7)
+        }
+        img.src = e.target.result
     }
     reader.readAsDataURL(file)
 }
@@ -345,8 +441,10 @@ const closeDetail = () => {
 // เพิ่มข้อมูลใหม่ + กลับไปตาราง
 const submitForm = () => {
     if (!selectedEquipment.value || !selectedRoom.value || !detail.value) {
+        showError.value = true
         return
     }
+    showError.value = false
 
     const newId = items.value.length
         ? Math.max(...items.value.map(i => i.id)) + 1
@@ -488,7 +586,7 @@ tbody td {
 }
 
 .clickable-row {
-  /* ไม่ต้องให้ทั้งแถวเป็น pointer แล้ว */
+    /* ไม่ต้องให้ทั้งแถวเป็น pointer แล้ว */
 }
 
 /* ✅ ลิงก์ "ดูรายละเอียด" */
