@@ -5,7 +5,7 @@
             <div v-if="!selectedItem">
                 <!-- หัวข้อระบบแจ้งซ่อม + ปุ่มเพิ่มรายการ -->
                 <div class="section-header">
-                    <span class="section-title">ระบบแจ้งซ่อม</span>
+                    <span class="section-title">ระบบแจ้งซ่อม </span>
                     <button type="button" class="btn btn-danger d-flex align-items-center gap-2" @click="openModal">
                         <i class="bi bi-plus-lg"></i>
                         เพิ่มรายการ

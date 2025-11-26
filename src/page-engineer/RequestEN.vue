@@ -5,7 +5,7 @@
       <div v-if="!selectedItem">
         <!-- หัวข้อระบบแจ้งซ่อม -->
         <div class="section-header">
-          <span class="section-title">ระบบแจ้งซ่อม</span>
+          <span class="section-title">ระบบแจ้งซ่อม </span>
         </div>
 
         <!-- ตารางแจ้งซ่อม -->
