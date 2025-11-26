@@ -77,13 +77,18 @@
           placeholder="กรอกรายละเอียดเพิ่มเติม..."
         ></textarea>
 
-        <label class="field-label mt-8">แนบไฟล์รูปภาพ</label>
-        <input type="file" accept="image/*" @change="onFileChange" />
-        <p v-if="form.fileName" class="file-name">
-          ไฟล์ที่เลือก: {{ form.fileName }}
-        </p>
-      </div>
-
+        <div class="mt-2">
+          <label class="form-label small mb-1"> แนบไฟล์ภาพหรือเอกสาร </label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
+        </div>
       <!-- ปุ่มจะสลับข้อความตามว่า ครบ 6 เดือนจากการบันทึกล่าสุดหรือยัง
            และใช้วันที่ที่กำหนดในฟอร์มเป็นตัวเช็ค -->
       <button

@@ -53,10 +53,17 @@
                 </td>
                 <td>
                   <textarea class="input-textarea" v-model="item.remark" placeholder="บันทึกหมายเหตุ..."></textarea>
-                  <input type="file" accept="image/*" @change="onItemFileChange($event, item)" />
-                  <p v-if="item.fileName" class="file-name">
-                    ไฟล์ที่เลือก: {{ item.fileName }}
-                  </p>
+                  <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
                 </td>
               </tr>
             </tbody>
@@ -90,10 +97,17 @@
                 </td>
                 <td>
                   <textarea class="input-textarea" v-model="plateEraseRemark" placeholder="บันทึกหมายเหตุ..."></textarea>
-                  <input type="file" accept="image/*" @change="onPlateEraseFileChange" />
-                  <p v-if="plateEraseFileName" class="file-name">
-                    ไฟล์ที่เลือก: {{ plateEraseFileName }}
-                  </p>
+                  <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
                 </td>
               </tr>
             </tbody>
