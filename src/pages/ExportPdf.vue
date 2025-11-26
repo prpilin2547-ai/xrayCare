@@ -53,9 +53,9 @@
                     <!-- แสดงคำว่า Checklist type ตอนยังไม่เลือกอะไร -->
                     <span
                       v-if="!selectedItemLabels.length"
-                      class="placeholder"
+                      class="placeholder-checklist"
                     >
-                      Checklist 
+                      Checklist type
                     </span>
 
                     <!-- แสดงหัวข้อที่เลือกแล้ว -->
@@ -812,7 +812,7 @@ const previewTitle = computed(() => {
 }
 
 .page {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -968,7 +968,7 @@ select::-ms-expand {
 }
 
 /* placeholder ของ Checklist type (multiselect) */
-.placeholder {
+.placeholder-checklist {
   font-size: 0.9rem;
   color: #9ca3af;
 }

@@ -1,16 +1,12 @@
 <template>
   <div class="layout-root">
     <!-- พื้นหลังเทาเข้มด้านนอก -->
-    <div class="layout-shell">
+    <div class="layout-shell m-nav">
+      <TopBar :role="role" class="fixed-top"/>
       <!-- แถบบนสีม่วง -->
-      <TopBar :role="role" />
-
       <!-- ส่วนล่าง: sidebar + เนื้อหา -->
       <div class="layout-body">
-        <SidebarNav
-          :active="activeMenu"
-          @navigate="onNavigate"
-        />
+        <SidebarNav :active="activeMenu" @navigate="onNavigate" class="" />
         <main class="layout-content">
           <slot />
         </main>
@@ -49,22 +45,22 @@ const activeMenu = computed(() => {
 
 const onNavigate = (menu) => {
   switch (menu) {
-    case 'dashboard':          router.push('/dashboard'); break
-    case 'equipment':          router.push('/machines/create'); break
-    case 'checklist':          router.push('/dashboard'); break // ยังเป็น mock
-    case 'pm':                 router.push('/pm-schedule'); break
-    case 'export':             router.push('/export-pdf'); break
-    case 'analytical':         router.push('/analytics'); break
-    case 'request':            router.push('/requests'); break // ยังเป็น mock
-    case 'profile':            router.push('/profile'); break
-    case 'admindashboard':     router.push('/admindashboard'); break
-    case 'engineerdashboard':  router.push('/engineerdashboard'); break
+    case 'dashboard': router.push('/dashboard'); break
+    case 'equipment': router.push('/machines/create'); break
+    case 'checklist': router.push('/dashboard'); break // ยังเป็น mock
+    case 'pm': router.push('/pm-schedule'); break
+    case 'export': router.push('/export-pdf'); break
+    case 'analytical': router.push('/analytics'); break
+    case 'request': router.push('/requests'); break // ยังเป็น mock
+    case 'profile': router.push('/profile'); break
+    case 'admindashboard': router.push('/admindashboard'); break
+    case 'engineerdashboard': router.push('/engineerdashboard'); break
     case 'engineeranalytical': router.push('/analyticalen'); break
-    case 'engineerrequest':    router.push('/requesten'); break
-    case 'adminuseraccount':   router.push('/adminuseraccount'); break
-    case 'additionalforms':    router.push('/qc-forms'); break
-    case 'adminanalytical':    router.push('/adminanalytical'); break
-    case 'logout':             router.push('/login'); break
+    case 'engineerrequest': router.push('/requesten'); break
+    case 'adminuseraccount': router.push('/adminuseraccount'); break
+    case 'additionalforms': router.push('/qc-forms'); break
+    case 'adminanalytical': router.push('/adminanalytical'); break
+    case 'logout': router.push('/login'); break
   }
 }
 </script>
@@ -72,15 +68,14 @@ const onNavigate = (menu) => {
 <style scoped>
 .layout-root {
   min-height: 100vh;
-  background: #111111; /* เทาเข้มด้านนอกเหมือน mockup */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  background: #111111;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: flex-start; */
 }
 
 .layout-shell {
   width: 100%;
-  /* max-width: 1440px; */
   min-height: 100vh;
   background: #ffffff;
   display: flex;
@@ -95,5 +90,9 @@ const onNavigate = (menu) => {
 .layout-content {
   flex: 1;
   padding: 24px 32px 32px;
+}
+
+.m-nav {
+  margin-top: 56px;
 }
 </style>
