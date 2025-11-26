@@ -4,7 +4,7 @@
 
       <!-- HEADER -->
       <div class="dashboard-header-row">
-        <h2 class="page-title">Dashboard</h2>
+        <h2 class="page-title">Dashboard1</h2>
       </div>
 
       <!-- SUMMARY CARDS -->
