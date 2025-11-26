@@ -2,7 +2,7 @@
   <MainLayout>
     <div class="page" @click="closeFloatingUI">
       <!-- ฟอร์มหน้าแรก -->
-      <div v-if="!isPreviewVisible" class="form-section-wrapper">
+      <div class="form-section-wrapper">
         <!-- แถบบาร์ด้านบน -->
         <div class="page-header">
           <span class="page-header-title">
@@ -146,9 +146,9 @@
             </div>
           </form>
 
-          <!-- ปุ่มตัวอย่างไฟล์ -->
+          <!-- ปุ่มตัวอย่างไฟล์ -> ไปหน้า XrayF1Print -->
           <div class="preview-wrapper">
-            <button class="btn-primary" @click="showPreview">
+            <button class="btn-primary" @click="goToXrayF1Print">
               ตัวอย่างไฟล์
             </button>
           </div>
@@ -191,216 +191,22 @@
           </div>
         </div>
       </div>
-
-      <!-- หน้า 2 : พรีวิว -->
-      <div v-if="isPreviewVisible" class="preview-section-wrapper">
-        <div class="preview-inner">
-          <!-- ลูกศรย้อนกลับ -->
-          <button class="back-btn" @click="backToForm">
-            ←
-          </button>
-
-          <!-- กระดาษ A4 : หน้าแรก -->
-          <div class="a4-paper">
-            <div class="paper-body">
-              <!-- กรณีพิเศษ F1 : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ -->
-              <template v-if="showDailyCareForm">
-                <h3 class="preview-title">
-                  แบบบันทึก การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์
-                </h3>
-
-                <p class="daily-subtitle">
-                  ความถี่ : ทุกวันก่อนเริ่มปฏิบัติงาน
-                </p>
-
-                <div class="daily-info-row">
-                  <span>
-                    เครื่องเอกซเรย์ {{ displayedMachine }}
-                  </span>
-                  <span class="daily-month">
-                    เดือน {{ selectedMonthText }}
-                  </span>
-                </div>
-
-                <!-- ตาราง Daily care -->
-                <table class="daily-table">
-                  <tr>
-                    <th class="daily-col1">
-                      วันที่ : {{ selectedDayText }}
-                    </th>
-                    <th class="daily-col2">
-                      ชื่อผู้ทดสอบ
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>รายการตรวจสอบ</td>
-                    <td>ผลการตรวจสอบ Pass(/) / Fail(X) ของวันที่</td>
-                  </tr>
-                  <tr>
-                    <td>สายไฟ</td>
-                    <td class="dates-row">
-                      <span v-for="d in days1to30" :key="'r3-' + d">
-                        {{ d }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>ระบบล็อกและเบรค</td>
-                    <td class="dates-row">
-                      <span v-for="d in days1to30" :key="'r4-' + d">
-                        {{ d }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>เตียง หลอดเอกซเรย์ และบักกี้</td>
-                    <td class="dates-row">
-                      <span v-for="d in days1to30" :key="'r5-' + d">
-                        {{ d }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>X-ray tube warm-up</td>
-                    <td class="dates-row">
-                      <span v-for="d in days1to30" :key="'r6-' + d">
-                        {{ d }}
-                      </span>
-                    </td>
-                  </tr>
-                </table>
-              </template>
-
-              <!-- กรณีไม่ใช่ F1 ให้ใช้ layout เดิม -->
-              <template v-else>
-                <h3 class="preview-title">
-                  {{ previewTitle }}
-                </h3>
-
-                <div class="info-chips-row">
-                  <div class="info-chip">
-                    <span class="info-label">X-ray machine</span>
-                    <span class="info-value">{{ displayedMachine }}</span>
-                  </div>
-
-                  <div class="info-chip">
-                    <span class="info-label">Checklist type</span>
-                    <span class="info-value">{{ displayedChecklistType }}</span>
-                  </div>
-
-                  <div class="info-chip">
-                    <span class="info-label">ข้อมูล ณ วันที่</span>
-                    <span class="info-value">{{ displayedDate }}</span>
-                  </div>
-                </div>
-
-                <div class="detail-box">
-                  <div class="detail-area">
-                    <p class="detail-label-inside">รายละเอียด</p>
-                    <p class="placeholder-content">
-                      [แสดงรายการตรวจสอบ Daily/Monthly ในรูปแบบตารางหรือรายการ]
-                    </p>
-                  </div>
-                </div>
-              </template>
-            </div>
-
-            <!-- ลายเซ็นให้เฉพาะ layout เดิม -->
-            <div v-if="!showDailyCareForm" class="signature-section">
-              <p class="signature-line">
-                ลงชื่อ................................................ผู้ทดสอบ
-              </p>
-              <p class="signature-line">
-                (...........................................................................)
-              </p>
-              <p class="signature-line">
-                ตำแหน่ง.............................................................
-              </p>
-            </div>
-          </div>
-
-          <!-- หน้าใหม่ : F2 การลบแผ่นเพลท -->
-          <div v-if="showDailyErasureForm" class="a4-paper">
-            <div class="paper-body">
-              <h3 class="preview-title">
-                แบบบันทึก การลบแผ่นเพลท แผนกเอกซเรย์
-              </h3>
-              <p class="center-line">
-                ปีงบประมาณ พ.ศ. {{ thaiBudgetYear }}
-              </p>
-
-              <div class="erasure-meta">
-                <p>ความถี่ : ทุกวัน</p>
-                <p>หมายเลข IP …………. </p>
-              </div>
-
-              <!-- ตาราง 3 ตารางเรียงกัน -->
-              <div class="erasure-tables-row">
-                <div
-                  class="erasure-table-wrapper"
-                  v-for="idx in 3"
-                  :key="'tb-' + idx"
-                >
-                  <table class="erasure-table">
-                    <tr>
-                      <th class="erasure-col1">
-                        เดือน / รายการ / วันที่ /
-                      </th>
-                      <th class="erasure-col2">
-                        1
-                      </th>
-                    </tr>
-                    <tr>
-                      <td>เดือน …………. </td>
-                      <td>2</td>
-                    </tr>
-                    <tr>
-                      <td>ผลการทดสอบ Pass(/)/Fail(X)</td>
-                      <td>3</td>
-                    </tr>
-                    <tr>
-                      <td>สภาพผิดปกติของแผ่นหรือตำแหน่งบนภาพ</td>
-                      <td>4</td>
-                    </tr>
-                    <tr>
-                      <td>ผู้ตรวจสอบ</td>
-                      <td>5</td>
-                    </tr>
-                    <tr
-                      v-for="n in extraNumsForErasure"
-                      :key="'row-' + idx + '-' + n"
-                    >
-                      <td></td>
-                      <td>{{ n }}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ปุ่ม Export -->
-          <div class="export-btn-wrapper">
-            <button class="btn-primary btn-shadow" @click="exportFile">
-              Export File
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   </MainLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const router = useRouter()
 
 const machine = ref('')
 // checklistType เก็บ id ของ "รายการย่อย" ที่เลือก (เลือกได้หลายค่า)
 const checklistType = ref([])
 const date = ref('')
 
-const isPreviewVisible = ref(false)
 const isCalendarVisible = ref(false)
 const isChecklistDropdownOpen = ref(false)
 
@@ -713,7 +519,7 @@ const toggleGroup = (groupId) => {
   }
 }
 
-// เอา label ของ "รายการย่อย" ที่เลือกไปใช้แสดงใน preview/chip
+// เอา label ของ "รายการย่อย" ที่เลือกไปใช้แสดงใน chip
 const selectedItemLabels = computed(() => {
   const labels = []
   checklistGroups.forEach((group) => {
@@ -731,78 +537,10 @@ const closeFloatingUI = () => {
   isChecklistDropdownOpen.value = false
 }
 
-// ---------- preview / export ----------
-const showPreview = () => {
-  isPreviewVisible.value = true
+// ---------- ไปหน้า XrayF1Print ----------
+const goToXrayF1Print = () => {
+  router.push({ name: 'XrayF1Print' })
 }
-
-const backToForm = () => {
-  isPreviewVisible.value = false
-}
-
-const exportFile = () => {
-  alert('Exporting PDF file...')
-}
-
-// ---------- helpers / computed สำหรับแบบฟอร์มพิเศษ ----------
-const showDailyCareForm = computed(() =>
-  checklistType.value.includes('daily-care-xray'),
-)
-
-const showDailyErasureForm = computed(() =>
-  checklistType.value.includes('daily-erasure-ip'),
-)
-
-const days1to30 = Array.from({ length: 30 }, (_, i) => i + 1)
-const extraNumsForErasure = Array.from({ length: 15 }, (_, i) => i + 6) // 6–20
-
-const selectedDayText = computed(() => {
-  if (!selectedDate.value) return '……'
-  return selectedDate.value.getDate()
-})
-
-const selectedMonthText = computed(() => {
-  if (!selectedDate.value) return '……'
-  const [day, month, year] = date.value.split('/')
-  return month || '……'
-})
-
-const thaiBudgetYear = computed(() => {
-  if (!selectedDate.value) return '…………'
-  // ปี พ.ศ. (ไม่แยกปีงบฯ ตามเดือน เพื่อให้ logic ง่าย)
-  return selectedDate.value.getFullYear() + 543
-})
-
-// ---------- computed สำหรับแสดงผลเดิม ----------
-const displayedMachine = computed(() => {
-  return machineOptions[machine.value] || 'X-ray machine (ไม่ได้เลือก)'
-})
-
-const displayedChecklistType = computed(() => {
-  if (!selectedItemLabels.value.length) {
-    return 'Checklist type (ไม่ได้เลือก)'
-  }
-  return selectedItemLabels.value.join(', ')
-})
-
-const displayedDate = computed(() => {
-  if (!date.value || date.value.length !== 10) return 'ไม่ระบุวันที่'
-  const [day, monthIndex, year] = date.value.split('/').map(Number)
-  const monthName = monthNames[monthIndex - 1]
-  if (!monthName) return 'ไม่ระบุวันที่'
-  return `${day} ${monthName} ${year}`
-})
-
-// หัวข้อด้านบนของ A4 ให้ตรงกับ Checklist type
-const previewTitle = computed(() => {
-  if (showDailyCareForm.value) {
-    return 'แบบบันทึก การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์'
-  }
-  if (!selectedItemLabels.value.length) {
-    return 'Checklist type (ไม่ได้เลือก)'
-  }
-  return selectedItemLabels.value.join(' / ')
-})
 </script>
 
 <style scoped>
@@ -812,7 +550,6 @@ const previewTitle = computed(() => {
 }
 
 .page {
-  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -840,8 +577,7 @@ const previewTitle = computed(() => {
   font-size: 0.95rem;
 }
 
-.form-section-wrapper,
-.preview-section-wrapper {
+.form-section-wrapper {
   max-width: 640px;
   width: 100%;
 }
@@ -1158,10 +894,6 @@ select::-ms-expand {
   box-shadow: 0 8px 18px rgba(55, 48, 163, 0.4);
 }
 
-.btn-shadow {
-  box-shadow: 0 12px 30px rgba(31, 41, 55, 0.28);
-}
-
 /* ปุ่มตัวอย่างไฟล์ */
 .preview-wrapper {
   margin-top: 18px;
@@ -1275,265 +1007,10 @@ select::-ms-expand {
   transform: translateY(-1px);
 }
 
-/* ---------------- preview หน้า 2 ---------------- */
-.preview-section-wrapper {
-  max-width: 680px;
-  width: 100%;
-}
-
-.preview-inner {
-  position: relative;
-}
-
-.back-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: none;
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
-  position: absolute;
-  top: 16px;
-  left: -20px;
-  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.3);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-.back-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.38);
-}
-
-/* กระดาษ A4 */
-.a4-paper {
-  width: 100%;
-  max-width: 595px;
-  min-height: 842px;
-  border-radius: 20px;
-  border: 1px solid #e5e7eb;
-  background: linear-gradient(180deg, #ffffff, #f9fafb);
-  margin: 0 auto 24px;
-  padding: 20px 40px 36px;
-  box-shadow:
-    0 26px 60px rgba(15, 23, 42, 0.28),
-    0 0 0 1px rgba(148, 163, 184, 0.4);
-  display: flex;
-  flex-direction: column;
-}
-
-/* เนื้อหาด้านบนให้ดันลงมา เหลือที่สำหรับลายเซ็นด้านล่าง */
-.paper-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.preview-title {
-  text-align: center;
-  margin-bottom: 12px;
-  font-size: 1.02rem;
-  white-space: nowrap;
-  color: #111827;
-  font-weight: 700;
-}
-
-/* แถบข้อมูลด้านบน */
-.info-chips-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.info-chip {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  font-size: 0.78rem;
-}
-
-.info-label {
-  color: #6b7280;
-}
-
-.info-value {
-  color: #111827;
-  font-weight: 500;
-}
-
-/* กล่องรายละเอียดใหญ่ */
-.detail-box {
-  margin-top: 8px;
-}
-
-.detail-area {
-  border-radius: 14px;
-  border: 1px dashed #9ca3af;
-  min-height: 380px;
-  padding: 10px 12px;
-  background: #fefefe;
-}
-
-.detail-label-inside {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.placeholder-content {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-top: 6px;
-}
-
-.signature-section {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.signature-line {
-  width: 260px;
-  text-align: left;
-  margin: 4px 0;
-  font-size: 0.78rem;
-}
-
-/* ปุ่ม Export */
-.export-btn-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 14px;
-  max-width: 595px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* ---------- Daily care form ---------- */
-.daily-subtitle {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-}
-
-.daily-info-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-}
-
-.daily-month {
-  text-align: right;
-}
-
-.daily-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.78rem;
-  margin-top: 4px;
-}
-
-.daily-table th,
-.daily-table td {
-  border: 1px solid #d1d5db;
-  padding: 4px 6px;
-  vertical-align: top;
-}
-
-.daily-col1 {
-  width: 30%;
-}
-
-.daily-col2 {
-  width: 70%;
-}
-
-.dates-row {
-  line-height: 1.6;
-}
-
-.dates-row span {
-  display: inline-block;
-  min-width: 18px;
-  text-align: center;
-}
-
-/* ---------- Erasure form ---------- */
-.center-line {
-  text-align: center;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-}
-
-.erasure-meta {
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-}
-
-.erasure-meta p {
-  margin: 2px 0;
-}
-
-.erasure-tables-row {
-  display: flex;
-  gap: 8px;
-  justify-content: space-between;
-  margin-top: 6px;
-}
-
-.erasure-table-wrapper {
-  flex: 1;
-}
-
-.erasure-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.75rem;
-}
-
-.erasure-table th,
-.erasure-table td {
-  border: 1px solid #d1d5db;
-  padding: 3px 4px;
-  vertical-align: top;
-}
-
-.erasure-col1 {
-  width: 60%;
-}
-
-.erasure-col2 {
-  width: 40%;
-  text-align: center;
-}
-
 /* --------- responsive --------- */
 @media (max-width: 640px) {
   .form-panel {
     padding: 24px 18px 20px;
-  }
-
-  .a4-paper {
-    padding: 16px 18px 26px;
-    min-height: 700px;
-  }
-
-  .preview-title {
-    white-space: normal;
-  }
-
-  .erasure-tables-row {
-    flex-direction: column;
   }
 
   /* ให้ select X-ray machine เป็นพื้นขาว */
