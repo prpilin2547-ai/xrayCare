@@ -159,168 +159,165 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import MainLayout from '../components/Layout/MainLayout.vue';
+import { ref, computed } from 'vue'
+import MainLayout from '../components/Layout/MainLayout.vue'
 
 // --- State ---
-const searchQuery = ref('');
-const showModal = ref(false);
-// เริ่มต้น users เป็น array ว่างก่อน แล้วค่อยโหลดจาก onMounted เพื่อป้องกันค่า default แสดงก่อน
-const users = ref([]);
+const searchQuery = ref('')
+const showModal = ref(false)
 
-// --- ข้อมูลเริ่มต้น (Default Mock Data) - เพิ่ม position (ข้อ 1) ---
+// --- ข้อมูลเริ่มต้น (Mock Data) ---
 const defaultUsers = [
   { id: 1, username: 'xxxxxxxxx', password: 'password123', position: 'Admin' },
   { id: 2, username: 'yyyyyyyyy', password: 'securepass', position: 'Radiological Technologist' },
   { id: 3, username: 'zzzzzzzzz', password: 'userpass01', position: 'Engineer' },
-  { id: 4, username: 'ทดสอบก', password: 'password007', position: 'Radiological Technologist' },
-];
+  { id: 4, username: 'ทดสอบก', password: 'password007', position: 'Radiological Technologist' }
+]
 
-// --- Load Data Logic ---
-const loadUsers = () => {
-  const storedUsers = localStorage.getItem('xray_users');
-  let parsedUsers = [];
-
-  if (storedUsers) {
-    try {
-      parsedUsers = JSON.parse(storedUsers);
-    } catch (e) {
-      parsedUsers = defaultUsers;
-    }
-  } else {
-    parsedUsers = defaultUsers;
-  }
-
-  // เมื่อโหลดข้อมูลมาแล้ว ต้องเซ็ตค่า showPassword / isEditing / tempPassword ให้เป็นค่าเริ่มต้นเสมอ
-  // ถ้า record เก่าไม่มี position ให้ default เป็น Radiological Technologist
-  users.value = parsedUsers.map(u => ({
+// ใช้แค่ใน memory (รีเฟรชหน้าหาย) ไม่มี backend / ไม่มี localStorage
+const users = ref(
+  defaultUsers.map(u => ({
     ...u,
-    position: u.position || 'Radiological Technologist',
-    showPassword: false, 
+    showPassword: false,
     isEditing: false,
     tempPassword: ''
-  }));
-};
+  }))
+)
 
-// เรียกใช้ตอนโหลดหน้าเว็บ
-onMounted(() => {
-  loadUsers();
-});
-
-// --- Save Data Logic ---
-watch(users, (newUsers) => {
-  // บันทึกเฉพาะข้อมูลที่จำเป็น (รวม position ด้วย)
-  const dataToSave = newUsers.map(({ id, username, password, position }) => ({ id, username, password, position }));
-  localStorage.setItem('xray_users', JSON.stringify(dataToSave));
-}, { deep: true });
-
-// --- New User Form State (เพิ่ม position ตามข้อ 2) ---
+// --- ฟอร์มสร้าง user ใหม่ ---
 const newUser = ref({
+  username: '',
+  password: '',
+  confirmPassword: '',
+  position: '',
+  showPass: false,
+  showConfirm: false
+})
+
+const errors = ref({
+  username: false,
+  password: false,
+  confirmPassword: false,
+  position: false
+})
+
+// --- Computed ---
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) return users.value
+  return users.value.filter(user =>
+    user.username.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
+
+// helper สำหรับ badge ของ position
+const getPositionClass = (position) => {
+  switch (position) {
+    case 'Admin':
+      return 'position-admin'
+    case 'Engineer':
+      return 'position-engineer'
+    case 'Radiological Technologist':
+    default:
+      return 'position-rt'
+  }
+}
+
+// --- Methods ---
+const openModal = () => {
+  newUser.value = {
     username: '',
     password: '',
     confirmPassword: '',
     position: '',
     showPass: false,
     showConfirm: false
-});
-
-const errors = ref({
+  }
+  errors.value = {
     username: false,
     password: false,
     confirmPassword: false,
     position: false
-});
-
-// --- Computed ---
-const filteredUsers = computed(() => {
-    if (!searchQuery.value) return users.value;
-    return users.value.filter(user => 
-        user.username.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
-});
-
-// helper สำหรับ class ของ position badge (ข้อ 1)
-const getPositionClass = (position) => {
-  switch (position) {
-    case 'Admin':
-      return 'position-admin';
-    case 'Engineer':
-      return 'position-engineer';
-    case 'Radiological Technologist':
-    default:
-      return 'position-rt';
   }
-};
-
-// --- Methods ---
-
-const openModal = () => {
-    newUser.value = { username: '', password: '', confirmPassword: '', position: '', showPass: false, showConfirm: false };
-    errors.value = { username: false, password: false, confirmPassword: false, position: false };
-    showModal.value = true;
-};
+  showModal.value = true
+}
 
 const closeModal = () => {
-    showModal.value = false;
-};
+  showModal.value = false
+}
 
 const createAccount = () => {
-    errors.value = { username: false, password: false, confirmPassword: false, position: false };
-    let isValid = true;
+  errors.value = {
+    username: false,
+    password: false,
+    confirmPassword: false,
+    position: false
+  }
+  let isValid = true
 
-    if (!newUser.value.username) { errors.value.username = true; isValid = false; }
-    if (!newUser.value.position) { errors.value.position = true; isValid = false; }
-    if (!newUser.value.password) { errors.value.password = true; isValid = false; }
-    if (!newUser.value.confirmPassword || newUser.value.confirmPassword !== newUser.value.password) {
-        errors.value.confirmPassword = true;
-        isValid = false;
-    }
+  if (!newUser.value.username) {
+    errors.value.username = true
+    isValid = false
+  }
+  if (!newUser.value.position) {
+    errors.value.position = true
+    isValid = false
+  }
+  if (!newUser.value.password) {
+    errors.value.password = true
+    isValid = false
+  }
+  if (
+    !newUser.value.confirmPassword ||
+    newUser.value.confirmPassword !== newUser.value.password
+  ) {
+    errors.value.confirmPassword = true
+    isValid = false
+  }
 
-    if (isValid) {
-        users.value.push({
-            id: Date.now(),
-            username: newUser.value.username,
-            password: newUser.value.password,
-            position: newUser.value.position,
-            showPassword: false, // สร้างใหม่ก็ต้องปิดตา
-            isEditing: false,
-            tempPassword: ''
-        });
-        showModal.value = false; 
-    }
-};
+  if (!isValid) return
 
-// Delete Logic
+  users.value.push({
+    id: Date.now(),
+    username: newUser.value.username,
+    password: newUser.value.password,
+    position: newUser.value.position,
+    showPassword: false,
+    isEditing: false,
+    tempPassword: ''
+  })
+
+  showModal.value = false
+}
+
 const deleteUser = (id) => {
-    if(confirm('คุณต้องการลบบัญชีผู้ใช้นี้ใช่หรือไม่?')) {
-        users.value = users.value.filter(u => u.id !== id);
-    }
-};
+  if (confirm('คุณต้องการลบบัญชีผู้ใช้นี้ใช่หรือไม่?')) {
+    users.value = users.value.filter(u => u.id !== id)
+  }
+}
 
-// Toggle Eye
 const toggleVisibility = (user) => {
-    user.showPassword = !user.showPassword;
-};
+  user.showPassword = !user.showPassword
+}
 
-// Edit Logic
 const startEdit = (user) => {
-    user.tempPassword = ''; // เคลียร์ค่าเพื่อให้กรอกใหม่
-    user.isEditing = true;
-};
+  user.tempPassword = ''
+  user.isEditing = true
+}
 
 const saveEdit = (user) => {
-    if (user.tempPassword.trim()) {
-        user.password = user.tempPassword; // อัปเดตค่าจริง
-        user.isEditing = false;
-    } else {
-        alert("Password cannot be empty!");
-    }
-};
+  if (user.tempPassword.trim()) {
+    user.password = user.tempPassword
+    user.isEditing = false
+  } else {
+    alert('Password cannot be empty!')
+  }
+}
 
 const cancelEdit = (user) => {
-    user.isEditing = false;
-};
+  user.isEditing = false
+}
 </script>
+
 
 <style scoped>
 /* Page Title */
