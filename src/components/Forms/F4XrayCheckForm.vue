@@ -81,11 +81,17 @@
           placeholder="สรุปผลการตรวจ / ข้อเสนอแนะ..."
         ></textarea>
 
-        <label class="field-label mt-8">แนบไฟล์รูปภาพ</label>
-        <input type="file" accept="image/*" @change="onFileChange" />
-        <p v-if="form.fileName" class="file-name">
-          ไฟล์ที่เลือก: {{ form.fileName }}
-        </p>
+       <div class="mt-2">
+          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
 
         <p class="footnote">
           * ในระบบ DR ให้ทวนสอบค่าทางเทคนิคว่าถูกต้องเป็นปัจจุบัน<br />
