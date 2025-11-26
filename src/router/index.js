@@ -23,6 +23,7 @@ import F9ProtectiveClothesForm from '../pages/F9ProtectiveClothesForm.vue'
 import F11 from '../pages/F11.vue'
 import F13 from '../pages/F13.vue'
 import QCFormsHub from '../pages/QCFormsHub.vue'
+import AdminAnalytical from '../pages-admin/AdminAnalytical.vue'
 
 
 
@@ -52,6 +53,7 @@ const routes = [
   { path: '/analyticalen', component: AnalyticalEN },
   { path: '/requesten', component: RequestEN },
   { path: '/adminuseraccount', component: Adminuseraccount },
+  { path: '/adminanalytical', component: AdminAnalytical },
   { path: '/requests/new', component: RequestForm },
   {
     path: '/checklist-next',
