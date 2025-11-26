@@ -76,7 +76,7 @@
         </table>
       </div>
 
-      <!-- ---------------------- CALENDAR ---------------------- -->
+      <!-- ---------------------- CALENDAR (ใช้ logic เดียวกับ PM Schedule) ---------------------- -->
       <div class="calendar-wrapper">
 
         <!-- DATE CARD -->
@@ -123,13 +123,27 @@
                 <span>{{ cell.day }}</span>
               </div>
 
-              <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell)">
+              <!-- tag-stack เหมือนหน้า PM (ฟ้า/แดง/เขียว) -->
+              <div
+                class="tag-stack"
+                v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)"
+              >
+                <!-- Monthly Check -->
                 <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
-                  ★ Monthly Check
+                  <span class="star">★</span>
+                  <span>Monthly Check</span>
                 </div>
 
+                <!-- Daily Check -->
                 <div v-if="isDailySpecialCell(cell)" class="tag-pill monthly-tag-red">
-                  ★ Daily Check
+                  <span class="star">★</span>
+                  <span>Daily Check</span>
+                </div>
+
+                <!-- Custom event -->
+                <div v-if="getCustomTagLabel(cell)" class="tag-pill custom-tag">
+                  <span class="star">★</span>
+                  <span>{{ getCustomTagLabel(cell) }}</span>
                 </div>
               </div>
             </div>
@@ -178,7 +192,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import MainLayout from "../components/Layout/MainLayout.vue";
 
@@ -202,7 +216,7 @@ function goToMachinesCreate() {
   router.push("/machines/create");
 }
 
-/* ---------------- Calendar Core ---------------- */
+/* ---------------- Calendar Core (เหมือนหน้า PM) ---------------- */
 const today = new Date();
 const currentYear = ref(today.getFullYear());
 const currentMonth = ref(today.getMonth());
@@ -225,16 +239,21 @@ const calendarCells = computed(() => {
   const year = currentYear.value;
   const month = currentMonth.value;
 
-  const first = new Date(year, month, 1).getDay();
-  const days = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const cells = [];
-  for (let i = 0; i < first; i++) cells.push({ key: `p-${i}`, day: null });
-  for (let d = 1; d <= days; d++) cells.push({ key: `d-${d}`, day: d });
-
-  const remain = 42 - cells.length;
-  for (let i = 0; i < remain; i++) cells.push({ key: `s-${i}`, day: null });
-
+  for (let i = 0; i < firstDay; i++) {
+    cells.push({ key: `p-${i}`, day: null, isPadding: true });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ key: `d-${d}`, day: d, isPadding: false });
+  }
+  const totalCells = 42;
+  const remain = totalCells - cells.length;
+  for (let i = 0; i < remain; i++) {
+    cells.push({ key: `s-${i}`, day: null, isPadding: true });
+  }
   return cells;
 });
 
@@ -260,142 +279,200 @@ const isToday = (day) => {
   );
 };
 
-/* ---------------- Event Definition ---------------- */
-// เริ่มต้นจากเดือน Nov 2025 (index 10)
-const RECUR_EVENTS = [
-  {
-    id: "monthly-1",
-    type: "monthly",
-    day: 5,
-    startYear: 2025,
-    startMonth: 10,
-    intervalMonths: 1,
-    title: "Monthly Check",
-    frequencyText: "ทำประจำทุก 1 เดือน",
-    sectionTitle: "รายละเอียด",
-    tasks: [
-      "-การตรวจสอบความสว่างแสงไฟ",
-      "-แบบบันทึกอัตราการถ่ายภาพซ้ำ"
-    ]
-  },
-  {
-    id: "monthly-3",
-    type: "monthly",
-    day: 12,
-    startYear: 2025,
-    startMonth: 10,
-    intervalMonths: 3,
-    title: "Monthly Check",
-    frequencyText: "ทำประจำทุก 3 เดือน",
-    sectionTitle: "รายละเอียด",
-    tasks: [
-      "-การควบคุมคุณภาพอภาพ",
-      "-แบบบันทึกการตรวจสอบเครื่องเอกซเรย์",
-      "-ความสม่ำเสมอของภาพ",
-      "-ความคงที่ของค่าดัชนีปริมาณรังสี"
-    ]
-  },
-  {
-    id: "monthly-6",
-    type: "monthly",
-    day: 19,
-    startYear: 2025,
-    startMonth: 10,
-    intervalMonths: 6,
-    title: "Monthly Check",
-    frequencyText: "ทำประจำทุก 6 เดือน",
-    sectionTitle: "รายละเอียด",
-    tasks: [
-      "-การทดสอบ Collimator and Beam Alignment",
-      "-การทดสอบ Collimator and Beam Alignment สำหรับกรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)",
-      "-การทดสอบสัญญาณรบกวนมืด (Dark noise) ระบบ DR",
-      "-การทดสอบสัญญาณรบกวนมืด (Dark noise) ระบบ CR",
-      "-การตรวจสอบคุณภาพของฟิล์มและหัวทรอมแคสของเครื่องด้วยรังสีเอ็กซ์"
-    ]
-  }
+/* ---------- ใช้ localStorage ร่วมกับ PM Schedule ---------- */
+const STORAGE_EVENTS_KEY = "pmEventsByDate";
+const STORAGE_RULES_KEY = "pmMonthlyRules";
+const STORAGE_HIDDEN_MONTHLY_KEY = "pmHiddenMonthlyTasks";
+const STORAGE_DAILY_DISABLED_KEY = "pmDisabledDailyDates";
+
+const eventsByDate = ref({});
+const monthlyTypeByStartDate = ref({});
+const hiddenMonthlyTasksByDate = ref({});
+const disabledDailyDates = ref({});
+
+/* วัน Daily Check พิเศษ: 28 Nov 2025 */
+const DAILY_SPECIAL_DATES = [
+  { year: 2025, month: 10, day: 28 } // month index 0-based
 ];
 
-// Daily check แค่ครั้งเดียว 28 Nov 2025
-const ONE_TIME_EVENTS = [
-  {
-    id: "daily-1",
-    type: "daily",
-    date: new Date(2025, 10, 28),
-    title: "Daily Check",
-    frequencyText: "ทำประจำทุกวัน",
-    sectionTitle: "รายการที่ยังไม่ได้ทำ",
-    tasks: [
-      "-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์",
-      "-การลบแผ่นเพลท (Erasure of Imaging Plate)"
-    ]
-  }
+/* Tasks รายเดือน (เหมือน PM Schedule) */
+const MONTHLY_TASKS_MAP = {
+  "1m": [
+    "-การตรวจสอบความสว่างแสงไฟ",
+    "-แบบบันทึกอัตราการถ่ายภาพซ้ำ"
+  ],
+  "3m": [
+    "-การควบคุมคุณภาพจอภาพ",
+    "-แบบบันทึกการตรวจสอบเครื่องเอกซเรย์",
+    "-ความสม่ำเสมอของภาพ",
+    "-ความคงที่ของค่าดัชนีปริมาณรังสี"
+  ],
+  "6m": [
+    "-การทดสอบ Collimator and Beam Alignment",
+    "-การทดสอบ Collimator and Beam Alignment สำหรับกรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)",
+    "-การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ DR",
+    "-การทดสอบสัญญาณรบกวนมืด ( Dark noise ) ระบบ CR",
+    "-การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์"
+  ]
+};
+
+/* daily tasks */
+const dailySpecialTasks = [
+  "-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์",
+  "-การลบแผ่นเพลท (Erasure of Imaging Plate)"
 ];
 
-function sameYMD(d1, d2) {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
+const dateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const getCellDate = (cell) => {
+  if (!cell.day) return null;
+  return new Date(currentYear.value, currentMonth.value, cell.day);
+};
+
+/* daily special? */
+const isDailySpecialDate = (date) => {
+  if (!date) return false;
+
+  const dateYear = date.getFullYear();
+  const dateMonth = date.getMonth();
+  const dateDay = date.getDate();
+
+  const isBaseSpecial = DAILY_SPECIAL_DATES.some(
+    (s) => s.year === dateYear && s.month === dateMonth && s.day === dateDay
   );
-}
+  if (!isBaseSpecial) return false;
 
-// เช็กว่า event รายเดือนตัวนี้เกิดในวันที่ date หรือไม่
-function isMatchRecurring(event, date) {
-  if (date.getDate() !== event.day) return false;
+  const key = dateKey(date);
+  return !disabledDailyDates.value[key];
+};
 
-  const start = new Date(event.startYear, event.startMonth, event.day);
-  if (date < start) return false;
+/* หารอบ Monthly ที่ตรงกับวันนั้น */
+const getMonthlyTypeForDate = (date) => {
+  if (!date) return null;
+  const dateDay = date.getDate();
+  const dateMonth = date.getMonth();
+  const dateYear = date.getFullYear();
 
-  const diffMonths =
-    (date.getFullYear() - start.getFullYear()) * 12 +
-    (date.getMonth() - start.getMonth());
+  const entries = Object.entries(monthlyTypeByStartDate.value);
+  for (const [startKey, type] of entries) {
+    const [y, m, d] = startKey.split("-").map((v) => parseInt(v, 10));
+    const startYear = y;
+    const startMonth = m - 1;
+    const startDay = d;
 
-  return diffMonths % event.intervalMonths === 0;
-}
+    const startDate = new Date(startYear, startMonth, startDay);
+    if (date < startDate) continue;
+    if (dateDay !== startDay) continue;
 
-// หาว่า วันที่นี้มี event อะไร
-function getEventForDate(date) {
-  // daily แบบครั้งเดียวก่อน
-  for (const e of ONE_TIME_EVENTS) {
-    if (sameYMD(e.date, date)) return e;
-  }
-  // recurring
-  for (const e of RECUR_EVENTS) {
-    if (isMatchRecurring(e, date)) return e;
+    const diffMonths =
+      (dateYear - startYear) * 12 + (dateMonth - startMonth);
+
+    if (diffMonths < 0) continue;
+
+    if (type === "1m" && diffMonths % 1 === 0) return type;
+    if (type === "3m" && diffMonths % 3 === 0) return type;
+    if (type === "6m" && diffMonths % 6 === 0) return type;
   }
   return null;
-}
+};
 
-/* ---------------- READ-ONLY TAG LOGIC ---------------- */
+/* tag helpers */
 const hasMonthlyTag = (cell) => {
-  if (!cell.day) return false;
-  const d = new Date(currentYear.value, currentMonth.value, cell.day);
-  const ev = getEventForDate(d);
-  return ev && ev.type === "monthly";
+  const date = getCellDate(cell);
+  if (!date) return false;
+  return !!getMonthlyTypeForDate(date);
 };
 
 const isDailySpecialCell = (cell) => {
-  if (!cell.day) return false;
-  const d = new Date(currentYear.value, currentMonth.value, cell.day);
-  const ev = getEventForDate(d);
-  return ev && ev.type === "daily";
+  const date = getCellDate(cell);
+  return isDailySpecialDate(date);
 };
 
-/* ---------------- Popup (Read Only) ---------------- */
+/* custom green tag: text 7 ตัวแรก + ... */
+const getCustomTagLabel = (cell) => {
+  const date = getCellDate(cell);
+  if (!date) return "";
+  const key = dateKey(date);
+  const list = eventsByDate.value[key] || [];
+  if (!list.length) return "";
+
+  const firstText = (list[0] || "").trim();
+  if (!firstText) return "";
+
+  if (firstText.length <= 7) return firstText;
+  return firstText.slice(0, 7) + "...";
+};
+
+/* ---------- Popup (read-only) ---------- */
 const showPopup = ref(false);
 const popupDate = ref(null);
-const activeEvent = ref(null);
 
 const openDayPopup = (cell) => {
-  const d = new Date(currentYear.value, currentMonth.value, cell.day);
-  popupDate.value = d;
-  activeEvent.value = getEventForDate(d);
+  const date = getCellDate(cell);
+  if (!date) return;
+  popupDate.value = date;
   showPopup.value = true;
 };
 
 const closePopup = () => {
   showPopup.value = false;
 };
+
+const currentDayKey = computed(() =>
+  popupDate.value ? dateKey(popupDate.value) : null
+);
+
+const isDailySpecial = computed(() => isDailySpecialDate(popupDate.value));
+
+const dayPopupMonthlyType = computed(() => {
+  if (!popupDate.value) return null;
+  return getMonthlyTypeForDate(popupDate.value);
+});
+
+const dayEvents = computed(() => {
+  if (!currentDayKey.value) return [];
+  return eventsByDate.value[currentDayKey.value] || [];
+});
+
+const monthlyTasksForCurrentDay = computed(() => {
+  if (!dayPopupMonthlyType.value) return [];
+  const base = MONTHLY_TASKS_MAP[dayPopupMonthlyType.value] || [];
+  if (!currentDayKey.value) return base;
+
+  const hidden = hiddenMonthlyTasksByDate.value[currentDayKey.value] || [];
+  return base.filter((text) => !hidden.includes(text));
+});
+
+const popupTasks = computed(() => {
+  if (isDailySpecial.value) return dailySpecialTasks;
+  return [...monthlyTasksForCurrentDay.value, ...dayEvents.value];
+});
+
+const popupTitle = computed(() => {
+  if (isDailySpecial.value) return "Daily Check";
+  if (dayPopupMonthlyType.value) return "Monthly Check";
+  if (popupTasks.value.length) return "รายละเอียด";
+  return "ไม่มีรายการ";
+});
+
+const popupFrequency = computed(() => {
+  if (isDailySpecial.value) return "ทำประจำทุกวัน";
+  if (!dayPopupMonthlyType.value) return "";
+  if (dayPopupMonthlyType.value === "1m") return "ทำประจำทุก 1 เดือน";
+  if (dayPopupMonthlyType.value === "6m") return "ทำประจำทุก 6 เดือน";
+  return "ทำประจำทุก 3 เดือน";
+});
+
+const popupSectionTitle = computed(() => {
+  if (isDailySpecial.value) return "รายการที่ยังไม่ได้ทำ";
+  if (popupTasks.value.length) return "รายละเอียด";
+  return "";
+});
 
 const popupFullDate = computed(() => {
   if (!popupDate.value) return "";
@@ -406,24 +483,43 @@ const popupFullDate = computed(() => {
   return `${w} ${d} ${m} ${y}`;
 });
 
-const popupTitle = computed(() => {
-  if (!activeEvent.value) return "ไม่มีรายการ";
-  return activeEvent.value.title;
-});
+/* ---------- โหลดข้อมูลจาก localStorage ให้เหมือนหน้า PM ---------- */
+onMounted(() => {
+  try {
+    const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY);
+    if (savedEvents) {
+      eventsByDate.value = JSON.parse(savedEvents);
+    }
+  } catch (e) {
+    console.error("Cannot load events from storage", e);
+  }
 
-const popupTasks = computed(() => {
-  if (!activeEvent.value) return [];
-  return activeEvent.value.tasks;
-});
+  try {
+    const savedRules = localStorage.getItem(STORAGE_RULES_KEY);
+    if (savedRules) {
+      monthlyTypeByStartDate.value = JSON.parse(savedRules);
+    }
+  } catch (e) {
+    console.error("Cannot load monthly rules from storage", e);
+  }
 
-const popupFrequency = computed(() => {
-  if (!activeEvent.value) return "";
-  return activeEvent.value.frequencyText;
-});
+  try {
+    const savedHiddenMonthly = localStorage.getItem(STORAGE_HIDDEN_MONTHLY_KEY);
+    if (savedHiddenMonthly) {
+      hiddenMonthlyTasksByDate.value = JSON.parse(savedHiddenMonthly);
+    }
+  } catch (e) {
+    console.error("Cannot load hidden monthly tasks from storage", e);
+  }
 
-const popupSectionTitle = computed(() => {
-  if (!activeEvent.value) return "";
-  return activeEvent.value.sectionTitle;
+  try {
+    const savedDisabledDaily = localStorage.getItem(STORAGE_DAILY_DISABLED_KEY);
+    if (savedDisabledDaily) {
+      disabledDailyDates.value = JSON.parse(savedDisabledDaily);
+    }
+  } catch (e) {
+    console.error("Cannot load disabled daily dates from storage", e);
+  }
 });
 </script>
 
@@ -571,18 +667,6 @@ tbody tr:nth-child(even) {
   color: #f97316;
 }
 
-.equipment-cell {
-  cursor: pointer;
-  color: #2563eb;
-  text-decoration: underline;
-  transition: color 0.2s ease;
-}
-
-.equipment-cell:hover {
-  color: #1d4ed8;
-}
-
-/* ปุ่ม CHECK ในตาราง */
 .check-btn {
   background: #2563eb;
   color: #ffffff;
@@ -595,47 +679,14 @@ tbody tr:nth-child(even) {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-/* Monthly check box */
-.monthly-box {
-  display: inline-flex;  /* ให้กล่องมีขนาดตามเนื้อหา */
-  width: 150px;          /* กันการขยายเอง */
-  background: #fee2e2;
-  border-radius: 14px;
-  padding: 4px 8px;      /* ลด padding ให้ดูพอดีกับข้อความ */
-  align-items: center;
-}
-
-.monthly-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.monthly-icon {
-  font-size: 1.2rem;
-}
-
-.monthly-title {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.monthly-date {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
 @media (max-width: 960px) {
   .cards-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* ====== CALENDAR + POPUP (ดีไซน์ใหม่) ====== */
+/* ====== CALENDAR + POPUP ====== */
 
-/* Date card ให้ข้อความอยู่ข้าง ๆ ไอคอน */
 .date-inner {
   display: flex;
   align-items: center;
@@ -646,7 +697,6 @@ tbody tr:nth-child(even) {
   font-size: 22px;
 }
 
-/* Calendar layout */
 .calendar-wrapper {
   margin-top: 20px;
   display: flex;
@@ -665,7 +715,6 @@ tbody tr:nth-child(even) {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
-/* ปรับ date card ให้ดูสะอาด */
 .date-card {
   padding: 12px 18px;
 }
@@ -674,7 +723,6 @@ tbody tr:nth-child(even) {
   margin: 0;
 }
 
-/* Calendar header */
 .calendar-card {
   padding: 14px 18px 18px;
 }
@@ -691,7 +739,6 @@ tbody tr:nth-child(even) {
   text-transform: uppercase;
 }
 
-/* ปุ่มเลื่อนเดือน */
 .nav-btn {
   width: 28px;
   height: 28px;
@@ -712,7 +759,6 @@ tbody tr:nth-child(even) {
   transform: translateY(-1px);
 }
 
-/* Grid calendar */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -722,7 +768,6 @@ tbody tr:nth-child(even) {
   font-size: 0.78rem;
 }
 
-/* ส่วนหัววันในสัปดาห์ */
 .weekday {
   text-transform: uppercase;
   font-size: 0.68rem;
@@ -730,7 +775,6 @@ tbody tr:nth-child(even) {
   color: #9ca3af !important;
 }
 
-/* ช่องวัน */
 .day-cell {
   position: relative;
   min-height: 40px;
@@ -739,25 +783,22 @@ tbody tr:nth-child(even) {
   cursor: pointer;
   border-radius: 12px;
   padding-top: 4px;
-  padding-bottom: 18px; /* ให้มีที่ว่างเผื่อ tag-stack */
+  padding-bottom: 18px;
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-/* วันที่ไม่มี (ช่องว่าง) */
 .day-cell.empty {
   cursor: default;
   background: transparent;
   box-shadow: none;
 }
 
-/* hover เฉพาะวันที่มีจริง */
 .day-cell:not(.empty):hover {
   background: #eff6ff;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
   transform: translateY(-2px);
 }
 
-/* เลขวัน */
 .day-number {
   display: flex;
   justify-content: center;
@@ -768,7 +809,6 @@ tbody tr:nth-child(even) {
   color: #111827;
 }
 
-/* วงกลมวันปัจจุบันในปฏิทิน (แบบขอบน้ำเงิน พื้นขาว) */
 .day-cell.today .day-number span {
   display: flex;
   align-items: center;
@@ -782,7 +822,7 @@ tbody tr:nth-child(even) {
   font-weight: 600;
 }
 
-/* Tag stack ใต้เลขวัน */
+/* tag stack */
 .tag-stack {
   position: absolute;
   bottom: 3px;
@@ -804,13 +844,21 @@ tbody tr:nth-child(even) {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }
 
-/* Monthly / Daily สีแยกกันชัด ๆ */
+.tag-stack .star {
+  margin-right: 4px;
+  font-size: 0.6rem;
+}
+
 .monthly-tag-blue {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .monthly-tag-red {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.custom-tag {
+  background-color: #16a34a;
 }
 
 /* Popup overlay */
@@ -822,7 +870,6 @@ tbody tr:nth-child(even) {
   z-index: 900;
 }
 
-/* Popup box row */
 .popup-row {
   position: fixed;
   left: 50%;
@@ -832,7 +879,6 @@ tbody tr:nth-child(even) {
   z-index: 1000;
 }
 
-/* กล่อง popup ให้ดู modern, เน้นอ่านง่าย */
 .popup-box {
   background: #ffffff;
   width: 380px;
@@ -843,24 +889,20 @@ tbody tr:nth-child(even) {
   border: 1px solid #e5e7eb;
 }
 
-/* เส้นคั่น */
 .popup-divider {
   margin: 8px 0 10px;
   border-color: #e5e7eb;
 }
 
-/* ข้อความด้านใน */
 .popup-content p {
   margin-bottom: 4px;
   font-size: 0.85rem;
 }
 
-/* ข้อความ frequency (สีแดง) */
 .popup-content .text-danger {
   font-size: 0.82rem;
 }
 
-/* รายการงาน */
 .popup-list {
   list-style: none;
   padding-left: 0;
@@ -872,7 +914,6 @@ tbody tr:nth-child(even) {
   color: #111827;
 }
 
-/* bullet list spacing */
 .popup-list li + li {
   margin-top: 2px;
 }
