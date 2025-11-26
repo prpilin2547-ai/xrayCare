@@ -32,7 +32,7 @@
     <div class="request-section">
       <div class="d-flex align-items-center mb-3">
         <span class="title-dot me-2">●</span>
-        <h3 class="fw-600 m-2 request-title">REQUESTS</h3>
+        <h3 class="fw-600 m-2 request-title">REQUEST</h3>
       </div>
     </div>
 
