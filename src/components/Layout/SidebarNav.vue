@@ -32,7 +32,7 @@
           <span>Admin Dashboard</span>
         </li>
         <li :class="{ active: active === 'adminuseraccount' }" @click="$emit('navigate', 'adminuseraccount')">
-          <i class="fa-solid fa-chart-line"></i>
+          <i class="fa-solid fa-user"></i>
           <span>Admin UserAccount</span>
         </li>
         <li :class="{ active: active === 'adminanalytical' }" @click="$emit('navigate', 'adminanalytical')">
