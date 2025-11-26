@@ -121,7 +121,7 @@
         ></textarea>
 
        <div class="mt-2">
-          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+           <label class="form-label text-small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
           <input
             type="file"
             class="form-control form-control-sm"
@@ -199,5 +199,8 @@ const submitSave = () => {
 
 .btn-save-final:hover {
   background: #4fb759;
+}
+.text-small {
+  font-size: 0.875em;
 }
 </style>

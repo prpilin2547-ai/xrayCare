@@ -9,13 +9,8 @@
       <div class="border rounded-3 p-3 mb-3">
         <div class="form-check small" v-for="(opt, idx) in tubeOptions" :key="opt.value">
           <hr v-if="idx === 2" class="my-2" />
-          <input
-            class="form-check-input"
-            type="radio"
-            :id="`tube-${opt.value}`"
-            :value="opt.value"
-            v-model="form.tubeType"
-          />
+          <input class="form-check-input" type="radio" :id="`tube-${opt.value}`" :value="opt.value"
+            v-model="form.tubeType" />
           <label class="form-check-label" :for="`tube-${opt.value}`">
             {{ opt.label }}
           </label>
@@ -25,7 +20,7 @@
       <!-- ตารางความเหลื่อมล้ำ -->
       <div class="mb-1 small">
         ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)<br />
-        + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง  - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
+        + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
       </div>
 
       <div class="table-responsive mb-3">
@@ -44,11 +39,7 @@
                 <div class="d-flex align-items-center justify-content-between gap-2">
                   <span>{{ row.label }}</span>
                   <div class="input-group input-group-sm" style="max-width: 140px;">
-                    <input
-                      v-model="row.value1"
-                      type="text"
-                      class="form-control form-control-sm text-end"
-                    />
+                    <input v-model="row.value1" type="text" class="form-control form-control-sm text-end" />
                     <span class="input-group-text small">cm</span>
                   </div>
                 </div>
@@ -62,11 +53,7 @@
               </td>
 
               <td>
-                <input
-                  v-model="row.note"
-                  type="text"
-                  class="form-control form-control-sm"
-                />
+                <input v-model="row.note" type="text" class="form-control form-control-sm" />
               </td>
             </tr>
           </tbody>
@@ -92,13 +79,8 @@
             <tr v-for="row in form.beamAlignment" :key="row.id">
               <td>
                 <div class="d-flex align-items-center gap-2">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="beam-category"
-                    :value="row.id"
-                    v-model="form.selectedBeamCategory"
-                  />
+                  <input class="form-check-input" type="radio" name="beam-category" :value="row.id"
+                    v-model="form.selectedBeamCategory" />
                   <span>{{ row.label }}</span>
                 </div>
               </td>
@@ -112,33 +94,21 @@
               </td>
 
               <td>
-                <input
-                  v-model="row.note"
-                  type="text"
-                  class="form-control form-control-sm"
-                />
+                <input v-model="row.note" type="text" class="form-control form-control-sm" />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-     <!-- หมายเหตุ + ปุ่มถัดไปอยู่ด้านขวาสุด -->
-<div class="mt-3">
-  <label class="form-label small mb-1">หมายเหตุ</label>
-  <textarea
-    v-model="form.remark"
-    rows="2"
-    class="form-control form-control-sm mb-3"
-    placeholder="บันทึกรายละเอียดเพิ่มเติม..."
-  ></textarea> 
-  <div class="mt-2">
-          <label class="form-label small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
-          <input
-            type="file"
-            class="form-control form-control-sm"
-            @change="onFileChange"
-          />
+      <!-- หมายเหตุ + ปุ่มถัดไปอยู่ด้านขวาสุด -->
+      <div class="mt-3">
+        <label class="form-label small mb-1">หมายเหตุ</label>
+        <textarea v-model="form.remark" rows="2" class="form-control form-control-sm mb-3"
+          placeholder="บันทึกรายละเอียดเพิ่มเติม..."></textarea>
+        <div class="mt-2">
+          <label class="form-label text-small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input type="file" class="form-control form-control-sm" @change="onFileChange" />
           <p v-if="attachmentFileName" class="file-name small mt-1">
             ไฟล์ที่เลือก: {{ attachmentFileName }}
           </p>
@@ -146,16 +116,16 @@
       </div>
       <br>
 
-  <!-- ปุ่มถัดไปชิดขวา -->
-  <div class="d-flex justify-content-end">
-    <button class="btn btn-warning btn-sm fw-semibold" @click="submitNext">
-      ถัดไป
-    </button>
-  </div>
-</div>
-
-
+      <!-- ปุ่มถัดไปชิดขวา -->
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-warning btn-sm fw-semibold" @click="submitNext">
+          ถัดไป
+        </button>
+      </div>
     </div>
+
+
+  </div>
 </template>
 
 <script setup>
@@ -198,4 +168,11 @@ const form = ref({
 const submitNext = () => {
   emit('next', form.value)
 }
+
 </script>
+
+<style scoped>
+.text-small {
+  font-size: 0.875em;
+}
+</style>
