@@ -2,90 +2,59 @@
   <aside class="sidebar">
     <nav class="menu">
       <ul>
-        <li
-          :class="{ active: active === 'dashboard' }"
-          @click="$emit('navigate', 'dashboard')"
-        >
+        <li :class="{ active: active === 'dashboard' }" @click="$emit('navigate', 'dashboard')">
           <i class="fa-solid fa-chart-line"></i>
           <span>Dashboard</span>
         </li>
-        <li
-          :class="{ active: active === 'equipment' }"
-          @click="$emit('navigate', 'equipment')"
-        >
+        <li :class="{ active: active === 'equipment' }" @click="$emit('navigate', 'equipment')">
           <i class="fa-solid fa-laptop"></i>
           <span>Equipment</span>
         </li>
-        
-        <li
-          :class="{ active: active === 'pm' }"
-          @click="$emit('navigate', 'pm')"
-        >
+
+        <li :class="{ active: active === 'pm' }" @click="$emit('navigate', 'pm')">
           <i class="fa-solid fa-calendar"></i>
           <span>PM Schedule</span>
         </li>
-        <li
-          :class="{ active: active === 'export' }"
-          @click="$emit('navigate', 'export')"
-        >
+        <li :class="{ active: active === 'export' }" @click="$emit('navigate', 'export')">
           <i class="fa-solid fa-file-lines"></i>
           <span>Export PDF</span>
         </li>
-        <li
-          :class="{ active: active === 'analytical' }"
-          @click="$emit('navigate', 'analytical')"
-        >
+        <li :class="{ active: active === 'analytical' }" @click="$emit('navigate', 'analytical')">
           <i class="fa-solid fa-chart-simple"></i>
           <span>Analytical</span>
         </li>
-        <li
-          :class="{ active: active === 'request' }"
-          @click="$emit('navigate', 'request')"
-        >
+        <li :class="{ active: active === 'request' }" @click="$emit('navigate', 'request')">
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Request</span>
-        </li> 
-        <li
-          :class="{active: active === 'admindashboard'}"
-          @click="$emit('navigate', 'admindashboard')"
-        >
+        </li>
+        <li :class="{ active: active === 'admindashboard' }" @click="$emit('navigate', 'admindashboard')">
           <i class="fa-solid fa-chart-line"></i>
           <span>Admin Dashboard</span>
         </li>
-        <li
-          :class="{active: active === 'adminuseraccount'}"
-          @click="$emit('navigate', 'adminuseraccount')"
-        >
+        <li :class="{ active: active === 'adminuseraccount' }" @click="$emit('navigate', 'adminuseraccount')">
           <i class="fa-solid fa-chart-line"></i>
           <span>Admin UserAccount</span>
         </li>
-        <li
-          :class="{active: active === 'engineerdashboard'}"
-          @click="$emit('navigate', 'engineerdashboard')"
-        >
+        <li :class="{ active: active === 'adminanalytical' }" @click="$emit('navigate', 'adminanalytical')">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>Admin Analytical</span>
+        </li>
+
+        <li :class="{ active: active === 'engineerdashboard' }" @click="$emit('navigate', 'engineerdashboard')">
           <i class="fa-solid fa-chart-line"></i>
           <span>Engineer Dashboard</span>
         </li>
-        <li
-          :class="{active: active === 'engineeranalytical'}"
-          @click="$emit('navigate', 'engineeranalytical')"
-        >
+        <li :class="{ active: active === 'engineeranalytical' }" @click="$emit('navigate', 'engineeranalytical')">
           <i class="fa-solid fa-chart-simple"></i>
           <span>Engineer Analytical</span>
         </li>
-        <li
-          :class="{active: active === 'engineerrequest'}"
-          @click="$emit('navigate', 'engineerrequest')"
-        >
+        <li :class="{ active: active === 'engineerrequest' }" @click="$emit('navigate', 'engineerrequest')">
           <i class="fa-solid fa-code-pull-request"></i>
           <span>Engineer Request</span>
         </li>
 
         <!-- เมนูใหม่ Additional Forms -->
-        <li
-          :class="{ active: active === 'additionalforms' }"
-          @click="$emit('navigate', 'additionalforms')"
-        >
+        <li :class="{ active: active === 'additionalforms' }" @click="$emit('navigate', 'additionalforms')">
           <i class="fa-solid fa-list-check"></i>
           <span>Additional Forms</span>
         </li>
