@@ -171,7 +171,7 @@ const defaultUsers = [
   { id: 1, username: 'xxxxxxxxx', password: 'password123', position: 'Admin' },
   { id: 2, username: 'yyyyyyyyy', password: 'securepass', position: 'Radiological Technologist' },
   { id: 3, username: 'zzzzzzzzz', password: 'userpass01', position: 'Engineer' },
-  { id: 4, username: 'ทดสอบก', password: 'password007', position: 'Radiological Technologist' }
+  { id: 4, username: 'ทดสอบ', password: 'password007', position: 'Radiological Technologist' }
 ]
 
 // ใช้แค่ใน memory (รีเฟรชหน้าหาย) ไม่มี backend / ไม่มี localStorage
