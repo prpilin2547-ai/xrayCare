@@ -83,7 +83,7 @@
         <div class="card date-card mb-3">
           <div class="date-inner">
             <div class="calendar-icon">📅</div>
-            <div>
+            <div class="date-text">
               <p class="mb-0 fw-semibold">{{ headerDateText }}</p>
               <p class="mb-0 text-muted">{{ headerWeekdayText }}</p>
             </div>
@@ -125,11 +125,11 @@
 
               <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell)">
                 <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
-                  ★ Monthly
+                  ★ Monthly Check
                 </div>
 
                 <div v-if="isDailySpecialCell(cell)" class="tag-pill monthly-tag-red">
-                  ★ Daily
+                  ★ Daily Check
                 </div>
               </div>
             </div>
@@ -157,7 +157,9 @@
 
             <p class="mb-2">{{ popupFullDate }}</p>
 
-            <p v-if="popupTasks.length" class="fw-bold mb-1">รายละเอียด</p>
+            <p v-if="popupTasks.length" class="fw-bold mb-1">
+              {{ popupSectionTitle }}
+            </p>
 
             <ul class="popup-list" v-if="popupTasks.length">
               <li v-for="(task, i) in popupTasks" :key="i">
@@ -258,22 +260,136 @@ const isToday = (day) => {
   );
 };
 
+/* ---------------- Event Definition ---------------- */
+// เริ่มต้นจากเดือน Nov 2025 (index 10)
+const RECUR_EVENTS = [
+  {
+    id: "monthly-1",
+    type: "monthly",
+    day: 5,
+    startYear: 2025,
+    startMonth: 10,
+    intervalMonths: 1,
+    title: "Monthly Check",
+    frequencyText: "ทำประจำทุก 1 เดือน",
+    sectionTitle: "รายละเอียด",
+    tasks: [
+      "-การตรวจสอบความสว่างแสงไฟ",
+      "-แบบบันทึกอัตราการถ่ายภาพซ้ำ"
+    ]
+  },
+  {
+    id: "monthly-3",
+    type: "monthly",
+    day: 12,
+    startYear: 2025,
+    startMonth: 10,
+    intervalMonths: 3,
+    title: "Monthly Check",
+    frequencyText: "ทำประจำทุก 3 เดือน",
+    sectionTitle: "รายละเอียด",
+    tasks: [
+      "-การควบคุมคุณภาพอภาพ",
+      "-แบบบันทึกการตรวจสอบเครื่องเอกซเรย์",
+      "-ความสม่ำเสมอของภาพ",
+      "-ความคงที่ของค่าดัชนีปริมาณรังสี"
+    ]
+  },
+  {
+    id: "monthly-6",
+    type: "monthly",
+    day: 19,
+    startYear: 2025,
+    startMonth: 10,
+    intervalMonths: 6,
+    title: "Monthly Check",
+    frequencyText: "ทำประจำทุก 6 เดือน",
+    sectionTitle: "รายละเอียด",
+    tasks: [
+      "-การทดสอบ Collimator and Beam Alignment",
+      "-การทดสอบ Collimator and Beam Alignment สำหรับกรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)",
+      "-การทดสอบสัญญาณรบกวนมืด (Dark noise) ระบบ DR",
+      "-การทดสอบสัญญาณรบกวนมืด (Dark noise) ระบบ CR",
+      "-การตรวจสอบคุณภาพของฟิล์มและหัวทรอมแคสของเครื่องด้วยรังสีเอ็กซ์"
+    ]
+  }
+];
+
+// Daily check แค่ครั้งเดียว 28 Nov 2025
+const ONE_TIME_EVENTS = [
+  {
+    id: "daily-1",
+    type: "daily",
+    date: new Date(2025, 10, 28),
+    title: "Daily Check",
+    frequencyText: "ทำประจำทุกวัน",
+    sectionTitle: "รายการที่ยังไม่ได้ทำ",
+    tasks: [
+      "-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์",
+      "-การลบแผ่นเพลท (Erasure of Imaging Plate)"
+    ]
+  }
+];
+
+function sameYMD(d1, d2) {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+// เช็กว่า event รายเดือนตัวนี้เกิดในวันที่ date หรือไม่
+function isMatchRecurring(event, date) {
+  if (date.getDate() !== event.day) return false;
+
+  const start = new Date(event.startYear, event.startMonth, event.day);
+  if (date < start) return false;
+
+  const diffMonths =
+    (date.getFullYear() - start.getFullYear()) * 12 +
+    (date.getMonth() - start.getMonth());
+
+  return diffMonths % event.intervalMonths === 0;
+}
+
+// หาว่า วันที่นี้มี event อะไร
+function getEventForDate(date) {
+  // daily แบบครั้งเดียวก่อน
+  for (const e of ONE_TIME_EVENTS) {
+    if (sameYMD(e.date, date)) return e;
+  }
+  // recurring
+  for (const e of RECUR_EVENTS) {
+    if (isMatchRecurring(e, date)) return e;
+  }
+  return null;
+}
+
 /* ---------------- READ-ONLY TAG LOGIC ---------------- */
-const MONTHLY_DAYS = [5, 12, 19];
-const DAILY_DAYS   = [28];
+const hasMonthlyTag = (cell) => {
+  if (!cell.day) return false;
+  const d = new Date(currentYear.value, currentMonth.value, cell.day);
+  const ev = getEventForDate(d);
+  return ev && ev.type === "monthly";
+};
 
-const hasMonthlyTag = (cell) =>
-  cell.day && MONTHLY_DAYS.includes(cell.day);
-
-const isDailySpecialCell = (cell) =>
-  cell.day && DAILY_DAYS.includes(cell.day);
+const isDailySpecialCell = (cell) => {
+  if (!cell.day) return false;
+  const d = new Date(currentYear.value, currentMonth.value, cell.day);
+  const ev = getEventForDate(d);
+  return ev && ev.type === "daily";
+};
 
 /* ---------------- Popup (Read Only) ---------------- */
 const showPopup = ref(false);
 const popupDate = ref(null);
+const activeEvent = ref(null);
 
 const openDayPopup = (cell) => {
-  popupDate.value = new Date(currentYear.value, currentMonth.value, cell.day);
+  const d = new Date(currentYear.value, currentMonth.value, cell.day);
+  popupDate.value = d;
+  activeEvent.value = getEventForDate(d);
   showPopup.value = true;
 };
 
@@ -291,58 +407,43 @@ const popupFullDate = computed(() => {
 });
 
 const popupTitle = computed(() => {
-  if (!popupDate.value) return "";
-  const day = popupDate.value.getDate();
-
-  if (DAILY_DAYS.includes(day)) return "Daily Check";
-  if (MONTHLY_DAYS.includes(day)) return "Monthly Check";
-  return "ไม่มีรายการ";
+  if (!activeEvent.value) return "ไม่มีรายการ";
+  return activeEvent.value.title;
 });
 
 const popupTasks = computed(() => {
-  if (!popupDate.value) return [];
-
-  const day = popupDate.value.getDate();
-
-  if (DAILY_DAYS.includes(day)) {
-    return [
-      "-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์",
-      "-การลบแผ่นเพลท (Erasure of Imaging Plate)"
-    ];
-  }
-
-  if (MONTHLY_DAYS.includes(day)) {
-    return [
-      "-การตรวจสอบความสว่างแสงไฟ",
-      "-แบบบันทึกอัตราการถ่ายภาพซ้ำ"
-    ];
-  }
-
-  return [];
+  if (!activeEvent.value) return [];
+  return activeEvent.value.tasks;
 });
 
 const popupFrequency = computed(() => {
-  if (!popupDate.value) return "";
-  const day = popupDate.value.getDate();
+  if (!activeEvent.value) return "";
+  return activeEvent.value.frequencyText;
+});
 
-  if (DAILY_DAYS.includes(day)) return "ทำประจำทุกวัน";
-  if (MONTHLY_DAYS.includes(day)) return "ทำประจำทุก 1 เดือน";
-
-  return "";
+const popupSectionTitle = computed(() => {
+  if (!activeEvent.value) return "";
+  return activeEvent.value.sectionTitle;
 });
 </script>
 
 <style scoped>
-/* ==== (Styling คงเดิมทั้งหมด) ==== */
-  /* เพื่อลดข้อความ ผมคง CSS เดิมทั้งหมดของคุณจากเวอร์ชันก่อน */
-  /* ทุกอย่างเหมือนเดิม ไม่มีตัด ไม่มีลด ไม่มีเปลี่ยน */
-  /* ถ้าต้องการให้ผมปรับสไตล์เพิ่มเติม แจ้งได้เลย */
-
 .page { display:flex; flex-direction:column; gap:18px; }
 .cards-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .card { background:#fff; border-radius:14px; padding:12px 14px; border:1px solid #e5e7eb; }
 .table-card { background:#fff; border-radius:14px; padding:12px 14px 16px; border:1px solid #e5e7eb; }
 .check-btn { background:#2563eb; color:#fff; border:none; border-radius:6px; padding:4px 12px; font-weight:600; }
+
+/* ---------- Date card ให้ข้อความอยู่ข้าง ๆ ไอคอน ---------- */
+.date-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-icon {
+  font-size: 22px;
+}
 
 /* Calendar */
 .calendar-wrapper { margin-top:20px; display:flex; flex-direction:column; align-items:flex-start; }
@@ -379,4 +480,20 @@ const popupFrequency = computed(() => {
 .popup-divider { margin:8px 0 10px; }
 .popup-list { list-style:none; padding-left:0; margin:0; }
 .task-text { font-size:.9rem; }
-</style>
+/* วงกลมวันปัจจุบันในปฏิทิน */
+/* วงกลมวันปัจจุบันในปฏิทิน (แบบขอบดำ พื้นขาว) */
+.day-cell.today .day-number span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;     /* วงกลม */
+  border: 2px solid #111827;/* ขอบดำเข้ม */
+  background-color: #ffffff;/* พื้นขาว */
+  color: #111827;           /* ตัวเลขดำ */
+  font-weight: 600;
+}
+
+
+</style> 
