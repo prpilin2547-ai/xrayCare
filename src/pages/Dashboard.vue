@@ -428,72 +428,475 @@ const popupSectionTitle = computed(() => {
 </script>
 
 <style scoped>
-.page { display:flex; flex-direction:column; gap:18px; }
-.cards-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-.card { background:#fff; border-radius:14px; padding:12px 14px; border:1px solid #e5e7eb; }
-.table-card { background:#fff; border-radius:14px; padding:12px 14px 16px; border:1px solid #e5e7eb; }
-.check-btn { background:#2563eb; color:#fff; border:none; border-radius:6px; padding:4px 12px; font-weight:600; }
+/* ====== DASHBOARD + TABLE (เดิม) ====== */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-/* ---------- Date card ให้ข้อความอยู่ข้าง ๆ ไอคอน ---------- */
+.dashboard-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title {
+  margin: 0;
+}
+
+.toggle-wrapper {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-card .card-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.summary-card .card-label.date {
+  color: #db2777;
+}
+
+.summary-card .card-label.purple {
+  color: var(--purple-main);
+}
+
+.summary-card .card-label.orange {
+  color: #f97316;
+}
+
+.summary-card .card-label.blue {
+  color: #2563eb;
+}
+
+.summary-card .card-value {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.checklist-header {
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot-blue {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #3b82f6;
+}
+
+.checklist-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn-add {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add-icon {
+  font-size: 1.2rem;
+}
+
+.table-card {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 6px 4px;
+}
+
+thead tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.status.pending {
+  color: #f97316;
+}
+
+.equipment-cell {
+  cursor: pointer;
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.equipment-cell:hover {
+  color: #1d4ed8;
+}
+
+/* ปุ่ม CHECK ในตาราง */
+.check-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Monthly check box */
+.monthly-box {
+  display: inline-flex;  /* ให้กล่องมีขนาดตามเนื้อหา */
+  width: 150px;          /* กันการขยายเอง */
+  background: #fee2e2;
+  border-radius: 14px;
+  padding: 4px 8px;      /* ลด padding ให้ดูพอดีกับข้อความ */
+  align-items: center;
+}
+
+.monthly-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.monthly-icon {
+  font-size: 1.2rem;
+}
+
+.monthly-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.monthly-date {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@media (max-width: 960px) {
+  .cards-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ====== CALENDAR + POPUP (ดีไซน์ใหม่) ====== */
+
+/* Date card ให้ข้อความอยู่ข้าง ๆ ไอคอน */
 .date-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .calendar-icon {
   font-size: 22px;
 }
 
-/* Calendar */
-.calendar-wrapper { margin-top:20px; display:flex; flex-direction:column; align-items:flex-start; }
-.date-card, .calendar-card {
-  width:420px; background:#fff; border-radius:20px; border:1px solid #d4d4d4;
-  box-shadow:0 4px 12px rgba(0,0,0,0.04);
+/* Calendar layout */
+.calendar-wrapper {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
-.date-card { padding:12px 24px; }
-.calendar-card { padding:16px 24px 20px; }
+
+.date-card,
+.calendar-card {
+  width: 420px;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* ปรับ date card ให้ดูสะอาด */
+.date-card {
+  padding: 12px 18px;
+}
+
+.date-text p {
+  margin: 0;
+}
+
+/* Calendar header */
+.calendar-card {
+  padding: 14px 18px 18px;
+}
+
+.calendar-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.calendar-header span {
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ปุ่มเลื่อนเดือน */
+.nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.nav-btn:hover {
+  background: #eff6ff;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Grid calendar */
 .calendar-grid {
-  display:grid; grid-template-columns:repeat(7,1fr);
-  gap:12px; justify-items:center;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  justify-items: center;
+  margin-top: 10px;
+  font-size: 0.78rem;
 }
-.day-cell { position:relative; min-height:40px; cursor:pointer; }
 
-/* Tags */
-.tag-stack { position:absolute; bottom:2px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:2px; }
-.tag-pill { padding:1px 6px; border-radius:999px; color:white; font-size:.6rem; white-space:nowrap; }
-.monthly-tag-blue { background:#1d4ed8; }
-.monthly-tag-red { background:#dc2626; }
+/* ส่วนหัววันในสัปดาห์ */
+.weekday {
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: #9ca3af !important;
+}
 
-/* Popup */
-.popup-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.05); z-index:900;
+/* ช่องวัน */
+.day-cell {
+  position: relative;
+  min-height: 40px;
+  width: 100%;
+  max-width: 44px;
+  cursor: pointer;
+  border-radius: 12px;
+  padding-top: 4px;
+  padding-bottom: 18px; /* ให้มีที่ว่างเผื่อ tag-stack */
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
-.popup-row {
-  position:fixed; left:50%; top:55%;
-  transform:translateX(-50%); display:flex; z-index:1000;
+
+/* วันที่ไม่มี (ช่องว่าง) */
+.day-cell.empty {
+  cursor: default;
+  background: transparent;
+  box-shadow: none;
 }
-.popup-box {
-  background:#f7c4d2; width:360px; border-radius:18px;
-  padding:14px 16px; box-shadow:0 4px 12px rgba(0,0,0,0.3);
+
+/* hover เฉพาะวันที่มีจริง */
+.day-cell:not(.empty):hover {
+  background: #eff6ff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
+  transform: translateY(-2px);
 }
-.popup-divider { margin:8px 0 10px; }
-.popup-list { list-style:none; padding-left:0; margin:0; }
-.task-text { font-size:.9rem; }
-/* วงกลมวันปัจจุบันในปฏิทิน */
-/* วงกลมวันปัจจุบันในปฏิทิน (แบบขอบดำ พื้นขาว) */
+
+/* เลขวัน */
+.day-number {
+  display: flex;
+  justify-content: center;
+}
+
+.day-number span {
+  font-size: 0.8rem;
+  color: #111827;
+}
+
+/* วงกลมวันปัจจุบันในปฏิทิน (แบบขอบน้ำเงิน พื้นขาว) */
 .day-cell.today .day-number span {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 999px;     /* วงกลม */
-  border: 2px solid #111827;/* ขอบดำเข้ม */
-  background-color: #ffffff;/* พื้นขาว */
-  color: #111827;           /* ตัวเลขดำ */
+  border-radius: 999px;
+  border: 2px solid #2563eb;
+  background-color: #ffffff;
+  color: #1d4ed8;
   font-weight: 600;
 }
 
+/* Tag stack ใต้เลขวัน */
+.tag-stack {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
 
-</style> 
+.tag-pill {
+  padding: 1px 6px;
+  border-radius: 999px;
+  color: white;
+  font-size: 0.58rem;
+  white-space: nowrap;
+  line-height: 1.3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+/* Monthly / Daily สีแยกกันชัด ๆ */
+.monthly-tag-blue {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.monthly-tag-red {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 900;
+}
+
+/* Popup box row */
+.popup-row {
+  position: fixed;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  z-index: 1000;
+}
+
+/* กล่อง popup ให้ดู modern, เน้นอ่านง่าย */
+.popup-box {
+  background: #ffffff;
+  width: 380px;
+  max-width: 92vw;
+  border-radius: 18px;
+  padding: 16px 18px 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+  border: 1px solid #e5e7eb;
+}
+
+/* เส้นคั่น */
+.popup-divider {
+  margin: 8px 0 10px;
+  border-color: #e5e7eb;
+}
+
+/* ข้อความด้านใน */
+.popup-content p {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+/* ข้อความ frequency (สีแดง) */
+.popup-content .text-danger {
+  font-size: 0.82rem;
+}
+
+/* รายการงาน */
+.popup-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 4px 0 0;
+}
+
+.task-text {
+  font-size: 0.84rem;
+  color: #111827;
+}
+
+/* bullet list spacing */
+.popup-list li + li {
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  .calendar-wrapper {
+    align-items: stretch;
+  }
+
+  .date-card,
+  .calendar-card {
+    width: 100%;
+  }
+
+  .calendar-grid {
+    gap: 6px;
+  }
+
+  .day-cell {
+    max-width: 100%;
+  }
+
+  .popup-box {
+    width: 340px;
+  }
+}
+</style>
