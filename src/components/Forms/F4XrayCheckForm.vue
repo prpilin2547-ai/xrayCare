@@ -81,11 +81,17 @@
           placeholder="สรุปผลการตรวจ / ข้อเสนอแนะ..."
         ></textarea>
 
-        <label class="field-label mt-8">แนบไฟล์รูปภาพ</label>
-        <input type="file" accept="image/*" @change="onFileChange" />
-        <p v-if="form.fileName" class="file-name">
-          ไฟล์ที่เลือก: {{ form.fileName }}
-        </p>
+       <div class="mt-2">
+           <label class="form-label text-small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
 
         <p class="footnote">
           * ในระบบ DR ให้ทวนสอบค่าทางเทคนิคว่าถูกต้องเป็นปัจจุบัน<br />
@@ -257,4 +263,7 @@ const submitNext = () => {
 @import './_formTableCommon.css';
 /* ใช้ไฟล์รวม หรือคัดลอก style จาก F3 ก็ได้
    ถ้าไม่ใช้ @import ก็สามารถคัดลอก style จาก F3 มาได้เหมือนกัน */
+   .text-small {
+  font-size: 0.875em;
+}
 </style>

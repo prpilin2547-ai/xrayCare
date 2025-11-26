@@ -1,9 +1,10 @@
 <template>
-    <MainLayout>
-       <!-- engineer dash -->
-        <div class="page">
-          <h2 class="page-title">Dashboard</h2>
-          <div class="cards-row">
+  <MainLayout>
+    <!-- engineer dash -->
+    <div class="page">
+      <h2 class="page-title">Dashboard</h2>
+
+      <div class="cards-row">
         <div class="card summary-card">
           <p class="card-label pink">DATE</p>
           <p class="card-value">{{ displayDate }}</p>
@@ -25,46 +26,49 @@
           <p class="card-value">{{ hasCompleted ? '1' : '-' }}</p>
         </div>
       </div>
-          </div>
-      <!-- Request Table -->
-            <div class="request-section">
-                <div class="d-flex align-items-center mb-3">
-                    <span class="title-dot me-2">●</span>
-                    <h3 class="fw-600 m-2">REQUESTS</h3>
-                </div>
+    </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered border-dark text-center align-middle request-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%;">ลำดับ</th>
-                                <th style="width: 40%;">อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
-                                <th style="width: 20%;">ห้องตรวจ</th>
-                                <th style="width: 30%;">สถานะการแจ้งซ่อม</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white">
-                            <tr v-for="(item, index) in repairRequests" :key="item.id">
-                                <td>{{ index + 1 }}</td>
-                                <td class="text-center">{{ item.name }}</td>
-                                <td>{{ item.room }}</td>
-                                <td class="text-warning-custom">{{ item.status }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-    </MainLayout>
+    <!-- Request Table -->
+    <div class="request-section">
+      <div class="d-flex align-items-center mb-3">
+        <span class="title-dot me-2">●</span>
+        <h3 class="fw-600 m-2 request-title">REQUEST</h3>
+      </div>
+    </div>
+
+
+    <!-- ทำให้ดูเหมือน table-card ของ CHECKLIST -->
+    <div class="table-responsive request-table-card">
+      <table class="table request-table">
+        <thead>
+          <tr>
+            <th style="width: 10%;">ลำดับ</th>
+            <th style="width: 40%;">อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
+            <th style="width: 20%;">ห้องตรวจ</th>
+            <th style="width: 30%;">สถานะการแจ้งซ่อม</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in repairRequests" :key="item.id">
+            <td>{{ index + 1 }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.room }}</td>
+            <td class="text-warning-custom">{{ item.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </MainLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
-// State สำหรับเปลี่ยนหน้า
+// State สำหรับเปลี่ยนหน้า (ถ้ายังไม่ได้ใช้จริงก็ปล่อยไว้ได้)
 const currentView = ref('dashboard');
 
-// Mock Data: Dashboard Summary Cards
+// ตัวอย่าง summary cards (ตอนนี้ยังไม่ได้ใช้ใน template นี้)
 const summaryCards = [
   { title: 'Date', value: '19 Nov', colorClass: 'text-magenta' },
   { title: 'Equipment', value: '5 Units', colorClass: 'text-purple' },
@@ -72,15 +76,20 @@ const summaryCards = [
   { title: 'Repair Requests', value: '1 New', colorClass: 'text-blue' }
 ];
 
-const displayDate = '10 Nov 2025'
+const displayDate = '10 Nov 2025';
+
+// mock flag สำหรับตัวเลข cards (คุณจะไปผูกกับ data จริงภายหลังได้)
+const hasMachines = ref(true);
+const hasPendingrepair = ref(true);
+const hasProgress = ref(true);
+const hasCompleted = ref(true);
 
 const repairRequests = ref([
   { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'อยู่ระหว่างดำเนินการ' },
   { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'อยู่ระหว่างดำเนินการ' },
   { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'อยู่ระหว่างดำเนินการ' },
+  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'อยู่ระหว่างดำเนินการ' }
 ]);
-
 </script>
 
 <style scoped>
@@ -95,11 +104,12 @@ const repairRequests = ref([
   overflow: hidden;
 }
 
-/* 1.2.1 & 1.1.2 Header Bar */
+/* Header Bar */
 .header-bar {
   height: 60px;
-  background-color: #4A148C; /* Deep Purple */
+  background-color: #4A148C;
 }
+
 .bg-header-purple {
   background-color: #4A148C;
 }
@@ -107,7 +117,7 @@ const repairRequests = ref([
 /* Sidebar Styling */
 .sidebar {
   width: 250px;
-  background-color: #F8F9FA; /* Light Grey */
+  background-color: #F8F9FA;
   border-right: 1px solid #dee2e6;
 }
 
@@ -118,37 +128,66 @@ const repairRequests = ref([
 }
 
 .nav-link.active {
-  background-color: #e9ecef; /* Slightly darker grey */
+  background-color: #e9ecef;
   color: #000;
   font-weight: 600;
 }
 
-/* Analytical Active State (Special case with purple border) */
+/* Analytical Active State */
 .nav-link.analytical-link.active {
   border-left: 5px solid #4A148C;
   background-color: #e2e6ea;
 }
 
 /* Text Colors for Summary Cards */
-.text-magenta { color: #D81B60; }
-.text-purple  { color: #6A1B9A; }
-.text-orange  { color: #fd7e14; }
-.text-blue    { color: #0d6efd; }
-.text-purple-theme { color: #4A148C; }
+.text-magenta {
+  color: #D81B60;
+}
 
-/* Background Colors for Analytical Charts & Pills */
-.bg-off-white { background-color: #f8f9fa; }
-.bg-light-pink { background-color: #F8D7DA; }
-.bg-orange { background-color: #fd7e14; }
-.bg-green { background-color: #198754; }
-.bg-pink { background-color: #D81B60; }
+.text-purple {
+  color: #6A1B9A;
+}
+
+.text-orange {
+  color: #fd7e14;
+}
+
+.text-blue {
+  color: #0d6efd;
+}
+
+.text-purple-theme {
+  color: #4A148C;
+}
+
+/* Background Colors */
+.bg-off-white {
+  background-color: #f8f9fa;
+}
+
+.bg-light-pink {
+  background-color: #F8D7DA;
+}
+
+.bg-orange {
+  background-color: #fd7e14;
+}
+
+.bg-green {
+  background-color: #198754;
+}
+
+.bg-pink {
+  background-color: #D81B60;
+}
 
 /* Dashboard: Monthly Button */
 .btn-monthly {
-  background-color: #F8D7DA; /* Light Pink */
+  background-color: #F8D7DA;
   border: none;
   transition: all 0.3s;
 }
+
 .btn-monthly:hover {
   background-color: #f1b0b7;
 }
@@ -158,14 +197,14 @@ const repairRequests = ref([
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #0d6efd; /* Blue */
+  background-color: #0d6efd;
 }
 
 /* User Account: Custom Grey Table */
-.custom-grey-table thead th, 
+.custom-grey-table thead th,
 .custom-grey-table tbody td {
-  background-color: #e9ecef; /* Grey Cell Background */
-  border: 1px solid white;   /* White Grid Lines */
+  background-color: #e9ecef;
+  border: 1px solid white;
   vertical-align: middle;
 }
 
@@ -179,6 +218,13 @@ const repairRequests = ref([
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* PAGE + CARDS */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .cards-row {
@@ -232,39 +278,73 @@ const repairRequests = ref([
   }
 }
 
-/* --- Request Table Styles --- */
-        .title-dot {
-            color: #007bff; /* สีฟ้า */
-            font-size: 1.2rem;
-            line-height: 1;
-        }
+/* ================== REQUEST TABLE (ให้เหมือน CHECKLIST TABLE) ================== */
 
-        .request-table {
-            border-width: 1px;
-        }
+.request-section {
+  margin-top: 18px;
+}
 
-        .request-table thead th {
-            background-color: #90CAF9; /* สีฟ้าอ่อน */
-            color: #000;
-            font-weight: 600;
-            border-bottom: 1px solid #000;
-            padding: 12px;
-        }
+/* จุดสีน้ำเงินเล็ก ๆ หน้า REQUESTS */
+.title-dot {
+  color: #3b82f6;
+  font-size: 1.1rem;
+  line-height: 1;
+}
 
-        .request-table tbody td {
-            padding: 12px;
-            font-size: 1rem;
-        }
+/* card หุ้ม table ให้คล้าย .table-card */
+.request-table-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px 14px 16px;
+  border: 1px solid #e5e7eb;
+}
 
-        .text-warning-custom {
-            color: #FF9800; /* สีส้มเหลือง */
-            font-weight: 500;
-        }
+/* table ภายในให้เหมือน .table ของ checklist */
+.request-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
 
-        /* Responsive */
-        @media (max-width: 960px) {
-            .cards-row {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
+/* บังคับให้เส้นขอบเป็นสีเทาอ่อนแทนดำ (override border-dark ของ bootstrap) */
+.request-table th,
+.request-table td {
+  border: 1px solid #e5e7eb !important;
+  text-align: left;
+  /* ให้ align left เหมือน checklist */
+  padding: 6px 4px;
+  vertical-align: middle;
+}
+
+/* header row */
+.request-table thead tr {
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.request-table thead th {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* zebra stripe */
+.request-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+/* status สีส้ม (แบบ pending) */
+.request-table .text-warning-custom {
+  color: #f97316;
+  font-weight: 600;
+}
+
+/* ซ่อน scrollbar แนวนอนถ้าไม่จำเป็น (optional) */
+.request-table-card::-webkit-scrollbar {
+  height: 6px;
+}
+.request-title {
+  font-size: 0.9rem;  /* ปรับให้เล็กลง (จะเล็กกว่า h3 ปกติ) */
+  font-weight: 600;   /* คงความหนาไว้เหมือนเดิม */
+}
+
 </style>

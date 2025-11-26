@@ -120,11 +120,17 @@
           placeholder="ข้อสังเกตเพิ่มเติมเกี่ยวกับ EI..."
         ></textarea>
 
-        <label class="field-label mt-8">แนบไฟล์รูปภาพ</label>
-        <input type="file" accept="image/*" @change="onFileChange" />
-        <p v-if="form.fileName" class="file-name">
-          ไฟล์ที่เลือก: {{ form.fileName }}
-        </p>
+       <div class="mt-2">
+           <label class="form-label text-small mb-1">แนบไฟล์ภาพหรือเอกสาร</label>
+          <input
+            type="file"
+            class="form-control form-control-sm"
+            @change="onFileChange"
+          />
+          <p v-if="attachmentFileName" class="file-name small mt-1">
+            ไฟล์ที่เลือก: {{ attachmentFileName }}
+          </p>
+        </div>
       </div>
 
       <!-- ปุ่มบันทึกสุดท้าย -->
@@ -193,5 +199,8 @@ const submitSave = () => {
 
 .btn-save-final:hover {
   background: #4fb759;
+}
+.text-small {
+  font-size: 0.875em;
 }
 </style>
