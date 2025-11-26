@@ -43,6 +43,7 @@ const activeMenu = computed(() => {
   if (route.path.startsWith('/requesten')) return 'engineerrequest'
   if (route.path.startsWith('/adminuseraccount')) return 'adminuseraccount'
   if (route.path.startsWith('/qc-forms')) return 'additionalforms'
+  if (route.path.startsWith('/adminanalytical')) return 'adminanalytical'
   return ''
 })
 
@@ -62,6 +63,7 @@ const onNavigate = (menu) => {
     case 'engineerrequest':    router.push('/requesten'); break
     case 'adminuseraccount':   router.push('/adminuseraccount'); break
     case 'additionalforms':    router.push('/qc-forms'); break
+    case 'adminanalytical':    router.push('/adminanalytical'); break
     case 'logout':             router.push('/login'); break
   }
 }
