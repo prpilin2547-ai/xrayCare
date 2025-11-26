@@ -115,7 +115,9 @@ const routes = [
     name: 'XrayF1Print',
     component: XrayF1Print,
     props: true
-  }
+  },
+
+
 ]
 
 const router = createRouter({
