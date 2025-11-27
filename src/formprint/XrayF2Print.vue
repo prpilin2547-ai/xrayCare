@@ -4,9 +4,18 @@
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-        <span class="print-icon">🖨</span>
-        <span class="print-text">Print</span>
-      </button>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      style="margin-right:6px;"
+    >
+      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
+    </svg>
+      Print
+    </button>
     </div>
 
     <!-- แผ่น A4 -->
@@ -222,9 +231,8 @@ onMounted(async () => {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
 }
 
-/* พื้นหลังนอก A4 */
 .print-root {
-  background: #111827;
+  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
