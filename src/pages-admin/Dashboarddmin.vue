@@ -1,14 +1,14 @@
 <template>
   <MainLayout>
     <div class="dashboard-container">
-      
+
       <!-- ========================================= -->
       <!-- PART 1: ADMIN DASHBOARD (ด้านบน) -->
       <!-- ========================================= -->
       <div id="admin-section" class="section-container pb-3">
-        
+
         <div class="dashboard-header-row">
-          <h2 class="page-title">Dashboard (Tech) </h2>
+          <h2 class="page-title">Dashboard (Radiological Technologist) </h2>
           <div class="toggle-wrapper">
             <label class="toggle-label">
               <input type="checkbox" v-model="hasMachines" />
@@ -99,7 +99,7 @@
       <!-- PART 2: ENGINEER DASHBOARD (ด้านล่าง) -->
       <!-- ========================================= -->
       <div id="engineer-section" class="section-container pt-0">
-        
+
         <h2 class="page-title mb-3">Dashboard (Engineer)</h2>
 
         <!-- Engineer Summary Cards -->
@@ -148,7 +148,7 @@
             <tbody class="bg-white">
               <tr v-for="(item, index) in engineerRequests" :key="item.id">
                 <td>{{ index + 1 }}</td>
-                <td class="text-center">{{ item.name }}</td> 
+                <td class="text-center">{{ item.name }}</td>
                 <td>{{ item.room }}</td>
                 <td class="text-warning-custom">{{ item.status }}</td>
               </tr>
@@ -214,6 +214,7 @@ const engineerRequests = ref([
   font-size: 0.9rem;
   color: #6b7280;
 }
+
 .toggle-label {
   display: inline-flex;
   align-items: center;
@@ -231,7 +232,7 @@ const engineerRequests = ref([
 
 /* Responsive Grid for Engineer Cards (5 cards) */
 #engineer-section .cards-row {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .card {
@@ -239,20 +240,49 @@ const engineerRequests = ref([
   border-radius: 14px;
   padding: 12px 14px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Card Labels Colors */
-.summary-card .card-label { font-size: 0.78rem; font-weight: 600; margin: 0 0 4px; }
-.card-label.date { color: #db2777; }
-.card-label.purple { color: #6A1B9A; }
-.card-label.orange { color: #f97316; }
-.card-label.blue { color: #2563eb; }
-.card-label.pink { color: #db2777; }
-.card-label.red { color: #dc2626; }
-.card-label.green { color: #16a34a; }
+.summary-card .card-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
 
-.card-value { margin: 0; font-size: 1.4rem; font-weight: 700; }
+.card-label.date {
+  color: #db2777;
+}
+
+.card-label.purple {
+  color: #6A1B9A;
+}
+
+.card-label.orange {
+  color: #f97316;
+}
+
+.card-label.blue {
+  color: #2563eb;
+}
+
+.card-label.pink {
+  color: #db2777;
+}
+
+.card-label.red {
+  color: #dc2626;
+}
+
+.card-label.green {
+  color: #16a34a;
+}
+
+.card-value {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
 
 /* --- Section Header Blue Style --- */
 .section-header-blue {
@@ -260,16 +290,23 @@ const engineerRequests = ref([
   justify-content: space-between;
   align-items: center;
 }
-.left { display: flex; align-items: center; gap: 8px; }
-.dot-blue { 
-  width: 10px; 
-  height: 10px; 
-  border-radius: 50%; 
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot-blue {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   background: #3b82f6;
 }
-.header-text-blue { 
-  font-weight: 600; 
-  font-size: 1.1rem; 
+
+.header-text-blue {
+  font-weight: 600;
+  font-size: 1.1rem;
   color: #000;
 }
 
@@ -280,12 +317,31 @@ const engineerRequests = ref([
   padding: 12px 14px 16px;
   border: 1px solid #e5e7eb;
 }
-.table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-th, td { text-align: left; padding: 10px 8px; }
-thead tr { border-bottom: 1px solid #e5e7eb; }
-tbody tr:nth-child(even) { background: #f9fafb; }
 
-.status.pending { color: #f97316; font-weight: 500; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 8px;
+}
+
+thead tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.status.pending {
+  color: #f97316;
+  font-weight: 500;
+}
 
 /* ปรับตามข้อ 2: ตัด cursor: pointer ออก แต่คงสีฟ้า + ขีดเส้นใต้เดิม */
 .equipment-cell {
@@ -294,20 +350,26 @@ tbody tr:nth-child(even) { background: #f9fafb; }
 }
 
 /* --- Request Table Specifics (Engineer) --- */
-.request-table th, 
-.request-table td { 
-    text-align: center !important; 
-    vertical-align: middle !important;
+.request-table th,
+.request-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
-.request-table th { 
-    background-color: #90CAF9; 
-    color: black; 
-    border: 1px solid #333; 
+
+.request-table th {
+  background-color: #90CAF9;
+  color: black;
+  border: 1px solid #333;
 }
-.request-table td { 
-    border: 1px solid #ccc; 
+
+.request-table td {
+  border: 1px solid #ccc;
 }
-.text-warning-custom { color: #f97316; font-weight: 500; }
+
+.text-warning-custom {
+  color: #f97316;
+  font-weight: 500;
+}
 
 /* Monthly Box */
 .monthly-box {
@@ -318,14 +380,34 @@ tbody tr:nth-child(even) { background: #f9fafb; }
   padding: 8px 12px;
   align-items: center;
 }
-.monthly-left { display: flex; align-items: center; gap: 10px; }
-.monthly-icon { font-size: 1.5rem; }
-.monthly-title { margin: 0; font-size: 0.9rem; font-weight: 600; }
-.monthly-date { margin: 0; font-size: 0.85rem; color: #6b7280; }
+
+.monthly-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.monthly-icon {
+  font-size: 1.5rem;
+}
+
+.monthly-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.monthly-date {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
 
 /* Responsive */
 @media (max-width: 960px) {
-  .cards-row, #engineer-section .cards-row {
+
+  .cards-row,
+  #engineer-section .cards-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
