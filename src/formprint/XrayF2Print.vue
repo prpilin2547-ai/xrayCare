@@ -4,7 +4,8 @@
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-        🖨 พิมพ์แบบบันทึก F2
+        <span class="print-icon">🖨</span>
+        <span class="print-text">Print</span>
       </button>
     </div>
 
@@ -13,34 +14,38 @@
       <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
+          <!-- บรรทัดแรก: หัวฟอร์มตัวหนา 18 pt ชิดซ้าย -->
           <div class="title-main">
             แบบบันทึก F2 : การลบแผ่นเพลท (Erasure of Imaging Plate)
           </div>
-          <div class="title-sub">
-            แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์
-          </div>
-          <div class="title-sub">
-            ปีงบประมาณ พ.ศ.
-            <span class="underline inline">
-              {{ record.fiscalYear }}
-            </span>
+
+          <!-- เว้น 1 บรรทัด แล้วให้ 2 บรรทัดถัดไปอยู่กลางหน้า -->
+          <div class="title-center-block">
+            <div class="title-sub">
+              แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์
+            </div>
+            <div class="title-sub">
+              ปีงบประมาณ พ.ศ.
+              <span class="underline inline">
+                {{ record.fiscalYear }}
+              </span>
+            </div>
           </div>
         </div>
 
-        <!-- ความถี่ / หมายเลข IP -->
-        <div class="meta-block">
-          <div class="meta-row">
-            ความถี่ :
-            <span class="underline short">
-              {{ record.frequency }}
-            </span>
-          </div>
-          <div class="meta-row">
-            หมายเลข IP
-            <span class="underline long">
-              {{ record.ipNumber }}
-            </span>
-          </div>
+        <!-- เว้น 1 บรรทัด แล้วแสดงความถี่ + หมายเลข IP ชิดซ้าย ตรงกับหัวข้อหลัก -->
+        <div class="meta-inline">
+          <span>ความถี่ :</span>
+          <span class="underline meta-short">
+            {{ record.frequency }}
+          </span>
+
+          <span class="meta-gap"></span>
+
+          <span>หมายเลข IP</span>
+          <span class="underline meta-long">
+            {{ record.ipNumber }}
+          </span>
         </div>
 
         <!-- ตาราง 3 ชุด (เหมือนภาพ) -->
@@ -64,12 +69,32 @@
             </thead>
 
             <tbody>
-              <!-- แถว ผลการทดสอบ Pass / Fail -->
+              <!-- แถวที่ 1 : เดือน ............ -->
               <tr>
                 <td class="col-left align-left">
-                  <div class="row-label">ผลการทดสอบ</div>
-                  <div class="row-label">Pass (✓) /</div>
-                  <div class="row-label">Fail (✗)</div>
+                  <div class="cell-left-wrapper">
+                    เดือน
+                    <span class="dotted-line">
+                      {{ section.monthLabel || '..................' }}
+                    </span>
+                  </div>
+                </td>
+                <td
+                  v-for="d in 20"
+                  :key="'m-' + d"
+                  class="col-day"
+                >
+                  &nbsp;
+                </td>
+              </tr>
+
+              <!-- แถวที่ 2 : ผลการทดสอบ Pass / Fail -->
+              <tr>
+                <td class="col-left align-left">
+                  <div class="cell-left-wrapper">
+                    <div>ผลการทดสอบ</div>
+                    <div>Pass (✓) / Fail (✗)</div>
+                  </div>
                 </td>
                 <td
                   v-for="d in 20"
@@ -81,29 +106,14 @@
                 </td>
               </tr>
 
-              <!-- แถว เดือน ............ -->
+              <!-- แถวที่ 3 : สภาพผิดปกติของแผ่นหรือด้านบนบนภาพ -->
               <tr>
                 <td class="col-left align-left">
-                  เดือน
-                  <span class="dotted-line">
-                    {{ section.monthLabel || '..................' }}
-                  </span>
-                </td>
-                <td
-                  v-for="d in 20"
-                  :key="'m-' + d"
-                  class="col-day"
-                >
-                  &nbsp;
-                </td>
-              </tr>
-
-              <!-- แถว สภาพผิดปกติของแผ่นหรือด้านบนบนภาพ -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="row-label">สภาพผิดปกติ</div>
-                  <div class="row-label">ของแผ่น</div>
-                  <div class="row-label">หรือด้านบนบนภาพ</div>
+                  <div class="cell-left-wrapper multi-line">
+                    <div>สภาพผิดปกติ</div>
+                    <div>ของแผ่น</div>
+                    <div>หรือด้านบนบนภาพ</div>
+                  </div>
                 </td>
                 <td
                   v-for="d in 20"
@@ -114,10 +124,12 @@
                 </td>
               </tr>
 
-              <!-- แถว ผู้ตรวจสอบ (มีเส้นยาวด้านล่าง) -->
+              <!-- แถวที่ 4 : ผู้ตรวจสอบ -->
               <tr>
                 <td class="col-left align-left">
-                  ผู้ตรวจสอบ
+                  <div class="cell-left-wrapper">
+                    ผู้ตรวจสอบ
+                  </div>
                 </td>
                 <td
                   colspan="20"
@@ -129,10 +141,12 @@
                 </td>
               </tr>
 
-              <!-- แถว ผลการตรวจสอบ (สรุป) -->
+              <!-- แถวที่ 5 : ผลการตรวจสอบ (สรุป) -->
               <tr>
                 <td class="col-left align-left">
-                  ผลการตรวจสอบ
+                  <div class="cell-left-wrapper">
+                    ผลการตรวจสอบ
+                  </div>
                 </td>
                 <td
                   colspan="20"
@@ -160,7 +174,7 @@ const route = useRoute()
 // ---------------------------
 const record = ref({
   fiscalYear: '...............', // ปีงบประมาณ พ.ศ.
-  frequency: 'ทุกวัน',           // ความถี่ (default ตามแบบฟอร์ม)
+  frequency: 'ทุกวัน',           // ความถี่
   ipNumber: '..................', // หมายเลข IP
   inspector: '..............................', // ผู้ตรวจสอบ
   summaryResult: '................................................' // ผลการตรวจสอบ
@@ -190,7 +204,7 @@ onMounted(async () => {
   //
   // record.value = {
   //   fiscalYear: data.fiscalYear,
-  //   frequency: data.frequency,        // ควรได้ "ทุกวัน" จากฐานข้อมูล
+  //   frequency: data.frequency,
   //   ipNumber: data.ipNumber,
   //   inspector: data.inspector,
   //   summaryResult: data.summaryResult
@@ -218,18 +232,32 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* ปุ่ม print */
+/* ปุ่ม print แบบเดียวกับภาพที่ 1 */
 .print-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   margin-bottom: 18px;
 }
 
 .btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  background: #f9fafb;
   border-radius: 999px;
-  border: 1px solid #4b5563;
+  border: 1px solid #d1d5db;
   cursor: pointer;
   font-size: 16px;
+}
+
+.btn-print:hover {
+  background: #e5e7eb;
+}
+
+.print-icon {
+  font-size: 18px;
 }
 
 /* A4 */
@@ -245,19 +273,25 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
+  font-size: 16pt; /* ข้อความทั่ว ๆ ไป 16 pt */
 }
 
 /* Header */
 .header-main {
-  text-align: center;
   margin-bottom: 8mm;
 }
 
+/* หัวฟอร์มหลัก 18 pt ชิดซ้าย */
 .title-main {
   font-weight: 700;
-  margin-bottom: 2mm;
   font-size: 18pt;
+  text-align: left;
+  margin-bottom: 4mm; /* เว้น 1 บรรทัด */
+}
+
+/* บล็อกกลางสำหรับ 2 บรรทัดถัดไป */
+.title-center-block {
+  text-align: center;
 }
 
 .title-sub {
@@ -265,15 +299,27 @@ onMounted(async () => {
   font-size: 16pt;
 }
 
-/* Meta block : ความถี่ / หมายเลข IP */
-.meta-block {
-  margin-left: 10mm;
+/* ความถี่ + หมายเลข IP ชิดซ้าย ตรงกับหัวข้อหลัก */
+.meta-inline {
+  margin-top: 8mm;  /* เว้น 1 บรรทัดจากหัวฟอร์ม */
   margin-bottom: 6mm;
-  font-size: 14pt;
+  font-size: 16pt;
+  text-align: left;
 }
 
-.meta-row {
-  margin-bottom: 3mm;
+.meta-short {
+  min-width: 35mm;
+  margin-left: 4px;
+}
+
+.meta-long {
+  min-width: 60mm;
+  margin-left: 4px;
+}
+
+.meta-gap {
+  display: inline-block;
+  width: 16mm;
 }
 
 /* เส้นสำหรับกรอกข้อมูล */
@@ -287,12 +333,6 @@ onMounted(async () => {
 .inline {
   min-width: 40mm;
 }
-.short {
-  min-width: 35mm;
-}
-.long {
-  min-width: 60mm;
-}
 
 /* ตารางหลัก */
 .month-block {
@@ -303,7 +343,7 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 16pt;
 }
 
 .f2-table th,
@@ -314,6 +354,7 @@ onMounted(async () => {
   text-align: center;
 }
 
+/* คอลัมน์ซ้ายให้ข้อความชิดซ้ายแต่จัดกึ่งกลางแนวตั้งด้วย flex */
 .col-left {
   width: 48mm;
   text-align: left;
@@ -327,7 +368,15 @@ onMounted(async () => {
   text-align: left;
 }
 
-.row-label {
+/* wrapper ในเซลล์ซ้ายเพื่อให้ข้อความอยู่กลางเซลล์แนวตั้ง */
+.cell-left-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.multi-line div {
   line-height: 1.2;
 }
 
