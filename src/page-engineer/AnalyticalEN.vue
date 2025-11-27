@@ -6,75 +6,38 @@
       <!-- 1) BAR CHART -->
       <div class="panel">
         <div class="panel-header">
-          <h3>1. Bar Chart – เปรียบเทียบ Failure / QC / RFR รายเดือน</h3>
+          <h3>1. การวิเคราะห์ประสิทธิภาพและคุณภาพเครื่องเอกซเรย์</h3>
         </div>
         <div class="panel-body">
-          <div class="panel-chart bar-chart">
-            <div class="bars">
-              <div
-                v-for="(m, index) in monthlyData"
-                :key="m.label"
-                class="bar-group"
-              >
-                <!-- Failure Rate (ครั้ง/เดือน) -->
-                <div
-                  class="bar bar-failure"
-                  :style="{ height: failureHeights[index] + '%' }"
-                  :title="`Failure: ${failureRate[index]} ครั้ง`"
-                ></div>
-
-                <!-- QC Pass Rate (%) -->
-                <div
-                  class="bar bar-qc"
-                  :style="{ height: qcHeights[index] + '%' }"
-                  :title="`QC Pass: ${qcPassRate[index]}%`"
-                ></div>
-
-                <!-- Recurrent Failure Rate (%) -->
-                <div
-                  class="bar bar-rfr"
-                  :style="{ height: rfrHeights[index] + '%' }"
-                  :title="`RFR: ${rfrRate[index]}%`"
-                ></div>
-
-                <div class="bar-label">{{ m.label }}</div>
-              </div>
-            </div>
-
-            <!-- Legend -->
-            <div class="legend">
-              <div class="legend-item">
-                <span class="legend-dot failure"></span>
-                <span>Failure Rate (ครั้ง/เดือน)</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot qc"></span>
-                <span>QC Pass Rate (%)</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot rfr"></span>
-                <span>Recurrent Failure Rate (RFR, %)</span>
-              </div>
-            </div>
+          <div class="chart-container">
+            <canvas ref="barChartRef"></canvas>
           </div>
 
           <!-- explanation -->
           <div class="panel-explain">
+            <p class="explain-title">📊 กราฟแท่ง (Bar Chart) คืออะไร?</p>
+            <p class="explain-desc">
+              กราฟแท่งเป็นกราฟที่ใช้แท่งสี่เหลี่ยมในการแสดงข้อมูลเชิงปริมาณ
+              เหมาะสำหรับการเปรียบเทียบค่าต่างๆ ในแต่ละช่วงเวลา หรือหมวดหมู่
+            </p>
             <p class="explain-title">สถิติที่ใช้ในกราฟนี้</p>
             <ul class="explain-list">
               <li>
-                <strong>Failure Rate (ครั้ง/เดือน)</strong>
+                <strong>Failure Rate (จำนวนครั้งที่เสีย/เดือน)</strong>
                 = จำนวนครั้งที่เครื่องเอกซเรย์ <u>ขัดข้องหรือมีการแจ้งซ่อม</u> ในแต่ละเดือน
+                <br><span class="data-source">ข้อมูลจาก: แบบบันทึกการแจ้งซ่อม/การขัดข้อง</span>
               </li>
               <li>
                 <strong>QC Pass Rate (%)</strong>
                 = (จำนวนครั้งที่ผลการทดสอบ QC <u>ผ่านเกณฑ์กรมวิทย์</u> ÷
                 จำนวนการทดสอบ QC ทั้งหมดในเดือนนั้น) × 100
+                <br><span class="data-source">ข้อมูลจาก: แบบบันทึกการทดสอบ QC รายรอบ</span>
               </li>
               <li>
                 <strong>Recurrent Failure Rate (RFR, %)</strong>
-                = (จำนวนการเสียที่จัดเป็น <u>การเสียซ้ำ</u> ภายในช่วงเวลาสั้น (เช่น 3 เดือน)
+                = (จำนวนการเสียที่จัดเป็น <u>การเสียซ้ำ</u> ภายใน 3 เดือน
                 ÷ จำนวนการเสียทั้งหมดในช่วงเดียวกัน) × 100
+                <br><span class="data-source">ข้อมูลจาก: การวิเคราะห์ประวัติการซ่อมในระบบ</span>
               </li>
             </ul>
           </div>
@@ -84,58 +47,24 @@
       <!-- 2) LINE CHART -->
       <div class="panel">
         <div class="panel-header">
-          <h3>2. Line Chart – แนวโน้ม Failure / QC / RFR ตามช่วงเวลา</h3>
+          <h3>2. แนวโน้มประสิทธิภาพและคุณภาพตามช่วงเวลา</h3>
         </div>
         <div class="panel-body">
-          <div class="panel-chart line-chart">
-            <div class="line-chart-wrapper">
-              <svg viewBox="0 0 100 40" class="line-svg">
-                <!-- Failure line -->
-                <polyline
-                  :points="failureLinePoints"
-                  class="line failure-line"
-                />
-                <!-- QC line -->
-                <polyline
-                  :points="qcLinePoints"
-                  class="line qc-line"
-                />
-                <!-- RFR line -->
-                <polyline
-                  :points="rfrLinePoints"
-                  class="line rfr-line"
-                />
-              </svg>
-              <div class="line-x-labels">
-                <span v-for="m in monthlyData" :key="m.label">
-                  {{ m.label }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Legend -->
-            <div class="legend">
-              <div class="legend-item">
-                <span class="legend-dot failure"></span>
-                <span>Failure Rate</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot qc"></span>
-                <span>QC Pass Rate</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot rfr"></span>
-                <span>RFR</span>
-              </div>
-            </div>
+          <div class="chart-container">
+            <canvas ref="lineChartRef"></canvas>
           </div>
 
           <!-- explanation -->
           <div class="panel-explain">
+            <p class="explain-title">📈 กราฟเส้น (Line Chart) คืออะไร?</p>
+            <p class="explain-desc">
+              กราฟเส้นเป็นกราฟที่ใช้เส้นเชื่อมจุดข้อมูลต่างๆ เพื่อแสดงแนวโน้มหรือการเปลี่ยนแปลงของข้อมูลตามช่วงเวลา
+              เหมาะสำหรับการวิเคราะห์ว่าค่าต่างๆ เพิ่มขึ้น ลดลง หรือคงที่
+            </p>
             <p class="explain-title">การตีความจากกราฟเส้น</p>
             <ul class="explain-list">
               <li>
-                ใช้ดู <strong>แนวโน้ม</strong> ว่าจำนวนการเสีย (Failure) เพิ่มขึ้นหรือลดลงในแต่ละเดือน
+                ใช้ดู <strong>แนวโน้ม</strong> ว่าจำนวนการเสีย (Failure Rate) เพิ่มขึ้นหรือลดลงในแต่ละเดือน
               </li>
               <li>
                 ดูว่า <strong>คุณภาพภาพและปริมาณรังสี (QC Pass Rate)</strong>
@@ -146,6 +75,10 @@
                 มีช่วงไหนที่สูงผิดปกติ ซึ่งอาจบ่งชี้ว่าเครื่องไม่เสถียร หรือการซ่อมไม่แก้ปัญหาต้นเหตุ
               </li>
             </ul>
+            <p class="explain-title">สถิติที่ใช้</p>
+            <p class="explain-desc">
+              ใช้ข้อมูลเดียวกับกราฟแท่ง แต่แสดงในรูปแบบเส้นเพื่อให้เห็นแนวโน้มการเปลี่ยนแปลงได้ชัดเจนขึ้น
+            </p>
           </div>
         </div>
       </div>
@@ -153,55 +86,39 @@
       <!-- 3) PIE CHART -->
       <div class="panel">
         <div class="panel-header">
-          <h3>3. Pie Chart – สัดส่วนปัญหา Failure / QC / RFR รวม</h3>
+          <h3>3. สัดส่วนปัญหาทั้งหมดที่เกิดขึ้น</h3>
         </div>
         <div class="panel-body">
-          <div class="panel-chart">
-            <div class="pie-chart">
-              <div class="pie-circle" :style="pieStyle"></div>
-            </div>
-            <div class="legend">
-              <div class="legend-item">
-                <span class="legend-dot failure"></span>
-                <span>จำนวนการเสียทั้งหมด (Failure) : {{ totalFailure }} ครั้ง</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot qc"></span>
-                <span>จำนวนครั้ง QC ไม่ผ่านเกณฑ์ : {{ totalQcFail }} ครั้ง</span>
-              </div>
-              <div class="legend-item">
-                <span class="legend-dot rfr"></span>
-                <span>จำนวนการเสียซ้ำ (Recurrent Failure) : {{ totalRecurrent }} ครั้ง</span>
-              </div>
-
-              <div class="legend-extra">
-                <p>
-                  <strong>รวมเหตุการณ์ทั้งหมด</strong>
-                  = {{ totalAllEvents }} ครั้ง
-                </p>
-              </div>
-            </div>
+          <div class="chart-container pie-container">
+            <canvas ref="pieChartRef"></canvas>
           </div>
 
           <!-- explanation -->
           <div class="panel-explain">
+            <p class="explain-title">🥧 กราฟวงกลม/แผนภูมิวงกลม (Pie Chart) คืออะไร?</p>
+            <p class="explain-desc">
+              กราฟวงกลมเป็นกราฟที่แสดงสัดส่วนของข้อมูลแต่ละประเภทเทียบกับข้อมูลทั้งหมด
+              โดยแบ่งวงกลมออกเป็นส่วนต่างๆ ตามเปอร์เซ็นต์ เหมาะสำหรับการดูภาพรวมว่าส่วนไหนมีสัดส่วนมากที่สุด
+            </p>
             <p class="explain-title">สถิติที่ใช้ใน Pie Chart</p>
             <ul class="explain-list">
               <li>
-                <strong>จำนวนการเสียทั้งหมด (Failure)</strong> =
+                <strong>จำนวนการเสียทั้งหมด (Total Failures)</strong> =
                 ผลรวมจำนวนครั้งที่เครื่องขัดข้องหรือมีการแจ้งซ่อมทุกเดือน
+                <br><span class="data-source">คำนวณจาก: Σ Failure Rate ทุกเดือน</span>
               </li>
               <li>
-                <strong>จำนวนครั้ง QC ไม่ผ่านเกณฑ์</strong> =
+                <strong>จำนวนครั้ง QC ไม่ผ่านเกณฑ์ (Total QC Failures)</strong> =
                 ผลรวมของ (จำนวนการทดสอบ QC ทั้งหมด − จำนวนที่ผ่านเกณฑ์) ทุกเดือน
+                <br><span class="data-source">คำนวณจาก: Σ (QC Total - QC Passed) ทุกเดือน</span>
               </li>
               <li>
-                <strong>จำนวนการเสียซ้ำ (Recurrent Failure)</strong> =
-                ผลรวมครั้งที่เครื่องเสียซ้ำภายในช่วงเวลาสั้น (เช่น 3 เดือนหลังจากซ่อม)
+                <strong>จำนวนการเสียซ้ำ (Total Recurrent Failures)</strong> =
+                ผลรวมครั้งที่เครื่องเสียซ้ำภายในช่วงเวลาสั้น (3 เดือนหลังจากซ่อม)
+                <br><span class="data-source">คำนวณจาก: Σ Recurrent Failures ทุกเดือน</span>
               </li>
               <li>
-                สัดส่วนในวงกลม = (จำนวนของแต่ละประเภท ÷ จำนวนเหตุการณ์ทั้งหมด)
-                × 100 แล้วนำมาสร้างเป็นส่วนโค้งของ Pie Chart
+                สัดส่วนในวงกลม = (จำนวนของแต่ละประเภท ÷ จำนวนเหตุการณ์ทั้งหมด) × 100
               </li>
             </ul>
           </div>
@@ -212,8 +129,9 @@
       <div class="summary-strip">
         <span class="summary-label">สรุป :</span>
         <span class="summary-text">
-          ตัวอย่างการใช้ข้อมูลจริงจากแบบบันทึกเพื่อวิเคราะห์
-          1) ประสิทธิภาพเครื่องเอกซเรย์ (Failure Rate) 2) คุณภาพภาพและปริมาณรังสี (QC Pass Rate)
+          ระบบแสดงข้อมูลจริงจากแบบบันทึกเพื่อวิเคราะห์
+          1) ประสิทธิภาพเครื่องเอกซเรย์ (Failure Rate)
+          2) คุณภาพภาพและปริมาณรังสี (QC Pass Rate)
           และ 3) ความเสถียรของเครื่องจากการเสียซ้ำ (Recurrent Failure Rate; RFR)
           โดยแสดงทั้งในรูปกราฟแท่ง กราฟเส้น และแผนภูมิวงกลม
         </span>
@@ -223,351 +141,592 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
+import {
+  Chart,
+  BarController,
+  LineController,
+  PieController,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+// Register Chart.js components
+Chart.register(
+  BarController,
+  LineController,
+  PieController,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 /**
- * ข้อมูลดิบ (สมมติจากแบบบันทึกจริง)
+ * ข้อมูลดิบ (จากแบบบันทึกจริง)
  * - failures     = จำนวนครั้งที่เครื่องเสีย/มีการแจ้งซ่อม ในเดือนนั้น
  * - qcTotal      = จำนวนการทดสอบ QC ทั้งหมด
  * - qcPassed     = จำนวนการทดสอบ QC ที่ผ่านเกณฑ์กรมวิทย์
- * - recurrent    = จำนวนครั้งการเสียที่นับเป็น "การเสียซ้ำ" ภายในช่วงเวลาสั้น (เช่น 3 เดือน)
+ * - recurrent    = จำนวนครั้งการเสียที่นับเป็น "การเสียซ้ำ" ภายใน 3 เดือน
  */
+const currentYear = new Date().getFullYear(); // ปีปัจจุบัน (2025)
+
 const monthlyData = [
   { label: 'Jan', failures: 5, qcTotal: 50, qcPassed: 46, recurrent: 1 },
   { label: 'Feb', failures: 3, qcTotal: 45, qcPassed: 40, recurrent: 1 },
-  { label: 'Mar', failures: 4, qcTotal: 48, qcPassed: 44, recurrent: 2 },
-  { label: 'Apr', failures: 6, qcTotal: 52, qcPassed: 47, recurrent: 2 }
+  { label: 'Mar', failures: 8, qcTotal: 48, qcPassed: 44, recurrent: 2 },
+  { label: 'Apr', failures: 6, qcTotal: 52, qcPassed: 47, recurrent: 2 },
+  { label: 'May', failures: 4, qcTotal: 55, qcPassed: 50, recurrent: 1 },
+  { label: 'Jun', failures: 7, qcTotal: 50, qcPassed: 45, recurrent: 3 },
+  { label: 'Jul', failures: 2, qcTotal: 48, qcPassed: 46, recurrent: 0 },
+  { label: 'Aug', failures: 5, qcTotal: 52, qcPassed: 49, recurrent: 1 },
+  { label: 'Sep', failures: 6, qcTotal: 54, qcPassed: 51, recurrent: 2 },
+  { label: 'Oct', failures: 4, qcTotal: 51, qcPassed: 48, recurrent: 1 },
+  { label: 'Nov', failures: 3, qcTotal: 49, qcPassed: 47, recurrent: 0 },
+  { label: 'Dec', failures: 7, qcTotal: 53, qcPassed: 50, recurrent: 2 }
 ];
 
-// --- series สำหรับแสดงในกราฟ ---
-const failureRate = computed(() =>
-  monthlyData.map((m) => m.failures) // Failure Rate (ครั้ง/เดือน)
-);
+// คำนวณข้อมูลสำหรับกราฟ
+const labels = computed(() => monthlyData.map(m => `${m.label} ${currentYear}`));
+
+const failureRate = computed(() => monthlyData.map(m => m.failures));
 
 const qcPassRate = computed(() =>
-  monthlyData.map((m) =>
+  monthlyData.map(m =>
     m.qcTotal > 0 ? Math.round((m.qcPassed / m.qcTotal) * 100) : 0
   )
 );
 
 const rfrRate = computed(() =>
-  monthlyData.map((m) =>
+  monthlyData.map(m =>
     m.failures > 0 ? Math.round((m.recurrent / m.failures) * 100) : 0
   )
 );
 
-// ค่ามากสุด เพื่อ normalise ความสูงของ bar / จุดกราฟ
-const maxValue = computed(() => {
-  return Math.max(
-    ...failureRate.value,
-    ...qcPassRate.value,
-    ...rfrRate.value
-  );
-});
-
-// ปรับเป็น % สำหรับเอาไปใช้เป็นความสูง bar
-const failureHeights = computed(() =>
-  failureRate.value.map((v) => (maxValue.value ? (v / maxValue.value) * 100 : 0))
-);
-const qcHeights = computed(() =>
-  qcPassRate.value.map((v) => (maxValue.value ? (v / maxValue.value) * 100 : 0))
-);
-const rfrHeights = computed(() =>
-  rfrRate.value.map((v) => (maxValue.value ? (v / maxValue.value) * 100 : 0))
-);
-
-// -------- LINE CHART (สร้าง polyline points สำหรับ SVG) --------
-const makeLinePoints = (values) => {
-  const n = values.length;
-  if (n === 0) return '';
-  return values
-    .map((v, i) => {
-      const x = (i / (n - 1 || 1)) * 100;
-      // y ยิ่งมาก ยิ่งอยู่ต่ำลง (ใน SVG 0 = บนสุด)
-      const norm = maxValue.value ? v / maxValue.value : 0;
-      const y = 40 - norm * 35 - 2; // กันไม่ให้ชนขอบบน/ล่างมากไป
-      return `${x},${y}`;
-    })
-    .join(' ');
-};
-
-const failureLinePoints = computed(() => makeLinePoints(failureRate.value));
-const qcLinePoints = computed(() => makeLinePoints(qcPassRate.value));
-const rfrLinePoints = computed(() => makeLinePoints(rfrRate.value));
-
-// -------- PIE CHART (รวมเหตุการณ์ทั้งหมด) --------
+// คำนวณข้อมูลสำหรับ Pie Chart
 const totalFailure = computed(() =>
   monthlyData.reduce((sum, m) => sum + m.failures, 0)
 );
+
 const totalQcFail = computed(() =>
   monthlyData.reduce((sum, m) => sum + (m.qcTotal - m.qcPassed), 0)
 );
+
 const totalRecurrent = computed(() =>
   monthlyData.reduce((sum, m) => sum + m.recurrent, 0)
 );
 
-const totalAllEvents = computed(
-  () => totalFailure.value + totalQcFail.value + totalRecurrent.value
-);
+// Chart references
+const barChartRef = ref(null);
+const lineChartRef = ref(null);
+const pieChartRef = ref(null);
 
-// สร้าง style ของ conic-gradient ตามสัดส่วนจริง
-const pieStyle = computed(() => {
-  const total = totalAllEvents.value;
-  if (!total) {
-    return {
-      background: '#e5e7eb'
-    };
-  }
+let barChart = null;
+let lineChart = null;
+let pieChart = null;
 
-  const fPerc = (totalFailure.value / total) * 100;
-  const qcPerc = (totalQcFail.value / total) * 100;
-  const rfrPerc = 100 - fPerc - qcPerc;
-
-  return {
-    background: `conic-gradient(
-      #f97316 0 ${fPerc}%,
-      #10b981 ${fPerc}% ${fPerc + qcPerc}%,
-      #ec4899 ${fPerc + qcPerc}% 100%
-    )`
-  };
+onMounted(() => {
+  createBarChart();
+  createLineChart();
+  createPieChart();
 });
+
+// สร้าง Bar Chart
+const createBarChart = () => {
+  if (!barChartRef.value) return;
+
+  const ctx = barChartRef.value.getContext('2d');
+
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.value,
+      datasets: [
+        {
+          label: 'Failure Rate (ครั้ง/เดือน)',
+          data: failureRate.value,
+          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'QC Pass Rate (%)',
+          data: qcPassRate.value,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Recurrent Failure Rate (%)',
+          data: rfrRate.value,
+          backgroundColor: 'rgba(255, 206, 86, 0.7)',
+          borderColor: 'rgba(255, 206, 86, 1)',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            font: {
+              size: 12,
+              family: 'Noto Sans Thai, sans-serif'
+            },
+            padding: 15,
+            usePointStyle: true
+          }
+        },
+        title: {
+          display: true,
+          text: 'การเปรียบเทียบ Failure Rate, QC Pass Rate และ RFR รายเดือน',
+          font: {
+            size: 14,
+            family: 'Noto Sans Thai, sans-serif',
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: {
+            size: 13,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          bodyFont: {
+            size: 12,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          padding: 12,
+          cornerRadius: 8
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: true
+          },
+          ticks: {
+            font: {
+              size: 11,
+              family: 'Noto Sans Thai, sans-serif'
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 11,
+              family: 'Noto Sans Thai, sans-serif'
+            }
+          }
+        }
+      }
+    }
+  });
+};
+
+// สร้าง Line Chart
+const createLineChart = () => {
+  if (!lineChartRef.value) return;
+
+  const ctx = lineChartRef.value.getContext('2d');
+
+  lineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels.value,
+      datasets: [
+        {
+          label: 'Failure Rate (ครั้ง/เดือน)',
+          data: failureRate.value,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        },
+        {
+          label: 'QC Pass Rate (%)',
+          data: qcPassRate.value,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        },
+        {
+          label: 'Recurrent Failure Rate (%)',
+          data: rfrRate.value,
+          borderColor: 'rgba(255, 206, 86, 1)',
+          backgroundColor: 'rgba(255, 206, 86, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: 'rgba(255, 206, 86, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            font: {
+              size: 12,
+              family: 'Noto Sans Thai, sans-serif'
+            },
+            padding: 15,
+            usePointStyle: true
+          }
+        },
+        title: {
+          display: true,
+          text: 'แนวโน้มการเปลี่ยนแปลงของ Failure Rate, QC Pass Rate และ RFR',
+          font: {
+            size: 14,
+            family: 'Noto Sans Thai, sans-serif',
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: {
+            size: 13,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          bodyFont: {
+            size: 12,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          padding: 12,
+          cornerRadius: 8
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: true
+          },
+          ticks: {
+            font: {
+              size: 11,
+              family: 'Noto Sans Thai, sans-serif'
+            }
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            font: {
+              size: 11,
+              family: 'Noto Sans Thai, sans-serif'
+            }
+          }
+        }
+      }
+    }
+  });
+};
+
+// สร้าง Pie Chart
+const createPieChart = () => {
+  if (!pieChartRef.value) return;
+
+  const ctx = pieChartRef.value.getContext('2d');
+
+  pieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: [
+        `การเสียทั้งหมด (${totalFailure.value} ครั้ง)`,
+        `QC ไม่ผ่านเกณฑ์ (${totalQcFail.value} ครั้ง)`,
+        `การเสียซ้ำ (${totalRecurrent.value} ครั้ง)`
+      ],
+      datasets: [
+        {
+          data: [totalFailure.value, totalQcFail.value, totalRecurrent.value],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)'
+          ],
+          borderWidth: 2,
+          hoverOffset: 15
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1.5,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'right',
+          labels: {
+            font: {
+              size: 12,
+              family: 'Noto Sans Thai, sans-serif'
+            },
+            padding: 15,
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        title: {
+          display: true,
+          text: 'สัดส่วนปัญหาทั้งหมดที่เกิดขึ้น',
+          font: {
+            size: 14,
+            family: 'Noto Sans Thai, sans-serif',
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: {
+            size: 13,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          bodyFont: {
+            size: 12,
+            family: 'Noto Sans Thai, sans-serif'
+          },
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            label: function (context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
+              return `${label}: ${percentage}%`;
+            }
+          }
+        }
+      }
+    }
+  });
+};
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
+  font-family: 'Noto Sans Thai', sans-serif;
 }
 
 .page-title {
   margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 /* PANEL BASE */
 .panel {
-  background: #f3f4f6;
+  background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.panel:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .panel-header {
-  background: var(--purple-main);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 8px 14px;
+  padding: 16px 20px;
 }
 
 .panel-header h3 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .panel-body {
-  padding: 14px;
+  padding: 24px;
 }
 
-.panel-chart {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-/* LEGEND */
-.legend {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.88rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-}
-
-.legend-dot.failure {
-  background: #f97316;
-}
-
-.legend-dot.qc {
-  background: #10b981;
-}
-
-.legend-dot.rfr {
-  background: #ec4899;
-}
-
-.legend-extra {
-  margin-top: 6px;
-  font-size: 0.82rem;
-  color: #4b5563;
-}
-
-/* 1) BAR CHART */
-.bar-chart {
-  align-items: flex-end;
-}
-
-.bars {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  gap: 18px;
-  padding: 10px 0 4px;
-}
-
-.bar-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-width: 40px;
-}
-
-.bar {
-  width: 12px;
-  border-radius: 6px 6px 0 0;
-  transition: height 0.2s ease;
-}
-
-.bar-failure {
-  background: #f97316;
-}
-
-.bar-qc {
-  background: #10b981;
-}
-
-.bar-rfr {
-  background: #ec4899;
-}
-
-.bar-label {
-  font-size: 0.7rem;
-  color: #6b7280;
-}
-
-/* 2) LINE CHART */
-.line-chart {
-  align-items: center;
-}
-
-.line-chart-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.line-svg {
-  width: 100%;
-  height: 160px;
-  background: #ffffff;
+/* CHART CONTAINER */
+.chart-container {
+  background: #f9fafb;
   border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
   border: 1px solid #e5e7eb;
-  padding: 4px;
 }
 
-.line {
-  fill: none;
-  stroke-width: 1.8;
-}
-
-.failure-line {
-  stroke: #f97316;
-}
-
-.qc-line {
-  stroke: #10b981;
-}
-
-.rfr-line {
-  stroke: #ec4899;
-}
-
-.line-x-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: #6b7280;
-  padding: 0 4px;
-}
-
-/* 3) PIE CHART */
-.pie-chart {
-  flex: 1;
+.pie-container {
   display: flex;
   justify-content: center;
-}
-
-.pie-circle {
-  width: 140px;
-  height: 140px;
-  border-radius: 999px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  align-items: center;
+  min-height: 400px;
 }
 
 /* EXPLANATION BLOCK */
 .panel-explain {
-  margin-top: 10px;
-  padding: 10px 12px;
+  margin-top: 16px;
+  padding: 16px 18px;
   border-radius: 12px;
-  background: #f9fafb;
-  font-size: 0.86rem;
-  color: #374151;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 4px solid #f59e0b;
+  font-size: 0.9rem;
+  color: #78350f;
 }
 
 .explain-title {
-  margin: 0 0 4px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #92400e;
+}
+
+.explain-desc {
+  margin: 0 0 12px;
+  line-height: 1.6;
+  color: #78350f;
 }
 
 .explain-list {
-  margin: 0;
-  padding-left: 18px;
+  margin: 8px 0 0;
+  padding-left: 24px;
+  line-height: 1.7;
 }
 
-.explain-list li + li {
-  margin-top: 3px;
+.explain-list li {
+  margin-bottom: 10px;
+}
+
+.explain-list li strong {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.data-source {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: #a16207;
+  font-style: italic;
 }
 
 /* SUMMARY STRIP */
 .summary-strip {
-  margin-top: 4px;
-  padding: 10px 12px;
+  margin-top: 8px;
+  padding: 16px 20px;
   border-radius: 12px;
-  background: #fee2e2;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left: 4px solid #3b82f6;
   display: flex;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .summary-label {
-  font-weight: 600;
+  font-weight: 700;
+  color: #1e40af;
 }
 
 .summary-text {
   flex: 1;
+  line-height: 1.6;
+  color: #1e3a8a;
 }
 
-@media (max-width: 900px) {
-  .panel-chart {
-    flex-direction: column;
-    align-items: stretch;
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
   }
 
-  .bars {
-    gap: 10px;
+  .panel-header h3 {
+    font-size: 1rem;
+  }
+
+  .chart-container {
+    padding: 15px;
+  }
+
+  .panel-body {
+    padding: 16px;
+  }
+
+  .explain-list {
+    padding-left: 18px;
+    font-size: 0.85rem;
   }
 }
 </style>

@@ -648,8 +648,10 @@ ul.content-list li::before {
 
 /* ✅ ลิงก์ "ลบ" */
 .delete-link {
-  color: #dc2626;           /* แดง */
+  color: #dc2626;
+  /* แดง */
   text-decoration: underline;
-  cursor: pointer;          /* เมาส์เป็นรูปมือ */
+  cursor: pointer;
+  /* เมาส์เป็นรูปมือ */
 }
 </style>
