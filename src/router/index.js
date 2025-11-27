@@ -26,6 +26,9 @@ import F13 from '../pages/F13.vue'
 import QCFormsHub from '../pages/QCFormsHub.vue'
 import AdminAnalytical from '../pages-admin/AdminAnalytical.vue'
 import XrayF1Print from '../formprint/XrayF1Print.vue'
+import XrayF2Print from '../formprint/XrayF2Print.vue'
+import XrayF3Print from '../formprint/XrayF3Print.vue'
+
 
 
 const routes = [
@@ -117,6 +120,19 @@ const routes = [
     props: true
   },
 
+  {
+    path: '/print/f2/:id',
+    name: 'print-f2',
+    component: XrayF2Print,
+    props: true     // ให้รับ param id เป็น prop ได้ถ้าต้องการ
+  },
+
+  {
+    path: '/print/f3/:id',     // ลิงก์สำหรับเปิดหน้า print ฟอร์ม F3
+    name: 'print-f3',
+    component: XrayF3Print,
+    props: true
+  }
 
 ]
 
