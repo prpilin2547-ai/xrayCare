@@ -91,7 +91,7 @@
           </tr>
 
           <tr>
-            <td class="cell-label">ข้อคิดเห็น-ความคมชัดภาพ (heel effect etc?)</td>
+            <td class="cell-label">ข้อคิดเห็น-ความดำ (heel effect etc?)</td>
             <td colspan="2">
               <input type="text" v-model="form.comment" class="input-cell" />
             </td>

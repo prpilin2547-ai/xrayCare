@@ -84,7 +84,7 @@
                 <td>รายการ</td>
                 <td class="text-center">ผ่าน</td>
                 <td class="text-center">ไม่ผ่าน</td>
-                <td class="text-center">หมายเหตุ</td>
+                <td class="text-center">สภาพผิดปกติของแผ่นหรือตำแหน่งบนภาพ</td>
               </tr>
 
               <tr>
