@@ -19,6 +19,7 @@
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
                 <th>รายละเอียด</th>
+                <th>จัดการ</th>
               </tr>
             </thead>
             <tbody>
@@ -34,6 +35,12 @@
                 <td>
                   <span class="detail-link" @click="openDetail(item)">
                     ตรวจสอบ
+                  </span>
+                </td>
+                <!-- ✅ คอลัมน์ใหม่: ลบ -->
+                <td>
+                  <span class="delete-link" @click="deleteItem(item.id)">
+                    ลบ
                   </span>
                 </td>
               </tr>
@@ -329,6 +336,14 @@ const getStatusCellClass = (status) => {
   if (status === 'อยู่ระหว่างดำเนินการ') return 'status-progress'
   if (status === 'ดำเนินการแล้ว') return 'status-completed'
   return ''
+}
+
+// ลบรายการแจ้งซ่อม (Engineer) + sync ไปนักรังสีผ่าน localStorage
+const deleteItem = (id) => {
+  const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
+  if (!confirmed) return
+
+  items.value = items.value.filter((i) => i.id !== id)
 }
 </script>
 
@@ -627,8 +642,14 @@ ul.content-list li::before {
   transition: 0.2s;
 }
 
-
 .close-modal-btn:hover {
   transform: scale(1.1);
+}
+
+/* ✅ ลิงก์ "ลบ" */
+.delete-link {
+  color: #dc2626;           /* แดง */
+  text-decoration: underline;
+  cursor: pointer;          /* เมาส์เป็นรูปมือ */
 }
 </style>
