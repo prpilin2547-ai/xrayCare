@@ -28,7 +28,8 @@ import AdminAnalytical from '../pages-admin/AdminAnalytical.vue'
 import XrayF1Print from '../formprint/XrayF1Print.vue'
 import XrayF2Print from '../formprint/XrayF2Print.vue'
 import XrayF3Print from '../formprint/XrayF3Print.vue'
-
+import XrayF4Print from '../formprint/XrayF4Print.vue'
+import XrayF5Print from '../formprint/XrayF5Print.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -128,6 +129,18 @@ const routes = [
     path: '/formprint/xray-f3',
     name: 'XrayF3Print',
     component: XrayF3Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f4',
+    name: 'XrayF4Print',
+    component: XrayF4Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f5',
+    name: 'XrayF5Print',
+    component: XrayF5Print,
     props: true
   }
 ]
