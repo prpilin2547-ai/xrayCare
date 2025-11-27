@@ -32,7 +32,7 @@
     <div class="request-section">
       <div class="left">
         <span class="dot-blue"></span>
-        <span class="checklist-text">REQUEST</span>
+        <span class="checklist-text">REQUESTS</span>
       </div>
     </div>
 
