@@ -9,40 +9,154 @@
             </td>
           </tr>
 
-          <!-- กำหนดวันที่ตรวจได้ -->
-          <!-- <tr>
-            <td class="cell-label">วันที่ตรวจ</td>
-            <td colspan="2">
-              <input
-                type="date"
-                v-model="form.date"
-                class="input-cell"
-              />
-            </td>
-          </tr> -->
-
-          <!-- ถ้าอยากให้กรอกผู้ทดสอบเองด้วยก็ใช้ช่องนี้ -->
-          <!--
-          <tr>
-            <td class="cell-label">ผู้ทดสอบ</td>
-            <td colspan="2">
-              <input
-                type="text"
-                v-model="form.tester"
-                class="input-cell"
-                :placeholder="currentUserName"
-              />
-            </td>
-          </tr>
-          -->
-
+          <!-- หัวตารางรวม -->
           <tr class="row-header-columns">
-            <td>คุณภาพของภาพพิมพ์โดยทั่วไป</td>
+            <td>รายการตรวจสอบ</td>
             <td class="text-center">Pass (P)</td>
             <td class="text-center">Fail (F)</td>
           </tr>
 
-          <tr v-for="item in form.items" :key="item.id">
+          <!-- 1) คุณภาพของภาพพิมพ์โดยทั่วไป -->
+          <tr class="row-section-title">
+            <td colspan="3">คุณภาพของภาพพิมพ์โดยทั่วไป</td>
+          </tr>
+          <tr v-for="item in form.qualityItems" :key="item.id">
+            <td class="cell-label">
+              {{ item.label }}
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="P"
+                v-model="item.result"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="F"
+                v-model="item.result"
+              />
+            </td>
+          </tr>
+
+          <!-- 2) ความคมชัดเบื้องต้น -->
+          <tr class="row-section-title">
+            <td colspan="3">ความบิดเบือนทั่วไป</td>
+          </tr>
+          <tr v-for="item in form.sharpnessItems" :key="item.id">
+            <td class="cell-label">
+              {{ item.label }}
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="P"
+                v-model="item.result"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="F"
+                v-model="item.result"
+              />
+            </td>
+          </tr>
+
+          <!-- 3) ความส่องสว่าง (Luminance) -->
+          <tr class="row-section-title">
+            <td colspan="3">ความส่องสว่าง (Luminance)</td>
+          </tr>
+          <tr v-for="item in form.luminanceItems" :key="item.id">
+            <td class="cell-label">
+              {{ item.label }}
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="P"
+                v-model="item.result"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="F"
+                v-model="item.result"
+              />
+            </td>
+          </tr>
+
+          <!-- 4) กลุ่มวัตถุทดสอบความชัดเจนเล็กๆ ของเห็นได้ -->
+          <tr class="row-section-title">
+            <td colspan="3">
+              กลุ่มวัตถุทดสอบความชัดเจนเล็กๆ ของเห็นได้
+              (ในมุมทั้ง 4 และตรงกลางของภาพ)
+            </td>
+          </tr>
+          <tr v-for="item in form.objectGroupItems" :key="item.id">
+            <td class="cell-label">
+              {{ item.label }}
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="P"
+                v-model="item.result"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="F"
+                v-model="item.result"
+              />
+            </td>
+          </tr>
+
+          <!-- 5) จำนวนวัตถุชิ้นขาวที่มองเห็น -->
+          <tr class="row-section-title">
+            <td colspan="3">
+              จำนวนวัตถุชิ้นขาวที่มองเห็น
+              (อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")
+            </td>
+          </tr>
+          <tr v-for="item in form.whiteObjectItems" :key="item.id">
+            <td class="cell-label">
+              {{ item.label }}
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="P"
+                v-model="item.result"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="radio"
+                :name="`f3-${item.id}`"
+                value="F"
+                v-model="item.result"
+              />
+            </td>
+          </tr>
+
+          <!-- 6) ลูกกลิ้งของเครื่องพิมพ์ -->
+          <tr class="row-section-title">
+            <td colspan="3">ลูกกลิ้งของเครื่องพิมพ์</td>
+          </tr>
+          <tr v-for="item in form.rollerItems" :key="item.id">
             <td class="cell-label">
               {{ item.label }}
             </td>
@@ -88,9 +202,8 @@
             ไฟล์ที่เลือก: {{ attachmentFileName }}
           </p>
         </div>
-        </div>
-      <!-- ปุ่มจะสลับข้อความตามว่า ครบ 6 เดือนจากการบันทึกล่าสุดหรือยัง
-           และใช้วันที่ที่กำหนดในฟอร์มเป็นตัวเช็ค -->
+      </div>
+
       <button
         v-if="isSixMonthsFromLast"
         class="btn btn-warning"
@@ -106,7 +219,6 @@
       >
         ถัดไป
       </button>
-      <!-- เปลี่ยนเป็นุ่มถัดไปก่อนนะคะ -->
     </div>
   </div>
 </template>
@@ -127,29 +239,51 @@ const props = defineProps({
 const emit = defineEmits(['next'])
 
 const defaultForm = () => ({
-  date: '', // ใช้เป็นวันที่ตรวจรอบนี้
+  date: '',
   tester: props.currentUserName || '',
-  items: [
-    { id: 'smear', label: 'ภาพไม่มีรอยเบลอ (Smear)', result: '' },
-    { id: 'noArtifact', label: 'ไม่มีสิ่งแปลกปลอม', result: '' },
-    { id: 'ramp', label: 'ภาพลาดชัน (ramp) แสดงระดับสัญญาณต่อเนื่อง', result: '' },
-    { id: 'line', label: 'เส้นตรงต่อเนื่อง ไม่ขาดหาย', result: '' },
-    { id: 'square', label: 'กรอบหรือช่องเป็นสี่เหลี่ยมชัดเจน', result: '' },
-    { id: 'luminance', label: 'ความสว่าง (Luminance) เหมาะสม', result: '' },
-    { id: '0pct', label: 'กรอบลึก 0% มองเห็นในพื้นหลัง', result: '' },
-    { id: '5pct', label: 'กรอบลึก 5% มองเห็นในพื้นหลัง', result: '' },
-    { id: '95pct', label: 'กรอบลึก 95% มองเห็นในพื้นหลัง', result: '' },
-    { id: '100pct', label: 'กรอบลึก 100% แสดงสัญญาณเต็มที่', result: '' },
-    { id: 'highContrast', label: 'กลุ่มวัตถุคอนทราสสูงขนาดเล็กมองเห็นได้ในมุมต่าง ๆ', result: '' },
-    { id: 'lowContrast', label: 'กลุ่มวัตถุคอนทราสต่ำมองเห็นได้', result: '' },
-    { id: 'uniformity', label: 'กลุ่มช่องเท่ากันมีความสม่ำเสมอ', result: '' },
-    {
-      id: 'qualityCont',
-      label:
-        'จำนวนตัวอักษรที่มองเห็นได้ (อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")',
-      result: ''
-    }
+
+  // 1) คุณภาพของภาพพิมพ์โดยทั่วไป
+  qualityItems: [
+    { id: 'q-smear', label: 'ภาพไม่มีลายเปื้อน (Smear)', result: '' },
+    { id: 'q-noArtifact', label: 'ไม่มีสิ่งแปลกปลอม', result: '' },
+    { id: 'q-ramp', label: 'ภาพลดหลั่น (ramp) แบบต่อเนื่อง', result: '' }
   ],
+
+  // 2) ความบิดเบือนทั่วไป
+  sharpnessItems: [
+    { id: 's-line', label: 'เส้นตรงต่อเนื่อง', result: '' },
+    { id: 's-square', label: 'กรอบหรือช่องเป็นสี่เหลี่ยม', result: '' }
+  ],
+
+  // 3) ความส่องสว่าง (Luminance)
+  luminanceItems: [
+    { id: 'l-greyAll', label: 'กรอบที่มีระดับสีเทาวางซ้อนกัน', result: '' },
+    { id: 'l-5pct', label: 'กรอบสีเทา 5% มองเห็นในพื้น', result: '' },
+    { id: 'l-0pct', label: 'กรอบสีเทา 0%', result: '' },
+    { id: 'l-95pct', label: 'กรอบสีเทา 95% มองเห็นในพื้น', result: '' },
+    { id: 'l-100pct', label: 'กรอบสีเทา 100%', result: '' }
+  ],
+
+  // 4) กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้(ในมุมทั้ง 4 และตรงกลางของภาพ)
+  objectGroupItems: [
+    { id: 'o-outer', label: 'กลุ่มเส้นคู่แนวนอน', result: '' },
+    { id: 'o-inner', label: 'กลุ่มเส้นคู่แนวตั้ง', result: '' },
+  
+  ],
+
+  // 5) จำนวนตัวอักษรที่มองเห็น(อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")
+  whiteObjectItems: [
+    { id: 'w-dark', label: 'ในพื้นที่มืด (Dark)', result: '' },
+    { id: 'w-mid', label: 'ในพื้นที่ที่ระดับสีเทากลาง (Mid-grey)', result: '' },
+    { id: 'w-light', label: 'ในพื้นที่สว่าง (Light)', result: '' }
+  ],
+
+  // 6) ลูกกลิ้งของเครื่องพิมพ์
+  rollerItems: [
+    { id: 'r-stick', label: 'ทำความสะอาด(ถ้าจำเป็น)', result: '' },
+   
+  ],
+
   remark: '',
   file: null,
   fileName: ''
@@ -157,32 +291,27 @@ const defaultForm = () => ({
 
 const form = ref(props.initial || defaultForm())
 
-// ---------- เช็คครบ 6 เดือนจากวันที่บันทึกล่าสุด โดยใช้ "วันที่ที่กำหนดในฟอร์ม" ----------
+const attachmentFileName = computed(() => form.value.fileName || '')
 
-// แปลง lastRecordDate เป็น Date (ถ้ามี)
+// ---------- เช็คครบ 6 เดือนจากวันที่บันทึกล่าสุด ----------
 const lastDate = computed(() => {
   if (props.lastRecordDate) {
     return new Date(props.lastRecordDate)
   }
-  // ถ้าไม่เคยมีการบันทึกมาก่อน ให้คืน null
   return null
 })
 
-// วันที่ที่จะใช้เปรียบเทียบ (ถ้า user เลือกในฟอร์มใช้วันนั้น, ถ้าไม่เลือกใช้วันนี้)
 const currentCheckDate = computed(() => {
   if (form.value.date) {
-    // form.date จะเป็นรูปแบบ 'YYYY-MM-DD'
     return new Date(form.value.date)
   }
   return new Date()
 })
 
-// true เมื่อ currentCheckDate ห่างจาก lastDate เป็น 6, 12, 18,... เดือน
 const isSixMonthsFromLast = computed(() => {
   const start = lastDate.value
   const current = currentCheckDate.value
 
-  // ถ้ายังไม่เคยบันทึก (ไม่มี lastDate) ให้ยังเป็นโหมด "บันทึก" ก่อน
   if (!start) return false
 
   const monthsDiff =
@@ -207,6 +336,7 @@ const submitNext = () => {
 
 <style scoped>
 @import './_formTableCommon.css';
+
 .content-panel {
   background: #ffffff;
   padding: 18px 22px 22px;
@@ -240,15 +370,27 @@ const submitNext = () => {
   background: #f3f4f6;
 }
 
-.check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
-  background: #f9fafb;
-}
-.check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
+.row-section-title td {
+  font-weight: 600;
   background: #e5e7eb;
 }
 
+/* สลับสีแถวข้อมูล (ไม่รวมหัวฟ้า / หัวคอลัมน์ / หัว section) */
+.check-table
+  tr:nth-child(odd):not(.row-header-main):not(.row-header-columns):not(
+    .row-section-title
+  ) {
+  background: #f9fafb;
+}
+.check-table
+  tr:nth-child(even):not(.row-header-main):not(.row-header-columns):not(
+    .row-section-title
+  ) {
+  background: #e5e7eb33;
+}
+
 .cell-label {
-  width: 60%;
+  width: 70%;
 }
 
 .text-center {
@@ -294,40 +436,16 @@ const submitNext = () => {
   margin-top: 4px;
 }
 
-.mt-8 {
-  margin-top: 8px;
-}
-
 .file-name {
   font-size: 0.8rem;
   color: #6b7280;
   margin-top: 4px;
 }
 
-.btn-next {
-  border: none;
-  border-radius: 6px;
-  padding: 10px 26px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  background: #f7c948;
-  color: #111827;
-}
-
-.btn-next:hover {
-  background: #e0b63f;
-}
-
 @media (max-width: 768px) {
   .remark-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .btn-next {
-    align-self: flex-end;
   }
 }
 

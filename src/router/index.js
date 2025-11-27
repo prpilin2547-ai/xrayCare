@@ -30,6 +30,17 @@ import XrayF2Print from '../formprint/XrayF2Print.vue'
 import XrayF3Print from '../formprint/XrayF3Print.vue'
 import XrayF4Print from '../formprint/XrayF4Print.vue'
 import XrayF5Print from '../formprint/XrayF5Print.vue'
+import XrayF6Print from '../formprint/XrayF6Print.vue'
+import XrayF71Print from '../formprint/XrayF71Print.vue'
+import XrayF72Print from '../formprint/XrayF72Print.vue'
+import XrayF81Print from '../formprint/XrayF81Print.vue'
+import XrayF82Print from '../formprint/XrayF82Print.vue'
+import XrayF9Print from '../formprint/XrayF9Print.vue'
+import XrayF10Print from '../formprint/XrayF10Print.vue'
+import XrayF11Print from '../formprint/XrayF11Print.vue'
+import XrayF12Print from '../formprint/XrayF12Print.vue'
+import XrayF13Print from '../formprint/XrayF13Print.vue'
+
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -141,6 +152,66 @@ const routes = [
     path: '/formprint/xray-f5',
     name: 'XrayF5Print',
     component: XrayF5Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f6',
+    name: 'XrayF6Print',
+    component: XrayF6Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f71',
+    name: 'XrayF71Print',
+    component: XrayF71Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f72',
+    name: 'XrayF72Print',
+    component: XrayF72Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f81',
+    name: 'XrayF81Print',
+    component: XrayF81Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f82',
+    name: 'XrayF82Print',
+    component: XrayF82Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f9',
+    name: 'XrayF9Print',
+    component: XrayF9Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f10',
+    name: 'XrayF10Print',
+    component: XrayF10Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f11',
+    name: 'XrayF11Print',
+    component: XrayF11Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f12',
+    name: 'XrayF12Print',
+    component: XrayF12Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f13',
+    name: 'XrayF13Print',
+    component: XrayF13Print,
     props: true
   }
 ]
