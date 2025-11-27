@@ -35,7 +35,11 @@ import XrayF71Print from '../formprint/XrayF71Print.vue'
 import XrayF72Print from '../formprint/XrayF72Print.vue'
 import XrayF81Print from '../formprint/XrayF81Print.vue'
 import XrayF82Print from '../formprint/XrayF82Print.vue'
-
+import XrayF9Print from '../formprint/XrayF9Print.vue'
+import XrayF10Print from '../formprint/XrayF10Print.vue'
+import XrayF11Print from '../formprint/XrayF11Print.vue'
+import XrayF12Print from '../formprint/XrayF12Print.vue'
+import XrayF13Print from '../formprint/XrayF13Print.vue'
 
 
 const routes = [
@@ -178,6 +182,36 @@ const routes = [
     path: '/formprint/xray-f82',
     name: 'XrayF82Print',
     component: XrayF82Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f9',
+    name: 'XrayF9Print',
+    component: XrayF9Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f10',
+    name: 'XrayF10Print',
+    component: XrayF10Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f11',
+    name: 'XrayF11Print',
+    component: XrayF11Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f12',
+    name: 'XrayF12Print',
+    component: XrayF12Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f13',
+    name: 'XrayF13Print',
+    component: XrayF13Print,
     props: true
   }
 ]
