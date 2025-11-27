@@ -1,0 +1,369 @@
+<template>
+  <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม print + A4 -->
+  <div class="print-root">
+    <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
+    <div class="print-toolbar">
+      <button class="btn-print" @click="handlePrint">
+        🖨 พิมพ์แบบบันทึก F2
+      </button>
+    </div>
+
+    <!-- แผ่น A4 -->
+    <div class="sheet-a4">
+      <div class="sheet-inner">
+        <!-- หัวฟอร์ม -->
+        <div class="header-main">
+          <div class="title-main">
+            แบบบันทึก F2 : การลบแผ่นเพลท (Erasure of Imaging Plate)
+          </div>
+          <div class="title-sub">
+            แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์
+          </div>
+          <div class="title-sub">
+            ปีงบประมาณ พ.ศ.
+            <span class="underline inline">
+              {{ record.fiscalYear }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ความถี่ / หมายเลข IP -->
+        <div class="meta-block">
+          <div class="meta-row">
+            ความถี่ :
+            <span class="underline short">
+              {{ record.frequency }}
+            </span>
+          </div>
+          <div class="meta-row">
+            หมายเลข IP
+            <span class="underline long">
+              {{ record.ipNumber }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ตาราง 3 ชุด (เหมือนภาพ) -->
+        <div
+          v-for="(section, index) in monthSections"
+          :key="index"
+          class="month-block"
+        >
+          <table class="f2-table">
+            <thead>
+              <tr>
+                <th class="col-left">เดือน/รายการ/วันที่</th>
+                <th
+                  v-for="d in 20"
+                  :key="d"
+                  class="col-day"
+                >
+                  {{ d }}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- แถว ผลการทดสอบ Pass / Fail -->
+              <tr>
+                <td class="col-left align-left">
+                  <div class="row-label">ผลการทดสอบ</div>
+                  <div class="row-label">Pass (✓) /</div>
+                  <div class="row-label">Fail (✗)</div>
+                </td>
+                <td
+                  v-for="d in 20"
+                  :key="'r-' + d"
+                  class="col-day"
+                >
+                  <span v-if="section.results[d] === 'pass'">✓</span>
+                  <span v-else-if="section.results[d] === 'fail'">✗</span>
+                </td>
+              </tr>
+
+              <!-- แถว เดือน ............ -->
+              <tr>
+                <td class="col-left align-left">
+                  เดือน
+                  <span class="dotted-line">
+                    {{ section.monthLabel || '..................' }}
+                  </span>
+                </td>
+                <td
+                  v-for="d in 20"
+                  :key="'m-' + d"
+                  class="col-day"
+                >
+                  &nbsp;
+                </td>
+              </tr>
+
+              <!-- แถว สภาพผิดปกติของแผ่นหรือด้านบนบนภาพ -->
+              <tr>
+                <td class="col-left align-left">
+                  <div class="row-label">สภาพผิดปกติ</div>
+                  <div class="row-label">ของแผ่น</div>
+                  <div class="row-label">หรือด้านบนบนภาพ</div>
+                </td>
+                <td
+                  v-for="d in 20"
+                  :key="'a-' + d"
+                  class="col-day align-left"
+                >
+                  {{ section.appearance[d] || '' }}
+                </td>
+              </tr>
+
+              <!-- แถว ผู้ตรวจสอบ (มีเส้นยาวด้านล่าง) -->
+              <tr>
+                <td class="col-left align-left">
+                  ผู้ตรวจสอบ
+                </td>
+                <td
+                  colspan="20"
+                  class="align-left"
+                >
+                  <span class="bottom-line">
+                    {{ section.inspector || record.inspector }}
+                  </span>
+                </td>
+              </tr>
+
+              <!-- แถว ผลการตรวจสอบ (สรุป) -->
+              <tr>
+                <td class="col-left align-left">
+                  ผลการตรวจสอบ
+                </td>
+                <td
+                  colspan="20"
+                  class="align-left"
+                >
+                  {{ section.summaryResult || record.summaryResult }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// ---------------------------
+// ข้อมูลหัวฟอร์ม (ดึงมาจากการบันทึกจริง)
+// ---------------------------
+const record = ref({
+  fiscalYear: '...............', // ปีงบประมาณ พ.ศ.
+  frequency: 'ทุกวัน',           // ความถี่ (default ตามแบบฟอร์ม)
+  ipNumber: '..................', // หมายเลข IP
+  inspector: '..............................', // ผู้ตรวจสอบ
+  summaryResult: '................................................' // ผลการตรวจสอบ
+})
+
+// ---------------------------
+// 3 ชุดตารางตามภาพ
+// ---------------------------
+const monthSections = ref([
+  { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' },
+  { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' },
+  { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' }
+])
+
+function handlePrint () {
+  // เปิด dialog พิมพ์ของ browser (Chrome/Edge)
+  window.print()
+}
+
+// โหลดข้อมูลจริงจาก backend
+onMounted(async () => {
+  const id = route.params.id
+
+  // ตัวอย่างโครง API — แก้ URL และโครงให้ตรงกับ backend ของคุณ
+  // const res = await fetch(`/api/f2/${id}`)
+  // const data = await res.json()
+  //
+  // record.value = {
+  //   fiscalYear: data.fiscalYear,
+  //   frequency: data.frequency,        // ควรได้ "ทุกวัน" จากฐานข้อมูล
+  //   ipNumber: data.ipNumber,
+  //   inspector: data.inspector,
+  //   summaryResult: data.summaryResult
+  // }
+  //
+  // monthSections.value = data.sections
+})
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+/* ใช้ TH Sarabun ให้ทั้งหน้า */
+* {
+  font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+}
+
+/* พื้นหลังนอก A4 */
+.print-root {
+  background: #111827;
+  min-height: 100vh;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ปุ่ม print */
+.print-toolbar {
+  margin-bottom: 18px;
+}
+
+.btn-print {
+  padding: 6px 18px;
+  background: #ffffff;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* A4 */
+.sheet-a4 {
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+}
+
+.sheet-inner {
+  width: 180mm;
+  padding: 18mm 0 14mm;
+  font-size: 14pt;
+}
+
+/* Header */
+.header-main {
+  text-align: center;
+  margin-bottom: 8mm;
+}
+
+.title-main {
+  font-weight: 700;
+  margin-bottom: 2mm;
+  font-size: 18pt;
+}
+
+.title-sub {
+  margin-bottom: 2mm;
+  font-size: 16pt;
+}
+
+/* Meta block : ความถี่ / หมายเลข IP */
+.meta-block {
+  margin-left: 10mm;
+  margin-bottom: 6mm;
+  font-size: 14pt;
+}
+
+.meta-row {
+  margin-bottom: 3mm;
+}
+
+/* เส้นสำหรับกรอกข้อมูล */
+.underline {
+  border-bottom: 0.4pt solid #000;
+  min-height: 6mm;
+  padding: 0 2mm;
+  display: inline-block;
+}
+
+.inline {
+  min-width: 40mm;
+}
+.short {
+  min-width: 35mm;
+}
+.long {
+  min-width: 60mm;
+}
+
+/* ตารางหลัก */
+.month-block {
+  margin-bottom: 12mm; /* ระยะห่างระหว่าง 3 กรอบให้เท่ากัน */
+}
+
+.f2-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13pt;
+}
+
+.f2-table th,
+.f2-table td {
+  border: 0.4pt solid #000;
+  padding: 1.5mm 1mm;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.col-left {
+  width: 48mm;
+  text-align: left;
+}
+
+.col-day {
+  width: 7mm;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.row-label {
+  line-height: 1.2;
+}
+
+/* เส้นปะหลังคำว่า เดือน .......... */
+.dotted-line {
+  display: inline-block;
+  min-width: 32mm;
+}
+
+/* เส้นใต้ยาวสำหรับชื่อผู้ตรวจสอบ */
+.bottom-line {
+  display: inline-block;
+  min-width: 90mm;
+  border-bottom: 0.4pt solid #000;
+}
+
+/* การพิมพ์ */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  .print-toolbar {
+    display: none;
+  }
+
+  .print-root {
+    background: #ffffff;
+    padding: 0;
+  }
+
+  .sheet-a4 {
+    box-shadow: none;
+    width: auto;
+    min-height: auto;
+  }
+}
+</style>
