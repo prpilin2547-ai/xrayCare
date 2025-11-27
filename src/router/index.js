@@ -30,6 +30,13 @@ import XrayF2Print from '../formprint/XrayF2Print.vue'
 import XrayF3Print from '../formprint/XrayF3Print.vue'
 import XrayF4Print from '../formprint/XrayF4Print.vue'
 import XrayF5Print from '../formprint/XrayF5Print.vue'
+import XrayF6Print from '../formprint/XrayF6Print.vue'
+import XrayF71Print from '../formprint/XrayF71Print.vue'
+import XrayF72Print from '../formprint/XrayF72Print.vue'
+import XrayF81Print from '../formprint/XrayF81Print.vue'
+import XrayF82Print from '../formprint/XrayF82Print.vue'
+
+
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -141,6 +148,36 @@ const routes = [
     path: '/formprint/xray-f5',
     name: 'XrayF5Print',
     component: XrayF5Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f6',
+    name: 'XrayF6Print',
+    component: XrayF6Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f71',
+    name: 'XrayF71Print',
+    component: XrayF71Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f72',
+    name: 'XrayF72Print',
+    component: XrayF72Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f81',
+    name: 'XrayF81Print',
+    component: XrayF81Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f82',
+    name: 'XrayF82Print',
+    component: XrayF82Print,
     props: true
   }
 ]
