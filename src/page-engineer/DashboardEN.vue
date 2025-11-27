@@ -30,9 +30,9 @@
 
     <!-- Request Table -->
     <div class="request-section">
-      <div class="d-flex align-items-center mb-3">
-        <span class="title-dot me-2">●</span>
-        <h3 class="fw-600 m-2 request-title">REQUEST</h3>
+      <div class="left">
+        <span class="dot-blue"></span>
+        <span class="checklist-text">REQUEST</span>
       </div>
     </div>
 
@@ -281,7 +281,29 @@ const repairRequests = ref([
 /* ================== REQUEST TABLE (ให้เหมือน CHECKLIST TABLE) ================== */
 
 .request-section {
-  margin-top: 18px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot-blue {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #3b82f6;
+}
+
+.checklist-text {
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 /* จุดสีน้ำเงินเล็ก ๆ หน้า REQUESTS */
@@ -342,9 +364,11 @@ const repairRequests = ref([
 .request-table-card::-webkit-scrollbar {
   height: 6px;
 }
-.request-title {
-  font-size: 0.9rem;  /* ปรับให้เล็กลง (จะเล็กกว่า h3 ปกติ) */
-  font-weight: 600;   /* คงความหนาไว้เหมือนเดิม */
-}
 
+.request-title {
+  font-size: 0.9rem;
+  /* ปรับให้เล็กลง (จะเล็กกว่า h3 ปกติ) */
+  font-weight: 600;
+  /* คงความหนาไว้เหมือนเดิม */
+}
 </style>

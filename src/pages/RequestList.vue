@@ -23,6 +23,7 @@
                                 <th>รายละเอียด</th>
                                 <th>สถานะ</th>
                                 <th>รายละเอียด</th>
+                                <th>จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -39,6 +40,12 @@
                                 <td>
                                     <span class="detail-link" @click="openDetail(item)">
                                         ดูรายละเอียด
+                                    </span>
+                                </td>
+                                <!-- ✅ คอลัมน์ใหม่: ลบ -->
+                                <td>
+                                    <span class="delete-link" @click="deleteItem(item.id)">
+                                        ลบ
                                     </span>
                                 </td>
                             </tr>
@@ -508,6 +515,14 @@ const detailStatusClass = computed(() => {
     if (!selectedItem.value) return ''
     return getStatusCellClass(selectedItem.value.statusText)
 })
+
+// ลบรายการแจ้งซ่อม (นักรังสี) + sync ไป Engineer ผ่าน localStorage
+const deleteItem = (id) => {
+  const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
+  if (!confirmed) return
+
+  items.value = items.value.filter((i) => i.id !== id)
+}
 </script>
 
 <style scoped>
@@ -597,6 +612,13 @@ tbody td {
     /* ขีดเส้นใต้ */
     cursor: pointer;
     /* เมาส์เป็นรูปมือ */
+}
+
+/* ✅ ลิงก์ "ลบ" */
+.delete-link {
+  color: #dc2626;           /* แดง */
+  text-decoration: underline;
+  cursor: pointer;          /* เมาส์เป็นรูปมือ */
 }
 
 /* ---------- style หน้ารายละเอียด ---------- */
