@@ -4,7 +4,19 @@
     <!-- ปุ่มพิมพ์ (จะหายไปตอนสั่ง Print) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-        🖨 พิมพ์แบบบันทึก F10
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
+        Print
       </button>
     </div>
 
@@ -23,41 +35,88 @@
 
         <!-- ข้อมูลเครื่อง / หน่วยงาน -->
         <div class="meta-block">
-          <div class="meta-row">
-            วันที่
+          <!-- แถว 1 : วันที่ / ประเภทเครื่องเอกซเรย์ -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">วันที่</span>
             <span class="underline long">{{ record.date }}</span>
-            ประเภทเครื่องฉายแสง
+
+            <span class="meta-label">ประเภทเครื่องเอกซเรย์</span>
             <span class="underline long">{{ record.deviceType }}</span>
+
+            <span></span>
+            <span></span>
           </div>
 
-          <div class="meta-row">
-            หน่วยงาน
+          <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">หน่วยงาน</span>
             <span class="underline mid">{{ record.department }}</span>
-            ตำแหน่ง
-            <span class="underline short">{{ record.location }}</span>
-            อำเภอ
+
+            <span class="meta-label">ตำบล</span>
+            <span class="underline short-narrow">{{ record.location }}</span>
+
+            <span class="meta-label">อำเภอ</span>
             <span class="underline short">{{ record.district }}</span>
-            จังหวัด
-            <span class="underline short">{{ record.province }}</span>
           </div>
 
-          <div class="meta-row">
-            เครื่องหมายเรียกชื่อ
+          <!-- แถว 2.1 : จังหวัด (ให้อยู่คอลัมน์เดียวกับตำบล) -->
+          <div class="meta-row meta-row-grid">
+            <span></span>
+            <span></span>
+
+            <span class="meta-label">จังหวัด</span>
+            <span class="underline short">{{ record.province }}</span>
+
+            <span></span>
+            <span></span>
+          </div>
+
+          <!-- แถว 3 : เครื่องเอกซเรย์ / Model / S/N -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">เครื่องเอกซเรย์</span>
             <span class="underline mid">{{ record.deviceName }}</span>
-            Model
-            <span class="underline short">{{ record.model }}</span>
-            S/N
+
+            <span class="meta-label">Model</span>
+            <span class="underline short-narrow">{{ record.model }}</span>
+
+            <span class="meta-label">S/N</span>
             <span class="underline short">{{ record.serialNo }}</span>
           </div>
 
-          <div class="meta-row">
-            Application
-            <span class="underline long">{{ record.application }}</span>
+          <!-- แถว 4 : สมาร์ทโฟน ยี่ห้อ / รุ่น -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">สมาร์ทโฟน ยี่ห้อ</span>
+            <span class="underline mid">{{ record.deviceName }}</span>
+
+            <span class="meta-label">รุ่น</span>
+            <span class="underline short-narrow">{{ record.model }}</span>
+
+            <span></span>
+            <span></span>
           </div>
 
-          <div class="meta-row">
-            Calibration
+          <!-- แถว 5 : Application -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">Application</span>
+            <span class="underline long">{{ record.application }}</span>
+
+            <span></span>
+            <span></span>
+
+            <span></span>
+            <span></span>
+          </div>
+
+          <!-- แถว 6 : Calibration -->
+          <div class="meta-row meta-row-grid">
+            <span class="meta-label">Calibration</span>
             <span class="underline long">{{ record.calibration }}</span>
+
+            <span></span>
+            <span></span>
+
+            <span></span>
+            <span></span>
           </div>
         </div>
 
@@ -67,10 +126,10 @@
             <tr>
               <th class="col-run" rowspan="2">ครั้งที่</th>
               <th class="col-illum-group" colspan="5">
-                ความสว่างแสงไฟ (lx)
+                ความสว่างแสงไฟ (IAV)
               </th>
               <th class="col-bg" rowspan="2">
-                Background (lx)
+                Background (I<sub>BG</sub>)
               </th>
             </tr>
             <tr>
@@ -108,7 +167,6 @@
             <span class="underline formula">
               {{ record.iav }}
             </span>
-            lx
           </div>
 
           <div class="formula-row">
@@ -116,7 +174,6 @@
             <span class="underline formula">
               {{ record.ibg }}
             </span>
-            lx
           </div>
 
           <div class="formula-row">
@@ -124,29 +181,19 @@
             <span class="underline formula-wide">
               {{ record.ilbd }}
             </span>
-            lx
           </div>
         </div>
 
         <!-- ลายเซ็นผู้ทดสอบ -->
         <div class="signature-block">
-          <div class="sig-row">
-            ลงชื่อ
-            <span class="underline sig-line">{{ record.testerName }}</span>
-            ผู้ทดสอบ
+          <div class="sig-row sig-row-name">
+            ลงชื่อ.......................................................................ผู้ทดสอบ
+          </div>
+          <div class="sig-row sig-row-parenthesis">
+            (...........................................................................)
           </div>
           <div class="sig-row">
-            (
-            <span class="underline sig-line">
-              {{ record.testerFullName }}
-            </span>
-            )
-          </div>
-          <div class="sig-row">
-            ตำแหน่ง
-            <span class="underline sig-line">
-              {{ record.testerPosition }}
-            </span>
+            ตำแหน่ง.................................................................................
           </div>
         </div>
       </div>
@@ -160,35 +207,26 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// ---------------------------
-// โครงข้อมูลหัวฟอร์ม + ตาราง (ดึงจริงจาก backend ทีหลัง)
-// ---------------------------
 const record = ref({
-  date: '',             // วันที่ตรวจ
-  deviceType: '',       // ประเภทเครื่องฉายแสง
-  department: '',       // หน่วยงาน
-  location: '',         // ตำแหน่งติดตั้ง
-  district: '',         // อำเภอ
-  province: '',         // จังหวัด
-  deviceName: '',       // เครื่องหมายเรียกชื่อ
-  model: '',            // รุ่น
-  serialNo: '',         // หมายเลขเครื่อง
-  application: '',      // การใช้งาน
-  calibration: '',      // ข้อมูลการสอบเทียบ
-
-  // ตารางค่าความสว่าง 3 ครั้ง
+  date: '',
+  deviceType: '',
+  department: '',
+  location: '',
+  district: '',
+  province: '',
+  deviceName: '',
+  model: '',
+  serialNo: '',
+  application: '',
+  calibration: '',
   runs: [
     { runNo: 1, points: ['', '', '', '', ''], background: '' },
     { runNo: 2, points: ['', '', '', '', ''], background: '' },
     { runNo: 3, points: ['', '', '', '', ''], background: '' }
   ],
-
-  // ค่า IAV, IBG, ILBD
   iav: '',
   ibg: '',
   ilbd: '',
-
-  // ผู้ทดสอบ
   testerName: '',
   testerFullName: '',
   testerPosition: ''
@@ -200,45 +238,20 @@ function handlePrint () {
 
 onMounted(async () => {
   const id = route.params.id
-
-  // ✳️ ตัวอย่างการดึงข้อมูลจาก backend (ปรับ URL / โครง JSON ให้ตรงระบบจริง)
-  //
-  // const res = await fetch(`/api/print/f10/${id}`)
-  // const data = await res.json()
-  // record.value = {
-  //   date: data.date,
-  //   deviceType: data.deviceType,
-  //   department: data.department,
-  //   location: data.location,
-  //   district: data.district,
-  //   province: data.province,
-  //   deviceName: data.deviceName,
-  //   model: data.model,
-  //   serialNo: data.serialNo,
-  //   application: data.application,
-  //   calibration: data.calibration,
-  //   runs: data.runs,         // [{ runNo, points:[...], background }, ...]
-  //   iav: data.iav,
-  //   ibg: data.ibg,
-  //   ilbd: data.ilbd,
-  //   testerName: data.testerName,
-  //   testerFullName: data.testerFullName,
-  //   testerPosition: data.testerPosition
-  // }
+  if (!id) return
+  // โหลดข้อมูลจริงค่อยใส่ภายหลัง
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ใช้ TH Sarabun ทั้งหน้า */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
 }
 
-/* พื้นหลังนอก */
 .print-root {
-  background: #111827;
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
@@ -246,7 +259,6 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* ปุ่ม print */
 .print-toolbar {
   margin-bottom: 16px;
 }
@@ -260,7 +272,6 @@ onMounted(async () => {
   font-size: 16px;
 }
 
-/* แผ่น A4 */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -276,15 +287,15 @@ onMounted(async () => {
   font-size: 14pt;
 }
 
-/* หัวฟอร์ม */
+/* หัวฟอร์ม – ชิดซ้าย + ระยะห่างเท่ากับ meta-row */
 .header-main {
-  text-align: center;
-  margin-bottom: 8mm;
+  text-align: left;
+  margin-bottom: 3mm;   /* ระยะระหว่าง "ความถี่" กับ "วันที่" */
 }
 
 .title-main {
   font-weight: 700;
-  margin-bottom: 2mm;
+  margin-bottom: 3mm;   /* ระหว่างแบบบันทึกกับความถี่ เท่ากับ meta-row */
   font-size: 18pt;
 }
 
@@ -294,16 +305,25 @@ onMounted(async () => {
 
 /* meta block */
 .meta-block {
-  margin-left: 10mm;
+  margin-left: 0;
   margin-bottom: 6mm;
   font-size: 14pt;
 }
 
-.meta-row {
-  margin-bottom: 3mm;
+/* ใช้ grid 3 คู่ label+line -> 6 คอลัมน์ */
+.meta-row-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr auto 1fr;
+  column-gap: 3mm;
+  align-items: flex-end;
+  margin-bottom: 3mm;   /* ✅ เว้นบรรทัดเท่ากันทุก meta-row */
 }
 
-/* เส้นสำหรับกรอกข้อมูล */
+.meta-label {
+  white-space: nowrap;
+}
+
+/* เส้นสำหรับกรอก */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
@@ -311,16 +331,22 @@ onMounted(async () => {
   display: inline-block;
 }
 
+/* ความยาวพื้นฐาน */
 .long {
-  min-width: 55mm;
-}
-
-.mid {
   min-width: 40mm;
 }
 
+.mid {
+  min-width: 30mm;
+}
+
 .short {
-  min-width: 28mm;
+  min-width: 20mm;
+}
+
+/* ลดความยาวเฉพาะ ตำบล / Model / รุ่น ให้ 3 คำอยู่บรรทัดเดียว */
+.short-narrow {
+  min-width: 5mm;
 }
 
 /* ตาราง F10 */
@@ -367,12 +393,18 @@ onMounted(async () => {
   margin-bottom: 2mm;
 }
 
+.formula-block .underline {
+  border-bottom: 0.4pt solid #000;
+}
+
 .formula {
   min-width: 40mm;
+  display: inline-block;
 }
 
 .formula-wide {
   min-width: 60mm;
+  display: inline-block;
 }
 
 /* ลายเซ็น */
@@ -386,8 +418,9 @@ onMounted(async () => {
   margin-bottom: 3mm;
 }
 
-.sig-line {
-  min-width: 60mm;
+/* ขยับวงเล็บให้ "(" ตรงกับ "อ." ของคำว่า "ชื่อ" (ปรับตาม preview ได้) */
+.sig-row-parenthesis {
+  text-indent: 3mm;
 }
 
 /* สไตล์ตอนพิมพ์ */
