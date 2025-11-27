@@ -26,7 +26,6 @@ import F13 from '../pages/F13.vue'
 import QCFormsHub from '../pages/QCFormsHub.vue'
 import AdminAnalytical from '../pages-admin/AdminAnalytical.vue'
 import XrayF1Print from '../formprint/XrayF1Print.vue'
-import XrayF2Print from '../formprint/XrayF2Print.vue'
 
 
 const routes = [
@@ -116,13 +115,7 @@ const routes = [
     name: 'XrayF1Print',
     component: XrayF1Print,
     props: true
-  },
-
-  { path: '/formprint/xray-f2', 
-    name: 'XrayF2Print', 
-    component: XrayF2Print 
-  },
-
+  }
 ]
 
 const router = createRouter({
