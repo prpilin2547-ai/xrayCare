@@ -47,8 +47,8 @@
             <span></span>
           </div>
 
-          <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ -->
-          <div class="meta-row meta-row-grid">
+          <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ / จังหวัด (อยู่บรรทัดเดียวกัน) -->
+          <div class="meta-row meta-row-grid-4">
             <span class="meta-label">หน่วยงาน</span>
             <span class="underline mid">{{ record.department }}</span>
 
@@ -56,21 +56,13 @@
             <span class="underline short-narrow">{{ record.location }}</span>
 
             <span class="meta-label">อำเภอ</span>
-            <span class="underline short">{{ record.district }}</span>
-          </div>
-
-          <!-- แถว 2.1 : จังหวัด (ให้อยู่คอลัมน์เดียวกับตำบล) -->
-          <div class="meta-row meta-row-grid">
-            <span></span>
-            <span></span>
+            <span class="underline short-narrow">{{ record.district }}</span>
 
             <span class="meta-label">จังหวัด</span>
             <span class="underline short">{{ record.province }}</span>
-
-            <span></span>
-            <span></span>
           </div>
 
+        
           <!-- แถว 3 : เครื่องเอกซเรย์ / Model / S/N -->
           <div class="meta-row meta-row-grid">
             <span class="meta-label">เครื่องเอกซเรย์</span>
@@ -246,8 +238,11 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
 .print-root {
@@ -259,6 +254,7 @@ onMounted(async () => {
   align-items: center;
 }
 
+/* ปุ่ม print */
 .print-toolbar {
   margin-bottom: 16px;
 }
@@ -269,9 +265,10 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;   /* = 11 ทั้งหน้า */
 }
 
+/* แผ่น A4 */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -284,39 +281,39 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
+  /* ไม่กำหนด font-size เพิ่ม → ใช้ 11pt จาก * */
 }
 
 /* หัวฟอร์ม – ชิดซ้าย + ระยะห่างเท่ากับ meta-row */
 .header-main {
   text-align: left;
-  margin-bottom: 3mm;   /* ระยะระหว่าง "ความถี่" กับ "วันที่" */
+  margin-bottom: 3mm;
 }
 
+/* คำว่า “แบบบันทึก F10 ...” ให้เป็น 13pt */
 .title-main {
   font-weight: 700;
-  margin-bottom: 3mm;   /* ระหว่างแบบบันทึกกับความถี่ เท่ากับ meta-row */
-  font-size: 18pt;
+  margin-bottom: 3mm;
+  font-size: 13pt;    /* ยกเว้นตัวเดียวที่ใหญ่กว่า */
 }
 
+/* ความถี่ = 11pt */
 .title-sub {
-  font-size: 16pt;
+  font-size: 11pt;
 }
 
 /* meta block */
 .meta-block {
   margin-left: 0;
   margin-bottom: 6mm;
-  font-size: 14pt;
 }
 
-/* ใช้ grid 3 คู่ label+line -> 6 คอลัมน์ */
 .meta-row-grid {
   display: grid;
   grid-template-columns: auto 1fr auto 1fr auto 1fr;
   column-gap: 3mm;
   align-items: flex-end;
-  margin-bottom: 3mm;   /* ✅ เว้นบรรทัดเท่ากันทุก meta-row */
+  margin-bottom: 3mm;
 }
 
 .meta-label {
@@ -331,31 +328,31 @@ onMounted(async () => {
   display: inline-block;
 }
 
-/* ความยาวพื้นฐาน */
 .long {
   min-width: 40mm;
 }
 
+/* แก้ตรงนี้: ให้ mid ยาวเท่า long เพื่อให้คำว่า ประเภท / ตำบล / Model / รุ่น อยู่แนวเดียวกัน */
 .mid {
-  min-width: 30mm;
+  min-width: 40mm;   /* เดิม 30mm */
 }
 
 .short {
   min-width: 20mm;
 }
 
-/* ลดความยาวเฉพาะ ตำบล / Model / รุ่น ให้ 3 คำอยู่บรรทัดเดียว */
 .short-narrow {
   min-width: 5mm;
 }
+
 
 /* ตาราง F10 */
 .f10-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
   margin-bottom: 10mm;
+  /* ใช้ font-size 11pt จาก * */
 }
 
 .f10-table th,
@@ -386,7 +383,6 @@ onMounted(async () => {
 .formula-block {
   margin-left: 10mm;
   margin-bottom: 10mm;
-  font-size: 14pt;
 }
 
 .formula-row {
@@ -411,14 +407,13 @@ onMounted(async () => {
 .signature-block {
   margin-top: 10mm;
   text-align: right;
-  font-size: 14pt;
 }
 
 .sig-row {
   margin-bottom: 3mm;
 }
 
-/* ขยับวงเล็บให้ "(" ตรงกับ "อ." ของคำว่า "ชื่อ" (ปรับตาม preview ได้) */
+/* ขยับวงเล็บให้ "(" ตรงกับ "อ." ของคำว่า "ชื่อ" (ถ้าจะจูนต่อ ใช้ค่าตรงนี้) */
 .sig-row-parenthesis {
   text-indent: 3mm;
 }

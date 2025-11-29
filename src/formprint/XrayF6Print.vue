@@ -236,19 +236,21 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -261,7 +263,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt !important;
 }
 
 /* กระดาษ A4 */
@@ -277,10 +279,11 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
+  font-size: 11pt !important;
 }
 
 /* หัวฟอร์ม */
+/* ★ title-main = 13 pt เท่านั้น */
 .header-main {
   text-align: center;
   margin-bottom: 8mm;
@@ -289,12 +292,12 @@ onMounted(async () => {
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 18pt;
+  font-size: 13pt !important;  /* ← ค่าเดียวที่เป็น 13pt */
 }
 
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 16pt;
+  font-size: 11pt !important;
 }
 
 /* กล่องข้อมูล */
@@ -302,10 +305,12 @@ onMounted(async () => {
   border: 0.4pt solid #000;
   padding: 3mm 4mm;
   margin-bottom: 4mm;
+  font-size: 11pt !important;
 }
 
 .info-row {
   margin-bottom: 2mm;
+  font-size: 11pt !important;
 }
 
 /* เส้นกรอกข้อมูล */
@@ -314,25 +319,20 @@ onMounted(async () => {
   min-height: 6mm;
   padding: 0 2mm;
   display: inline-block;
+  font-size: 11pt !important;
 }
 
-.long {
-  min-width: 70mm;
-}
-.mid {
-  min-width: 40mm;
-}
-.short {
-  min-width: 25mm;
-}
+.long { min-width: 70mm; }
+.mid { min-width: 40mm; }
+.short { min-width: 25mm; }
 
 /* ตาราง EI */
 .f6-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
   margin-top: 4mm;
+  font-size: 11pt !important;
 }
 
 .f6-table th,
@@ -341,35 +341,27 @@ onMounted(async () => {
   padding: 2mm 1mm;
   vertical-align: middle;
   text-align: center;
+  font-size: 11pt !important;
 }
 
-.col-date {
-  width: 32mm;
-}
+.col-date { width: 32mm; }
+.col-center { width: 28mm; }
+.col-comment { width: auto; }
 
-.col-center {
-  width: 28mm;
-}
-
-.col-comment {
-  width: auto;
-}
-
-.align-left {
-  text-align: left;
-}
+.align-left { text-align: left; }
 
 /* ตารางเทคนิคการถ่ายภาพ */
 .exposure-block {
   margin-top: 6mm;
+  font-size: 11pt !important;
 }
 
 .expo-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
   margin-top: 2mm;
+  font-size: 11pt !important;
 }
 
 .expo-table th,
@@ -377,17 +369,19 @@ onMounted(async () => {
   border: 0.4pt solid #000;
   padding: 2mm 1mm;
   text-align: center;
+  font-size: 11pt !important;
 }
 
 /* ลายเซ็น */
 .signature-block {
   margin-top: 12mm;
   text-align: center;
-  font-size: 14pt;
+  font-size: 11pt !important;
 }
 
 .sig-line {
   margin-bottom: 3mm;
+  font-size: 11pt !important;
 }
 
 /* การพิมพ์ */
@@ -397,19 +391,8 @@ onMounted(async () => {
 }
 
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #fff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
+  .print-toolbar { display: none; }
+  .print-root { background: #fff; padding: 0; }
+  .sheet-a4 { box-shadow: none; width: auto; min-height: auto; }
 }
-</style>
+</style> 

@@ -135,13 +135,13 @@
         <!-- ข้อเสนอแนะ: เส้นจุด 3 บรรทัด -->
         <div class="comment-block">
           <div class="comment-title">
-            ข้อเสนอแนะ............................................................................................................................................................................................................
+            ข้อเสนอแนะ....................................................................................................................................
           </div>
           <div class="comment-dot-line">
-            .................................................................................................................................................................................................................................
+            ........................................................................................................................................................
           </div>
           <div class="comment-dot-line">
-            .................................................................................................................................................................................................................................
+            ........................................................................................................................................................
           </div>
         </div>
 
@@ -169,13 +169,13 @@
         <div class="sign-block">
           <div class="sign-inner">
             <div class="sign-row sign-row-name">
-              ลงชื่อ ................................................................. ผู้ทดสอบ
+              ลงชื่อ .................................................. ผู้ทดสอบ
             </div>
             <div class="sign-row sign-row-parenthesis">
-              (..................................................................)
+              (....................................................)
             </div>
             <div class="sign-row sign-row-position">
-              ตำแหน่ง ............................................................
+              ตำแหน่ง ................................................
             </div>
           </div>
         </div>
@@ -245,21 +245,20 @@ onMounted(async () => {
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");
 
-/* ฟอนต์: TH Sarabun New > Tahoma > sans-serif */
+/* ฟอนต์: TH Sarabun New และฐานทั้งหน้า 11pt */
 * {
   font-family: "TH Sarabun New", Tahoma, sans-serif !important;
+  font-size: 11pt;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -272,7 +271,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;
 }
 
 /* A4 */
@@ -288,37 +287,37 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 16pt; /* โครงหน้าทั้งหมด 16 pt */
   line-height: 1.2;
 }
 
-/* Header – ชิดซ้ายและระยะห่างเท่ากันกับบรรทัด metadata */
+/* Header */
 .header-main {
   text-align: left;
-  margin-bottom: 2mm;   /* ระยะระหว่าง "ความถี่" กับ "สถานพยาบาล" */
+  margin-bottom: 2mm;
 }
 
+/* คำว่า "แบบบันทึก F12 : ..." ให้เป็น 13pt */
 .title-main {
   font-weight: 700;
-  margin-bottom: 2mm;   /* ระยะระหว่าง "แบบบันทึก F12" กับ "ความถี่" */
-  font-size: 16pt;
+  margin-bottom: 2mm;
+  font-size: 13pt;
 }
 
+/* ความถี่ = 11pt */
 .title-sub {
-  font-size: 16pt;
+  font-size: 11pt;
 }
 
 /* meta block */
 .meta-block {
   margin-bottom: 6mm;
-  font-size: 15pt;
 }
 
 .meta-row {
   display: flex;
   justify-content: space-between;
   gap: 8mm;
-  margin-bottom: 2mm;   /* ให้ทุกบรรทัด metadata ห่างเท่ากัน */
+  margin-bottom: 2mm;
 }
 
 .meta-side {
@@ -337,11 +336,6 @@ onMounted(async () => {
   min-height: 6mm;
   padding: 0 2mm;
   display: inline-block;
-  flex: 1;              /* เส้นยืดเต็มความกว้างฝั่งของตัวเอง */
-}
-
-/* ไม่ใช้ความยาวพิเศษแล้ว ให้สไตล์เหมือนกันทุกเส้น */
-.fill-line.short {
   flex: 1;
 }
 
@@ -350,7 +344,6 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 14pt;
   margin-bottom: 6mm;
 }
 
@@ -360,7 +353,7 @@ onMounted(async () => {
   padding: 1.5mm 1mm;
 }
 
-/* ทำให้ "จำนวนครั้ง" อยู่กึ่งกลางช่องแน่นอน */
+/* ทำให้ "จำนวนครั้ง" อยู่กึ่งกลาง */
 .col-reason {
   width: 75%;
   text-align: left;
@@ -373,14 +366,14 @@ onMounted(async () => {
 
 .align-left {
   text-align: left;
-  padding-left: 3mm; /* ให้ข้อความทั้ง 9 ข้อเริ่มในแนวเดียวกัน */
+  padding-left: 3mm;
 }
 
 .align-center {
   text-align: center;
 }
 
-/* แถวสรุปให้ตัวบางปกติ */
+/* แถวสรุปตัวบาง */
 .summary-row-table td {
   font-weight: 400;
 }
@@ -388,7 +381,6 @@ onMounted(async () => {
 /* ข้อเสนอแนะ */
 .comment-block {
   margin-bottom: 6mm;
-  font-size: 14pt;
 }
 
 .comment-title {
@@ -402,11 +394,10 @@ onMounted(async () => {
 /* หมายเหตุ */
 .note-block {
   margin-bottom: 10mm;
-  font-size: 14pt;
 }
 
 .note-title {
-  font-weight: 400;  /* ✅ ไม่เป็นตัวหนาแล้ว */
+  font-weight: 400;
   margin-bottom: 2mm;
 }
 
@@ -414,12 +405,11 @@ onMounted(async () => {
   line-height: 1.2;
 }
 
-/* ลายเซ็น - ชิดขวา & กล่องเดียวกัน */
+/* ลายเซ็น */
 .sign-block {
   margin-top: 8mm;
   display: flex;
   justify-content: flex-end;
-  font-size: 16pt;
 }
 
 .sign-inner {
@@ -430,7 +420,7 @@ onMounted(async () => {
   margin-bottom: 2mm;
 }
 
-/* บรรทัดวงเล็บยังขยับเล็กน้อยได้ถ้าอยากให้ตรง "อ." ของคำว่า ชื่อ เป๊ะ */
+/* ขยับวงเล็บได้ถ้าต้องการจูนเพิ่ม */
 .sign-row-parenthesis {
   text-indent: 8mm;
 }
@@ -458,4 +448,3 @@ onMounted(async () => {
   }
 }
 </style>
-

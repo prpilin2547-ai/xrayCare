@@ -34,23 +34,20 @@
           </div>
 
           <div class="title-sub header-row-inline">
-            เครื่องเอกซเรย์ รุ่น
-            <span class="underline long">
-              {{ header.machineName }}
-            </span>
+            เครื่องเอกซเรย์ยี่ห้อ
+          <span class="underline long"></span>
+            รุ่น
+          <span class="underline long"></span>
           </div>
 
-          <div class="title-sub header-row-inline">
-            วันที่
-            <span class="underline short">
-              {{ header.qcDate }}
-            </span>
-            ผู้ทดสอบ
-            <span class="underline short">
-              {{ header.testerName }}
-            </span>
-          </div>
-        </div>
+      <div class="title-sub header-row-inline">
+        วันที่
+      <span class="underline short"></span>
+        ผู้ทดสอบ
+      <span class="underline short"></span>
+      </div>
+      </div>
+
 
         <!-- ================= ตารางตรวจสอบ ================= -->
         <table class="f4-table">
@@ -58,8 +55,8 @@
             <tr>
               <th class="col-no">ลำดับที่</th>
               <th class="col-desc">รายการตรวจสอบ</th>
-              <th class="col-pass">ผ่าน (✓)</th>
-              <th class="col-fail">ไม่ผ่าน (✗)</th>
+              <th class="col-result">ผ่าน (✓)<br />
+                ไม่ผ่าน(✗)</th>
               <th class="col-remark">หมายเหตุ</th>
             </tr>
           </thead>
@@ -70,11 +67,9 @@
               <td class="col-desc align-left">
                 {{ row.description }}
               </td>
-              <td class="col-pass">
+              <td class="col-result">
                 <span v-if="row.result === 'P'">✓</span>
-              </td>
-              <td class="col-fail">
-                <span v-if="row.result === 'F'">✗</span>
+                <span v-else-if="row.result === 'F'">✗</span>
               </td>
               <td class="col-remark align-left">
                 {{ row.remark }}
@@ -118,16 +113,108 @@ const header = ref({
 
 // --------- ตารางรายการตรวจสอบ (ข้อมูลจากฐาน) ----------
 const rows = ref([
-  { no: 1, description: 'สภาพความมั่นคงของขาตั้งและตู้คอนโซล', result: '', remark: '' },
-  { no: 2, description: 'ระบบเบรกหรือกลไกล็อกของหลอดเอกซเรย์', result: '', remark: '' },
-  { no: 3, description: 'การเคลื่อนที่ของหลอดเอกซเรย์ โต๊ะผู้ป่วย และบักกี้', result: '', remark: '' },
-  { no: 4, description: 'แผงควบคุมและปุ่มสั่งงานทำงานได้ถูกต้อง', result: '', remark: '' },
-  { no: 5, description: 'สัญญาณเตือน ขณะเริ่มเปิดลำรังสีทำงานปกติ', result: '', remark: '' },
-  { no: 6, description: 'สายไฟและปลั๊กอยู่ในสภาพดี ไม่มีชำรุดหรือร้อนผิดปกติ', result: '', remark: '' },
-  { no: 7, description: 'อุปกรณ์เสริม (ตะแกรงกริด/ตัวรองผู้ป่วย) พร้อมใช้งาน', result: '', remark: '' },
-  { no: 8, description: 'จอภาพแสดงผลภาพเอกซเรย์สว่างชัดเจน', result: '', remark: '' },
-  { no: 9, description: 'เครื่องวัดระยะ SID และอุปกรณ์จัดท่าพร้อมใช้งาน', result: '', remark: '' },
-  { no: 10, description: 'บริเวณรอบเครื่องเอกซเรย์โล่ง ปลอดภัย', result: '', remark: '' }
+  {
+    no: 1,
+    description:
+      'สภาพสายไฟไม่มีรอยแตก บิดงอหรือเป็นปมสาย และไม่ถูกอุปกรณ์ที่มีน้ำหนักกดทับสาย',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 2,
+    description: 'ระบบอินเตอร์ล็อคและเบรคทำงานอย่างถูกต้อง',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 3,
+    description:
+      'การเคลื่อนที่ของเตียง หัวหลอดเอกซเรย์ และบัคกี้ เป็นไปอย่างราบรื่น',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 4,
+    description:
+      'สวิตซ์แผงควบคุม ไฟแสดงสถานะต่างๆ และมิเตอร์แสดงค่าทางเทคนิคทำงานและมองเห็นอย่างชัดเจน',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 5,
+    description:
+      'แสงไฟจากคอลลิเมเตอร์มีความเข้มแสงเพียงพอต่อการปฏิบัติงานในขณะที่เปิดไฟห้องปฏิบัติการ และคอลลิเมเตอร์ปราศจากฝุ่น',
+    result: '',
+    remark: ''
+  },
+  {
+    no: '6*',
+    description:
+      'มีแผนภูมิค่าทางเทคนิคที่ใช้ปัจจุบันแสดงอยู่ใกล้แผงควบคุม',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 7,
+    description:
+      'ไม่มีน้ำมันระบายความร้อนรั่วรอบหลอดเอกซเรย์ ถังเครื่องกำเนิดไฟฟ้าแรงสูง และปราศจากฝุ่น',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 8,
+    description: 'แผ่นรับภาพสะอาดและปราศจากสิ่งแปลกปลอม',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 9,
+    description:
+      'บนเวิร์กสเตชัน ให้แสดงภาพทางคลินิกล่าสุด ในภาพตรวจสอบเวลาและวันที่ รวมถึงการระบุสถานที่ และคำอธิบายประกอบอื่นๆถูกต้อง',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 10,
+    description:
+      'ที่หลอดเอกซเรย์ และเครื่องกำเนิดไฟฟ้า มีป้ายบอกรุ่น หมายเลขซีเรียลอ่านได้ชัดเจน หรือมีการจดบันทึกไว้ที่แฟ้มเอกสารคุณภาพ',
+    result: '',
+    remark: ''
+  },
+  {
+    no: 11,
+    description:
+      'อุปกรณ์ป้องกันรังสี เช่น เสื้อตะกั่ว ไทรอยด์ชิวด์ อุปกรณ์กำบังรังสีบริเวณอวัยวะสืบพันธุ์ ไม่ชำรุดหรือฉีกขาด สะอาดและมีการจัดเก็บอย่างเหมาะสม',
+    result: '',
+    remark: ''
+  },
+  {
+    no: '12**',
+    description:
+      'สามารถมองเห็นผู้ป่วยจากห้องควบคุมโดยไม่มีสิ่งกีดขวางบดบังผ่านจากช่องมองกระจก หรือมีระบบกล้องวงจรปิด',
+    result: '',
+    remark: ''
+  },
+  {
+    no: '13**',
+    description:
+      'ป้ายและสัญลักษณ์เตือนภัยทางรังสีติดหน้าประตูและไฟเตือนขณะฉายรังสีหน้าห้องปฏิบัติการ',
+    result: '',
+    remark: ''
+  },
+  {
+    no: '14**',
+    description: 'ช่องหรือบักกี้ใส่คาสเซทและตัวล็อคทำงานปกติ',
+    result: '',
+    remark: ''
+  },
+  {
+    no: '15**',
+    description:
+      'ศูนย์กลางลำรังสีกับเตียง ตัวเลขบอกระยะ SID หรือขนาดแสงไฟ ถูกต้อง',
+    result: '',
+    remark: ''
+  }
 ])
 
 const footerNote = ref('')
@@ -143,12 +230,15 @@ onMounted(async () => {
 })
 </script>
 
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ใช้ TH Sarabun ให้ทั้งหน้า */
+/* ตั้งค่ามาตรฐานทั้งหน้า = 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
@@ -171,7 +261,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt !important;
 }
 
 /* A4 */
@@ -187,63 +277,88 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
 }
 
-/* Header – ทำให้ระยะห่างระหว่างบรรทัดเท่ากัน */
+/* ================= Header ================= */
 .header-main {
   margin-bottom: 8mm;
+  width: 100%;           /* ให้กว้างเท่าตาราง */
 }
 
+/* คำว่า "แบบบันทึก F4…" = 13pt */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
-  margin-bottom: 3mm;  /* ระยะระหว่างบรรทัด 1–2 */
+  font-size: 13pt !important;
+  margin-bottom: 3mm;
 }
 
+/* บรรทัดอื่นของ header = 11pt */
 .title-sub {
-  font-size: 14pt;
-  margin-bottom: 3mm;  /* ระยะระหว่างบรรทัด 2–3 และ 3–4 */
+  font-size: 11pt !important;
+  margin-bottom: 3mm;
+  line-height: 1.4;
 }
 
 .header-row-inline {
   display: flex;
   align-items: center;
   gap: 4mm;
+  width: 100%;
 }
 
-/* เส้น underline */
+/* underline — ให้เส้นยาวจนสุดขอบเท่าตาราง */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
-  padding: 0 2mm;
   display: inline-block;
+  flex: 1;
+  margin: 0;             /* ★ ไม่มีระยะข้างซ้าย-ขวา */
 }
 
 .short {
-  min-width: 35mm;
+  flex: 0 0 40mm;
 }
 
 .long {
-  min-width: 60mm;
+  flex: 1;
 }
 
-/* ตาราง F4 */
+/* ================= ตาราง (ฟอนต์ 10pt) ================= */
 .f4-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 10pt !important;      /* ★ 10 pt ทั้งตาราง */
 }
 
-.f4-table th,
+.f4-table th {
+  border: 0.4pt solid #000;
+  padding: 1.5mm 1mm;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 10pt !important;
+}
+
+/* ข้อความในเซลล์ทั่วไปชิดซ้าย */
 .f4-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 1mm;
   vertical-align: middle;
-  text-align: center;
+  text-align: left !important;
+  font-size: 10pt !important;
 }
 
+/* ★ ลำดับที่ (1–15) ให้อยู่กึ่งกลางช่อง */
+.f4-table td.col-no {
+  text-align: center !important;
+}
+
+/* ถ้าต้องการให้ช่องผล (ผ่าน/ไม่ผ่าน) อยู่กลางด้วย */
+.f4-table td.col-result {
+  text-align: center !important;
+}
+
+/* คอลัมน์ */
 .col-no {
   width: 12mm;
 }
@@ -252,36 +367,30 @@ onMounted(async () => {
   width: 90mm;
 }
 
-.col-pass,
-.col-fail {
-  width: 18mm;
+.col-result {
+  width: 22mm;
 }
 
 .col-remark {
   width: auto;
 }
 
-.align-left {
-  text-align: left;
-}
-
-/* หมายเหตุที่เพิ่มเข้ามา */
+/* หมายเหตุ */
 .note-block {
   margin-top: 4mm;
-  font-size: 12pt;
+  font-size: 11pt !important;
 }
 
 .note-line {
-  line-height: 1.2;
+  line-height: 1.4 !important;
 }
 
-/* หมายเหตุท้ายฟอร์ม (จาก backend) */
 .footer-note {
   margin-top: 3mm;
-  font-size: 12pt;
+  font-size: 11pt !important;
 }
 
-/* สำหรับการพิมพ์ */
+/* Print mode */
 @page {
   size: A4 portrait;
   margin: 10mm;
@@ -291,12 +400,10 @@ onMounted(async () => {
   .print-toolbar {
     display: none;
   }
-
   .print-root {
     background: #ffffff;
     padding: 0;
   }
-
   .sheet-a4 {
     box-shadow: none;
     width: auto;

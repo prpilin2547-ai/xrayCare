@@ -38,11 +38,18 @@
               <td colspan="4" class="empty-row">&nbsp;</td>
             </tr>
 
+            <!-- ลบแถวว่างด้านบนออก -->
+            <!-- (ลบทั้ง block นี้)
+          <tr>
+           <td colspan="4" class="empty-row">&nbsp;</td>
+          </tr>
+            -->
+
             <!-- วันที่ -->
             <tr>
               <td class="label-col">วันที่</td>
               <td colspan="3" class="value-cell">
-                <span class="underline">{{ record.date }}</span>
+                {{ record.date }}
               </td>
             </tr>
 
@@ -50,7 +57,7 @@
             <tr>
               <td class="label-col">ผู้ทดสอบ</td>
               <td colspan="3" class="value-cell">
-                <span class="underline">{{ record.tester }}</span>
+                {{ record.tester }}
               </td>
             </tr>
 
@@ -140,15 +147,13 @@
             </tr>
 
         
-            <!-- ข้อคิดเห็น -->
-            <tr>
-              <td class="label-col">ข้อคิดเห็น</td>
-              <td colspan="3" class="value-cell">
-                <span class="underline">
-                  {{ record.comment }}
-                </span>
-              </td>
-            </tr>
+           <!-- ข้อคิดเห็น -->
+          <tr>
+            <td class="label-col">ข้อคิดเห็น</td>
+            <td colspan="3" class="value-cell">
+              {{ record.comment }}
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -164,43 +169,43 @@ const route = useRoute()
 
 // ข้อมูลที่ดึงมาจากการบันทึกจริง
 const record = ref({
-  date: '...............',
-  tester: '........................',
-  result: '........................................',
+  date: '',
+  tester: '',
+  result: '',
   comment: ''
 })
 
 // แถวข้อความในแต่ละกลุ่ม (ตามฟอร์ม)
 const printQualityRows = [
-  'ภาพไม่มีเลือนเบลอ (Smear)',
-  'ไม่มีสีเข้มปลายแฉก',
-  'ภาพลำดับขั้น (ramp) แบบต่อเนื่อง'
+  'ภาพไม่มีลายเปื้อน (Smear)',
+  'ไม่มีสิ่งแปลกปลอม',
+  'ภาพลดหลั่น (ramp) แบบต่อเนื่อง'
 ]
 
 const clarityRows = [
   'เส้นตรงต่อเนื่อง',
-  'กรอบหรือช่องเป็นสีเทาสม่ำเสมอ'
+  'กรอบหรือช่องเป็นสีเหลี่ยม'
 ]
 
 const luminanceRows = [
-  'กรอบที่มีระดับสีเทาทาวซ้อนกัน',
-  'กรอบสีเทา 5% มองเห็นเป็นขั้น',
+  'กรอบที่มีระดับสีเทาวางซ้อนกัน',
+  'กรอบสีเทา 5% มองเห็นในพื้น',
   'กรอบสีเทา 0%',
-  'กรอบสีเทา 95% มองเห็นเป็นขั้น',
+  'กรอบสีเทา 95% มองเห็นในพื้น',
   'กรอบสีเทา 100%'
 ]
 
 const smallGroupRows = [
-  'กลุ่มจุดเล็กมุมบนขวา',
-  'กลุ่มจุดเล็กมุมบนซ้าย',
-  'กลุ่มจุดเล็กกลางภาพ'
+  'กลุ่มเส้นคู่แนวนอน',
+  'กลุ่มเส้นคู่แนวตั้ง'
 ]
 
 const textRows = [
   'ในพื้นที่มืด (Dark)',
-  'ในพื้นที่ที่มีค่าระดับกลาง (Mid-grey)',
+  'ในพื้นที่สีเทาระดับกลาง (Mid-grey)',
   'ในพื้นที่สว่าง (Light)'
 ]
+
 
 // โหลดข้อมูลจาก backend ตาม id
 onMounted(async () => {
@@ -227,20 +232,21 @@ function handlePrint () {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ใช้ TH Sarabun ทั้งหน้า */
+/* ตั้งค่าฟอนต์มาตรฐานทั้งหน้า = 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;   
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -253,7 +259,7 @@ function handlePrint () {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt !important;
 }
 
 /* A4 */
@@ -269,7 +275,6 @@ function handlePrint () {
 .sheet-inner {
   width: 185mm;
   padding: 15mm 0 15mm;
-  font-size: 14pt;
 }
 
 /* Header */
@@ -277,28 +282,31 @@ function handlePrint () {
   margin-bottom: 6mm;
 }
 
+/* ★ title-main = 13pt ตามที่ต้องการ */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt !important; 
   margin-bottom: 2mm;
 }
 
+/* บรรทัดรอง → 11pt */
 .title-sub {
-  font-size: 14pt;
+  font-size: 11pt !important;
 }
 
-/* ตารางฟอร์ม */
+/* ตาราง */
 .f3-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 11pt !important;
 }
 
 .f3-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 2mm;
   vertical-align: middle;
+  font-size: 11pt !important;
 }
 
 .empty-row {
@@ -332,6 +340,8 @@ function handlePrint () {
   min-width: 50mm;
   min-height: 6mm;
 }
+
+/* Print */
 @page {
   size: A4 portrait;
   margin: 10mm;

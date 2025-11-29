@@ -226,13 +226,17 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ใช้ TH Sarabun ให้ทั้งหน้า */
+/* --------------------------- */
+/* ฟอนต์ทั้งหน้า = 11 pt */
+/* --------------------------- */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
 }
 
+/* พื้นหลังหน้า */
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
@@ -240,7 +244,7 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* ปุ่ม print แบบเดียวกับภาพที่ 1 */
+/* ปุ่ม Print */
 .print-toolbar {
   width: 100%;
   display: flex;
@@ -257,18 +261,11 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #d1d5db;
   cursor: pointer;
-  font-size: 16px;
 }
 
-.btn-print:hover {
-  background: #e5e7eb;
-}
-
-.print-icon {
-  font-size: 18px;
-}
-
+/* --------------------------- */
 /* A4 */
+/* --------------------------- */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -281,37 +278,33 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 16pt; /* ข้อความทั่ว ๆ ไป 16 pt */
 }
 
-/* Header */
-.header-main {
-  margin-bottom: 8mm;
-}
+/* --------------------------- */
+/* หัวฟอร์ม */
+/* --------------------------- */
 
-/* หัวฟอร์มหลัก 18 pt ชิดซ้าย */
+/* ★★★ title-main = 13 pt เท่านั้น ★★★ */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt !important;    /* ← ตัวเดียวที่เป็น 13 */
   text-align: left;
-  margin-bottom: 4mm; /* เว้น 1 บรรทัด */
+  margin-bottom: 4mm;
 }
 
-/* บล็อกกลางสำหรับ 2 บรรทัดถัดไป */
+/* 2 บรรทัดตรงกลางยังคง 11pt */
 .title-center-block {
   text-align: center;
 }
 
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 16pt;
 }
 
-/* ความถี่ + หมายเลข IP ชิดซ้าย ตรงกับหัวข้อหลัก */
+/* ความถี่ + หมายเลข IP */
 .meta-inline {
-  margin-top: 8mm;  /* เว้น 1 บรรทัดจากหัวฟอร์ม */
+  margin-top: 8mm;
   margin-bottom: 6mm;
-  font-size: 16pt;
   text-align: left;
 }
 
@@ -330,7 +323,7 @@ onMounted(async () => {
   width: 16mm;
 }
 
-/* เส้นสำหรับกรอกข้อมูล */
+/* เส้นกรอกข้อมูล */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
@@ -342,16 +335,17 @@ onMounted(async () => {
   min-width: 40mm;
 }
 
-/* ตารางหลัก */
+/* --------------------------- */
+/* ตาราง */
+/* --------------------------- */
 .month-block {
-  margin-bottom: 12mm; /* ระยะห่างระหว่าง 3 กรอบให้เท่ากัน */
+  margin-bottom: 12mm;
 }
 
 .f2-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 16pt;
 }
 
 .f2-table th,
@@ -362,7 +356,6 @@ onMounted(async () => {
   text-align: center;
 }
 
-/* คอลัมน์ซ้ายให้ข้อความชิดซ้ายแต่จัดกึ่งกลางแนวตั้งด้วย flex */
 .col-left {
   width: 48mm;
   text-align: left;
@@ -376,7 +369,6 @@ onMounted(async () => {
   text-align: left;
 }
 
-/* wrapper ในเซลล์ซ้ายเพื่อให้ข้อความอยู่กลางเซลล์แนวตั้ง */
 .cell-left-wrapper {
   display: flex;
   flex-direction: column;
@@ -388,20 +380,20 @@ onMounted(async () => {
   line-height: 1.2;
 }
 
-/* เส้นปะหลังคำว่า เดือน .......... */
 .dotted-line {
   display: inline-block;
   min-width: 32mm;
 }
 
-/* เส้นใต้ยาวสำหรับชื่อผู้ตรวจสอบ */
 .bottom-line {
   display: inline-block;
   min-width: 90mm;
   border-bottom: 0.4pt solid #000;
 }
 
-/* การพิมพ์ */
+/* --------------------------- */
+/* Print mode */
+/* --------------------------- */
 @page {
   size: A4 portrait;
   margin: 10mm;

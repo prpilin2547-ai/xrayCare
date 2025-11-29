@@ -24,7 +24,7 @@
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
-            แบบบันทึก F9 : การตรวจสอบคุณภาพเสื้อคะท้วงและการขยายรอยแตกของเสื้อคะท้วงด้วยรังสีเอกซ์
+            แบบบันทึก F9 : การตรวจสอบคุณภาพเสื้อตะกั่วและการหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์
           </div>
           <div class="title-sub">
             ความถี่ : {{ record.frequency }}
@@ -221,19 +221,24 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ============================
+   FONT ทั้งหน้า = 11 pt
+   ============================ */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
+/* พื้นหลัง print */
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -246,10 +251,10 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;
 }
 
-/* A4 */
+/* แผ่น A4 */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -262,32 +267,38 @@ onMounted(async () => {
 .sheet-inner {
   width: 185mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
 }
 
-/* Header */
+/* ============================
+   HEADER (แก้ตามคำสั่ง)
+   ============================ */
 .header-main {
-  text-align: center;
+  text-align: left;    /* ← ชิดซ้ายตามที่ต้องการ */
   margin-bottom: 8mm;
 }
 
+/* คำว่า “แบบบันทึก F9...” = 11pt */
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 18pt;
+  font-size: 11pt;    /* ← ลดจาก 13pt → 11pt */
 }
 
+/* ความถี่ = 11pt และชิดซ้ายเหมือนกัน */
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 15pt;
+  font-size: 11pt;
+  text-align: left;
 }
 
-/* ตาราง */
+/* ============================
+   TABLE
+   ============================ */
 .f9-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 11pt;
 }
 
 .f9-table th,
@@ -302,13 +313,13 @@ onMounted(async () => {
   font-weight: 700;
   text-align: left;
   padding-left: 3mm;
+  font-size: 11pt;
 }
 
 .col-no {
   width: 12mm;
 }
 
-/* ระยะห่างระหว่างสองตาราง */
 .table-gap {
   height: 8mm;
 }
@@ -316,7 +327,7 @@ onMounted(async () => {
 /* ลายเซ็น */
 .signature-block {
   margin-top: 10mm;
-  font-size: 14pt;
+  font-size: 11pt;
 }
 
 .sig-row {
@@ -325,7 +336,9 @@ onMounted(async () => {
   padding-right: 20mm;
 }
 
-/* การพิมพ์ */
+/* ============================
+   PRINT
+   ============================ */
 @page {
   size: A4 portrait;
   margin: 10mm;

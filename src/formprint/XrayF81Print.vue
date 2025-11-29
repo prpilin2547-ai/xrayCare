@@ -4,18 +4,20 @@
     <!-- ปุ่ม Print (จะถูกซ่อนตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
+        Print
+      </button>
     </div>
 
     <!-- แผ่น A4 -->
@@ -79,33 +81,33 @@
                 v-for="(row, index) in rows"
                 :key="index"
               >
-                <td class="align-center">{{ row.ipNo }}</td>
-                <td class="align-center">{{ row.ipSize }}</td>
-                <td class="align-center">{{ row.readerId }}</td>
-                <td class="align-center">{{ row.type }}</td>
-                <td class="align-center">{{ row.eiOrS }}</td>
+                <td>{{ row.ipNo }}</td>
+                <td>{{ row.ipSize }}</td>
+                <td>{{ row.readerId }}</td>
+                <td>{{ row.type }}</td>
+                <td>{{ row.eiOrS }}</td>
 
                 <!-- PV 1–3 + mean -->
-                <td class="align-center">{{ row.pv[0] || '' }}</td>
-                <td class="align-center">{{ row.pv[1] || '' }}</td>
-                <td class="align-center">{{ row.pv[2] || '' }}</td>
-                <td class="align-center">{{ row.pvMean || '' }}</td>
+                <td>{{ row.pv[0] || '' }}</td>
+                <td>{{ row.pv[1] || '' }}</td>
+                <td>{{ row.pv[2] || '' }}</td>
+                <td>{{ row.pvMean || '' }}</td>
 
                 <!-- PVSD 4–6 + mean -->
-                <td class="align-center">{{ row.pvsd[0] || '' }}</td>
-                <td class="align-center">{{ row.pvsd[1] || '' }}</td>
-                <td class="align-center">{{ row.pvsd[2] || '' }}</td>
-                <td class="align-center">{{ row.pvsdMean || '' }}</td>
+                <td>{{ row.pvsd[0] || '' }}</td>
+                <td>{{ row.pvsd[1] || '' }}</td>
+                <td>{{ row.pvsd[2] || '' }}</td>
+                <td>{{ row.pvsdMean || '' }}</td>
 
                 <!-- ผลการแปรผล P/F -->
-                <td class="align-center">{{ row.pvResult || '' }}</td>
-                <td class="align-center">{{ row.pvsdResult || '' }}</td>
+                <td>{{ row.pvResult || '' }}</td>
+                <td>{{ row.pvsdResult || '' }}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- พื้นที่ลายเซ็นด้านล่าง -->
+        <!-- พื้นที่ลายเซ็นด้านล่าง ขวา -->
         <div class="signature-block">
           <div class="sig-row">
             ลงชื่อ.............................................................ผู้ทดสอบ
@@ -135,23 +137,71 @@ const header = ref({
 
 // ข้อมูลแถวตาราง (แต่ละ IP)
 const rows = ref([
-  // mock ไว้ให้เห็นโครง – เมื่อดึงจากฐานก็เขียนทับได้เลย
   {
     ipNo: '',
     ipSize: '',
     readerId: '',
     type: '',
     eiOrS: '',
-    pv: ['', '', ''],      // PV ตำแหน่ง 1–3
-    pvMean: '',            // ค่าเฉลี่ย PV
-    pvsd: ['', '', ''],    // PVSD ตำแหน่ง 4–6
-    pvsdMean: '',          // ค่าเฉลี่ย PVSD
-    pvResult: '',          // P หรือ F
-    pvsdResult: '',        // P หรือ F
+    pv: ['', '', ''],
+    pvMean: '',
+    pvsd: ['', '', ''],
+    pvsdMean: '',
+    pvResult: '',
+    pvsdResult: '',
   },
-  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
-  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
-  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
+  {
+    ipNo: '',
+    ipSize: '',
+    readerId: '',
+    type: '',
+    eiOrS: '',
+    pv: ['', '', ''],
+    pvMean: '',
+    pvsd: ['', '', ''],
+    pvsdMean: '',
+    pvResult: '',
+    pvsdResult: '',
+  },
+  {
+    ipNo: '',
+    ipSize: '',
+    readerId: '',
+    type: '',
+    eiOrS: '',
+    pv: ['', '', ''],
+    pvMean: '',
+    pvsd: ['', '', ''],
+    pvsdMean: '',
+    pvResult: '',
+    pvsdResult: '',
+  },
+  {
+    ipNo: '',
+    ipSize: '',
+    readerId: '',
+    type: '',
+    eiOrS: '',
+    pv: ['', '', ''],
+    pvMean: '',
+    pvsd: ['', '', ''],
+    pvsdMean: '',
+    pvResult: '',
+    pvsdResult: '',
+  },
+  {
+    ipNo: '',
+    ipSize: '',
+    readerId: '',
+    type: '',
+    eiOrS: '',
+    pv: ['', '', ''],
+    pvMean: '',
+    pvsd: ['', '', ''],
+    pvsdMean: '',
+    pvResult: '',
+    pvsdResult: '',
+  },
 ])
 
 // ปุ่มสั่งพิมพ์
@@ -163,28 +213,26 @@ const handlePrint = () => {
 onMounted(async () => {
   const id = route.params.id
 
-  // ตัวอย่างโครงเรียก API (comment ไว้ให้)
   // const res = await fetch(`/api/print/f8-1/${id}`)
   // const data = await res.json()
-  //
-  // header.value = {
-  //   frequency: data.frequency || 'ทุก 6 เดือน',
-  // }
-  //
+  // header.value.frequency = data.frequency || 'ทุก 6 เดือน'
   // rows.value = data.rows
 })
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
 
-/* ใช้ฟอนต์ TH Sarabun ทั้งหน้า */
+/* ใช้ฟอนต์ TH Sarabun ทั้งหน้า ตัวบางเป็นค่าเริ่มต้น */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 12pt;
+  font-weight: 400; /* ตัวบาง */
 }
 
+/* พื้นหลังเทาอ่อน */
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
@@ -203,7 +251,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 12pt; /* ให้เท่ากับตัวอื่น */
 }
 
 /* แผ่น A4 */
@@ -219,26 +267,28 @@ onMounted(async () => {
 .sheet-inner {
   width: 185mm;
   padding: 18mm 0 16mm;
-  font-size: 14pt;
 }
 
-/* Header */
+/* Header – ชิดซ้าย */
 .header-main {
-  text-align: center;
+  text-align: left;
   margin-bottom: 10mm;
 }
 
+/* ชื่อแบบบันทึกให้ใหญ่และหนา */
 .title-main {
-  font-weight: 700;
+  font-weight: 700;        /* หนาเฉพาะบรรทัดนี้ */
   margin-bottom: 2mm;
-  font-size: 18pt;
+  font-size: 14pt;         /* ใหญ่กว่าส่วนอื่น */
 }
 
+/* ความถี่ – หนาแต่ขนาด 12 */
 .title-sub {
-  font-size: 16pt;
+  font-size: 12pt;
+  font-weight: 700;        /* หนาเฉพาะบรรทัดนี้ */
 }
 
-/* ตารางหลัก */
+/* ตารางหลัก = 12 ตัวบาง */
 .table-wrapper {
   width: 100%;
 }
@@ -247,7 +297,7 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 12pt;
 }
 
 .f81-table th,
@@ -255,32 +305,26 @@ onMounted(async () => {
   border: 0.4pt solid #000;
   padding: 1.5mm 1mm;
   vertical-align: middle;
-}
-
-.col-ip {
-  width: 18mm;
-}
-
-.col-roi {
   text-align: center;
+  font-size: 12pt;
+  font-weight: 400;       /* บังคับให้หัวตารางก็เป็นตัวบาง */
 }
 
-.col-result {
-  text-align: center;
-}
-
-.align-center {
-  text-align: center;
-}
-
-/* ลายเซ็น */
+/* ลายเซ็น = 12 ตัวบาง */
 .signature-block {
+  width: 100%;
   margin-top: 14mm;
-  font-size: 14pt;
+  font-size: 12pt;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
 }
 
 .sig-row {
   margin-bottom: 3mm;
+  white-space: nowrap;
+  font-weight: 400;
 }
 
 /* ตั้งค่าหน้ากระดาษตอนพิมพ์ */
