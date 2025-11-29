@@ -41,7 +41,8 @@
                 <th class="col-id">ID</th>
                 <th class="col-ei">EI</th>
                 <th class="col-ddi">DDI</th>
-                <th class="col-pixel">Pixel mean</th>
+                <th class="col-pixel">Pixel<br />
+                  mean</th>
               </tr>
             </thead>
             <tbody>
@@ -162,19 +163,22 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
+/* พื้นหลัง print */
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม Print */
 .print-toolbar {
@@ -187,7 +191,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;
 }
 
 /* A4 */
@@ -203,26 +207,33 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 20mm 0 18mm;
-  font-size: 14pt;
 }
 
-/* Header */
+/* ============================
+   HEADER – ชิดซ้าย
+   ============================ */
 .header-main {
-  text-align: center;
+  text-align: left !important;
   margin-bottom: 10mm;
 }
 
+/* หัวข้อใหญ่ */
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 18pt;
+  font-size: 13pt;
+  text-align: left !important;
 }
 
+/* ความถี่ */
 .title-sub {
-  font-size: 16pt;
+  font-size: 11pt;
+  text-align: left !important;
 }
 
-/* ตาราง */
+/* ============================
+   TABLE
+   ============================ */
 .table-wrapper {
   margin-bottom: 18mm;
 }
@@ -231,26 +242,26 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
 }
 
+/* เพิ่ม padding เพื่อให้แถวว่างทั้ง 5 แถว “สูงและกว้าง” เท่ากัน */
 .f82-table th,
 .f82-table td {
   border: 0.4pt solid #000;
-  padding: 2mm 1mm;
+  padding: 3mm 2mm;       /* ← เพิ่มความกว้างแถว */
   text-align: center;
   vertical-align: middle;
 }
 
-/* กำหนดความกว้างคอลัมน์ให้ใกล้เคียงต้นฉบับ */
+/* กำหนดความกว้างคอลัมน์ */
 .col-fpd-no {
-  width: 20mm;
+  width: 22mm;
 }
 .col-fpd-size {
-  width: 30mm;
+  width: 35mm;
 }
 .col-id {
-  width: 25mm;
+  width: 28mm;
 }
 .col-ei {
   width: 25mm;
@@ -262,17 +273,23 @@ onMounted(async () => {
   width: 30mm;
 }
 
-/* ลายเซ็น */
+/* ============================
+   SIGNATURE – ชิดขวา
+   ============================ */
 .signature-block {
   margin-top: 20mm;
-  font-size: 14pt;
+  font-size: 11pt;
+  text-align: right !important;     /* ← ชิดขวาทั้งบล็อก */
+  padding-right: 5mm;               /* ← ขยับชิดขวาแบบสวยงาม */
 }
 
 .sig-line {
   margin-bottom: 4mm;
 }
 
-/* โหมดพิมพ์ */
+/* ============================
+   PRINT
+   ============================ */
 @page {
   size: A4 portrait;
   margin: 10mm;

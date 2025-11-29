@@ -3,24 +3,25 @@
     <!-- ปุ่ม Print -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
+        Print
+      </button>
     </div>
 
     <!-- กระดาษ A4 -->
     <div class="sheet-a4">
       <div class="sheet-inner">
-
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -48,60 +49,57 @@
           </tr>
         </table>
 
-        <!-- ตารางผลการตรวจ -->
         <table class="f5-table">
-          <tbody>
-            <tr>
-              <td class="col-label">วันที่</td>
-              <td class="col-content">
-                {{ record.result.date }}
-              </td>
-            </tr>
+  <tbody>
 
-            <tr>
-              <td class="col-label">ผู้ทดสอบ</td>
-              <td class="col-content">
-                {{ record.result.tester }}
-              </td>
-            </tr>
+    <!-- วันที่ (ล้างค่าในช่อง) -->
+    <tr>
+      <td class="col-label">วันที่</td>
+      <td class="col-right-4" colspan="4"></td>
+    </tr>
 
-            <tr>
-              <td class="col-label">ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)</td>
-              <td class="col-content">
-                {{ record.result.uniformYN }}
-              </td>
-            </tr>
+    <!-- ผู้ทดสอบ (ล้างค่าในช่อง) -->
+    <tr>
+      <td class="col-label">ผู้ทดสอบ</td>
+      <td class="col-right-4" colspan="4"></td>
+    </tr>
 
-            <tr>
-              <td class="col-label">มีสิ่งแปลกปลอมหรือไม่? (Y/N)</td>
-              <td class="col-content">
-                {{ record.result.artifactYN }}
-              </td>
-            </tr>
+    <!-- ช่องข้อความ 3 บรรทัดรวมเป็นช่องเดียว / ไม่มีเส้นแบ่งแนวนอนใต้แถว -->
+    <tr>
+      <td class="col-label merged-text">
+        ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)<br />
+        มีสิ่งแปลกปลอมหรือไม่? (Y/N)<br />
+        อธิบาย–สิ่งแปลกปลอม
+      </td>
 
-            <tr>
-              <td class="col-label">อธิบายสิ่งแปลกปลอม</td>
-              <td class="col-content">
-                {{ record.result.artifactDesc }}
-              </td>
-            </tr>
 
-            <tr>
-              <td class="col-label">ข้อคิดเห็น–ความผิดปกติ (heel effect etc.)</td>
-              <td class="col-content">
-                {{ record.result.comment }}
-              </td>
-            </tr>
+      <!-- ช่องขวาแบ่ง 4 ช่อง -->
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
 
-            <tr>
-              <td class="col-label">การแก้ไข (ถ้าเป็นไปได้)</td>
-              <td class="col-content">
-                {{ record.result.action }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- ข้อคิดเห็น (1 แถว) -->
+    <tr>
+      <td class="col-label">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
 
+    <!-- การแก้ไข -->
+    <tr>
+      <td class="col-label">การแก้ไข (ถ้าเป็นไปได้)</td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
+
+  </tbody>
+</table>
       </div>
     </div>
   </div>
@@ -113,7 +111,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// โครงข้อมูล F5
+// โครงข้อมูล F5 (ยังเก็บไว้เผื่อใช้ต่อในอนาคต แม้ตอนนี้ไม่แสดงในช่องขวา)
 const record = ref({
   frequency: 'ทุก 3 เดือน',
   plateNo: '',
@@ -135,26 +133,10 @@ function handlePrint () {
 onMounted(async () => {
   const id = route.params.id
 
-  // TODO: ให้ backend ส่งข้อมูลในโครงนี้ หรือ map ค่าให้ตรง
-  // const res = await fetch(`/api/f5/${id}`)
-  // const data = await res.json()
-  //
-  // record.value.frequency = data.frequency        // "ทุก 3 เดือน"
-  // record.value.plateNo = data.plateNo
-  // record.value.result = {
-  //   date: data.dateText,
-  //   tester: data.testerName,
-  //   uniformYN: data.uniformYN,
-  //   artifactYN: data.artifactYN,
-  //   artifactDesc: data.artifactDesc,
-  //   comment: data.comment,
-  //   action: data.action
-  // }
-
-  // MOCK ตัวอย่าง (ลบเมื่อเชื่อม API จริง)
+  // ตัวอย่าง mock (ลบออกเมื่อใช้ข้อมูลจริง)
   record.value = {
     frequency: 'ทุก 3 เดือน',
-    plateNo: 'IP-01',
+    plateNo: "",
     result: {
       date: '27/11/2568',
       tester: 'รังสีเทคนิค ตัวอย่าง',
@@ -171,19 +153,22 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt + ระยะห่างบรรทัดเท่ากัน */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม Print */
 .print-toolbar {
@@ -196,7 +181,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;
 }
 
 /* กระดาษ A4 */
@@ -212,24 +197,27 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
 }
 
-/* Header */
+/* HEADER – ชิดซ้าย */
 .header-main {
-  text-align: center;
+  text-align: left;
   margin-bottom: 8mm;
 }
 
+/* คำว่า “แบบบันทึก F5 …” = 13pt */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt;
   margin-bottom: 2mm;
+  text-align: left;
 }
 
+/* ความถี่ / หมายเลขแผ่น = 11pt */
 .title-sub {
-  font-size: 15pt;
+  font-size: 11pt;
   margin-bottom: 2mm;
+  text-align: left;
 }
 
 /* underline */
@@ -243,25 +231,24 @@ onMounted(async () => {
   min-width: 60mm;
 }
 
-/* กล่องสรุปบน */
+/* กล่องสรุปด้านบน */
 .summary-box {
   width: 100%;
   border-collapse: collapse;
   border: 0.4pt solid #000;
   margin-bottom: 8mm;
-  font-size: 14pt;
 }
 
 .summary-box td {
   padding: 4mm;
   text-align: left;
+  line-height: 2.5; /* เพิ่มระยะห่างบรรทัดในกล่องนี้ให้มากขึ้น */
 }
 
 /* ตาราง F5 */
 .f5-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14pt;
 }
 
 .f5-table td {
@@ -270,8 +257,9 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
+/* ป้ายกำกับกว้างขึ้น เพื่อให้ข้อความยาวอยู่บรรทัดเดียว */
 .col-label {
-  width: 70mm;
+  width: 90mm;
 }
 
 .col-content {
@@ -301,5 +289,10 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+  .merged-text {
+  line-height: 2.5 !important;   /* ระยะห่างเท่ากับ summary-box */
+}
+
+
 }
 </style>
