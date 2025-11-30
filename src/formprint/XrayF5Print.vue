@@ -49,57 +49,53 @@
           </tr>
         </table>
 
+        <!-- ตารางหลัก F5 -->
         <table class="f5-table">
-  <tbody>
+          <tbody>
+            <!-- วันที่ -->
+            <tr>
+              <td class="col-label">วันที่</td>
+              <td class="col-right-4" colspan="4"></td>
+            </tr>
 
-    <!-- วันที่ (ล้างค่าในช่อง) -->
-    <tr>
-      <td class="col-label">วันที่</td>
-      <td class="col-right-4" colspan="4"></td>
-    </tr>
+            <!-- ผู้ทดสอบ -->
+            <tr>
+              <td class="col-label">ผู้ทดสอบ</td>
+              <td class="col-right-4" colspan="4"></td>
+            </tr>
 
-    <!-- ผู้ทดสอบ (ล้างค่าในช่อง) -->
-    <tr>
-      <td class="col-label">ผู้ทดสอบ</td>
-      <td class="col-right-4" colspan="4"></td>
-    </tr>
+            <!-- 3 บรรทัดรวมเป็นช่องเดียว -->
+            <tr>
+              <td class="col-label merged-text">
+                ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)<br />
+                มีสิ่งแปลกปลอมหรือไม่? (Y/N)<br />
+                อธิบาย–สิ่งแปลกปลอม
+              </td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+            </tr>
 
-    <!-- ช่องข้อความ 3 บรรทัดรวมเป็นช่องเดียว / ไม่มีเส้นแบ่งแนวนอนใต้แถว -->
-    <tr>
-      <td class="col-label merged-text">
-        ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)<br />
-        มีสิ่งแปลกปลอมหรือไม่? (Y/N)<br />
-        อธิบาย–สิ่งแปลกปลอม
-      </td>
+            <!-- ข้อคิดเห็น -->
+            <tr>
+              <td class="col-label">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+            </tr>
 
-
-      <!-- ช่องขวาแบ่ง 4 ช่อง -->
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-    </tr>
-
-    <!-- ข้อคิดเห็น (1 แถว) -->
-    <tr>
-      <td class="col-label">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-    </tr>
-
-    <!-- การแก้ไข -->
-    <tr>
-      <td class="col-label">การแก้ไข (ถ้าเป็นไปได้)</td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-      <td class="small-box"></td>
-    </tr>
-
-  </tbody>
-</table>
+            <!-- การแก้ไข -->
+            <tr>
+              <td class="col-label">การแก้ไข (ถ้าเป็นไปได้)</td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+              <td class="small-box"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -111,7 +107,6 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// โครงข้อมูล F5 (ยังเก็บไว้เผื่อใช้ต่อในอนาคต แม้ตอนนี้ไม่แสดงในช่องขวา)
 const record = ref({
   frequency: 'ทุก 3 เดือน',
   plateNo: '',
@@ -133,10 +128,10 @@ function handlePrint () {
 onMounted(async () => {
   const id = route.params.id
 
-  // ตัวอย่าง mock (ลบออกเมื่อใช้ข้อมูลจริง)
+  // mock data (เอาออกเมื่อใช้ข้อมูลจริง)
   record.value = {
     frequency: 'ทุก 3 เดือน',
-    plateNo: "",
+    plateNo: '',
     result: {
       date: '27/11/2568',
       tester: 'รังสีเทคนิค ตัวอย่าง',
@@ -153,7 +148,7 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt + ระยะห่างบรรทัดเท่ากัน */
+/* ฟอนต์ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 11pt;
@@ -161,6 +156,7 @@ onMounted(async () => {
   line-height: 1.4;
 }
 
+/* พื้นหลังหน้า */
 .print-root {
   background: #e5e7eb;
   min-height: 100vh;
@@ -181,7 +177,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 11pt; /* ยังเป็น 11 ตามทั้งหน้า */
 }
 
 /* กระดาษ A4 */
@@ -199,21 +195,21 @@ onMounted(async () => {
   padding: 18mm 0 14mm;
 }
 
-/* HEADER – ชิดซ้าย */
+/* HEADER – ชิดซ้ายติดขอบเนื้อหา */
 .header-main {
   text-align: left;
   margin-bottom: 8mm;
 }
 
-/* คำว่า “แบบบันทึก F5 …” = 13pt */
+/* คำว่า “แบบบันทึก F5 …” = 13pt (ตัวเดียวที่ใหญ่กว่า) */
 .title-main {
   font-weight: 700;
-  font-size: 13pt;
+  font-size: 13pt;   /* ยกเว้นบรรทัดนี้ */
   margin-bottom: 2mm;
   text-align: left;
 }
 
-/* ความถี่ / หมายเลขแผ่น = 11pt */
+/* ความถี่ / หมายเลขแผ่น = 11pt และชิดซ้าย */
 .title-sub {
   font-size: 11pt;
   margin-bottom: 2mm;
@@ -242,7 +238,7 @@ onMounted(async () => {
 .summary-box td {
   padding: 4mm;
   text-align: left;
-  line-height: 2.5; /* เพิ่มระยะห่างบรรทัดในกล่องนี้ให้มากขึ้น */
+  line-height: 2.5;
 }
 
 /* ตาราง F5 */
@@ -257,13 +253,18 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
-/* ป้ายกำกับกว้างขึ้น เพื่อให้ข้อความยาวอยู่บรรทัดเดียว */
+/* ป้ายกำกับกว้างขึ้น */
 .col-label {
   width: 90mm;
 }
 
-.col-content {
+.col-right-4 {
   width: auto;
+}
+
+.small-box {
+  width: auto;
+  border: 0.4pt solid #000;
 }
 
 .align-left {
@@ -289,10 +290,10 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+
   .merged-text {
-  line-height: 2.5 !important;   /* ระยะห่างเท่ากับ summary-box */
-}
-
-
+    line-height: 2.5 !important; /* ระยะห่างเท่ากับ summary-box */
+  }
 }
 </style>
+

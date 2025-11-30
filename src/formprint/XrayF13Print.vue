@@ -26,9 +26,6 @@
           <div class="title-main">
             แบบบันทึก F13 : แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวนด์ : B-mode QC Test
           </div>
-          <div class="title-sub">
-            ความถี่ : {{ header.frequencyLabel }}
-          </div>
         </div>
 
         <!-- ข้อมูลเครื่อง / ผู้ตรวจ -->
@@ -37,8 +34,8 @@
             ยี่ห้อ .............................................. รุ่น .............................................. ผู้ตรวจสอบ ............................................................
           </div>
           <div class="machine-row">
-            แผนก/กลุ่มงาน ......................................................... คุณสมบัติโพรบ ............................................................
-          </div>
+            แผนก/กลุ่มงาน ......................................................... อุณหภูมิห้อง ............................................................ความชื้นห้อง..............................
+          </div> 
           <div class="machine-row">
             Probe ชนิด/ความถี่ : 
             <span class="underline long">{{ header.probeInfo }}</span>
@@ -93,32 +90,9 @@
             </tr>
           </tbody>
         </table>
-
-        <!-- หมายเหตุการทดสอบ (เว้นบรรทัดให้เขียนได้) -->
-        <div class="note-block">
-          หมายเหตุ / ผลการประเมินเพิ่มเติม :
-          <div class="note-line"></div>
-          <div class="note-line"></div>
-        </div>
-
-        <!-- ===== ลายเซ็น ===== -->
-        <div class="signature-block">
-          <div class="signature-line">
-            ลงชื่อ ................................................................. ผู้ทดสอบ
-          </div>
-          <div class="signature-line">
-            ( ................................................................. )
-          </div>
-          <div class="signature-line">
-            ตำแหน่ง .............................................................
-          </div>
-          <div class="signature-line">
-            วันที่ตรวจ : {{ header.testDate || '.............../.............../...............' }}
-          </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -316,10 +290,14 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ทั้งหน้า = 11pt */
 * {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
+/* ===== พื้นหลัง & ปุ่ม ===== */
 .print-root {
   background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
   min-height: 100vh;
@@ -329,7 +307,6 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* ปุ่ม print */
 .print-toolbar {
   margin-bottom: 16px;
 }
@@ -339,7 +316,6 @@ onMounted(async () => {
   background: #ffffff;
   border-radius: 999px;
   border: 1px solid #4b5563;
-  font-size: 16px;
   cursor: pointer;
 }
 
@@ -356,7 +332,7 @@ onMounted(async () => {
 .sheet-inner {
   width: 185mm;
   padding: 18mm 0 16mm;
-  font-size: 14pt;
+  /* ใช้ฟอนต์ 11pt จาก * */
 }
 
 /* Header */
@@ -365,19 +341,20 @@ onMounted(async () => {
   margin-bottom: 8mm;
 }
 
+/* << ตัวเดียวที่ใหญ่กว่า = 13pt >> */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt;   /* ยกเว้นหัวข้อนี้ */
   margin-bottom: 2mm;
 }
 
+/* ที่เหลือกลับมาใช้ 11pt (มาจาก * อยู่แล้ว) */
 .title-sub {
-  font-size: 14pt;
+  /* ไม่ต้องกำหนด font-size เพิ่ม */
 }
 
 /* ข้อมูลเครื่อง */
 .machine-block {
-  font-size: 14pt;
   margin-bottom: 6mm;
 }
 
@@ -403,7 +380,6 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
   margin-bottom: 6mm;
 }
 
@@ -442,7 +418,6 @@ onMounted(async () => {
 
 /* หมายเหตุ */
 .note-block {
-  font-size: 13pt;
   margin-bottom: 10mm;
 }
 
@@ -454,7 +429,6 @@ onMounted(async () => {
 
 /* ลายเซ็น */
 .signature-block {
-  font-size: 14pt;
   margin-top: 6mm;
 }
 

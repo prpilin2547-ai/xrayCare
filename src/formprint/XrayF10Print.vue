@@ -62,7 +62,6 @@
             <span class="underline short">{{ record.province }}</span>
           </div>
 
-        
           <!-- แถว 3 : เครื่องเอกซเรย์ / Model / S/N -->
           <div class="meta-row meta-row-grid">
             <span class="meta-label">เครื่องเอกซเรย์</span>
@@ -92,11 +91,8 @@
             <span class="meta-label">Application</span>
             <span class="underline long">{{ record.application }}</span>
 
-            <span></span>
-            <span></span>
-
-            <span></span>
-            <span></span>
+            <span></span><span></span>
+            <span></span><span></span>
           </div>
 
           <!-- แถว 6 : Calibration -->
@@ -104,51 +100,40 @@
             <span class="meta-label">Calibration</span>
             <span class="underline long">{{ record.calibration }}</span>
 
-            <span></span>
-            <span></span>
-
-            <span></span>
-            <span></span>
+            <span></span><span></span>
+            <span></span><span></span>
           </div>
         </div>
 
-        <!-- ตารางค่าความสว่าง -->
+        <!-- ตารางค่าความสว่าง (เหมือน PDF ต้นฉบับ) -->
         <table class="f10-table">
           <thead>
             <tr>
-              <th class="col-run" rowspan="2">ครั้งที่</th>
-              <th class="col-illum-group" colspan="5">
-                ความสว่างแสงไฟ (IAV)
-              </th>
-              <th class="col-bg" rowspan="2">
-                Background (I<sub>BG</sub>)
-              </th>
-            </tr>
-            <tr>
-              <th v-for="p in 5" :key="'head-point-' + p" class="col-point">
-                จุดที่ {{ p }}
-              </th>
+              <th class="col-run">ครั้งที่</th>
+              <th class="col-iav">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
+              <th class="col-bg">Background (I<sub>BG</sub>)</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(run, rIndex) in record.runs" :key="'run-' + rIndex">
-              <td class="col-run">
-                {{ run.runNo || rIndex + 1 }}
-              </td>
-
-              <td
-                v-for="(val, pIndex) in run.points"
-                :key="'run-' + rIndex + '-p-' + pIndex"
-                class="col-point"
-              >
-                {{ val }}
-              </td>
-
-              <td class="col-bg">
-                {{ run.background }}
-              </td>
-            </tr>
+            <!-- 1 ครั้ง = 3 แถวย่อย / ช่อง “ครั้งที่” รวม 3 แถว -->
+            <template v-for="(run, rIndex) in record.runs" :key="'run-' + rIndex">
+              <tr>
+                <td class="col-run run-number" rowspan="3">
+                  {{ run.runNo || rIndex + 1 }}
+                </td>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+              <tr>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+              <tr>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+            </template>
           </tbody>
         </table>
 
@@ -212,9 +197,9 @@ const record = ref({
   application: '',
   calibration: '',
   runs: [
-    { runNo: 1, points: ['', '', '', '', ''], background: '' },
-    { runNo: 2, points: ['', '', '', '', ''], background: '' },
-    { runNo: 3, points: ['', '', '', '', ''], background: '' }
+    { runNo: 1 },
+    { runNo: 2 },
+    { runNo: 3 }
   ],
   iav: '',
   ibg: '',
@@ -245,6 +230,7 @@ onMounted(async () => {
   font-weight: 400;
 }
 
+/* ===== พื้นหลัง & ปุ่ม ===== */
 .print-root {
   background: #e5e7eb;
   min-height: 100vh;
@@ -254,7 +240,6 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* ปุ่ม print */
 .print-toolbar {
   margin-bottom: 16px;
 }
@@ -265,10 +250,10 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;   /* = 11 ทั้งหน้า */
+  font-size: 11pt;
 }
 
-/* แผ่น A4 */
+/* ===== แผ่น A4 ===== */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -281,31 +266,32 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  /* ไม่กำหนด font-size เพิ่ม → ใช้ 11pt จาก * */
 }
 
-/* หัวฟอร์ม – ชิดซ้าย + ระยะห่างเท่ากับ meta-row */
+/* ===== HEADER & META ให้เว้นบรรทัดเท่ากัน ===== */
 .header-main {
   text-align: left;
-  margin-bottom: 3mm;
+  margin-bottom: 0;
 }
 
-/* คำว่า “แบบบันทึก F10 ...” ให้เป็น 13pt */
 .title-main {
   font-weight: 700;
+  font-size: 13pt;
   margin-bottom: 3mm;
-  font-size: 13pt;    /* ยกเว้นตัวเดียวที่ใหญ่กว่า */
 }
 
-/* ความถี่ = 11pt */
 .title-sub {
   font-size: 11pt;
+  margin-bottom: 3mm;
 }
 
-/* meta block */
 .meta-block {
   margin-left: 0;
   margin-bottom: 6mm;
+}
+
+.meta-row {
+  margin-bottom: 3mm;
 }
 
 .meta-row-grid {
@@ -313,14 +299,19 @@ onMounted(async () => {
   grid-template-columns: auto 1fr auto 1fr auto 1fr;
   column-gap: 3mm;
   align-items: flex-end;
-  margin-bottom: 3mm;
+}
+
+.meta-row-grid-4 {
+  display: grid;
+  grid-template-columns: auto 1fr auto 18mm auto 18mm auto 25mm;
+  column-gap: 3mm;
+  align-items: flex-end;
 }
 
 .meta-label {
   white-space: nowrap;
 }
 
-/* เส้นสำหรับกรอก */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
@@ -328,58 +319,38 @@ onMounted(async () => {
   display: inline-block;
 }
 
-.long {
-  min-width: 40mm;
-}
+.long { min-width: 40mm; }
+.mid  { min-width: 40mm; }
+.short { min-width: 20mm; }
+.short-narrow { min-width: 5mm; }
 
-/* แก้ตรงนี้: ให้ mid ยาวเท่า long เพื่อให้คำว่า ประเภท / ตำบล / Model / รุ่น อยู่แนวเดียวกัน */
-.mid {
-  min-width: 40mm;   /* เดิม 30mm */
-}
-
-.short {
-  min-width: 20mm;
-}
-
-.short-narrow {
-  min-width: 5mm;
-}
-
-
-/* ตาราง F10 */
+/* ===== ตาราง F10 ===== */
 .f10-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   margin-bottom: 10mm;
-  /* ใช้ font-size 11pt จาก * */
 }
 
 .f10-table th,
 .f10-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 1mm;
+  text-align: center;
   vertical-align: middle;
-  text-align: center;
 }
 
-.col-run {
-  width: 18mm;
+/* ความกว้างคอลัมน์ให้เหมือนฟอร์ม */
+.col-run { width: 20mm; }
+.col-iav { width: 110mm; }
+.col-bg  { width: 35mm; }
+
+/* ให้เลข 1/2/3 อยู่ด้านบนของช่องเหมือน PDF */
+.run-number {
+  vertical-align: top;
 }
 
-.col-illum-group {
-  text-align: center;
-}
-
-.col-point {
-  width: 20mm;
-}
-
-.col-bg {
-  width: 26mm;
-}
-
-/* block ค่าคำนวณ */
+/* ===== block ค่าคำนวณ ===== */
 .formula-block {
   margin-left: 10mm;
   margin-bottom: 10mm;
@@ -403,7 +374,7 @@ onMounted(async () => {
   display: inline-block;
 }
 
-/* ลายเซ็น */
+/* ===== ลายเซ็น ===== */
 .signature-block {
   margin-top: 10mm;
   text-align: right;
@@ -413,12 +384,11 @@ onMounted(async () => {
   margin-bottom: 3mm;
 }
 
-/* ขยับวงเล็บให้ "(" ตรงกับ "อ." ของคำว่า "ชื่อ" (ถ้าจะจูนต่อ ใช้ค่าตรงนี้) */
 .sig-row-parenthesis {
   text-indent: 3mm;
 }
 
-/* สไตล์ตอนพิมพ์ */
+/* ===== PRINT ===== */
 @page {
   size: A4 portrait;
   margin: 10mm;
