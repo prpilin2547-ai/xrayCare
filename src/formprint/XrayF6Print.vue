@@ -38,13 +38,13 @@
             ข้อมูลสำหรับระบบ CR / DR
           </div>
           <div class="info-row">
-            หมายเลขสถานีของระบบ CR / DR :
+            หมายเลขคาสเซท CR / DR :
             <span class="underline long">
               {{ record.stationNo }}
             </span>
           </div>
           <div class="info-row">
-            หมายเลขแผ่นรับภาพของระบบ CR / DR :
+            หมายเลขเครื่องอ่าน CR / DR :
             <span class="underline long">
               {{ record.plateNo }}
             </span>
@@ -54,14 +54,14 @@
         <!-- กล่องข้อมูลห้องเอกซเรย์ + Baseline -->
         <div class="info-box">
           <div class="info-row">
-            ข้อมูลด้านห้องเอกซเรย์
+            ข้อมูลเครื่องเอกซเรย์
           </div>
           <div class="info-row">
-            ชื่อห้อง :
+            ยี่ห้อ :
             <span class="underline mid">
               {{ record.roomName }}
             </span>
-            ชั้น :
+            รุ่น :
             <span class="underline short">
               {{ record.floor }}
             </span>
@@ -72,14 +72,15 @@
           </div>
 
           <div class="info-row">
-            ขอบเขต :
-            ค่าความคลาดเคลื่อนจากค่าอ้างอิงพื้นฐาน (Baseline)
-            ต้องไม่เกิน ± 10%
+            ขอบเขต
+          </div>
+          <div class="info-row">
+            ค่าแตกต่างจากค่าอ้างอิงพื้นฐาน (Baseline) น้อยกว่า ± 10%
           </div>
 
           <div class="info-row">
-            ข้อมูล EI เบื้องต้น :
-            ระบุค่าดัชนีปริมาณรังสีที่ใช้ เช่น S#, LgM, EI คือ
+            ข้อมูลเบื้องต้น :
+            ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S,EI คือ
             <span class="underline short">
               {{ record.eiType }}
             </span>
@@ -125,7 +126,7 @@
         <div class="exposure-block">
           <div class="info-row">
             ปริมาณรังสีที่ใช้สำหรับการทดสอบ
-            (กรณีมีผู้ป่วยทดแทนมาตรฐาน หรือใช้แฟนท่อมมาตรฐาน)
+            (กรณีศูนย์วิทยาศาสตร์การแพทย์ ดำเนินการวัดให้พร้อมตรวจมาตรฐานเครื่องเอกซเรย์ประจำปี)
           </div>
 
           <table class="expo-table">

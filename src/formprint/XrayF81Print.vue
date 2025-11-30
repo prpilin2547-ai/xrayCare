@@ -37,43 +37,52 @@
         <div class="table-wrapper">
           <table class="f81-table">
             <thead>
-              <!-- บรรทัดหัวตาราง 1 -->
-              <tr>
-                <th rowspan="3" class="col-ip">IP no.</th>
-                <th rowspan="3" class="col-ip">IP size</th>
-                <th rowspan="3" class="col-ip">ID</th>
-                <th rowspan="3" class="col-ip">Type</th>
-                <th rowspan="3" class="col-ip">EI / S</th>
+  <!-- แถวหัว 1: หัวหลัก -->
+  <tr>
+    <th rowspan="3" class="col-ip">IP no.</th>
+    <th rowspan="3" class="col-ip">IP size</th>
+    <th rowspan="3" class="col-ip">ID</th>
+    <th rowspan="3" class="col-ip">Type</th>
+    <th rowspan="3" class="col-ip">EI / S</th>
 
-                <th colspan="8" class="col-roi">
-                  ROI 80%
-                </th>
+    <!-- ROI 80% ครอบ 8 ช่อง -->
+    <th colspan="8" class="col-roi">
+      ROI 80%
+    </th>
 
-                <th colspan="2" class="col-result">
-                  การแปรผล (P/F)
-                </th>
-              </tr>
+    <!-- กลุ่มการแปรผล -->
+    <th colspan="2" class="col-result-head">
+      การแปรผล (P/F)
+    </th>
+  </tr>
 
-              <!-- บรรทัดหัวตาราง 2 -->
-              <tr>
-                <th colspan="4">PV</th>
-                <th colspan="4">PVSD</th>
-                <th rowspan="2">PV</th>
-                <th rowspan="2">PVSD</th>
-              </tr>
+  <!-- แถวหัว 2: PV / PVSD (ทั้งฝั่ง ROI และฝั่งผลการแปรผล) -->
+  <tr>
+    <!-- ROI: PV ครอบ 1 2 3 mean -->
+    <th colspan="4" class="col-roi-sub">PV</th>
+    <!-- ROI: PVSD ครอบ 4 5 6 mean -->
+    <th colspan="4" class="col-roi-sub">PVSD</th>
 
-              <!-- บรรทัดหัวตาราง 3 -->
-              <tr>
-                <th>1</th>
-                <th>2</th>
-                <th>3</th>
-                <th>mean</th>
-                <th>4</th>
-                <th>5</th>
-                <th>6</th>
-                <th>mean</th>
-              </tr>
-            </thead>
+    <!-- ผลการแปรผล: แค่ชื่อ PV / PVSD (ไม่มีจุดไข่ปลาแล้ว) -->
+    <th class="col-result">PV</th>
+    <th class="col-result">PVSD</th>
+  </tr>
+
+  <!-- แถวหัว 3: ตัวเลข + mean + จุดไข่ปลาในช่องว่างด้านล่าง -->
+  <tr>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>mean</th>
+    <th>4</th>
+    <th>5</th>
+    <th>6</th>
+    <th>mean</th>
+    <!-- ช่องว่างด้านล่างของ PV / PVSD -->
+    <th>............</th>
+    <th>............</th>
+  </tr>
+</thead>
 
             <tbody>
               <!-- แถวข้อมูลแต่ละ IP -->
@@ -99,7 +108,7 @@
                 <td>{{ row.pvsd[2] || '' }}</td>
                 <td>{{ row.pvsdMean || '' }}</td>
 
-                <!-- ผลการแปรผล P/F -->
+                <!-- ผลการแปรผล P/F (ช่องว่างด้านล่างจะเป็นของแต่ละแถวเอง) -->
                 <td>{{ row.pvResult || '' }}</td>
                 <td>{{ row.pvsdResult || '' }}</td>
               </tr>
@@ -113,10 +122,10 @@
             ลงชื่อ.............................................................ผู้ทดสอบ
           </div>
           <div class="sig-row">
-            (..........................................................................)
+            (............................................................)
           </div>
           <div class="sig-row">
-            ตำแหน่ง..............................................................
+            ตำแหน่ง.......................................................................
           </div>
         </div>
       </div>
@@ -137,71 +146,11 @@ const header = ref({
 
 // ข้อมูลแถวตาราง (แต่ละ IP)
 const rows = ref([
-  {
-    ipNo: '',
-    ipSize: '',
-    readerId: '',
-    type: '',
-    eiOrS: '',
-    pv: ['', '', ''],
-    pvMean: '',
-    pvsd: ['', '', ''],
-    pvsdMean: '',
-    pvResult: '',
-    pvsdResult: '',
-  },
-  {
-    ipNo: '',
-    ipSize: '',
-    readerId: '',
-    type: '',
-    eiOrS: '',
-    pv: ['', '', ''],
-    pvMean: '',
-    pvsd: ['', '', ''],
-    pvsdMean: '',
-    pvResult: '',
-    pvsdResult: '',
-  },
-  {
-    ipNo: '',
-    ipSize: '',
-    readerId: '',
-    type: '',
-    eiOrS: '',
-    pv: ['', '', ''],
-    pvMean: '',
-    pvsd: ['', '', ''],
-    pvsdMean: '',
-    pvResult: '',
-    pvsdResult: '',
-  },
-  {
-    ipNo: '',
-    ipSize: '',
-    readerId: '',
-    type: '',
-    eiOrS: '',
-    pv: ['', '', ''],
-    pvMean: '',
-    pvsd: ['', '', ''],
-    pvsdMean: '',
-    pvResult: '',
-    pvsdResult: '',
-  },
-  {
-    ipNo: '',
-    ipSize: '',
-    readerId: '',
-    type: '',
-    eiOrS: '',
-    pv: ['', '', ''],
-    pvMean: '',
-    pvsd: ['', '', ''],
-    pvsdMean: '',
-    pvResult: '',
-    pvsdResult: '',
-  },
+  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
+  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
+  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
+  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
+  { ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '', pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: '' },
 ])
 
 // ปุ่มสั่งพิมพ์
@@ -212,7 +161,6 @@ const handlePrint = () => {
 // ดึงข้อมูลจริงจากฐาน (ปรับ URL/โครง data ให้ตรง backend ของคุณ)
 onMounted(async () => {
   const id = route.params.id
-
   // const res = await fetch(`/api/print/f8-1/${id}`)
   // const data = await res.json()
   // header.value.frequency = data.frequency || 'ทุก 6 เดือน'
@@ -223,11 +171,11 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
 
-/* ใช้ฟอนต์ TH Sarabun ทั้งหน้า ตัวบางเป็นค่าเริ่มต้น */
+/* ฟอนต์ทั้งหน้า = 11pt ตัวบาง */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 12pt;
-  font-weight: 400; /* ตัวบาง */
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 /* พื้นหลังเทาอ่อน */
@@ -251,7 +199,6 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 12pt; /* ให้เท่ากับตัวอื่น */
 }
 
 /* แผ่น A4 */
@@ -275,20 +222,19 @@ onMounted(async () => {
   margin-bottom: 10mm;
 }
 
-/* ชื่อแบบบันทึกให้ใหญ่และหนา */
+/* ชื่อแบบบันทึกให้ 13pt หนา */
 .title-main {
-  font-weight: 700;        /* หนาเฉพาะบรรทัดนี้ */
+  font-weight: 700;
+  font-size: 13pt !important;
   margin-bottom: 2mm;
-  font-size: 14pt;         /* ใหญ่กว่าส่วนอื่น */
 }
 
-/* ความถี่ – หนาแต่ขนาด 12 */
+/* ความถี่ – 11pt ตัวบาง */
 .title-sub {
-  font-size: 12pt;
-  font-weight: 700;        /* หนาเฉพาะบรรทัดนี้ */
+  font-weight: 400;
 }
 
-/* ตารางหลัก = 12 ตัวบาง */
+/* ตารางหลัก */
 .table-wrapper {
   width: 100%;
 }
@@ -296,25 +242,58 @@ onMounted(async () => {
 .f81-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 12pt;
+  table-layout: auto;
 }
 
-.f81-table th,
-.f81-table td {
+/* หัวตาราง: ให้บางแต่ไม่ต้องสูงมาก */
+.f81-table th {
   border: 0.4pt solid #000;
-  padding: 1.5mm 1mm;
+  padding: 1.2mm 0.8mm;
   vertical-align: middle;
   text-align: center;
-  font-size: 12pt;
-  font-weight: 400;       /* บังคับให้หัวตารางก็เป็นตัวบาง */
+  font-size: 11pt !important;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
-/* ลายเซ็น = 12 ตัวบาง */
+/* ⭐ ช่องตาราง 5 แถวล่าง (tbody) ให้เท่ากับ f82-table = 3mm 2mm ⭐ */
+.f81-table tbody td {
+  border: 0.4pt solid #000;
+  padding: 3mm 2mm;          /* ← ทำให้ช่องว่างด้านล่างทั้ง 5 แถวกว้าง/สูงเท่าตารางบน */
+  vertical-align: middle;
+  text-align: center;
+  font-size: 11pt !important;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* คอลัมน์ซ้าย (IP/ID/Type/EI) */
+.col-ip {
+  padding-left: 0.8mm;
+  padding-right: 0.8mm;
+}
+
+/* หัวกลุ่มผลการแปรผล */
+.col-result-head {
+  text-align: center;
+}
+
+/* คอลัมน์ PV / PVSD */
+.col-result {
+  padding-left: 0.9mm;
+  padding-right: 0.9mm;
+}
+
+/* จุดไข่ปลาในหัว P/F */
+.pf-head {
+  font-size: 11pt;
+  font-weight: 400;
+}
+
+/* ลายเซ็น */
 .signature-block {
   width: 100%;
   margin-top: 14mm;
-  font-size: 12pt;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -324,7 +303,6 @@ onMounted(async () => {
 .sig-row {
   margin-bottom: 3mm;
   white-space: nowrap;
-  font-weight: 400;
 }
 
 /* ตั้งค่าหน้ากระดาษตอนพิมพ์ */
@@ -348,5 +326,19 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+  .col-roi {
+  text-align: center;
+}
+
+.col-roi-sub {
+  text-align: center;
+  font-weight: 400;
+}
+
+.col-result-head,
+.col-result {
+  text-align: center;
+}
+
 }
 </style>
