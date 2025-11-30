@@ -4,18 +4,20 @@
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
+        Print
+      </button>
     </div>
 
     <!-- แผ่น A4 -->
@@ -23,12 +25,12 @@
       <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
-          <!-- บรรทัดแรก: หัวฟอร์มตัวหนา 18 pt ชิดซ้าย -->
+          <!-- บรรทัดแรก -->
           <div class="title-main">
             แบบบันทึก F2 : การลบแผ่นเพลท (Erasure of Imaging Plate)
           </div>
 
-          <!-- เว้น 1 บรรทัด แล้วให้ 2 บรรทัดถัดไปอยู่กลางหน้า -->
+          <!-- 2 บรรทัดกลาง -->
           <div class="title-center-block">
             <div class="title-sub">
               แบบบันทึกการลบแผ่นเพลท แผนกเอกซเรย์
@@ -42,22 +44,24 @@
           </div>
         </div>
 
-        <!-- เว้น 1 บรรทัด แล้วแสดงความถี่ + หมายเลข IP ชิดซ้าย ตรงกับหัวข้อหลัก -->
+        <!-- ความถี่ + หมายเลข IP -->
         <div class="meta-inline">
-          <span>ความถี่ :</span>
-          <span class="underline meta-short">
-            {{ record.frequency }}
-          </span>
+          <div class="meta-row-inline">
+            <span>ความถี่ :</span>
+            <span class="underline meta-short">
+              {{ record.frequency }}
+            </span>
+          </div>
 
-          <span class="meta-gap"></span>
-
-          <span>หมายเลข IP</span>
-          <span class="underline meta-long">
-            {{ record.ipNumber }}
-          </span>
+          <div class="meta-row-inline">
+            <span>หมายเลข IP</span>
+            <span class="underline meta-long">
+              {{ record.ipNumber }}
+            </span>
+          </div>
         </div>
 
-        <!-- ตาราง 3 ชุด (เหมือนภาพ) -->
+        <!-- ตาราง 3 ชุด -->
         <div
           v-for="(section, index) in monthSections"
           :key="index"
@@ -66,7 +70,9 @@
           <table class="f2-table">
             <thead>
               <tr>
-                <th class="col-left">เดือน/รายการ/วันที่</th>
+                <th class="col-left">
+                  เดือน/รายการ/วันที่
+                </th>
                 <th
                   v-for="d in 20"
                   :key="d"
@@ -84,7 +90,7 @@
                   <div class="cell-left-wrapper">
                     เดือน
                     <span class="dotted-line">
-                      {{ section.monthLabel || '..................' }}
+                      {{ section.monthLabel }}
                     </span>
                   </div>
                 </td>
@@ -178,20 +184,14 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// ---------------------------
-// ข้อมูลหัวฟอร์ม (ดึงมาจากการบันทึกจริง)
-// ---------------------------
 const record = ref({
-  fiscalYear: '...............', // ปีงบประมาณ พ.ศ.
-  frequency: 'ทุกวัน',           // ความถี่
-  ipNumber: '..................', // หมายเลข IP
-  inspector: '..............................', // ผู้ตรวจสอบ
-  summaryResult: '................................................' // ผลการตรวจสอบ
+  fiscalYear: '',      // ปีงบประมาณ พ.ศ.
+  frequency: 'ทุกวัน',
+  ipNumber: '',
+  inspector: '',
+  summaryResult: ''
 })
 
-// ---------------------------
-// 3 ชุดตารางตามภาพ
-// ---------------------------
 const monthSections = ref([
   { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' },
   { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' },
@@ -199,36 +199,19 @@ const monthSections = ref([
 ])
 
 function handlePrint () {
-  // เปิด dialog พิมพ์ของ browser (Chrome/Edge)
   window.print()
 }
 
-// โหลดข้อมูลจริงจาก backend
 onMounted(async () => {
   const id = route.params.id
-
-  // ตัวอย่างโครง API — แก้ URL และโครงให้ตรงกับ backend ของคุณ
-  // const res = await fetch(`/api/f2/${id}`)
-  // const data = await res.json()
-  //
-  // record.value = {
-  //   fiscalYear: data.fiscalYear,
-  //   frequency: data.frequency,
-  //   ipNumber: data.ipNumber,
-  //   inspector: data.inspector,
-  //   summaryResult: data.summaryResult
-  // }
-  //
-  // monthSections.value = data.sections
+  // โหลดจาก backend ถ้ามี
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* --------------------------- */
 /* ฟอนต์ทั้งหน้า = 11 pt */
-/* --------------------------- */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 11pt !important;
@@ -263,9 +246,7 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-/* --------------------------- */
 /* A4 */
-/* --------------------------- */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -276,23 +257,18 @@ onMounted(async () => {
 }
 
 .sheet-inner {
-  width: 180mm;
+  width: 172mm;              /* แคบลงให้ขยับเข้าเหมือนต้นฉบับ */
   padding: 18mm 0 14mm;
 }
 
-/* --------------------------- */
 /* หัวฟอร์ม */
-/* --------------------------- */
-
-/* ★★★ title-main = 13 pt เท่านั้น ★★★ */
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;    /* ← ตัวเดียวที่เป็น 13 */
+  font-size: 13pt !important;
   text-align: left;
   margin-bottom: 4mm;
 }
 
-/* 2 บรรทัดตรงกลางยังคง 11pt */
 .title-center-block {
   text-align: center;
 }
@@ -301,26 +277,26 @@ onMounted(async () => {
   margin-bottom: 2mm;
 }
 
-/* ความถี่ + หมายเลข IP */
+/* ความถี่ + หมายเลข IP (สองบรรทัดชิดซ้าย แต่ทั้งบล็อกเลื่อนเข้ามาใกล้ตาราง) */
 .meta-inline {
   margin-top: 8mm;
   margin-bottom: 6mm;
   text-align: left;
+  margin-left: 12mm;         /* ขยับเข้าให้ตำแหน่งใกล้เคียงรูปแรก */
+}
+
+.meta-row-inline {
+  margin-bottom: 2mm;
 }
 
 .meta-short {
-  min-width: 35mm;
+  min-width: 28mm;           /* เส้นให้สั้นลงเหมือนใน PDF */
   margin-left: 4px;
 }
 
 .meta-long {
-  min-width: 60mm;
+  min-width: 50mm;
   margin-left: 4px;
-}
-
-.meta-gap {
-  display: inline-block;
-  width: 16mm;
 }
 
 /* เส้นกรอกข้อมูล */
@@ -335,9 +311,7 @@ onMounted(async () => {
   min-width: 40mm;
 }
 
-/* --------------------------- */
 /* ตาราง */
-/* --------------------------- */
 .month-block {
   margin-bottom: 12mm;
 }
@@ -356,8 +330,12 @@ onMounted(async () => {
   text-align: center;
 }
 
+/* หัวคอลัมน์ซ้ายให้จัดกลาง แต่แถวอื่นชิดซ้าย */
 .col-left {
-  width: 48mm;
+  width: 42mm;               /* แคบลงให้ใกล้ต้นฉบับ */
+}
+
+.f2-table td.col-left {
   text-align: left;
 }
 
@@ -382,7 +360,7 @@ onMounted(async () => {
 
 .dotted-line {
   display: inline-block;
-  min-width: 32mm;
+  min-width: 30mm;
 }
 
 .bottom-line {
@@ -391,9 +369,7 @@ onMounted(async () => {
   border-bottom: 0.4pt solid #000;
 }
 
-/* --------------------------- */
 /* Print mode */
-/* --------------------------- */
 @page {
   size: A4 portrait;
   margin: 10mm;

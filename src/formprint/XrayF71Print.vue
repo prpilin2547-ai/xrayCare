@@ -39,17 +39,13 @@
             <span class="underline medium">
               {{ header.machineModel }}
             </span>
-            ห้อง
-            <span class="underline short">
-              {{ header.roomNo }}
-            </span>
           </div>
         </div>
 
         <!-- ===== กล่องข้อมูลวันที่ / ผู้ทดสอบ ===== -->
         <table class="box-table">
           <tr>
-            <td class="label-cell">วันที่ทดสอบ :</td>
+            <td class="label-cell">วัน/เดือน/ปี ที่ทดสอบ :</td>
             <td class="value-cell">
               <span class="underline long">
                 {{ header.testDate }}
@@ -101,8 +97,8 @@
 
         <!-- หมายเหตุเกณฑ์ความเบี่ยงเบน -->
         <div class="note-block">
-          ความเบี่ยงเบนระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)<br />
-          * หมายถึงลำรังสีมีขนาดเท่ากับช่องแสงตามมาตรฐาน หมายถึงลำรังสีมีขนาดเล็กกว่าขนาดเขตจริง
+          ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)<br />
+          + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
         </div>
 
         <!-- ===== ตารางความเบี่ยงเบนระหว่างลำรังสีกับลำแสงไฟ ===== -->
@@ -298,12 +294,15 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์พื้นฐานทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
@@ -311,8 +310,7 @@ onMounted(async () => {
   align-items: center;
 }
 
-
-/* ปุ่ม Print */
+/* ปุ่ม print */
 .print-toolbar {
   margin-bottom: 16px;
 }
@@ -323,7 +321,8 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  /* ใช้ 11 pt ตามทั้งหน้า */
+  font-size: 11pt !important;
 }
 
 /* A4 */
@@ -339,7 +338,6 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 16mm;
-  font-size: 14pt;
 }
 
 /* Header */
@@ -348,15 +346,16 @@ onMounted(async () => {
   margin-bottom: 6mm;
 }
 
+/* ★ เฉพาะคำว่า “แบบบันทึก …” = 13 pt */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt !important;
   text-align: left;
   margin-bottom: 2mm;
 }
 
+/* บรรทัดรองใช้ 11 pt ตาม global แล้ว ไม่ต้องระบุเพิ่มก็ได้ */
 .title-sub {
-  font-size: 14pt;
   margin-bottom: 2mm;
 }
 
@@ -372,22 +371,15 @@ onMounted(async () => {
   display: inline-block;
 }
 
-.short {
-  min-width: 25mm;
-}
-.medium {
-  min-width: 35mm;
-}
-.long {
-  min-width: 60mm;
-}
+.short { min-width: 25mm; }
+.medium { min-width: 35mm; }
+.long { min-width: 60mm; }
 
 /* ตารางกรอบบน */
 .box-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 4mm;
-  font-size: 13pt;
 }
 
 .box-table td {
@@ -424,14 +416,12 @@ onMounted(async () => {
 /* หมายเหตุข้อความ */
 .note-block {
   margin: 2mm 0 4mm;
-  font-size: 13pt;
 }
 
 /* ตารางหลักด้านล่าง */
 .main-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13pt;
   margin-bottom: 4mm;
 }
 
@@ -443,19 +433,11 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
-.col-pos {
-  width: 55mm;
-}
-.col-offset {
-  width: 25mm;
-}
+.col-pos   { width: 55mm; }
+.col-offset{ width: 25mm; }
 .col-pass,
-.col-fail {
-  width: 18mm;
-}
-.col-note {
-  width: auto;
-}
+.col-fail  { width: 18mm; }
+.col-note  { width: auto; }
 
 .align-left {
   text-align: left;
@@ -464,13 +446,11 @@ onMounted(async () => {
 /* Beam title */
 .beam-title {
   margin: 4mm 0 2mm;
-  font-size: 14pt;
 }
 
 /* ลงชื่อ */
 .sign-block {
   margin-top: 8mm;
-  font-size: 14pt;
 }
 
 /* การพิมพ์ */
