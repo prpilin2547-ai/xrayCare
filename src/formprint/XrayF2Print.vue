@@ -48,6 +48,7 @@
         <div class="meta-inline">
           <div class="meta-row-inline">
             <span>ความถี่ :</span>
+            <!-- ยังใช้ class meta-short แต่ไปตัดเส้นใน CSS -->
             <span class="underline meta-short">
               {{ record.frequency }}
             </span>
@@ -127,7 +128,7 @@
                   <div class="cell-left-wrapper multi-line">
                     <div>สภาพผิดปกติ</div>
                     <div>ของแผ่น</div>
-                    <div>หรือด้านบนบนภาพ</div>
+                    <div>หรือตำแหน่งบนภาพ</div>
                   </div>
                 </td>
                 <td
@@ -150,26 +151,14 @@
                   colspan="20"
                   class="align-left"
                 >
+                  <!-- เอาเส้นออกโดยแก้ CSS ของ .bottom-line -->
                   <span class="bottom-line">
                     {{ section.inspector || record.inspector }}
                   </span>
                 </td>
               </tr>
 
-              <!-- แถวที่ 5 : ผลการตรวจสอบ (สรุป) -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="cell-left-wrapper">
-                    ผลการตรวจสอบ
-                  </div>
-                </td>
-                <td
-                  colspan="20"
-                  class="align-left"
-                >
-                  {{ section.summaryResult || record.summaryResult }}
-                </td>
-              </tr>
+              
             </tbody>
           </table>
         </div>
@@ -277,29 +266,34 @@ onMounted(async () => {
   margin-bottom: 2mm;
 }
 
-/* ความถี่ + หมายเลข IP (สองบรรทัดชิดซ้าย แต่ทั้งบล็อกเลื่อนเข้ามาใกล้ตาราง) */
+/* ความถี่ + หมายเลข IP */
 .meta-inline {
   margin-top: 8mm;
   margin-bottom: 6mm;
   text-align: left;
-  margin-left: 12mm;         /* ขยับเข้าให้ตำแหน่งใกล้เคียงรูปแรก */
+  margin-left: 0 !important;     /* ← เลื่อนมาชิดซ้าย */
+  padding-left: 2mm !important;  /* ← กันไม่ให้ชิดเกินไป */
 }
+
 
 .meta-row-inline {
   margin-bottom: 2mm;
 }
 
+/* *** แก้: meta-short ไม่ให้มีเส้นใต้ทุกวัน *** */
 .meta-short {
-  min-width: 28mm;           /* เส้นให้สั้นลงเหมือนใน PDF */
+  min-width: 28mm;
   margin-left: 4px;
+  border-bottom: none !important;  /* ตัดเส้นใต้ */
 }
 
+/* ยังให้หมายเลข IP มีเส้นอยู่ตามเดิม */
 .meta-long {
   min-width: 50mm;
   margin-left: 4px;
 }
 
-/* เส้นกรอกข้อมูล */
+/* เส้นกรอกข้อมูล (ทั่วไป) */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
@@ -308,7 +302,7 @@ onMounted(async () => {
 }
 
 .inline {
-  min-width: 40mm;
+  min-width: 20mm;
 }
 
 /* ตาราง */
@@ -363,10 +357,11 @@ onMounted(async () => {
   min-width: 30mm;
 }
 
+/* *** แก้: bottom-line ไม่ให้มีเส้นใต้ในช่องผู้ตรวจสอบ *** */
 .bottom-line {
   display: inline-block;
   min-width: 90mm;
-  border-bottom: 0.4pt solid #000;
+  border-bottom: none !important;  /* ตัดเส้นใต้ทั้งหมด */
 }
 
 /* Print mode */

@@ -4,18 +4,20 @@
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
+        Print
+      </button>
     </div>
 
     <!-- แผ่น A4 -->
@@ -31,14 +33,10 @@
           </div>
         </div>
 
-        <!-- ตารางชุดที่ 1 : ตรวจภายนอกด้วยสายตาและการคลำ -->
+        <!-- ตารางเดียว ต่อทั้งภายนอก + ภายใน -->
         <table class="f9-table">
           <thead>
-            <tr>
-              <th colspan="10" class="section-title">
-                การตรวจสอบลักษณะภายนอกด้วยสายตาและการคลำ
-              </th>
-            </tr>
+            <!-- แถวหัวคอลัมน์ -->
             <tr>
               <th class="col-no">ลำดับที่</th>
               <th>หมายเลขอุปกรณ์</th>
@@ -51,75 +49,132 @@
               <th>วิธีการจัดเก็บ</th>
               <th>ผู้บันทึก</th>
             </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(row, idx) in externalChecks"
-              :key="'ext-' + idx"
-            >
-              <td class="col-no">{{ idx + 1 }}</td>
-              <td>{{ row.equipmentNo }}</td>
-              <td>{{ row.equipmentType }}</td>
-              <td>{{ row.usageAge }}</td>
-              <td>{{ row.checkDate }}</td>
-              <td>{{ row.damageType }}</td>
-              <td>{{ row.position }}</td>
-              <td>{{ row.size }}</td>
-              <td>{{ row.storageMethod }}</td>
-              <td>{{ row.recorder }}</td>
-            </tr>
-            <!-- แถวว่างเผื่อกรอกเพิ่ม (ให้ layout เหมือน PDF) -->
-            <tr v-for="n in emptyExternalRows" :key="'ext-empty-' + n">
-              <td class="col-no">&nbsp;</td>
-              <td colspan="9">&nbsp;</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- ระยะห่างระหว่างสองตาราง -->
-        <div class="table-gap"></div>
-
-        <!-- ตารางชุดที่ 2 : ตรวจภายในด้วยรังสีเอกซ์ -->
-        <table class="f9-table">
-          <thead>
+            <!-- หัวส่วนที่ 1 : ภายนอก -->
             <tr>
               <th colspan="10" class="section-title">
-                การตรวจสอบภายในด้วยรังสีเอกซ์ในห้องตรวจทางรังสี/เครื่องเอกซเรย์ทั่วไป
+                การตรวจสอบลักษณะภายนอกด้วยสายตาและการคลำ
               </th>
             </tr>
-            <tr>
-              <th class="col-no">ลำดับที่</th>
-              <th>หมายเลขอุปกรณ์</th>
-              <th>ชนิดของอุปกรณ์</th>
-              <th>อายุการใช้งาน</th>
-              <th>วันที่ตรวจสอบ</th>
-              <th>ลักษณะความเสียหายที่พบ</th>
-              <th>ตำแหน่ง</th>
-              <th>ขนาด</th>
-              <th>วิธีการจัดเก็บ</th>
-              <th>ผู้บันทึก</th>
-            </tr>
           </thead>
+
           <tbody>
-            <tr
-              v-for="(row, idx) in internalChecks"
-              :key="'int-' + idx"
-            >
-              <td class="col-no">{{ idx + 1 }}</td>
-              <td>{{ row.equipmentNo }}</td>
-              <td>{{ row.equipmentType }}</td>
-              <td>{{ row.usageAge }}</td>
-              <td>{{ row.checkDate }}</td>
-              <td>{{ row.internalFinding }}</td>
-              <td>{{ row.position }}</td>
-              <td>{{ row.size }}</td>
-              <td>{{ row.storageMethod }}</td>
-              <td>{{ row.recorder }}</td>
+            <!-- แถวตัวอย่าง ต.ย. ภายนอก -->
+            <tr>
+              <td class="col-no">ต.ย.</td>
+              <td>{{ exampleExternal.equipmentNo || '' }}</td>
+              <td>{{ exampleExternal.equipmentType || '' }}</td>
+              <td>{{ exampleExternal.usageAge || '' }}</td>
+              <td>{{ exampleExternal.checkDate || '' }}</td>
+              <td>{{ exampleExternal.damageType || '' }}</td>
+              <td>{{ exampleExternal.position || '' }}</td>
+              <td>{{ exampleExternal.size || '' }}</td>
+              <td>{{ exampleExternal.storageMethod || '' }}</td>
+              <td>{{ exampleExternal.recorder || '' }}</td>
             </tr>
-            <!-- แถวว่างให้เต็มกรอบเหมือน PDF -->
-            <tr v-for="n in emptyInternalRows" :key="'int-empty-' + n">
-              <td class="col-no">&nbsp;</td>
-              <td colspan="9">&nbsp;</td>
+
+            <!-- ลำดับที่ 1 ภายนอก -->
+            <tr>
+              <td class="col-no row-top">1</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <!-- ลำดับที่ 2 ภายนอก -->
+            <tr>
+              <td class="col-no row-top">2</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <!-- แถวสุดท้ายว่าง ภายนอก -->
+            <tr>
+              <td class="col-no row-top">&nbsp;</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <!-- หัวส่วนที่ 2 : ภายใน -->
+            <tr>
+              <td colspan="10" class="section-title">
+                การตรวจสอบภายในด้วยรังสีเอกซ์ในห้องตรวจทางรังสี/เครื่องเอกซเรย์ทั่วไป
+              </td>
+            </tr>
+
+            <!-- แถวตัวอย่าง ต.ย. ภายใน -->
+            <tr>
+              <td class="col-no">ต.ย.</td>
+              <td>{{ exampleInternal.equipmentNo || '' }}</td>
+              <td>{{ exampleInternal.equipmentType || '' }}</td>
+              <td>{{ exampleInternal.usageAge || '' }}</td>
+              <td>{{ exampleInternal.checkDate || '' }}</td>
+              <td>{{ exampleInternal.internalFinding || '' }}</td>
+              <td>{{ exampleInternal.position || '' }}</td>
+              <td>{{ exampleInternal.size || '' }}</td>
+              <td>{{ exampleInternal.storageMethod || '' }}</td>
+              <td>{{ exampleInternal.recorder || '' }}</td>
+            </tr>
+
+            <!-- ลำดับที่ 1 ภายใน -->
+            <tr>
+              <td class="col-no row-top">1</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <!-- ลำดับที่ 2 ภายใน -->
+            <tr>
+              <td class="col-no row-top">2</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <!-- แถวสุดท้ายว่าง ภายใน -->
+            <tr>
+              <td class="col-no row-top">&nbsp;</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -147,27 +202,16 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// ข้อมูลหัวฟอร์ม (ดึงจากฐานข้อมูล)
 const record = ref({
   frequency: 'ทุก 6 เดือน'
 })
 
-// ตารางภายนอก
 const externalChecks = ref([])
-// ตารางภายใน
 const internalChecks = ref([])
 
-// จำนวนแถวขั้นต่ำให้กรอบดูเต็มเหมือน PDF
-const minExternalRows = 3
-const minInternalRows = 3
-
-const emptyExternalRows = computed(() =>
-  Math.max(0, minExternalRows - externalChecks.value.length)
-)
-
-const emptyInternalRows = computed(() =>
-  Math.max(0, minInternalRows - internalChecks.value.length)
-)
+/* ดึงแถวตัวอย่าง (ถ้ามี) สำหรับ ต.ย. */
+const exampleExternal = computed(() => externalChecks.value[0] || {})
+const exampleInternal = computed(() => internalChecks.value[0] || {})
 
 function handlePrint () {
   window.print()
@@ -176,54 +220,48 @@ function handlePrint () {
 onMounted(async () => {
   const id = route.params.id
 
-  // ตัวอย่างการดึงข้อมูลจาก backend (ให้แก้ URL/field ให้ตรงของจริง)
-  // const res = await fetch(`/api/f9/${id}`)
-  // const data = await res.json()
-  //
-  // record.value = {
-  //   frequency: data.frequency || 'ทุก 6 เดือน'
-  // }
-  //
-  // externalChecks.value = data.externalChecks || []
-  // internalChecks.value = data.internalChecks || []
-
-  // *** ตัวอย่าง mock data เอาออกเมื่อเชื่อม API จริง ***
+  // mock data ตัวอย่าง (เปลี่ยนเป็นเรียก backend จริงได้)
   externalChecks.value = [
     {
-      equipmentNo: 'ตัวอย่าง 001',
-      equipmentType: 'เสื้อคะท้วง',
+      equipmentNo: 'xxxx',
+      equipmentType: 'เสื้อตะกั่ว',
       usageAge: '> 3 ปี',
       checkDate: '4/3/65',
       damageType: 'รอยหัก',
-      position: 'บ่าขวา หน้า',
-      size: '3×10 cm',
-      storageMethod: 'ไม่แขวน',
-      recorder: 'ประวัติรังสี'
+      position: 'บ่าขวาหน้า',
+      size: '-',
+      storageMethod: 'ไม้แขวน',
+      recorder: 'ประวิตร'
     }
   ]
 
   internalChecks.value = [
     {
-      equipmentNo: 'ตัวอย่าง 001',
-      equipmentType: 'เสื้อคะท้วง',
+      equipmentNo: 'xxxx',
+      equipmentType: 'เสื้อตะกั่ว',
       usageAge: '> 5 ปี',
       checkDate: '4/3/65',
-      internalFinding: 'รอยร้าวยาว',
+      internalFinding: 'รูทะลุ',
       position: 'อกหน้า',
-      size: '3×10 cm',
+      size: '3x10 cm',
       storageMethod: 'วางราบ',
-      recorder: 'ประวัติรังสี'
+      recorder: 'ประวิตร'
     }
   ]
+
+  // ถ้าเชื่อมจริงก็ใช้แบบนี้แทน
+  // const res = await fetch(`/api/f9/${id}`)
+  // const data = await res.json()
+  // record.value.frequency = data.frequency || 'ทุก 6 เดือน'
+  // externalChecks.value = data.externalChecks || []
+  // internalChecks.value = data.internalChecks || []
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ============================
-   FONT ทั้งหน้า = 11 pt
-   ============================ */
+/* FONT ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 11pt;
@@ -269,31 +307,25 @@ onMounted(async () => {
   padding: 18mm 0 14mm;
 }
 
-/* ============================
-   HEADER (แก้ตามคำสั่ง)
-   ============================ */
+/* HEADER */
 .header-main {
-  text-align: left;    /* ← ชิดซ้ายตามที่ต้องการ */
+  text-align: left;
   margin-bottom: 8mm;
 }
 
-/* คำว่า “แบบบันทึก F9...” = 11pt */
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 11pt;    /* ← ลดจาก 13pt → 11pt */
+  font-size: 11pt;
 }
 
-/* ความถี่ = 11pt และชิดซ้ายเหมือนกัน */
 .title-sub {
   margin-bottom: 2mm;
   font-size: 11pt;
   text-align: left;
 }
 
-/* ============================
-   TABLE
-   ============================ */
+/* TABLE */
 .f9-table {
   width: 100%;
   border-collapse: collapse;
@@ -311,7 +343,7 @@ onMounted(async () => {
 
 .section-title {
   font-weight: 700;
-  text-align: left;
+  text-align: left !important;
   padding-left: 3mm;
   font-size: 11pt;
 }
@@ -320,25 +352,21 @@ onMounted(async () => {
   width: 12mm;
 }
 
-.table-gap {
-  height: 8mm;
-}
-
 /* ลายเซ็น */
 .signature-block {
-  margin-top: 10mm;
-  font-size: 11pt;
+  width: 100%;
+  margin-top: 12mm;
+  text-align: right !important;
+  padding-right: 0mm !important;
 }
 
 .sig-row {
   margin-bottom: 3mm;
-  text-align: right;
-  padding-right: 20mm;
+  white-space: nowrap;
+  padding-right: 0 !important;
 }
 
-/* ============================
-   PRINT
-   ============================ */
+/* PRINT */
 @page {
   size: A4 portrait;
   margin: 10mm;
@@ -359,5 +387,16 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+
+  .section-title {
+    text-align: left !important;
+    padding-left: 3mm;
+  }
+  /* ทำให้ตัวหนังสือในแถวลำดับที่ชิดด้านบน */
+.f9-table td.row-top {
+  vertical-align: top !important;
+  padding-top: 1mm !important;
+}
+
 }
 </style>
