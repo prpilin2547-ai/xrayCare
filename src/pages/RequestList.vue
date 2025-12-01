@@ -205,6 +205,10 @@
                                         ×
                                     </button>
                                 </div>
+                                <!-- Image Preview -->
+                                <div v-if="uploadedImageData" class="image-preview-container">
+                                    <img :src="uploadedImageData" alt="Preview" class="image-preview" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -518,10 +522,10 @@ const detailStatusClass = computed(() => {
 
 // ลบรายการแจ้งซ่อม (นักรังสี) + sync ไป Engineer ผ่าน localStorage
 const deleteItem = (id) => {
-  const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
-  if (!confirmed) return
+    const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
+    if (!confirmed) return
 
-  items.value = items.value.filter((i) => i.id !== id)
+    items.value = items.value.filter((i) => i.id !== id)
 }
 </script>
 
@@ -616,9 +620,11 @@ tbody td {
 
 /* ✅ ลิงก์ "ลบ" */
 .delete-link {
-  color: #dc2626;           /* แดง */
-  text-decoration: underline;
-  cursor: pointer;          /* เมาส์เป็นรูปมือ */
+    color: #dc2626;
+    /* แดง */
+    text-decoration: underline;
+    cursor: pointer;
+    /* เมาส์เป็นรูปมือ */
 }
 
 /* ---------- style หน้ารายละเอียด ---------- */
@@ -800,5 +806,22 @@ ul.content-list li::before {
 .section-header button {
     padding: 6px 14px;
     font-size: 0.9rem;
+}
+
+/* Image Preview Styling */
+.image-preview-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.image-preview {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

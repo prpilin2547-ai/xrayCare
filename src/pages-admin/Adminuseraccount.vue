@@ -1,7 +1,7 @@
 <template>
   <MainLayout activePage="user">
     <div class="user-management-content">
-      
+
       <!-- Page Title -->
       <div class="page-title-section">
         <div class="blue-dot"></div>
@@ -49,7 +49,7 @@
                   {{ user.position }}
                 </span>
               </td>
-              
+
               <!-- 2. Password (Display / Edit Mode) -->
               <td>
                 <div class="d-flex justify-content-center align-items-center gap-2">
@@ -57,30 +57,31 @@
                   <div v-if="user.isEditing" class="d-flex align-items-center gap-2 w-100 justify-content-center">
                     <input type="text" class="table-input" v-model="user.tempPassword" placeholder="Enter new password">
                     <!-- ปุ่ม Save สีเขียว -->
-                    <i class="bi bi-check-circle-fill text-success cursor-pointer fs-5" @click="saveEdit(user)" title="Save"></i>
+                    <i class="bi bi-check-circle-fill text-success cursor-pointer fs-5" @click="saveEdit(user)"
+                      title="Save"></i>
                     <!-- ปุ่ม Cancel สีแดง -->
-                    <i class="bi bi-x-circle-fill text-danger cursor-pointer fs-5" @click="cancelEdit(user)" title="Cancel"></i>
+                    <i class="bi bi-x-circle-fill text-danger cursor-pointer fs-5" @click="cancelEdit(user)"
+                      title="Cancel"></i>
                   </div>
-                  
+
                   <!-- Mode: View -->
                   <div v-else class="d-flex align-items-center gap-2">
                     <!-- แสดงจุดไข่ปลา หรือ รหัสผ่าน ตามสถานะ showPassword -->
                     <span>{{ user.showPassword ? user.password : '••••••••••' }}</span>
                     <!-- ปุ่มเปิด/ปิดตา -->
-                    <i class="bi cursor-pointer" 
-                       :class="user.showPassword ? 'bi-eye-fill' : 'bi-eye-slash-fill'"
-                       @click="toggleVisibility(user)"></i>
+                    <i class="bi cursor-pointer" :class="user.showPassword ? 'bi-eye-fill' : 'bi-eye-slash-fill'"
+                      @click="toggleVisibility(user)"></i>
                   </div>
                 </div>
               </td>
-              
+
               <!-- 3. Action Buttons -->
               <td>
                 <i class="bi bi-pencil-fill action-icon text-dark mx-2" @click="startEdit(user)" title="Edit"></i>
                 <i class="bi bi-trash-fill action-icon text-dark mx-2" @click="deleteUser(user.id)" title="Delete"></i>
               </td>
             </tr>
-            
+
             <tr v-if="filteredUsers.length === 0">
               <td colspan="4" class="text-center py-4 text-muted">No user found.</td>
             </tr>
@@ -92,41 +93,33 @@
       <div v-if="showModal" class="modal-overlay">
         <div class="modal-card">
           <i class="bi bi-x-circle close-modal-btn" @click="closeModal"></i>
-          
+
           <h3 class="text-center fw-bold mb-4">Sign Up</h3>
-          
+
           <!-- Form -->
           <div class="mb-3">
             <label class="form-label">Username</label>
-            <input type="text" 
-                   class="form-control" 
-                   :class="{ 'is-invalid': errors.username }"
-                   v-model="newUser.username">
+            <input type="text" class="form-control" :class="{ 'is-invalid': errors.username }"
+              v-model="newUser.username">
           </div>
 
           <!-- ข้อ 2: เพิ่ม Position ในหน้า Sign Up -->
           <div class="mb-3">
             <label class="form-label">Position</label>
-            <select
-              class="form-select"
-              :class="{ 'is-invalid': errors.position }"
-              v-model="newUser.position"
-            >
+            <select class="form-select" :class="{ 'is-invalid': errors.position }" v-model="newUser.position">
               <option value="" disabled>Select Position</option>
               <option value="Admin">Admin</option>
               <option value="Radiological Technologist">Radiological Technologist</option>
               <option value="Engineer">Engineer</option>
             </select>
           </div>
-          
+
           <div class="mb-3">
             <label class="form-label">Password</label>
             <div class="input-group">
               <!-- ข้อ 3: ยังใช้ input-group เหมือนเดิม แต่เราจะซ่อนไอคอน reveal ของ browser ด้วย CSS ด้านล่าง -->
-              <input :type="newUser.showPass ? 'text' : 'password'" 
-                     class="form-control" 
-                     :class="{ 'is-invalid': errors.password }"
-                     v-model="newUser.password">
+              <input :type="newUser.showPass ? 'text' : 'password'" class="form-control"
+                :class="{ 'is-invalid': errors.password }" v-model="newUser.password">
               <!-- ไอคอนตาข้างนอก (คงไว้) -->
               <span class="input-group-text cursor-pointer" @click="newUser.showPass = !newUser.showPass">
                 <i class="bi" :class="newUser.showPass ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
@@ -137,10 +130,8 @@
           <div class="mb-4">
             <label class="form-label">Confirm Password</label>
             <div class="input-group">
-              <input :type="newUser.showConfirm ? 'text' : 'password'" 
-                     class="form-control" 
-                     :class="{ 'is-invalid': errors.confirmPassword }"
-                     v-model="newUser.confirmPassword">
+              <input :type="newUser.showConfirm ? 'text' : 'password'" class="form-control"
+                :class="{ 'is-invalid': errors.confirmPassword }" v-model="newUser.confirmPassword">
               <!-- ไอคอนตาข้างนอก (คงไว้) -->
               <span class="input-group-text cursor-pointer" @click="newUser.showConfirm = !newUser.showConfirm">
                 <i class="bi" :class="newUser.showConfirm ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
@@ -322,161 +313,176 @@ const cancelEdit = (user) => {
 <style scoped>
 /* Page Title */
 .page-title-section {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .blue-dot {
-    width: 12px;
-    height: 12px;
-    background-color: #0d6efd;
-    border-radius: 50%;
-    margin-right: 10px;
+  width: 12px;
+  height: 12px;
+  background-color: #0d6efd;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 /* Controls */
 .search-bar-container {
-    position: relative;
-    max-width: 400px;
+  position: relative;
+  max-width: 400px;
 }
 
 .btn-purple {
-    background-color: #6200EA;
-    color: white;
-    border: none;
-    transition: 0.2s;
+  background-color: #6200EA;
+  color: white;
+  border: none;
+  transition: 0.2s;
 }
+
 .btn-purple:hover {
-    background-color: #4a00b0;
-    color: white;
+  background-color: #4a00b0;
+  color: white;
 }
 
 /* Table Styles */
 .user-table {
-    background-color: white;
+  background-color: white;
 }
+
 .user-table thead th {
-    background-color: #dcdcdc;
-    border-bottom: none;
-    padding: 15px;
-    font-weight: 600;
+  background-color: #dcdcdc;
+  border-bottom: none;
+  padding: 15px;
+  font-weight: 600;
 }
+
 .user-table tbody tr {
-    background-color: #e8e8e8;
-    border-bottom: 2px solid #fff;
+  background-color: #e8e8e8;
+  border-bottom: 2px solid #fff;
 }
+
 .user-table td {
-    padding: 15px;
-    vertical-align: middle;
+  padding: 15px;
+  vertical-align: middle;
 }
 
 .table-input {
-    background: white;
-    border: 1px solid #0d6efd;
-    border-radius: 4px;
-    padding: 4px 8px;
-    width: 140px;
+  background: white;
+  border: 1px solid #0d6efd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  width: 140px;
 }
 
 /* ข้อ 1: style ของ Position badge */
 .position-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 999px;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 0.9rem;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
+
 .position-admin {
-    background-color: #6200EA; /* ม่วง */
+  background-color: #6200EA;
+  /* ม่วง */
 }
+
 .position-rt {
-    background-color: #0d6efd; /* น้ำเงิน */
+  background-color: #0d6efd;
+  /* น้ำเงิน */
 }
+
 .position-engineer {
-    background-color: #ff9800; /* ส้ม */
+  background-color: #ff9800;
+  /* ส้ม */
 }
 
 /* Icons */
 .action-icon {
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: transform 0.2s;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: transform 0.2s;
 }
+
 .action-icon:hover {
-    transform: scale(1.2);
+  transform: scale(1.2);
 }
+
 .bi-trash-fill:hover {
-    color: #dc3545 !important;
+  color: #dc3545 !important;
 }
+
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Modal Styles */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1050;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
 }
 
 .modal-card {
-    background: white;
-    padding: 35px;
-    border-radius: 15px;
-    width: 400px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    /* ข้อ 4: ขยายกล่อง Sign Up ลงล่าง (เพิ่มความสูงขั้นต่ำ) */
-    min-height: 430px;
+  background: white;
+  padding: 35px;
+  border-radius: 15px;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  /* ข้อ 4: ขยายกล่อง Sign Up ลงล่าง (เพิ่มความสูงขั้นต่ำ) */
+  min-height: 430px;
 }
 
 .close-modal-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    cursor: pointer;
-    color: #dc3545;
-    font-size: 1.5rem;
-    transition: 0.2s;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  transition: 0.2s;
 }
+
 .close-modal-btn:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .form-control.is-invalid {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5zM6 8.2a.3.3 0 00-6 0 .3.3 0 00.6 0z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right calc(0.375em + 0.1875rem) center;
-    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-    border-color: #dc3545;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5zM6 8.2a.3.3 0 00-6 0 .3.3 0 00.6 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  border-color: #dc3545;
 }
 
 .btn-create-account {
-    background-color: #4A148C;
-    color: white;
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: none;
+  background-color: #4A148C;
+  color: white;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
 }
+
 .btn-create-account:hover {
-    background-color: #38006b;
-    color: white;
+  background-color: #38006b;
+  color: white;
 }
 
 /* ข้อ 3: ซ่อนปุ่ม reveal password ที่อยู่ในกล่องฟ้าของ browser (เช่น Edge) */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
-    display: none;
+  display: none;
 }
 </style>
