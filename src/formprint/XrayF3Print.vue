@@ -26,16 +26,20 @@
             แบบบันทึก F3 : การควบคุมคุณภาพจอภาพ (Display monitor)
           </div>
           <div class="title-sub">
-            ความถี่ : ทุก 3 เดือน (หรือ 1 เดือน)
+          <span class="bold-text">ความถี่ :</span>
+            ทุก 3 เดือน (หรือ 1 เดือน)
           </div>
+
         </div>
 
         <!-- ตารางหลัก -->
         <table class="f3-table">
           <tbody>
-            <!-- วันที่ -->
             <tr>
-              <td class="label-col">วันที่</td>
+              <td class="label-col right-label">
+                <span class="bold-text">วันที่</span>
+              </td>
+
               <td colspan="4" class="value-cell">
                 {{ record.date }}
               </td>
@@ -43,11 +47,15 @@
 
             <!-- ผู้ทดสอบ -->
             <tr>
-              <td class="label-col">ผู้ทดสอบ</td>
+              <td class="label-col right-label">
+                <span class="bold-text">ผู้ทดสอบ</span>
+              </td>
+  
               <td colspan="4" class="value-cell">
                 {{ record.tester }}
               </td>
             </tr>
+
 
             <!-- Pass / Fail (ตัวหนา) -->
             <tr>
@@ -379,5 +387,9 @@ function handlePrint () {
     width: auto;
     min-height: auto;
   }
+  .right-label {
+  text-align: right !important;
+  padding-right: 3mm !important; /* เล็กน้อยให้สวยงาม */
+}
 }
 </style>

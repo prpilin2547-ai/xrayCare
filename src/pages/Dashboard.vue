@@ -316,11 +316,11 @@ const MONTHLY_TASKS_MAP = {
   ]
 };
 
-/* daily tasks */
+/* รายการที่ไม่ได้ทำของ Daily Check */
 const dailySpecialTasks = [
-  "-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์",
-  "-การลบแผ่นเพลท (Erasure of Imaging Plate)"
+  '- X-ray shimazu รุ่น AAA ห้อง 1'
 ];
+
 
 const dateKey = (date) => {
   const y = date.getFullYear();
@@ -469,7 +469,7 @@ const popupFrequency = computed(() => {
 });
 
 const popupSectionTitle = computed(() => {
-  if (isDailySpecial.value) return "รายการที่ยังไม่ได้ทำ";
+  if (isDailySpecial.value) return "รายการเครื่องที่ยังไม่ได้ทำ";
   if (popupTasks.value.length) return "รายละเอียด";
   return "";
 });

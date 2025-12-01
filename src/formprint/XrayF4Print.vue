@@ -30,8 +30,9 @@
           </div>
 
           <div class="title-sub">
-            ความถี่ : ทุก 3 เดือน
+            <span class="bold-text">ความถี่ :</span> ทุก 3 เดือน
           </div>
+
 
           <div class="title-sub header-row-inline">
             เครื่องเอกซเรย์ยี่ห้อ
@@ -52,13 +53,22 @@
         <!-- ================= ตารางตรวจสอบ ================= -->
         <table class="f4-table">
           <thead>
-            <tr>
-              <th class="col-no">ลำดับที่</th>
-              <th class="col-desc">รายการตรวจสอบ</th>
-              <th class="col-result">ผ่าน (✓)<br />
-                ไม่ผ่าน(✗)</th>
-              <th class="col-remark">หมายเหตุ</th>
-            </tr>
+            <th class="col-no">
+              <span class="bold-text">ลำดับที่</span>
+            </th>
+
+            <th class="col-desc">
+              <span class="bold-text">รายการตรวจสอบ</span>
+            </th>
+
+            <th class="col-result">
+              <span class="bold-text">ผ่าน (✓) / ไม่ผ่าน (✗)</span>
+            </th>
+
+            <th class="col-remark">
+              <span class="bold-text">หมายเหตุ</span>
+            </th>
+
           </thead>
 
           <tbody>

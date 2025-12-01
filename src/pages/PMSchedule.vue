@@ -171,7 +171,7 @@
 
                   <!-- กรณีพิเศษ Daily -->
                   <template v-if="isDailySpecial">
-                    <p class="fw-bold mb-1">รายการที่ยังไม่ได้ทำ</p>
+                    <p class="fw-bold mb-1">รายการเครื่องที่ยังไม่ได้ทำ</p>
                     <ul class="mb-0 popup-list">
                       <li v-for="(task, idx) in dayTasks" :key="idx">
                         <span class="task-text">{{ task }}</span>
@@ -549,9 +549,9 @@ const dayPopupDateText = computed(() => {
 
 /* รายการที่ไม่ได้ทำของ Daily Check */
 const dailySpecialTasks = [
-  '-การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
-  '-การลบแผ่นเพลท (Erasure of Imaging Plate)'
+  '- X-ray shimazu รุ่น AAA ห้อง 1'
 ]
+
 
 /* รวมรายการของวันนั้น */
 const dayTasks = computed(() => {
