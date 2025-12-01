@@ -3,18 +3,18 @@
     <!-- ปุ่ม Print (จะไม่แสดงตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
+        </svg>
+        Print
+      </button>
     </div>
 
     <!-- แผ่น A4 -->
@@ -33,37 +33,32 @@
         <!-- ตารางหลัก -->
         <table class="f3-table">
           <tbody>
-            <!-- แถวว่างด้านบน (ตามแบบฟอร์ม) -->
-            <tr>
-              <td colspan="4" class="empty-row">&nbsp;</td>
-            </tr>
-
             <!-- วันที่ -->
             <tr>
               <td class="label-col">วันที่</td>
-              <td colspan="3" class="value-cell">
-                <span class="underline">{{ record.date }}</span>
+              <td colspan="4" class="value-cell">
+                {{ record.date }}
               </td>
             </tr>
 
             <!-- ผู้ทดสอบ -->
             <tr>
               <td class="label-col">ผู้ทดสอบ</td>
-              <td colspan="3" class="value-cell">
-                <span class="underline">{{ record.tester }}</span>
+              <td colspan="4" class="value-cell">
+                {{ record.tester }}
               </td>
             </tr>
 
-            <!-- Pass / Fail -->
+            <!-- Pass / Fail (ตัวหนา) -->
             <tr>
-              <td colspan="4" class="center-cell">
+              <td colspan="5" class="center-cell bold-text">
                 Pass (P) / Fail (F)
               </td>
             </tr>
 
             <!-- กลุ่ม : คุณภาพของภาพพิมพ์โดยทั่วไป -->
             <tr>
-              <td colspan="4" class="section-title">
+              <td colspan="5" class="section-title">
                 คุณภาพของภาพพิมพ์โดยทั่วไป
               </td>
             </tr>
@@ -73,11 +68,12 @@
               <td class="check-cell"></td>
               <td class="check-cell"></td>
               <td class="check-cell"></td>
+              <td class="check-cell"></td>
             </tr>
 
-            <!-- ความชัดเจนทั่วไป -->
+            <!-- ความบิดเบือนทั่วไป -->
             <tr>
-              <td colspan="4" class="section-title">
+              <td colspan="5" class="section-title">
                 ความบิดเบือนทั่วไป
               </td>
             </tr>
@@ -87,25 +83,52 @@
               <td class="check-cell"></td>
               <td class="check-cell"></td>
               <td class="check-cell"></td>
+              <td class="check-cell"></td>
             </tr>
 
-            <!-- ความสว่างสว่าง (Luminance) -->
+            <!-- ความส่องสว่าง (Luminance) -->
+<tr>
+  <td colspan="5" class="section-title">
+    ความส่องสว่าง (Luminance)
+  </td>
+</tr>
+
+<!-- แถว 1: กรอบที่มีระดับสีเทาวางซ้อนกัน -->
+<tr>
+  <td class="label-col">กรอบที่มีระดับสีเทาวางซ้อนกัน</td>
+  <td class="check-cell"></td>
+  <td class="check-cell"></td>
+  <td class="check-cell"></td>
+  <td class="check-cell"></td>
+</tr>
+
+<!-- แถว 2–3: กรอบสีเทา 5% + 0% (ผสานช่องว่างด้านขวาทั้ง 4 ช่อง) -->
+<tr>
+  <td class="label-col">กรอบสีเทา 5% มองเห็นในพื้น</td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+</tr>
+<tr>
+  <td class="label-col">กรอบสีเทา 0%</td>
+</tr>
+
+<!-- แถว 4–5: กรอบสีเทา 95% + 100% (ผสานช่องว่างด้านขวาทั้ง 4 ช่อง) -->
+<tr>
+  <td class="label-col">กรอบสีเทา 95% มองเห็นในพื้น</td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+  <td class="check-cell" rowspan="2"></td>
+</tr>
+<tr>
+  <td class="label-col">กรอบสีเทา 100%</td>
+</tr>
+
+            <!-- กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้ -->
             <tr>
-              <td colspan="4" class="section-title">
-                ความส่องสว่าง (Luminance)
-              </td>
-            </tr>
-
-            <tr v-for="(item, idx) in luminanceRows" :key="'lu-' + idx">
-              <td class="label-col">{{ item }}</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-            </tr>
-
-            <!-- กลุ่มจุดควบคุมมาตรฐานขนาดเล็กจุดมองเห็นได้ -->
-            <tr>
-              <td colspan="4" class="section-title">
+              <td colspan="5" class="section-title">
                 กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้ (ในมุมทั้ง 4 และตรงกลางของภาพ)
               </td>
             </tr>
@@ -115,11 +138,12 @@
               <td class="check-cell"></td>
               <td class="check-cell"></td>
               <td class="check-cell"></td>
+              <td class="check-cell"></td>
             </tr>
 
             <!-- จำนวนตัวอักษรที่มองเห็น -->
             <tr>
-              <td colspan="4" class="section-title">
+              <td colspan="5" class="section-title">
                 จำนวนตัวอักษรที่มองเห็น (อย่างน้อย 11 ตัว หรืออ่านได้ถึง “QUALITY CONT”)
               </td>
             </tr>
@@ -129,24 +153,30 @@
               <td class="check-cell"></td>
               <td class="check-cell"></td>
               <td class="check-cell"></td>
-            </tr>
-
-            <!-- ลูกศรชี้ของเครื่องพิมพ์ -->
-            <tr>
-              <td class="label-col">ลูกกลิ้งของเครื่องพิมพ์</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
               <td class="check-cell"></td>
             </tr>
 
-        
-            <!-- ข้อคิดเห็น -->
+            <!-- ลูกกลิ้งของเครื่องพิมพ์ (ผสานเซลล์ + ชิดซ้าย + ตัวหนา) -->
             <tr>
-              <td class="label-col">ข้อคิดเห็น</td>
-              <td colspan="3" class="value-cell">
-                <span class="underline">
-                  {{ record.comment }}
-                </span>
+              <td colspan="5" class="merged-left">
+                ลูกกลิ้งของเครื่องพิมพ์
+              </td>
+            </tr>
+
+            <!-- ทำความสะอาด (ถ้าจำเป็น) -->
+            <tr>
+              <td class="label-col">ทำความสะอาด (ถ้าจำเป็น)</td>
+              <td class="check-cell"></td>
+              <td class="check-cell"></td>
+              <td class="check-cell"></td>
+              <td class="check-cell"></td>
+            </tr>
+
+            <!-- ข้อคิดเห็น (ผสานเซลล์ + ชิดซ้าย + ตัวหนาแค่ label) -->
+            <tr>
+              <td colspan="5" class="merged-left">
+                <span class="bold-text">ข้อคิดเห็น</span><br />
+                {{ record.comment }}
               </td>
             </tr>
           </tbody>
@@ -164,62 +194,44 @@ const route = useRoute()
 
 // ข้อมูลที่ดึงมาจากการบันทึกจริง
 const record = ref({
-  date: '...............',
-  tester: '........................',
-  result: '........................................',
+  date: '',
+  tester: '',
+  result: '',
   comment: ''
 })
 
 // แถวข้อความในแต่ละกลุ่ม (ตามฟอร์ม)
 const printQualityRows = [
-  'ภาพไม่มีเลือนเบลอ (Smear)',
-  'ไม่มีสีเข้มปลายแฉก',
-  'ภาพลำดับขั้น (ramp) แบบต่อเนื่อง'
+  'ภาพไม่มีลายเปื้อน (Smear)',
+  'ไม่มีสิ่งแปลกปลอม',
+  'ภาพลดหลั่น (ramp) แบบต่อเนื่อง'
 ]
 
 const clarityRows = [
   'เส้นตรงต่อเนื่อง',
-  'กรอบหรือช่องเป็นสีเทาสม่ำเสมอ'
-]
-
-const luminanceRows = [
-  'กรอบที่มีระดับสีเทาทาวซ้อนกัน',
-  'กรอบสีเทา 5% มองเห็นเป็นขั้น',
-  'กรอบสีเทา 0%',
-  'กรอบสีเทา 95% มองเห็นเป็นขั้น',
-  'กรอบสีเทา 100%'
+  'กรอบหรือช่องเป็นสี่เหลี่ยม'
 ]
 
 const smallGroupRows = [
-  'กลุ่มจุดเล็กมุมบนขวา',
-  'กลุ่มจุดเล็กมุมบนซ้าย',
-  'กลุ่มจุดเล็กกลางภาพ'
+  'กลุ่มเส้นคู่แนวนอน',
+  'กลุ่มเส้นคู่แนวตั้ง'
 ]
 
 const textRows = [
   'ในพื้นที่มืด (Dark)',
-  'ในพื้นที่ที่มีค่าระดับกลาง (Mid-grey)',
+  'ในพื้นที่สีเทาระดับกลาง (Mid-grey)',
   'ในพื้นที่สว่าง (Light)'
 ]
 
 // โหลดข้อมูลจาก backend ตาม id
 onMounted(async () => {
   const id = route.params.id
-
-  // ตัวอย่าง (แก้ URL / โครง JSON ให้ตรงกับระบบจริงของคุณ)
   // const res = await fetch(`/api/f3/${id}`)
   // const data = await res.json()
-  //
-  // record.value = {
-  //   date: data.date,
-  //   tester: data.tester,
-  //   result: data.result,
-  //   comment: data.comment
-  // }
+  // record.value = { ... }
 })
 
 function handlePrint () {
-  // เปิด dialog print ของ browser (Chrome/Edge) = popup พิมพ์
   window.print()
 }
 </script>
@@ -227,20 +239,21 @@ function handlePrint () {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ใช้ TH Sarabun ทั้งหน้า */
+/* ตั้งค่าฟอนต์มาตรฐานทั้งหน้า = 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;   
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -253,7 +266,7 @@ function handlePrint () {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt !important;
 }
 
 /* A4 */
@@ -269,7 +282,6 @@ function handlePrint () {
 .sheet-inner {
   width: 185mm;
   padding: 15mm 0 15mm;
-  font-size: 14pt;
 }
 
 /* Header */
@@ -277,47 +289,54 @@ function handlePrint () {
   margin-bottom: 6mm;
 }
 
+/* ★ title-main = 13pt ตามที่ต้องการ */
 .title-main {
   font-weight: 700;
-  font-size: 18pt;
+  font-size: 13pt !important; 
   margin-bottom: 2mm;
 }
 
+/* บรรทัดรอง → 11pt */
 .title-sub {
-  font-size: 14pt;
+  font-size: 11pt !important;
 }
 
-/* ตารางฟอร์ม */
+/* ตาราง */
 .f3-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
+  font-size: 11pt !important;
 }
 
 .f3-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 2mm;
   vertical-align: middle;
-}
-
-.empty-row {
-  height: 8mm;
+  font-size: 11pt !important;
 }
 
 .label-col {
-  width: 70mm;
+  width: 65mm;
 }
 
 .check-cell {
-  width: 30mm;
+  width: 25mm; /* ให้ 4 คอลัมน์ว่างมีขนาดใกล้เคียงกัน */
 }
 
 .center-cell {
   text-align: center;
 }
 
+/* หัวกลุ่มทุกอัน: ตัวหนา + ชิดซ้าย + ชิดขอบตาราง */
 .section-title {
+  font-weight: 700;
+  text-align: left;
+  padding-left: 2mm;
+}
+
+/* ตัวหนา */
+.bold-text {
   font-weight: 700;
 }
 
@@ -326,12 +345,22 @@ function handlePrint () {
   text-align: left;
 }
 
+/* ผสานเซลล์และชิดซ้าย (ลูกกลิ้ง/ข้อคิดเห็น) */
+.merged-left {
+  font-weight: 700;
+  text-align: left !important;
+  padding-left: 2mm !important;
+  border: 0.4pt solid #000;
+}
+
 .underline {
   display: inline-block;
   border-bottom: 0.4pt solid #000;
   min-width: 50mm;
   min-height: 6mm;
 }
+
+/* Print */
 @page {
   size: A4 portrait;
   margin: 10mm;

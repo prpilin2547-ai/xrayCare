@@ -47,8 +47,8 @@
             <span></span>
           </div>
 
-          <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ -->
-          <div class="meta-row meta-row-grid">
+          <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ / จังหวัด (อยู่บรรทัดเดียวกัน) -->
+          <div class="meta-row meta-row-grid-4">
             <span class="meta-label">หน่วยงาน</span>
             <span class="underline mid">{{ record.department }}</span>
 
@@ -56,19 +56,10 @@
             <span class="underline short-narrow">{{ record.location }}</span>
 
             <span class="meta-label">อำเภอ</span>
-            <span class="underline short">{{ record.district }}</span>
-          </div>
-
-          <!-- แถว 2.1 : จังหวัด (ให้อยู่คอลัมน์เดียวกับตำบล) -->
-          <div class="meta-row meta-row-grid">
-            <span></span>
-            <span></span>
+            <span class="underline short-narrow">{{ record.district }}</span>
 
             <span class="meta-label">จังหวัด</span>
             <span class="underline short">{{ record.province }}</span>
-
-            <span></span>
-            <span></span>
           </div>
 
           <!-- แถว 3 : เครื่องเอกซเรย์ / Model / S/N -->
@@ -100,11 +91,8 @@
             <span class="meta-label">Application</span>
             <span class="underline long">{{ record.application }}</span>
 
-            <span></span>
-            <span></span>
-
-            <span></span>
-            <span></span>
+            <span></span><span></span>
+            <span></span><span></span>
           </div>
 
           <!-- แถว 6 : Calibration -->
@@ -112,51 +100,40 @@
             <span class="meta-label">Calibration</span>
             <span class="underline long">{{ record.calibration }}</span>
 
-            <span></span>
-            <span></span>
-
-            <span></span>
-            <span></span>
+            <span></span><span></span>
+            <span></span><span></span>
           </div>
         </div>
 
-        <!-- ตารางค่าความสว่าง -->
+        <!-- ตารางค่าความสว่าง (เหมือน PDF ต้นฉบับ) -->
         <table class="f10-table">
           <thead>
             <tr>
-              <th class="col-run" rowspan="2">ครั้งที่</th>
-              <th class="col-illum-group" colspan="5">
-                ความสว่างแสงไฟ (IAV)
-              </th>
-              <th class="col-bg" rowspan="2">
-                Background (I<sub>BG</sub>)
-              </th>
-            </tr>
-            <tr>
-              <th v-for="p in 5" :key="'head-point-' + p" class="col-point">
-                จุดที่ {{ p }}
-              </th>
+              <th class="col-run">ครั้งที่</th>
+              <th class="col-iav">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
+              <th class="col-bg">Background (I<sub>BG</sub>)</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(run, rIndex) in record.runs" :key="'run-' + rIndex">
-              <td class="col-run">
-                {{ run.runNo || rIndex + 1 }}
-              </td>
-
-              <td
-                v-for="(val, pIndex) in run.points"
-                :key="'run-' + rIndex + '-p-' + pIndex"
-                class="col-point"
-              >
-                {{ val }}
-              </td>
-
-              <td class="col-bg">
-                {{ run.background }}
-              </td>
-            </tr>
+            <!-- 1 ครั้ง = 3 แถวย่อย / ช่อง “ครั้งที่” รวม 3 แถว -->
+            <template v-for="(run, rIndex) in record.runs" :key="'run-' + rIndex">
+              <tr>
+                <td class="col-run run-number" rowspan="3">
+                  {{ run.runNo || rIndex + 1 }}
+                </td>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+              <tr>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+              <tr>
+                <td class="col-iav"></td>
+                <td class="col-bg"></td>
+              </tr>
+            </template>
           </tbody>
         </table>
 
@@ -220,9 +197,9 @@ const record = ref({
   application: '',
   calibration: '',
   runs: [
-    { runNo: 1, points: ['', '', '', '', ''], background: '' },
-    { runNo: 2, points: ['', '', '', '', ''], background: '' },
-    { runNo: 3, points: ['', '', '', '', ''], background: '' }
+    { runNo: 1 },
+    { runNo: 2 },
+    { runNo: 3 }
   ],
   iav: '',
   ibg: '',
@@ -246,10 +223,14 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
+/* ===== พื้นหลัง & ปุ่ม ===== */
 .print-root {
   background: #e5e7eb;
   min-height: 100vh;
@@ -269,9 +250,10 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt;
 }
 
+/* ===== แผ่น A4 ===== */
 .sheet-a4 {
   width: 210mm;
   min-height: 297mm;
@@ -284,46 +266,52 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
 }
 
-/* หัวฟอร์ม – ชิดซ้าย + ระยะห่างเท่ากับ meta-row */
+/* ===== HEADER & META ให้เว้นบรรทัดเท่ากัน ===== */
 .header-main {
   text-align: left;
-  margin-bottom: 3mm;   /* ระยะระหว่าง "ความถี่" กับ "วันที่" */
+  margin-bottom: 0;
 }
 
 .title-main {
   font-weight: 700;
-  margin-bottom: 3mm;   /* ระหว่างแบบบันทึกกับความถี่ เท่ากับ meta-row */
-  font-size: 18pt;
+  font-size: 13pt;
+  margin-bottom: 3mm;
 }
 
 .title-sub {
-  font-size: 16pt;
+  font-size: 11pt;
+  margin-bottom: 3mm;
 }
 
-/* meta block */
 .meta-block {
   margin-left: 0;
   margin-bottom: 6mm;
-  font-size: 14pt;
 }
 
-/* ใช้ grid 3 คู่ label+line -> 6 คอลัมน์ */
+.meta-row {
+  margin-bottom: 3mm;
+}
+
 .meta-row-grid {
   display: grid;
   grid-template-columns: auto 1fr auto 1fr auto 1fr;
   column-gap: 3mm;
   align-items: flex-end;
-  margin-bottom: 3mm;   /* ✅ เว้นบรรทัดเท่ากันทุก meta-row */
+}
+
+.meta-row-grid-4 {
+  display: grid;
+  grid-template-columns: auto 1fr auto 18mm auto 18mm auto 25mm;
+  column-gap: 3mm;
+  align-items: flex-end;
 }
 
 .meta-label {
   white-space: nowrap;
 }
 
-/* เส้นสำหรับกรอก */
 .underline {
   border-bottom: 0.4pt solid #000;
   min-height: 6mm;
@@ -331,30 +319,16 @@ onMounted(async () => {
   display: inline-block;
 }
 
-/* ความยาวพื้นฐาน */
-.long {
-  min-width: 40mm;
-}
+.long { min-width: 40mm; }
+.mid  { min-width: 40mm; }
+.short { min-width: 20mm; }
+.short-narrow { min-width: 5mm; }
 
-.mid {
-  min-width: 30mm;
-}
-
-.short {
-  min-width: 20mm;
-}
-
-/* ลดความยาวเฉพาะ ตำบล / Model / รุ่น ให้ 3 คำอยู่บรรทัดเดียว */
-.short-narrow {
-  min-width: 5mm;
-}
-
-/* ตาราง F10 */
+/* ===== ตาราง F10 ===== */
 .f10-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
   margin-bottom: 10mm;
 }
 
@@ -362,31 +336,24 @@ onMounted(async () => {
 .f10-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 1mm;
+  text-align: center;
   vertical-align: middle;
-  text-align: center;
 }
 
-.col-run {
-  width: 18mm;
+/* ความกว้างคอลัมน์ให้เหมือนฟอร์ม */
+.col-run { width: 20mm; }
+.col-iav { width: 110mm; }
+.col-bg  { width: 35mm; }
+
+/* ให้เลข 1/2/3 อยู่ด้านบนของช่องเหมือน PDF */
+.run-number {
+  vertical-align: top;
 }
 
-.col-illum-group {
-  text-align: center;
-}
-
-.col-point {
-  width: 20mm;
-}
-
-.col-bg {
-  width: 26mm;
-}
-
-/* block ค่าคำนวณ */
+/* ===== block ค่าคำนวณ ===== */
 .formula-block {
   margin-left: 10mm;
   margin-bottom: 10mm;
-  font-size: 14pt;
 }
 
 .formula-row {
@@ -407,23 +374,21 @@ onMounted(async () => {
   display: inline-block;
 }
 
-/* ลายเซ็น */
+/* ===== ลายเซ็น ===== */
 .signature-block {
   margin-top: 10mm;
   text-align: right;
-  font-size: 14pt;
 }
 
 .sig-row {
   margin-bottom: 3mm;
 }
 
-/* ขยับวงเล็บให้ "(" ตรงกับ "อ." ของคำว่า "ชื่อ" (ปรับตาม preview ได้) */
 .sig-row-parenthesis {
   text-indent: 3mm;
 }
 
-/* สไตล์ตอนพิมพ์ */
+/* ===== PRINT ===== */
 @page {
   size: A4 portrait;
   margin: 10mm;

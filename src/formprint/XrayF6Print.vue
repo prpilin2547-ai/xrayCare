@@ -4,18 +4,18 @@
     <!-- ปุ่ม Print (จะถูกซ่อนตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      style="margin-right:6px;"
-    >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-    </svg>
-      Print
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
+      </svg>
+        Print
+      </button>
     </div>
 
     <!-- กระดาษ A4 -->
@@ -32,72 +32,84 @@
           </div>
         </div>
 
-        <!-- กล่องข้อมูลระบบ CR / DR -->
-        <div class="info-box">
-          <div class="info-row">
-            ข้อมูลสำหรับระบบ CR / DR
-          </div>
-          <div class="info-row">
-            หมายเลขสถานีของระบบ CR / DR :
-            <span class="underline long">
-              {{ record.stationNo }}
-            </span>
-          </div>
-          <div class="info-row">
-            หมายเลขแผ่นรับภาพของระบบ CR / DR :
-            <span class="underline long">
-              {{ record.plateNo }}
-            </span>
-          </div>
-        </div>
-
-        <!-- กล่องข้อมูลห้องเอกซเรย์ + Baseline -->
-        <div class="info-box">
-          <div class="info-row">
-            ข้อมูลด้านห้องเอกซเรย์
-          </div>
-          <div class="info-row">
-            ชื่อห้อง :
-            <span class="underline mid">
-              {{ record.roomName }}
-            </span>
-            ชั้น :
-            <span class="underline short">
-              {{ record.floor }}
-            </span>
-            หมายเลขเครื่อง :
-            <span class="underline short">
-              {{ record.machineNo }}
-            </span>
-          </div>
-
-          <div class="info-row">
-            ขอบเขต :
-            ค่าความคลาดเคลื่อนจากค่าอ้างอิงพื้นฐาน (Baseline)
-            ต้องไม่เกิน ± 10%
-          </div>
-
-          <div class="info-row">
-            ข้อมูล EI เบื้องต้น :
-            ระบุค่าดัชนีปริมาณรังสีที่ใช้ เช่น S#, LgM, EI คือ
-            <span class="underline short">
-              {{ record.eiType }}
-            </span>
-          </div>
-        </div>
-
-        <!-- ================= ตารางหลัก (EI) ================= -->
+        <!-- ================= ตารางเดียวครอบทุกส่วน ================= -->
         <table class="f6-table">
-          <thead>
+          <tbody>
+            <!-- กลุ่ม: ข้อมูลระบบ CR/DR -->
+            <tr class="section-header">
+              <td colspan="5" class="align-left">
+                ข้อมูลสำหรับระบบ CR / DR
+              </td>
+            </tr>
             <tr>
+              <td colspan="5" class="align-left">
+                หมายเลขคาสเซท CR / DR :
+                <span class="underline long">
+                  {{ record.stationNo }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" class="align-left">
+                หมายเลขเครื่องอ่าน CR / DR :
+                <span class="underline long">
+                  {{ record.plateNo }}
+                </span>
+              </td>
+            </tr>
+
+            <!-- กลุ่ม: ข้อมูลเครื่องเอกซเรย์ -->
+            <tr class="section-header">
+              <td colspan="5" class="align-left">
+                ข้อมูลเครื่องเอกซเรย์
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" class="align-left">
+                ยี่ห้อ :
+                <span class="underline mid">
+                  {{ record.roomName }}
+                </span>
+                รุ่น :
+                <span class="underline short">
+                  {{ record.floor }}
+                </span>
+                หมายเลขเครื่อง :
+                <span class="underline short">
+                  {{ record.machineNo }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" class="align-left">
+                ขอบเขต
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" class="align-left">
+                ค่าแตกต่างจากค่าอ้างอิงพื้นฐาน (Baseline) น้อยกว่า ± 10%
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" class="align-left">
+                ข้อมูลเบื้องต้น :
+                ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ
+                <span class="underline short">
+                  {{ record.eiType }}
+                </span>
+              </td>
+            </tr>
+
+            <!-- หัวตาราง EI -->
+            <tr class="ei-header">
               <th class="col-date">วันที่ทำการทดสอบ</th>
               <th class="col-center">EI (จากภาพ)</th>
               <th class="col-center">EI จากเครื่อง</th>
               <th class="col-center">EI อ้างอิงเบื้องต้น (P/F)</th>
               <th class="col-comment">ข้อคิดเห็น</th>
             </tr>
-          </thead>
-          <tbody>
+
+            <!-- แถว EI -->
             <tr
               v-for="(row, idx) in record.eiRows"
               :key="'ei-row-' + idx"
@@ -118,37 +130,44 @@
                 {{ row.remark || '' }}
               </td>
             </tr>
+
+            <!-- กลุ่ม: ปริมาณรังสีที่ใช้สำหรับการทดสอบ -->
+            <tr class="section-header">
+              <td colspan="5" class="align-left">
+                ปริมาณรังสีที่ใช้สำหรับการทดสอบ
+                (กรณีศูนย์วิทยาศาสตร์การแพทย์ ดำเนินการวัดให้พร้อมตรวจมาตรฐานเครื่องเอกซเรย์ประจำปี)
+              </td>
+            </tr>
+
+            <!-- เทคนิคการถ่ายภาพ -->
+            <tr>
+              <td class="align-left">
+                เทคนิคการถ่ายภาพ
+              </td>
+              <td class="align-left" colspan="4">
+                {{ record.technique || '' }}
+              </td>
+            </tr>
+
+            <!-- kV / mAs / Dose -->
+            <tr>
+              <td></td>
+              <td>
+                kV<br />
+                {{ record.kv || '' }}
+              </td>
+              <td>
+                mAs<br />
+                {{ record.mas || '' }}
+              </td>
+              <td>
+                Dose (mGy)<br />
+                {{ record.dose || '' }}
+              </td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
-
-        <!-- ================= ตารางเทคนิคการถ่ายภาพ ================= -->
-        <div class="exposure-block">
-          <div class="info-row">
-            ปริมาณรังสีที่ใช้สำหรับการทดสอบ
-            (กรณีมีผู้ป่วยทดแทนมาตรฐาน หรือใช้แฟนท่อมมาตรฐาน)
-          </div>
-
-          <table class="expo-table">
-            <thead>
-              <tr>
-                <th>เทคนิคการถ่ายภาพ</th>
-                <th>kV</th>
-                <th>mAs</th>
-                <th>Dose (mGy)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="align-left">
-                  {{ record.technique || '' }}
-                </td>
-                <td>{{ record.kv || '' }}</td>
-                <td>{{ record.mas || '' }}</td>
-                <td>{{ record.dose || '' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
         <!-- ================= ลายเซ็น ================= -->
         <div class="signature-block">
@@ -187,7 +206,7 @@ const record = ref({
   // ข้อมูล EI
   eiType: '',
 
-  // ตาราง EI (อย่างน้อย 3–5 แถว)
+  // ตาราง EI
   eiRows: [
     { date: '', eiImage: '', eiConsole: '', eiBaseline: '', remark: '' },
     { date: '', eiImage: '', eiConsole: '', eiBaseline: '', remark: '' },
@@ -205,50 +224,36 @@ const record = ref({
 })
 
 function handlePrint () {
-  // เปิด dialog พิมพ์ของเบราว์เซอร์ (Google Chrome / Edge)
   window.print()
 }
 
-// ดึงข้อมูลจากฐาน ตาม id ที่ส่งมาใน URL
 onMounted(async () => {
   const id = route.params.id
-
-  // 🔁 ตัวอย่างการดึงข้อมูล — ปรับ URL / โครง JSON ให้ตรงกับ backend ของคุณ
+  // ดึงข้อมูลจริงจาก backend ถ้ามี
   // const res = await fetch(`/api/print/f6/${id}`)
   // const data = await res.json()
-  // record.value = {
-  //   stationNo: data.stationNo,
-  //   plateNo: data.plateNo,
-  //   roomName: data.roomName,
-  //   floor: data.floor,
-  //   machineNo: data.machineNo,
-  //   eiType: data.eiType,
-  //   eiRows: data.eiRows,
-  //   technique: data.technique,
-  //   kv: data.kv,
-  //   mas: data.mas,
-  //   dose: data.dose,
-  //   testerName: data.testerName
-  // }
+  // record.value = {...data}
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
+/* ฟอนต์ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt !important;
+  font-weight: 400;
 }
 
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -261,7 +266,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11pt !important;
 }
 
 /* กระดาษ A4 */
@@ -277,35 +282,25 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 14pt;
+  font-size: 11pt !important;
 }
 
-/* หัวฟอร์ม */
+/* หัวฟอร์ม – ชิดซ้าย */
 .header-main {
-  text-align: center;
+  text-align: left;
   margin-bottom: 8mm;
 }
 
+/* title-main = 13 pt เท่านั้น */
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 18pt;
+  font-size: 13pt !important;
 }
 
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 16pt;
-}
-
-/* กล่องข้อมูล */
-.info-box {
-  border: 0.4pt solid #000;
-  padding: 3mm 4mm;
-  margin-bottom: 4mm;
-}
-
-.info-row {
-  margin-bottom: 2mm;
+  font-size: 11pt !important;
 }
 
 /* เส้นกรอกข้อมูล */
@@ -314,25 +309,19 @@ onMounted(async () => {
   min-height: 6mm;
   padding: 0 2mm;
   display: inline-block;
+  font-size: 11pt !important;
 }
 
-.long {
-  min-width: 70mm;
-}
-.mid {
-  min-width: 40mm;
-}
-.short {
-  min-width: 25mm;
-}
+.long { min-width: 70mm; }
+.mid  { min-width: 40mm; }
+.short{ min-width: 25mm; }
 
-/* ตาราง EI */
+/* ตารางหลัก (ทุกอย่างอยู่ในตารางเดียว) */
 .f6-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13pt;
-  margin-top: 4mm;
+  font-size: 11pt !important;
 }
 
 .f6-table th,
@@ -341,53 +330,39 @@ onMounted(async () => {
   padding: 2mm 1mm;
   vertical-align: middle;
   text-align: center;
+  font-size: 11pt !important;
 }
 
-.col-date {
-  width: 32mm;
-}
-
-.col-center {
-  width: 28mm;
-}
-
-.col-comment {
-  width: auto;
-}
+.col-date { width: 32mm; }
+.col-center { width: 28mm; }
+.col-comment { width: auto; }
 
 .align-left {
   text-align: left;
 }
 
-/* ตารางเทคนิคการถ่ายภาพ */
-.exposure-block {
-  margin-top: 6mm;
+/* แถวหัวข้อแต่ละกลุ่ม */
+.section-header td {
+  font-weight: 700;
+  background: #f3f4f6;
 }
 
-.expo-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 13pt;
-  margin-top: 2mm;
+/* แถวหัวตาราง EI */
+.ei-header th {
+  font-weight: 700;
+  background: #e5e7eb;
 }
 
-.expo-table th,
-.expo-table td {
-  border: 0.4pt solid #000;
-  padding: 2mm 1mm;
-  text-align: center;
-}
-
-/* ลายเซ็น */
+/* ลายเซ็น – ชิดขอบขวาให้ตรงกับขอบตาราง */
 .signature-block {
   margin-top: 12mm;
-  text-align: center;
-  font-size: 14pt;
+  text-align: right;
+  font-size: 11pt !important;
 }
 
 .sig-line {
   margin-bottom: 3mm;
+  font-size: 11pt !important;
 }
 
 /* การพิมพ์ */
@@ -397,19 +372,8 @@ onMounted(async () => {
 }
 
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #fff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
+  .print-toolbar { display: none; }
+  .print-root { background: #fff; padding: 0; }
+  .sheet-a4 { box-shadow: none; width: auto; min-height: auto; }
 }
 </style>

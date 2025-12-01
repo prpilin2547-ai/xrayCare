@@ -4,19 +4,20 @@
     <!-- ปุ่ม Print (จะถูกซ่อนตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        style="margin-right:6px;"
-      >
-      <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
-      </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          style="margin-right:6px;"
+        >
+          <path
+            d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"
+          />
+        </svg>
         Print
-    </button>
-
+      </button>
     </div>
 
     <!-- กระดาษ A4 -->
@@ -37,26 +38,31 @@
                 บริเวณฉายรังสี
               </th>
               <th class="col-small">
-                ค่าความต่างศักย์<br />
+                ค่าความต่าง<br />
+                ศักย์<br />
                 (kV)
               </th>
               <th class="col-small">
                 ค่ากระแสไฟฟ้า<br />
-                กับเวลา (mAs)
+                กับเวลา<br />
+                (mAs)
               </th>
               <th class="col-small">
                 ระยะโฟกัสถึง<br />
-                ตัวรับภาพ (cm)<br />
+                ตัวรับภาพ<br />
+                (cm)<br />
                 (FTD)
               </th>
               <th class="col-small">
                 ความหนา<br />
-                ของอวัยวะ (cm)<br />
+                ของอวัยวะ<br />
+                (cm)<br />
                 (tₚ)
               </th>
               <th class="col-small">
                 ระยะ<br />
-                Bucky (cm)
+                Bucky<br />
+                (cm)
               </th>
             </tr>
           </thead>
@@ -69,21 +75,11 @@
               <td class="align-left">
                 {{ row.region }}
               </td>
-              <td>
-                {{ row.kv }}
-              </td>
-              <td>
-                {{ row.mas }}
-              </td>
-              <td>
-                {{ row.ftd }}
-              </td>
-              <td>
-                {{ row.tp }}
-              </td>
-              <td>
-                {{ row.bucky }}
-              </td>
+              <td>{{ row.kv }}</td>
+              <td>{{ row.mas }}</td>
+              <td>{{ row.ftd }}</td>
+              <td>{{ row.tp }}</td>
+              <td>{{ row.bucky }}</td>
             </tr>
           </tbody>
         </table>
@@ -91,17 +87,17 @@
         <!-- พื้นที่ว่างด้านล่าง (ให้ใกล้เคียง PDF) -->
         <div class="bottom-space"></div>
 
-        <!-- ลายเซ็นผู้ตรวจสอบ (จัดไปด้านขวาให้แนวกันทั้ง 3 บรรทัด) -->
+        <!-- ลายเซ็นผู้ตรวจสอบ -->
         <div class="sign-block">
           <div class="sign-inner">
             <div class="sign-line">
-              ลงชื่อ......................................................................................ผู้ทดสอบ
-            </div>
-            <div class="sign-line sign-line-parenthesis">
-              (.....................................................................................)
+              ลงชื่อ..............................................................ผู้ทดสอบ
             </div>
             <div class="sign-line">
-              ตำแหน่ง..................................................................................
+              (.................................................................)
+            </div>
+            <div class="sign-line">
+              ตำแหน่ง.........................................................
             </div>
           </div>
         </div>
@@ -116,8 +112,6 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// โครงข้อมูลสำหรับ F11 (ตัวอย่างเริ่มต้น)
-// ของจริงจะถูกแทนที่ด้วยข้อมูลจากฐาน
 const record = ref({
   id: route.params.id || null,
   rows: [
@@ -128,7 +122,6 @@ const record = ref({
     { region: 'Pelvis AP',    kv: '', mas: '', ftd: '', tp: '', bucky: '' },
     { region: 'Skull AP/PA',  kv: '', mas: '', ftd: '', tp: '', bucky: '' },
     { region: 'Skull LAT',    kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    // แถวว่างเผื่อกรอกเพิ่มเติม (เพิ่มใต้บรรทัดสุดท้ายอีก 1 แถว)
     { region: '',             kv: '', mas: '', ftd: '', tp: '', bucky: '' }
   ]
 })
@@ -140,34 +133,29 @@ function handlePrint () {
 onMounted(async () => {
   const id = route.params.id
   if (!id) return
-
-  try {
-    // const res = await fetch(`/api/prints/f11/${id}`)
-    // const data = await res.json()
-    // record.value = data
-  } catch (err) {
-    console.error('โหลดข้อมูล F11 ไม่สำเร็จ', err)
-  }
+  // โหลดข้อมูลจริงจาก backend ถ้ามี
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ฟอนต์: TH Sarabun New > Tahoma > sans-serif */
+/* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
-  font-family: 'TH Sarabun New', Tahoma, sans-serif !important;
+  font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
+  font-size: 11pt;
+  font-weight: 400;
 }
 
+/* หน้า print */
 .print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
+  background: #e5e7eb;
   min-height: 100vh;
   padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* ปุ่ม print */
 .print-toolbar {
@@ -180,7 +168,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 21px; /* เดิม 16px + ประมาณ 5 ระดับ */
+  font-size: 11pt;
 }
 
 /* กระดาษ A4 */
@@ -196,45 +184,44 @@ onMounted(async () => {
 /* เนื้อในกระดาษ */
 .sheet-inner {
   width: 180mm;
-  padding: 18mm 0 14mm;
-  font-size: 16pt; /* เดิม 11pt + 5 ระดับ */
+  padding: 15mm 0 12mm;
 }
 
 /* หัวฟอร์ม */
 .header-main {
-  text-align: left;   /* ให้หัวข้อชิดซ้าย */
-  margin-bottom: 8mm;
+  text-align: left;
+  margin-bottom: 7mm;
 }
 
 .title-main {
   font-weight: 700;
+  font-size: 13pt;
 }
 
-/* ตารางหลัก */
+/* ตาราง F11 */
 .f11-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 14pt; /* เดิม 9pt + 5 ระดับ */
+  font-size: 11pt;
 }
 
 .f11-table th,
 .f11-table td {
   border: 0.4pt solid #000;
-  padding: 2mm 1mm;
+  padding: 1mm 1mm;
   text-align: center;
   vertical-align: middle;
-  height: 11mm;
+  height: 9mm;
 }
 
-/* คอลัมน์แรกให้แคบลง (ลด 3mm) */
+/* คอลัมน์ตามฟอร์มราชการ */
 .col-region {
-  width: 10mm;  /* เดิม 45mm -> ลด 3mm */
+  width: 45mm;
 }
 
-/* คอลัมน์อื่นลดลง 3mm เช่นกัน */
 .col-small {
-  width: 10mm;  /* เดิม 26mm -> ลด 3mm */
+  width: 26mm;
 }
 
 .align-left {
@@ -242,33 +229,42 @@ onMounted(async () => {
   padding-left: 3mm;
 }
 
-/* พื้นที่ว่างก่อนลายเซ็น (ใกล้เคียง PDF) */
+/* พื้นที่ว่างก่อนลายเซ็น */
 .bottom-space {
-  height: 18mm;
+  height: 12mm;
 }
 
-/* ลายเซ็นผู้ทดสอบ - จัดไปด้านขวา และให้ทั้งสามบรรทัดตรงกัน */
+/* ลายเซ็นชิดขวาเหมือนเดิม แต่ข้อความจัดชิดซ้ายภายในกล่อง */
 .sign-block {
   margin-top: 6mm;
+  width: 100%;
   display: flex;
-  justify-content: flex-end; /* ชิดขวาให้แนวเดียวกับตาราง */
-  font-size: 16pt;           /* เดิม 11pt + 5 ระดับ */
+  justify-content: flex-end;
 }
 
 .sign-inner {
-  text-align: left;
+  width: 85mm;        /* กว้างกำหนดให้เหมือนช่องลายเซ็นในฟอร์มราชการ */
+  text-align: left;   /* จัดบรรทัดให้ชิดซ้าย */
 }
 
 .sign-line {
   margin-bottom: 2mm;
+  font-size: 11pt;
 }
 
-/* ขยับบรรทัดวงเล็บให้วงเล็บเปิดใกล้ตำแหน่งเดียวกับ "ชื่อ" */
+/* ให้วงเล็บ "(" ตรงกับตัว อ. ในคำว่า "ลงชื่อ" */
 .sign-line-parenthesis {
-  text-indent: 5mm;
+  padding-left: 21mm;   /* ปรับตรงกับตำแหน่งตัว อ. */
 }
 
-/* ตั้งค่าหน้ากระดาษตอน print */
+
+/* ให้คำว่า "ตำแหน่ง" ตรงกับคำว่า "ลงชื่อ" (ตัว ล.) */
+.sign-line-position {
+  padding-left: 0mm;    /* ตรงกับบรรทัดแรก ไม่ต้องขยับเพิ่มเติม */
+}
+
+
+/* Print layout */
 @page {
   size: A4 portrait;
   margin: 10mm;
@@ -280,14 +276,14 @@ onMounted(async () => {
   }
 
   .print-root {
-    background: #ffffff;
     padding: 0;
+    background: #ffffff;
   }
 
   .sheet-a4 {
-    box-shadow: none;
     width: auto;
     min-height: auto;
+    box-shadow: none;
   }
 }
 </style>
