@@ -37,15 +37,16 @@
         <div class="meta-block">
           <!-- แถว 1 : วันที่ / ประเภทเครื่องเอกซเรย์ -->
           <div class="meta-row meta-row-grid">
-            <span class="meta-label">วันที่</span>
-            <span class="underline long">{{ record.date }}</span>
+  <span class="meta-label">วันที่</span>
+  <span class="underline long">{{ record.date }}</span>
 
-            <span class="meta-label">ประเภทเครื่องเอกซเรย์</span>
-            <span class="underline long">{{ record.deviceType }}</span>
+  <span class="meta-label">ประเภทเครื่องเอกซเรย์</span>
+  <span class="underline long">{{ record.deviceType }}</span>
 
-            <span></span>
-            <span></span>
-          </div>
+  <span class="meta-label"></span>
+  <span></span>
+</div>
+
 
           <!-- แถว 2 : หน่วยงาน / ตำบล / อำเภอ / จังหวัด (อยู่บรรทัดเดียวกัน) -->
           <div class="meta-row meta-row-grid-4">
@@ -67,10 +68,10 @@
             <span class="meta-label">เครื่องเอกซเรย์</span>
             <span class="underline mid">{{ record.deviceName }}</span>
 
-            <span class="meta-label">Model</span>
+            <span class="meta-label">Model :</span>
             <span class="underline short-narrow">{{ record.model }}</span>
 
-            <span class="meta-label">S/N</span>
+            <span class="meta-label">S/N :</span>
             <span class="underline short">{{ record.serialNo }}</span>
           </div>
 
@@ -79,7 +80,7 @@
             <span class="meta-label">สมาร์ทโฟน ยี่ห้อ</span>
             <span class="underline mid">{{ record.deviceName }}</span>
 
-            <span class="meta-label">รุ่น</span>
+            <span class="meta-label">รุ่น :</span>
             <span class="underline short-narrow">{{ record.model }}</span>
 
             <span></span>
@@ -88,7 +89,7 @@
 
           <!-- แถว 5 : Application -->
           <div class="meta-row meta-row-grid">
-            <span class="meta-label">Application</span>
+            <span class="meta-label">Application :</span>
             <span class="underline long">{{ record.application }}</span>
 
             <span></span><span></span>
@@ -97,7 +98,7 @@
 
           <!-- แถว 6 : Calibration -->
           <div class="meta-row meta-row-grid">
-            <span class="meta-label">Calibration</span>
+            <span class="meta-label">Calibration :</span>
             <span class="underline long">{{ record.calibration }}</span>
 
             <span></span><span></span>
@@ -105,37 +106,72 @@
           </div>
         </div>
 
-        <!-- ตารางค่าความสว่าง (เหมือน PDF ต้นฉบับ) -->
-        <table class="f10-table">
-          <thead>
-            <tr>
-              <th class="col-run">ครั้งที่</th>
-              <th class="col-iav">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
-              <th class="col-bg">Background (I<sub>BG</sub>)</th>
-            </tr>
-          </thead>
+<!-- ตารางค่าความสว่าง (เหมือน PDF ต้นฉบับ รูปที่ 1) -->
+<!-- ตารางค่าความสว่าง -->
+<table class="f10-table">
+  <thead>
+    <tr>
+      <th class="col-run">ครั้งที่</th>
+      <th class="col-iav">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
+      <th class="col-bg">Background (I<sub>BG</sub>)</th>
+    </tr>
+  </thead>
 
-          <tbody>
-            <!-- 1 ครั้ง = 3 แถวย่อย / ช่อง “ครั้งที่” รวม 3 แถว -->
-            <template v-for="(run, rIndex) in record.runs" :key="'run-' + rIndex">
-              <tr>
-                <td class="col-run run-number" rowspan="3">
-                  {{ run.runNo || rIndex + 1 }}
-                </td>
-                <td class="col-iav"></td>
-                <td class="col-bg"></td>
-              </tr>
-              <tr>
-                <td class="col-iav"></td>
-                <td class="col-bg"></td>
-              </tr>
-              <tr>
-                <td class="col-iav"></td>
-                <td class="col-bg"></td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
+  <tbody>
+    <!-- แถวที่ 2: ครั้งที่ 1 -->
+    <tr>
+      <td class="col-run">1</td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- แถวที่ 3: ครั้งที่ 2 -->
+    <tr>
+      <td class="col-run">2</td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- แถวที่ 4: ครั้งที่ 3 -->
+    <tr>
+      <td class="col-run">3</td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+      <td>
+        <div class="quad-box">
+          <div></div><div></div>
+          <div></div><div></div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
 
         <!-- ส่วนคำนวณ IAV / IBG / ILBD -->
         <div class="formula-block">
@@ -325,6 +361,7 @@ onMounted(async () => {
 .short-narrow { min-width: 5mm; }
 
 /* ===== ตาราง F10 ===== */
+/* ===== ตาราง F10 ===== */
 .f10-table {
   width: 100%;
   border-collapse: collapse;
@@ -340,15 +377,16 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
-/* ความกว้างคอลัมน์ให้เหมือนฟอร์ม */
+/* ความกว้างคอลัมน์ให้เหมือนฟอร์มรูปที่ 1 */
 .col-run { width: 20mm; }
-.col-iav { width: 110mm; }
-.col-bg  { width: 35mm; }
+.col-iav { width: 80mm; }
+.col-bg  { width: 80mm; }
 
-/* ให้เลข 1/2/3 อยู่ด้านบนของช่องเหมือน PDF */
+/* เลขครั้งที่ อยู่กลางบล็อก */
 .run-number {
-  vertical-align: top;
+  vertical-align: middle;
 }
+
 
 /* ===== block ค่าคำนวณ ===== */
 .formula-block {
@@ -409,5 +447,43 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+  .col-iav-group,
+.col-bg-group {
+  text-align: center;
+  font-weight: 700;
+}
+
+.col-iav-half,
+.col-bg-half {
+  text-align: center;
+  height: 8mm;
+}
+
+/* ความกว้างแบบสมมาตรเหมือนฟอร์มราชการ */
+.col-iav { width: 80mm; }
+.col-bg  { width: 80mm; }
+
+
+  
+  .equal-header {
+  width: 50%;            /* กินพื้นที่ฝั่งขวา 50%-50% อย่างสมมาตร */
+  text-align: center;
+  font-weight: 700;
+}
+/* กล่องแบ่งเป็น 4 ช่อง ใน 1 เซลล์ (บน-ล่าง ซ้าย-ขวา) */
+.quad-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 18mm;           /* ปรับได้ตามความสูงที่ต้องการ */
+  gap: 0;
+}
+
+.quad-box > div {
+  border: 0.4pt solid #000;
+}
+
+
 }
 </style>
