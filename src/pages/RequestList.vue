@@ -776,15 +776,14 @@ ul.content-list li::before {
     cursor: pointer;
 }
 
-/* modal แสดงรูปภาพ – ให้ลอยอยู่ด้านขวา ไม่บังหน้าระบบแจ้งซ่อม */
+/* modal แสดงรูปภาพ – ให้อยู่ตรงกลางหน้าจอ */
 .modal-overlay {
     position: fixed;
     top: 0;
-    right: 0;
-    width: 50vw;
-    max-width: 600px;
+    left: 0;
+    width: 100vw;
     height: 100vh;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -792,7 +791,8 @@ ul.content-list li::before {
 }
 
 .image-modal-card {
-    width: 100%;
+    width: 90%;
+    max-width: 600px;
     background: white;
     border-radius: 4px;
     overflow: hidden;
