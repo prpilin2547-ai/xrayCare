@@ -31,24 +31,27 @@
         <!-- ข้อมูลเครื่อง / ผู้ตรวจ -->
         <div class="machine-block">
           <div class="machine-row">
-            ยี่ห้อ .............................................. รุ่น .............................................. ผู้ตรวจสอบ ............................................................
+            ยี่ห้อ <span class="underline long"></span>
+            รุ่น <span class="underline long"></span>
+            ผู้ตรวจสอบ <span class="underline long"></span>
+          <br>
           </div>
           <div class="machine-row">
-            แผนก/กลุ่มงาน ............................................ อุณหภูมิห้อง ..............................................ความชื้นห้อง..............................
+            แผนก/กลุ่มงาน <span class="underline long"></span>
+            อุณหภูมิห้อง <span class="underline long"></span>
+            ความชื้นห้อง <span class="underline long"></span>
+          <br>
           </div> 
           <div class="machine-row">
-            Probe ชนิด/ความถี่ : 
-            <span class="underline long">{{ header.probeInfo }}</span>
-            Phantom :
-            <span class="underline long">{{ header.phantom }}</span>
+            Probe ชนิด <span class="underline long"></span>
+            ความถี่ <span class="underline long"></span>
+            Phantom <span class="underline long"></span>
+          <br>
           </div>
           <div class="machine-row">
-            Power :
-            <span class="underline short">{{ header.power }}</span>
-            TGC :
-            <span class="underline short">{{ header.tgc }}</span>
-            Gain :
-            <span class="underline short">{{ header.gain }}</span>
+            Power <span class="underline long"></span>
+            TGC <span class="underline long"></span>
+            Gain <span class="underline long"></span>
           </div>
         </div>
 
@@ -56,8 +59,8 @@
         <table class="qc-table">
           <thead>
             <tr>
-              <th class="col-test">Test item</th>
-              <th class="col-baseline">Baseline</th>
+              <th class="col-test">Test Date</th>
+              <th class="col-baseline">aseline</th>
               <th class="col-action">Action level</th>
               <th class="col-defect">Defect level</th>
             </tr>

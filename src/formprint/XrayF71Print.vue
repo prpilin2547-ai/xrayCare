@@ -42,112 +42,136 @@
           </div>
         </div>
 
-        <!-- ===== ตารางหลักทั้งหมด ===== -->
-        <table class="main-table">
-          <!-- แถว 1: วัน/เดือน/ปี ที่ทดสอบ -->
-          <tr>
-            <td class="label-cell text-left">วัน/เดือน/ปี ที่ทดสอบ :</td>
-          </tr>
+       <table class="main-table">
+  <!-- ปรับเป็น 5 คอลัมน์: ข้อความ / cm / Pass / Fail / Note -->
+  <colgroup>
+    <col class="col-text" />
+    <col class="col-cm" />
+    <col class="col-pass" />
+    <col class="col-fail" />
+    <col class="col-note" />
+  </colgroup>
 
-          <!-- แถว 2: ผู้ทดสอบ -->
-          <tr>
-            <td class="label-cell text-left">ผู้ทดสอบ :</td>
-          </tr>
+  <!-- แถว 1: วัน/เดือน/ปี ที่ทดสอบ -->
+  <tr>
+    <td class="label-cell text-left" colspan="5">
+      วัน/เดือน/ปี ที่ทดสอบ :
+    </td>
+  </tr>
 
-          <!-- แถว 3: ○ หลอดใสเล็ก ○ หลอดใสใหญ่ -->
-          <tr>
-            <td colspan="4" class="value-cell text-left">
-              ○ หลอดไส้เล็ก<br />
-              ○ หลอดไส้ใหญ่
-            </td>
-          </tr>
+  <!-- แถว 2: ผู้ทดสอบ -->
+  <tr>
+    <td class="label-cell text-left" colspan="5">
+      ผู้ทดสอบ :
+    </td>
+  </tr>
 
-          <!-- แถว 4: ○ Collimator ... / ○ Coins ... -->
-          <tr>
-            <td class="align-left" colspan="4">
-              ○ Collimator / Beam alignment test tool<br />
-              ○ Coins for alignment test
-            </td>
-          </tr>
+  <!-- แถว 3: ○ หลอดไส้เล็ก ○ หลอดไส้ใหญ่ -->
+  <tr>
+    <td colspan="5" class="value-cell text-left">
+      ○ หลอดไส้เล็ก<br />
+      ○ หลอดไส้ใหญ่
+    </td>
+  </tr>
 
-          <!-- แถว 5: ข้อความคำอธิบายความเหลื่อมล้ำ +/+ หมายถึง ... -->
-          <tr>
-            <td class="align-left note-row" colspan="4">
-              <strong>
-                ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)
-              </strong><br />
-              + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
-            </td>
-          </tr>
+  <!-- แถว 4: ○ Collimator ... / ○ Coins ... -->
+  <tr>
+    <td class="align-left" colspan="5">
+      ○ ทดสอบโดย Collimator / Beam alignment test tool<br />
+      ○ ทดสอบโดย Coins for x-ray to light-beam alignment test
+    </td>
+  </tr>
 
-          <!-- แถว 6: หัวข้อ ความเหลื่อมล้ำ... Pass Fail Note -->
-          <tr class="sub-header">
-            <td class="align-left">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ</td>
-            <td>cm</td>
-            <td>Pass</td>
-            <td>Fail</td>
-          </tr>
+  <!-- แถว 5: ข้อความคำอธิบาย + / - -->
+  <tr>
+    <td class="align-left note-row" colspan="5">
+      <strong class="note-title">
+        ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 1 cm หรือ 1% ที่ SID 100 cm)
+      </strong><br />
+      <span class="note-desc">
+        + หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง 
+        - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง
+      </span>
+    </td>
+  </tr>
 
-          <!-- แถว 7–10: ด้านแอโนด / แคโทด / ด้านบน / ด้านล่าง + cm -->
-          <tr>
-            <td class="align-left">ด้านแอโนด</td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td class="align-left">ด้านแคโทด</td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td class="align-left">ด้านบน</td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td class="align-left">ด้านล่าง</td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+  <!-- แถว 6: หัวข้อ ความเหลื่อมล้ำ... + Pass / Fail / Note -->
+  <tr class="sub-header">
+    <!-- ผสานช่องข้อความ + cm -->
+    <td class="center-item nowrap-header" colspan="2">
+      ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ
+    </td>
+    <td>Pass</td>
+    <td>Fail</td>
+    <td>Note</td>
+  </tr>
 
-          <!-- แถว 11: ช่องว่าง -->
-          <tr>
-            <td colspan="4">&nbsp;</td>
-          </tr>
+  <!-- แถว 7–10: ด้านแอโนด / ด้านแคโทด / ด้านบน / ด้านล่าง + cm -->
+  <tr>
+    <td class="center-item">ด้านแอโนด</td>
+    <td class="cm-cell">cm</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="center-item">ด้านแคโทด</td>
+    <td class="cm-cell">cm</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="center-item">ด้านบน</td>
+    <td class="cm-cell">cm</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="center-item">ด้านล่าง</td>
+    <td class="cm-cell">cm</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
 
-          <!-- แถว 12: Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา -->
-          <tr class="section-row">
-            <td class="section-title" colspan="4">
-              Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา
-            </td>
-          </tr>
+  <!-- แถว 11: ช่องว่าง -->
+  <tr>
+    <td colspan="5">&nbsp;</td>
+  </tr>
 
-          <!-- แถว 13: หัว Beam Alignment + Pass / Fail / Note -->
-          <tr class="sub-header">
-            <td class="align-left">Beam Alignment</td>
-            <td>Pass</td>
-            <td>Fail</td>
-            <td>Note</td>
-          </tr>
+  <!-- Beam Alignment section -->
+  <tr class="section-row">
+    <td class="section-title" colspan="5">
+      Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา
+    </td>
+  </tr>
 
-          <!-- ★ ผสานเซลล์ Pass / Fail / Note ในแนวตั้ง (rowspan=3) -->
-          <tr>
-            <td class="align-left">○ &lt; 1.5°</td>
-            <td rowspan="3"></td>
-            <td rowspan="3"></td>
-            <td rowspan="3"></td>
-          </tr>
-          <tr>
-            <td class="align-left">○ 1.5° &lt; X &lt; 3°</td>
-          </tr>
-          <tr>
-            <td class="align-left">○ ≥ 3°</td>
-          </tr>
-        </table>
+  <!-- หัว Beam Alignment + Pass / Fail / Note -->
+  <tr class="sub-header">
+    <!-- ใช้ 2 คอลัมน์แรกเป็น Beam Alignment -->
+    <td class="col-beam-header" colspan="2">Beam Alignment</td>
+    <td>Pass</td>
+    <td>Fail</td>
+    <td>Note</td>
+  </tr>
+
+  <!-- ผสานเซลล์ Pass / Fail / Note ในแนวตั้ง -->
+  <tr>
+    <td class="align-left" colspan="2">○ &lt; 1.5°</td>
+    <td rowspan="3"></td>
+    <td rowspan="3"></td>
+    <td rowspan="3"></td>
+  </tr>
+  <tr>
+    <td class="align-left" colspan="2">○ 1.5° &lt; X &lt; 3°</td>
+  </tr>
+  <tr>
+    <td class="align-left" colspan="2">○ ≥ 3°</td>
+  </tr>
+</table>
+
       </div>
     </div>
   </div>
@@ -260,7 +284,6 @@ onMounted(async () => {
 .medium { min-width: 35mm; }
 .long { min-width: 60mm; }
 
-/* ตารางหลัก */
 .main-table {
   width: 100%;
   border-collapse: collapse;
@@ -268,31 +291,66 @@ onMounted(async () => {
   margin-bottom: 6mm;
 }
 
+/* กำหนดสัดส่วนความกว้างแต่ละคอลัมน์
+   - Fail แคบลง
+   - Note กว้างขึ้น และอยู่ในตาราง */
+.col-text { width: 15%; }  /* ข้อความหลัก */
+.col-cm   { width: 20%; }  /* cm */
+.col-pass { width: 10%; }  /* Pass */
+.col-fail { width: 10%; }   /* Fail (ลดขนาดลง) */
+.col-note { width: 25%; }  /* Note (กว้างขึ้น อยู่ในกรอบตาราง) */
+
+
 .main-table td,
 .main-table th {
   border: 0.4pt solid #000;
   padding: 1.5mm 2mm;
   vertical-align: middle;
   text-align: center;
-  font-weight: 700; /* ตัวหนาในตารางทั้งหมด */
-}
-
-/* ยกเว้นบรรทัดอธิบาย + / - ให้เป็นตัวบาง */
-.note-row {
-  font-weight: 400 !important;
-  text-align: left;
-  line-height: 1.35;
-}
-
-/* แถวหัว section */
-.section-title {
   font-weight: 700;
-  text-align: left;
 }
 
+/* ข้อความคำอธิบาย / label เป็นตัวบาง */
+.label-cell {
+  font-weight: 400;
+}
+/* ทำให้หัวข้อประโยคนี้หนามากขึ้น */
+.note-row strong {
+  font-weight: 700 !important;
+  display: inline-block;
+  margin-bottom: 1mm;
+}
+
+/* เพิ่มความสูงช่อง (บนล่าง) ของบรรทัดนี้ */
+.note-row {
+  padding-top: 3mm !important;
+  padding-bottom: 3mm !important;
+  line-height: 1.45;
+}
+
+/* แถวหัว section (บรรทัด Beam Alignment ต้องมีความเบี่ยงเบน...) */
+/* ทำให้หัวข้อ section ชิดซ้ายของเซลล์จริงๆ */
+.section-title {
+  text-align: left !important;
+  padding-left: 1mm !important;   /* ถ้าต้องการชิดสุดเปลี่ยนเป็น 0 */
+  font-weight: 700;
+}
+
+/* ทำให้หัวคอลัมน์ Beam Alignment อยู่กลาง */
+.col-beam-header {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* ทำให้ข้อความชิดขอบซ้ายของตารางมากขึ้น (ลด padding ซ้าย) */
+.section-row .section-title {
+  padding-left: 0.5mm !important; /* หรือ 0mm ถ้าอยากชิดสุดเลย */
+}
+
+/* ลบสีพื้นหัวตาราง */
 .sub-header td {
   font-weight: 700;
-  background: #f3f4f6;
+  /* ไม่มี background แล้ว */
 }
 
 /* จัดข้อความซ้าย */
@@ -302,6 +360,7 @@ onMounted(async () => {
   text-align: left !important;
   vertical-align: top !important;
 }
+
 
 /* ลายเซ็นชิดขวาเท่าขอบตาราง */
 .sign-block {
@@ -329,5 +388,32 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
+  /* ประโยคหัวข้อ = ตัวหนา */
+.note-title {
+  font-weight: 700 !important;
+}
+
+/* ประโยคอธิบาย + / - = ตัวบาง */
+.note-desc {
+  font-weight: 400 !important;
+}
+/* บังคับให้หัวข้อช่องนี้ไม่ตัดบรรทัด (อยู่บรรทัดเดียว) */
+.nowrap-header {
+  white-space: nowrap;
+}
+/* 1) ทำให้ข้อความหัวข้อและแถวด้านแอโนด/แคโทด/บน/ล่าง อยู่กึ่งกลางช่อง */
+.center-item {
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-weight: 700 !important; /* คงความหนาของข้อความตามเดิม */
+}
+
+/* 2) ทำให้คำว่า cm อยู่ขวาและเป็นตัวบาง */
+.cm-cell {
+  text-align: right !important;
+  font-weight: 400 !important;
+}
+
+
 }
 </style>
