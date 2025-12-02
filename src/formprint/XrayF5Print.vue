@@ -23,79 +23,93 @@
     <div class="sheet-a4">
       <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
-        <div class="header-main">
-          <div class="title-main">
-            แบบบันทึก F5 : ความสม่ำเสมอของภาพ (Measured Uniformity)
-          </div>
-          <div class="title-sub">
-            ความถี่ : {{ record.frequency || 'ทุก 3 เดือน' }}
-          </div>
-          <div class="title-sub">
-            หมายเลขของแผ่นรับภาพ
-            <span class="underline long">
-              {{ record.plateNo }}
-            </span>
-          </div>
-        </div>
+        <!-- หัวฟอร์ม -->
+<div class="header-main">
+  <div class="title-main">
+    แบบบันทึก F5 : ความสม่ำเสมอของภาพ (Measured Uniformity)
+  </div>
 
-        <!-- กล่องสรุปภาพรวมด้านบน -->
-        <table class="summary-box">
-          <tr>
-            <td class="align-left">
-              ค่าขอบเขต<br />
-              ภาพปรากฏสม่ำเสมอ<br />
-              ไม่มีสิ่งแปลกปลอม
-            </td>
-          </tr>
-        </table>
+  <!-- ความถี่ : -->
+  <div class="title-sub">
+    <span class="bold-text">ความถี่ :</span>
+    {{ record.frequency || 'ทุก 3 เดือน' }}
+  </div>
 
-        <!-- ตารางหลัก F5 -->
-        <table class="f5-table">
-          <tbody>
-            <!-- วันที่ -->
-            <tr>
-              <td class="col-label">วันที่</td>
-              <td class="col-right-4" colspan="4"></td>
-            </tr>
+  <!-- หมายเลขของแผ่นรับภาพ -->
+  <div class="title-sub">
+    <span class="bold-text">หมายเลขของแผ่นรับภาพ</span>
+    <span class="underline long">
+      {{ record.plateNo }}
+    </span>
+  </div>
+</div>
 
-            <!-- ผู้ทดสอบ -->
-            <tr>
-              <td class="col-label">ผู้ทดสอบ</td>
-              <td class="col-right-4" colspan="4"></td>
-            </tr>
+<!-- กล่องสรุปภาพรวมด้านบน -->
+<table class="summary-box">
+  <tr>
+    <td class="align-left">
+      <span class="bold-text">ค่าขอบเขต</span><br />
+      <span class="bold-text">ภาพปรากฏสม่ำเสมอ</span><br />
+      <span class="bold-text">ไม่มีสิ่งแปลกปลอม</span>
+    </td>
+  </tr>
+</table>
 
-            <!-- 3 บรรทัดรวมเป็นช่องเดียว -->
-            <tr>
-              <td class="col-label merged-text">
-                ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)<br />
-                มีสิ่งแปลกปลอมหรือไม่? (Y/N)<br />
-                อธิบาย–สิ่งแปลกปลอม
-              </td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-            </tr>
+<!-- ตารางหลัก F5 -->
+<table class="f5-table">
+  <tbody>
+    <!-- วันที่ -->
+    <tr>
+      <td class="col-label">
+        <span class="bold-text">วันที่</span>
+      </td>
+      <td class="col-right-4" colspan="4"></td>
+    </tr>
 
-            <!-- ข้อคิดเห็น -->
-            <tr>
-              <td class="col-label">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-            </tr>
+    <!-- ผู้ทดสอบ -->
+    <tr>
+      <td class="col-label">
+        <span class="bold-text">ผู้ทดสอบ</span>
+      </td>
+      <td class="col-right-4" colspan="4"></td>
+    </tr>
 
-            <!-- การแก้ไข -->
-            <tr>
-              <td class="col-label">การแก้ไข (ถ้าเป็นไปได้)</td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-              <td class="small-box"></td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- 3 บรรทัดรวมเป็นช่องเดียว -->
+    <tr>
+      <td class="col-label merged-text">
+        <span class="bold-text">ภาพปรากฏสม่ำเสมอหรือไม่? (Y/N)</span><br />
+        <span class="bold-text">มีสิ่งแปลกปลอมหรือไม่? (Y/N)</span><br />
+        <span class="bold-text">อธิบาย–สิ่งแปลกปลอม</span>
+      </td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
+
+    <!-- ข้อคิดเห็น -->
+    <tr>
+      <td class="col-label">
+        <span class="bold-text">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</span>
+      </td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
+
+    <!-- การแก้ไข -->
+    <tr>
+      <td class="col-label">
+        <span class="bold-text">การแก้ไข (ถ้าเป็นไปได้)</span>
+      </td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+      <td class="small-box"></td>
+    </tr>
+  </tbody>
+</table>
       </div>
     </div>
   </div>
@@ -294,6 +308,10 @@ onMounted(async () => {
   .merged-text {
     line-height: 2.5 !important; /* ระยะห่างเท่ากับ summary-box */
   }
+  .bold-text {
+  font-weight: 700 !important;
+}
+
 }
 </style>
 

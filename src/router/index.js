@@ -40,6 +40,7 @@ import XrayF10Print from '../formprint/XrayF10Print.vue'
 import XrayF11Print from '../formprint/XrayF11Print.vue'
 import XrayF12Print from '../formprint/XrayF12Print.vue'
 import XrayF13Print from '../formprint/XrayF13Print.vue'
+import CustomFormBuilder from '../pages/CustomFormBuilder.vue'
 
 
 const routes = [
@@ -213,6 +214,11 @@ const routes = [
     name: 'XrayF13Print',
     component: XrayF13Print,
     props: true
+  },
+   {
+    path: '/custom-form-builder',
+    name: 'CustomFormBuilder',
+    component: CustomFormBuilder
   }
 ]
 
