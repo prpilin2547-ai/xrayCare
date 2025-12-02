@@ -75,44 +75,215 @@
           </div>
         </div>
 
-        <!-- ตารางตามแบบฟอร์ม -->
+                       <!-- ตารางตามแบบฟอร์ม -->
         <div class="table-wrapper mt-16">
           <table class="check-table">
             <thead>
               <tr class="row-header-columns">
-                <th class="col-trial">ครั้งที่</th>
-                <th>ความสว่างแสงไฟ (Iav)</th>
-                <th>Background(Ibg)</th>
+                <!-- ครั้งที่ คอลัมน์หลัก 1 คอลัมน์ -->
+                <th class="col-trial" rowspan="2">ครั้งที่</th>
+                <!-- I_AV แบ่งเป็น 2 คอลัมน์ย่อย -->
+                <th colspan="2">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
+                <!-- I_BG แบ่งเป็น 2 คอลัมน์ย่อย -->
+                <th colspan="2">Background (I<sub>BG</sub>)</th>
               </tr>
+              <!-- <tr class="row-header-columns">
+                <th>1</th>
+                <th>2</th>
+                <th>1</th>
+                <th>2</th>
+              </tr> -->
             </thead>
             <tbody>
-              <!-- 3 ครั้ง แต่ละครั้งมี 3 แถวเหมือนแบบฟอร์ม -->
-              <template v-for="trial in measurements" :key="trial.id">
-                <tr v-for="(row, idx) in trial.rows" :key="idx">
-                  <!-- ครั้งที่ แสดงเฉพาะแถวแรก แล้ว rowspan=3 -->
-                  <td
-                    v-if="idx === 0"
-                    class="text-center"
-                    :rowspan="trial.rows.length"
-                  >
-                    {{ trial.id }}
-                  </td>
-                  <td>
-                    <input
-                      v-model="row.iav"
-                      class="cell-input"
-                      type="text"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      v-model="row.ibg"
-                      class="cell-input"
-                      type="text"
-                    />
-                  </td>
-                </tr>
-              </template>
+              <!-- ครั้งที่ 1 (2 แถวย่อย) -->
+              <tr>
+                <!-- ผสานเซลล์ในแนวตั้ง ครอบ 2 แถว -->
+                <td class="text-center" rowspan="2">1</td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[0].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[0].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[0].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[0].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[1].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[1].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[1].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[0].rows[1].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
+
+              <!-- ครั้งที่ 2 (2 แถวย่อย) -->
+              <tr>
+                <td class="text-center" rowspan="2">2</td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[0].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[0].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[0].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[0].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[1].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[1].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[1].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[1].rows[1].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
+
+              <!-- ครั้งที่ 3 (2 แถวย่อย) -->
+              <tr>
+                <td class="text-center" rowspan="2">3</td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[0].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[0].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[0].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[0].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[1].iav1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[1].iav2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[1].ibg1"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model="measurements[2].rows[1].ibg2"
+                    class="cell-input"
+                    type="text"
+                  />
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>

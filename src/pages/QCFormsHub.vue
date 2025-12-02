@@ -4,14 +4,8 @@
     <div class="checklist-page">
       <!-- หัวข้อหน้า -->
       <h1 class="page-title">
-        Additional QC Forms 
+        Additional QC Forms
       </h1>
-
-      <!-- แคปซูลด้านบน -->
-      <!-- <div class="pill-row">
-        <div class="pill">วันที่ : {{ todayText }}</div>
-        <div class="pill">ผู้ใช้งาน : {{ currentUserName }}</div>
-      </div> -->
 
       <!-- กล่องเนื้อหา -->
       <div class="content-panel">
@@ -22,12 +16,19 @@
               เลือกแบบฟอร์มที่ต้องการบันทึกข้อมูลคุณภาพเครื่องมือและอุปกรณ์
             </p>
           </div>
+
+          <!-- ปุ่มสร้างฟอร์มเอง -->
+          <div class="header-actions">
+            <button type="button" class="btn-outline" @click="goToCreateForm">
+              + สร้างแบบบันทึก
+            </button>
+          </div>
         </div>
 
         <!-- Grid แสดงการ์ดแบบบันทึก -->
         <div class="form-grid">
           <div
-            v-for="form in forms"
+            v-for="form in allForms"
             :key="form.id"
             class="form-card"
             @click="openForm(form.route)"
@@ -50,6 +51,11 @@
               เปิดแบบบันทึก
             </button>
           </div>
+
+          <!-- กรณีไม่มีฟอร์มเลย -->
+          <div v-if="!allForms.length" class="empty-card">
+            ยังไม่มีแบบฟอร์ม ให้กด &quot;สร้างแบบฟอร์มเอง&quot; เพื่อเริ่มต้น
+          </div>
         </div>
       </div>
     </div>
@@ -57,7 +63,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -70,26 +76,14 @@ const props = defineProps({
 
 const router = useRouter()
 
-const todayText = computed(() => {
-  const d = new Date()
-  return d.toLocaleDateString('th-TH', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-})
-
-/**
- * forms: กำหนด route ให้ตรงกับที่คุณตั้งใน router/index.js
- * ถ้าใช้ชื่อ path อื่น เช่น /f9-protective ให้เปลี่ยนใน field route ได้เลย
- */
-const forms = [
+// แบบฟอร์มที่ fix ไว้เดิม
+const builtinForms = [
   {
     id: 'f9',
     code: 'F9',
     title: 'แบบบันทึกตรวจสอบคุณภาพเสื้อตะกั่ว',
     description: 'ตรวจสอบสภาพเสื้อตะกั่วและอุปกรณ์ป้องกันรังสี',
-    route: '/f9', // แก้ให้ตรงกับ route จริงของ F9ProtectiveClothesForm.vue
+    route: '/f9',
     category: 'Protective Devices'
   },
   {
@@ -118,13 +112,42 @@ const forms = [
   }
 ]
 
+// ฟอร์มที่ผู้ใช้สร้างเองจาก localStorage
+const customForms = ref([])
+
+// รวมทั้งหมด
+const allForms = computed(() => {
+  return [...builtinForms, ...customForms.value]
+})
+
+const loadCustomForms = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare_custom_forms') || '[]')
+    if (Array.isArray(stored)) {
+      customForms.value = stored
+    }
+  } catch (err) {
+    console.error('อ่าน custom forms จาก localStorage ไม่ได้', err)
+    customForms.value = []
+  }
+}
+
 const openForm = (routePath) => {
+  if (!routePath) return
   router.push(routePath)
 }
+
+const goToCreateForm = () => {
+  // path นี้ให้ตั้งใน router ว่าใช้ CustomFormBuilder.vue
+  router.push('/custom-form-builder')
+}
+
+onMounted(() => {
+  loadCustomForms()
+})
 </script>
 
 <style scoped>
-/* ใช้สไตล์พื้นฐานตามหน้า checklist เดิม */
 .checklist-page {
   background: #ffffff;
   min-height: calc(100vh - 56px);
@@ -137,23 +160,6 @@ const openForm = (routePath) => {
   color: #000000;
   letter-spacing: 0.12em;
   margin-bottom: 16px;
-}
-
-.pill-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.pill {
-  background: #ffb480;
-  color: #111827;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  white-space: nowrap;
 }
 
 .content-panel {
@@ -181,11 +187,29 @@ const openForm = (routePath) => {
   margin-top: 4px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-outline {
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: #ffffff;
+}
+.btn-outline:hover {
+  background: #e5e7eb;
+}
+
 /* Grid การ์ดแบบฟอร์ม */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  margin-top: 6px;
 }
 
 .form-card {
@@ -268,6 +292,16 @@ const openForm = (routePath) => {
   transform: translateY(-1px);
 }
 
+.empty-card {
+  grid-column: 1 / -1;
+  padding: 16px 12px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
 /* responsive */
 @media (max-width: 900px) {
   .form-grid {
@@ -278,12 +312,6 @@ const openForm = (routePath) => {
 @media (max-width: 768px) {
   .checklist-page {
     padding: 16px;
-  }
-  .pill-row {
-    gap: 8px;
-  }
-  .pill {
-    font-size: 0.8rem;
   }
 }
 </style>
