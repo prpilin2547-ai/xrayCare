@@ -299,229 +299,7 @@
             </div>
           </div>
 
-          <!-- Main layout: left preview + right settings -->
-          <div class="builder-body">
-            <!-- Left column: preview ของฟิลด์ -->
-            <div class="left-column">
-              <div class="preview-card">
-                <h2 class="preview-title">ตัวอย่างช่องบันทึกผล</h2>
-                <p class="preview-subtitle">
-                  ด้านล่างเป็นตัวอย่างฟิลด์ที่ระบบจะใช้เก็บข้อมูลจริง
-                </p>
-
-                <form class="preview-form" @submit.prevent>
-                  <div
-                    v-for="(field, index) in fields"
-                    :key="field.id"
-                    class="preview-field"
-                    :class="{ selected: selectedFieldIndex === index }"
-                    @click.stop="selectField(index)"
-                  >
-                    <div class="preview-field-header">
-                      <label class="preview-label">
-                        {{ field.label || 'ชื่อฟิลด์ (ตั้งค่าด้านขวา)' }}
-                        <span v-if="field.required" class="required-star">*</span>
-                      </label>
-                      <div class="preview-field-actions">
-                        <span class="field-name-tag">{{ field.name }}</span>
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          title="ลบฟิลด์"
-                          @click.stop="removeField(index)"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="preview-input-wrapper">
-                      <template v-if="field.type === 'short-text'">
-                        <input
-                          type="text"
-                          class="preview-input"
-                          :placeholder="field.placeholder || 'ใส่ข้อความ...'"
-                          disabled
-                        />
-                      </template>
-
-                      <template v-else-if="field.type === 'long-text'">
-                        <textarea
-                          class="preview-textarea"
-                          :placeholder="field.placeholder || 'ใส่รายละเอียด...'"
-                          disabled
-                        ></textarea>
-                      </template>
-
-                      <template v-else-if="field.type === 'number'">
-                        <input
-                          type="number"
-                          class="preview-input"
-                          :placeholder="field.placeholder || 'ใส่ตัวเลข...'"
-                          disabled
-                        />
-                      </template>
-
-                      <template v-else-if="field.type === 'date'">
-                        <input type="date" class="preview-input" disabled />
-                      </template>
-
-                      <template v-else-if="field.type === 'dropdown'">
-                        <select class="preview-input" disabled>
-                          <option v-if="!field.options?.length">
-                            -- ตัวเลือก --
-                          </option>
-                          <option
-                            v-for="(opt, idx) in field.options"
-                            :key="idx"
-                            :value="opt"
-                          >
-                            {{ opt }}
-                          </option>
-                        </select>
-                      </template>
-
-                      <template v-else-if="field.type === 'checkbox'">
-                        <label class="checkbox-line">
-                          <input type="checkbox" disabled />
-                          <span>{{ field.placeholder || 'ตัวเลือก' }}</span>
-                        </label>
-                      </template>
-
-                      <template v-else-if="field.type === 'image'">
-                        <div class="image-placeholder">
-                          พื้นที่แนบรูปภาพ (ผู้ใช้จะอัปโหลดจริงตอนบันทึกผล)
-                        </div>
-                      </template>
-                    </div>
-
-                    <div v-if="field.note" class="preview-note">
-                      {{ field.note }}
-                    </div>
-                  </div>
-
-                  <div v-if="!fields.length" class="empty-hint">
-                    ยังไม่มีฟิลด์ในฟอร์ม กดไอคอน Form Elements ด้านบนเพื่อเพิ่มฟิลด์
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <!-- Right column: ตั้งค่าฟิลด์ -->
-            <div class="right-column">
-              <div class="settings-card" v-if="selectedField">
-                <h3 class="settings-title">ตั้งค่าฟิลด์</h3>
-                <p class="settings-subtitle">
-                  แก้ไขชื่อฟิลด์ Placeholder ตัวเลือก และคุณสมบัติอื่น ๆ
-                </p>
-
-                <div class="settings-row">
-                  <label class="settings-label">ประเภทฟิลด์</label>
-                  <div class="settings-pill">
-                    {{ fieldTypeLabel(selectedField.type) }}
-                  </div>
-                </div>
-
-                <div class="settings-row">
-                  <label class="settings-label">Field ID / Name (ไม่ซ้ำ)</label>
-                  <input
-                    v-model="selectedField.name"
-                    type="text"
-                    class="settings-input"
-                    readonly
-                  />
-                </div>
-
-                <div class="settings-row">
-                  <label class="settings-label">ชื่อฟิลด์ (Label)</label>
-                  <input
-                    v-model="selectedField.label"
-                    type="text"
-                    class="settings-input"
-                    placeholder="เช่น ความหนา (mm), รายละเอียดปัญหา"
-                  />
-                </div>
-
-                <div class="settings-row" v-if="selectedField.type !== 'image'">
-                  <label class="settings-label">
-                    Placeholder / คำอธิบายสั้น ๆ
-                  </label>
-                  <input
-                    v-model="selectedField.placeholder"
-                    type="text"
-                    class="settings-input"
-                    placeholder="ข้อความตัวอย่างในช่อง"
-                  />
-                </div>
-
-                <div
-                  class="settings-row"
-                  v-if="selectedField.type === 'dropdown'"
-                >
-                  <label class="settings-label">
-                    ตัวเลือก Dropdown (หนึ่งบรรทัดต่อหนึ่งตัวเลือก)
-                  </label>
-                  <textarea
-                    v-model="dropdownOptionText"
-                    class="settings-textarea"
-                    rows="4"
-                    placeholder="เช่น&#10;ผ่าน&#10;ไม่ผ่าน&#10;รอทดสอบใหม่"
-                    @input="updateDropdownOptions"
-                  ></textarea>
-                </div>
-
-                <div
-                  class="settings-row"
-                  v-if="selectedField.type === 'checkbox'"
-                >
-                  <label class="settings-label">ข้อความข้าง Checkbox</label>
-                  <input
-                    v-model="selectedField.placeholder"
-                    type="text"
-                    class="settings-input"
-                    placeholder="เช่น ยืนยันว่าตรวจสอบแล้ว"
-                  />
-                </div>
-
-                <div class="settings-row">
-                  <label class="settings-label">
-                    หมายเหตุ (จะแสดงตัวเล็กใต้ฟิลด์)
-                  </label>
-                  <textarea
-                    v-model="selectedField.note"
-                    class="settings-textarea"
-                    rows="3"
-                    placeholder="เช่น กรอกเป็นหน่วย mm, กรอกเฉพาะตัวเลข"
-                  ></textarea>
-                </div>
-
-                <div class="settings-row inline">
-                  <label class="settings-label">บังคับกรอก</label>
-                  <label class="switch">
-                    <input v-model="selectedField.required" type="checkbox" />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-
-                <div class="settings-row">
-                  <button
-                    type="button"
-                    class="btn-danger"
-                    @click="deleteSelected"
-                  >
-                    ลบฟิลด์นี้
-                  </button>
-                </div>
-              </div>
-
-              <div class="settings-card empty" v-else>
-                <h3 class="settings-title">เลือกฟิลด์เพื่อแก้ไข</h3>
-                <p class="settings-subtitle">
-                  คลิกฟิลด์ในตัวอย่างด้านซ้ายเพื่อดูรายละเอียดและแก้ไขค่าต่าง ๆ
-                </p>
-              </div>
-            </div>
-          </div>
+          <!-- คำอธิบาย: ฟิลด์ทั้งหมดถูกจัดการใน Visual Editor แล้ว -->
         </div>
 
         <!-- ===== HTML MODE: แก้ HTML โดยตรง (เฉพาะส่วน Rich Text) ===== -->
@@ -613,12 +391,17 @@
         </div>
       </div>
       <!-- /template-shell -->
+      <!-- Floating actions (bottom-right) -->
+      <!-- <div class="floating-actions">
+        <button class="btn-outline" type="button" @click="goBack">Cancel</button>
+        <button class="btn-primary" type="button" @click="handleSaveForm">Save Template</button>
+      </div> -->
     </div>
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -674,19 +457,22 @@ const generateId = (prefix = 'cf_') => {
 }
 
 // ---------- editor mode switch ----------
-const switchMode = (mode) => {
+const switchMode = async (mode) => {
   if (mode === editorMode.value) return
 
-  // ก่อนออกจาก visual ให้ sync richContent
-  if (editorMode.value === 'visual') {
+  // ก่อนเปลี่ยนโหมดให้ sync richContent เสมอ (ไม่ว่าจะออกจากโหมดไหน)
+  if (editorMode.value === 'visual' && richEditorRef.value) {
     syncRichContent()
   }
 
   editorMode.value = mode
 
-  // เข้าสู่ visual อีกครั้ง → render richContent ลง editor
-  if (mode === 'visual' && richEditorRef.value) {
-    richEditorRef.value.innerHTML = richContent.value
+  // เข้าสู่ visual อีกครั้ง → รอให้ DOM พร้อมก่อน render richContent ลง editor
+  if (mode === 'visual') {
+    await nextTick()
+    if (richEditorRef.value) {
+      richEditorRef.value.innerHTML = richContent.value
+    }
   }
 }
 
@@ -727,27 +513,62 @@ const applyHighlightColor = () => {
 }
 
 // ---------- field operations ----------
+// insert HTML into the rich editor at the current cursor (fallback: append)
+const insertHtmlAtCursor = (html) => {
+  if (!richEditorRef.value) return
+  richEditorRef.value.focus()
+  try {
+    document.execCommand('insertHTML', false, html)
+  } catch (e) {
+    // fallback: append
+    richEditorRef.value.insertAdjacentHTML('beforeend', html)
+  }
+  syncRichContent()
+}
+
 const addField = (type) => {
   const id = generateId('fld_')
-  const base = {
-    id,
-    name: 'f_' + generateId().slice(-8), // field name ไม่ซ้ำ
-    type,
-    label: '',
-    placeholder: '',
-    required: false,
-    note: ''
+  const fieldName = 'f_' + generateId().slice(-8) // field name ไม่ซ้ำ
+  
+  // สร้าง HTML สำหรับแสดงใน visual editor เท่านั้น
+  let html = ''
+  const labelText = type === 'short-text' ? 'Enter text' : 'Field'
+
+  switch (type) {
+    case 'short-text':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="text" placeholder="Enter" /></div></div>`
+      break
+    case 'long-text':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><textarea class="editor-textarea" placeholder="Enter longer text"></textarea></div></div>`
+      break
+    case 'number':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="number" placeholder="" /></div></div>`
+      break
+    case 'date':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="date" /></div></div>`
+      break
+    case 'dropdown':
+      {
+        const opts = '<option>ตัวเลือก 1</option><option>ตัวเลือก 2</option>'
+        html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><select class="editor-select">${opts}</select></div></div>`
+      }
+      break
+    case 'checkbox':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label><input type="checkbox" /> ${labelText}</label></div>`
+      break
+    case 'image':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control image-placeholder">Image placeholder</div></div>`
+      break
+    default:
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label></div>`
   }
 
-  if (type === 'dropdown') {
-    base.options = ['ตัวเลือก 1', 'ตัวเลือก 2']
-  }
-
-  fields.value.push(base)
-  selectedFieldIndex.value = fields.value.length - 1
-
-  if (type === 'dropdown') {
-    dropdownOptionText.value = base.options.join('\n')
+  // เพิ่มใน visual editor เท่านั้น ไม่ push เข้า fields array
+  if (editorMode.value === 'visual' && richEditorRef.value) {
+    insertHtmlAtCursor(html)
+  } else {
+    // keep richContent in sync so HTML mode shows it
+    richContent.value += html
   }
 }
 
@@ -1401,6 +1222,44 @@ input:checked + .slider:before {
 }
 .preview-template-control {
   margin-bottom: 2px;
+}
+
+/* editor inserted field blocks (inside rich editor) */
+.editor-field {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+  margin: 8px 0;
+  background: #fafafa;
+}
+.editor-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.editor-control .editor-input,
+.editor-control .editor-textarea,
+.editor-control .editor-select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 0.9rem;
+}
+.editor-control .editor-textarea {
+  min-height: 70px;
+}
+
+/* floating action buttons (bottom-right) */
+.floating-actions {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  display: flex;
+  gap: 10px;
+  z-index: 60;
 }
 
 /* responsive */
