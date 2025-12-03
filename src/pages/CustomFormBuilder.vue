@@ -499,7 +499,7 @@ const handleSaveForm = () => {
   localStorage.setItem('xraycare_custom_forms', JSON.stringify(stored))
 
   // กลับไปหน้า hub (ถ้า path จริงไม่ใช่ /qc-forms-hub ให้แก้)
-  router.push('/qc-forms-hub')
+  router.push('/qc-forms')
 }
 
 const stripHtml = (html) => {
@@ -509,7 +509,7 @@ const stripHtml = (html) => {
 }
 
 const goBack = () => {
-  router.push('/qc-forms-hub')
+  router.push('/qc-forms')
 }
 
 // โหลดฟอร์มเดิมถ้าอยู่ในโหมดแก้ไข
