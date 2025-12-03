@@ -27,12 +27,13 @@
 
         <!-- Grid แสดงการ์ดแบบบันทึก -->
         <div class="form-grid">
-          <div
-            v-for="form in allForms"
-            :key="form.id"
-            class="form-card"
-            @click="openForm(form.route)"
-          >
+          <div v-for="form in allForms" :key="form.id" class="form-card" @click="openForm(form.route)">
+            <!-- ปุ่มลบสำหรับฟอร์มที่สร้างเอง -->
+            <button v-if="isCustomForm(form.id)" type="button" class="btn-delete"
+              @click.stop="deleteCustomForm(form.id)" title="ลบแบบบันทึก">
+              ✕
+            </button>
+
             <div class="form-code">
               {{ form.code }}
             </div>
@@ -43,11 +44,7 @@
                 <span class="badge">{{ form.category }}</span>
               </div>
             </div>
-            <button
-              type="button"
-              class="btn-card"
-              @click.stop="openForm(form.route)"
-            >
+            <button type="button" class="btn-card" @click.stop="openForm(form.route)">
               เปิดแบบบันทึก
             </button>
           </div>
@@ -142,6 +139,28 @@ const goToCreateForm = () => {
   router.push('/custom-form-builder')
 }
 
+// ตรวจสอบว่าเป็นฟอร์มที่ผู้ใช้สร้างเองหรือไม่
+const isCustomForm = (formId) => {
+  return customForms.value.some(form => form.id === formId)
+}
+
+// ลบฟอร์มที่สร้างเองออกจาก localStorage
+const deleteCustomForm = (formId) => {
+  if (confirm('คุณต้องการลบแบบบันทึกนี้หรือไม่?')) {
+    // ลบออกจาก array
+    customForms.value = customForms.value.filter(form => form.id !== formId)
+
+    // บันทึกกลับไปที่ localStorage
+    try {
+      localStorage.setItem('xraycare_custom_forms', JSON.stringify(customForms.value))
+      console.log('ลบฟอร์มสำเร็จ:', formId)
+    } catch (err) {
+      console.error('ลบฟอร์มไม่สำเร็จ:', err)
+      alert('เกิดข้อผิดพลาดในการลบฟอร์ม')
+    }
+  }
+}
+
 onMounted(() => {
   loadCustomForms()
 })
@@ -200,6 +219,7 @@ onMounted(() => {
   cursor: pointer;
   background: #ffffff;
 }
+
 .btn-outline:hover {
   background: #e5e7eb;
 }
@@ -300,6 +320,32 @@ onMounted(() => {
   border: 1px dashed #d1d5db;
   font-size: 0.85rem;
   color: #6b7280;
+}
+
+/* ปุ่มลบฟอร์ม */
+.btn-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+  z-index: 10;
+}
+
+.btn-delete:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
 }
 
 /* responsive */
