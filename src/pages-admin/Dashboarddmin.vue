@@ -135,22 +135,22 @@
         </div>
 
         <!-- Request Table (Engineer) -->
-        <div class="table-responsive">
-          <table class="table table-bordered border-dark request-table">
+        <div class="table-card">
+          <table class="table">
             <thead>
               <tr>
-                <th style="width: 10%;">ลำดับ</th>
-                <th style="width: 40%;">อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
-                <th style="width: 20%;">ห้องตรวจ</th>
-                <th style="width: 30%;">สถานะการแจ้งซ่อม</th>
+                <th>ลำดับ</th>
+                <th>อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
+                <th>ห้องตรวจ</th>
+                <th>สถานะการแจ้งซ่อม</th>
               </tr>
             </thead>
-            <tbody class="bg-white">
+            <tbody>
               <tr v-for="(item, index) in engineerRequests" :key="item.id">
                 <td>{{ index + 1 }}</td>
-                <td class="text-center">{{ item.name }}</td>
+                <td>{{ item.name }}</td>
                 <td>{{ item.room }}</td>
-                <td class="text-warning-custom">{{ item.status }}</td>
+                <td class="status pending">{{ item.status }}</td>
               </tr>
             </tbody>
           </table>
