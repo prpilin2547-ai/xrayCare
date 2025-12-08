@@ -120,20 +120,24 @@
   <tbody>
     <!-- แถวที่ 2: ครั้งที่ 1 -->
     <tr>
-      <td class="col-run">1</td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
-    </tr>
+  <td class="col-run">1</td>
+
+  <!-- ตารางย่อย 2×2 ใต้ IAV -->
+  <td>
+    <div class="quad-box">
+      <div></div><div></div>
+      <div></div><div></div>
+    </div>
+  </td>
+
+  <!-- BG ยังเป็น 2×2 กล่องเหมือนเดิม -->
+  <td>
+    <div class="quad-box">
+      <div></div><div></div>
+      <div></div><div></div>
+    </div>
+  </td>
+</tr>
 
     <!-- แถวที่ 3: ครั้งที่ 2 -->
     <tr>
@@ -378,9 +382,9 @@ onMounted(async () => {
 }
 
 /* ความกว้างคอลัมน์ให้เหมือนฟอร์มรูปที่ 1 */
-.col-run { width: 20mm; }
-.col-iav { width: 80mm; }
-.col-bg  { width: 80mm; }
+.col-run { width: 18mm; }
+.col-iav { width: 81mm; }
+.col-bg  { width: 81mm; }
 
 /* เลขครั้งที่ อยู่กลางบล็อก */
 .run-number {
@@ -447,7 +451,7 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
-  .col-iav-group,
+.col-iav-group,
 .col-bg-group {
   text-align: center;
   font-weight: 700;
@@ -478,6 +482,18 @@ onMounted(async () => {
   width: 100%;
   height: 18mm;           /* ปรับได้ตามความสูงที่ต้องการ */
   gap: 0;
+}
+
+.quad-box > div {
+  border: 0.4pt solid #000;
+}
+
+.quad-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 25mm;
 }
 
 .quad-box > div {

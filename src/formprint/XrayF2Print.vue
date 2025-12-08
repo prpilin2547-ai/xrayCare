@@ -83,83 +83,79 @@
                 </th>
               </tr>
             </thead>
+<tbody>
+  <!-- แถวที่ 1 : เดือน -->
+  <tr>
+    <!-- คอลัมน์ซ้าย -->
+    <td class="col-left align-center">
+      เดือน
+      <div>
+        <span class="dotted-line">{{ section.monthLabel }}</span>
+      </div>
+    </td>
 
-            <tbody>
-              <!-- แถวที่ 1 : เดือน ............ -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="cell-left-wrapper">
-                    เดือน
-                    <span class="dotted-line">
-                      {{ section.monthLabel }}
-                    </span>
-                  </div>
-                </td>
-                <td
-                  v-for="d in 20"
-                  :key="'m-' + d"
-                  class="col-day"
-                >
-                  &nbsp;
-                </td>
-              </tr>
+    <!-- คอลัมน์วันที่ -->
+    <td
+      v-for="d in 20"
+      :key="'m-' + d"
+      class="col-day"
+    >
+      &nbsp;
+    </td>
+  </tr>
 
-              <!-- แถวที่ 2 : ผลการทดสอบ Pass / Fail -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="cell-left-wrapper">
-                    <div>ผลการทดสอบ</div>
-                    <div>Pass (✓) / Fail (✗)</div>
-                  </div>
-                </td>
-                <td
-                  v-for="d in 20"
-                  :key="'r-' + d"
-                  class="col-day"
-                >
-                  <span v-if="section.results[d] === 'pass'">✓</span>
-                  <span v-else-if="section.results[d] === 'fail'">✗</span>
-                </td>
-              </tr>
+  <!-- แถวที่ 2 : ผลการทดสอบ -->
+  <tr>
+    <td class="col-left align-left">
+      <div class="cell-left-wrapper">
+        <div>ผลการทดสอบ</div>
+        <div>Pass (✓) / Fail (✗)</div>
+      </div>
+    </td>
 
-              <!-- แถวที่ 3 : สภาพผิดปกติของแผ่นหรือด้านบนบนภาพ -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="cell-left-wrapper multi-line">
-                    <div>สภาพผิดปกติ</div>
-                    <div>ของแผ่น</div>
-                    <div>หรือตำแหน่งบนภาพ</div>
-                  </div>
-                </td>
-                <td
-                  v-for="d in 20"
-                  :key="'a-' + d"
-                  class="col-day align-left"
-                >
-                  {{ section.appearance[d] || '' }}
-                </td>
-              </tr>
+    <td
+      v-for="d in 20"
+      :key="'r-' + d"
+      class="col-day"
+    >
+      <span v-if="section.results[d] === 'pass'">✓</span>
+      <span v-else-if="section.results[d] === 'fail'">✗</span>
+    </td>
+  </tr>
 
-              <!-- แถวที่ 4 : ผู้ตรวจสอบ -->
-              <tr>
-                <td class="col-left align-left">
-                  <div class="cell-left-wrapper">
-                    ผู้ตรวจสอบ
-                  </div>
-                </td>
-                <td
-                  colspan="20"
-                  class="align-left"
-                >
-                  <!-- เอาเส้นออกโดยแก้ CSS ของ .bottom-line -->
-                  <span class="bottom-line">
-                    {{ section.inspector || record.inspector }}
-                  </span>
-                </td>
-              </tr>
+  <!-- แถวที่ 3 : สภาพผิดปกติ -->
+  <tr>
+    <td class="col-left align-left">
+      <div class="cell-left-wrapper multi-line">
+        <div>สภาพผิดปกติ</div>
+        <div>ของแผ่น</div>
+        <div>หรือตำแหน่งบนภาพ</div>
+      </div>
+    </td>
 
-              
-            </tbody>
+    <td
+      v-for="d in 20"
+      :key="'a-' + d"
+      class="col-day align-left"
+    >
+      {{ section.appearance[d] || '' }}
+    </td>
+  </tr>
+
+  <!-- แถวที่ 4 : ผู้ตรวจสอบ -->
+  <tr>
+    <td class="col-left align-left">
+      <div class="cell-left-wrapper">
+        ผู้ตรวจสอบ
+      </div>
+    </td>
+
+    <td colspan="20" class="align-left">
+      <span class="bottom-line">{{ section.inspector || record.inspector }}</span>
+    </td>
+  </tr>
+</tbody>
+
           </table>
         </div>
       </div>
@@ -339,6 +335,11 @@ onMounted(async () => {
 
 .align-left {
   text-align: left;
+}
+
+.align-center {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .cell-left-wrapper {
