@@ -35,7 +35,7 @@
       <div class="card shadow-sm" v-if="showGraph">
         <div class="card-header bg-white py-3">
           <h5 class="card-title m-0 text-primary">
-            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
+            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Count) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
             <span v-if="displayMonth && displayYear">
               ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
             </span>
@@ -57,7 +57,7 @@
       <div v-else class="card shadow-sm">
         <div class="card-header bg-white py-3">
           <h5 class="card-title m-0 text-primary">
-            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
+            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Count) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
             ประจำเดือน _____ ปี _____
           </h5>
         </div>
@@ -92,10 +92,9 @@ let myChart = null;
 
 // Methods
 const handleSearch = () => {
-  // Always show the card/header when search is clicked
-  showGraph.value = true;
-
+  // Only show the graph when both month and year are selected
   if (selectedMonth.value && selectedYear.value) {
+    showGraph.value = true;
     displayMonth.value = selectedMonth.value;
     displayYear.value = selectedYear.value;
 
@@ -104,7 +103,8 @@ const handleSearch = () => {
       renderChart(selectedMonth.value, selectedYear.value);
     });
   } else {
-    // Clear display values to show underscores
+    // Hide the graph if either month or year is not selected
+    showGraph.value = false;
     displayMonth.value = '';
     displayYear.value = '';
   }
@@ -117,24 +117,17 @@ const renderChart = (month, year) => {
     myChart.destroy();
   }
 
-  // Generate Mock Data based on selection (Random for demo)
-  // In a real app, this would filter based on the standard monthly sequence
-  // For this demo, we will show relevant data. 
-  // Let's assume we show the breakdown for the specific month (Metrics vs Targets? or Comparison?)
-  // Requirement: "Graph showing Failure Rate (Count) vs Recurrent Failure Rate (Rate)"
+  // X-axis labels: 4 X-ray machines
+  const labels = [
+    'X-Ray (BrandA/ModelX)',
+    'X-Ray (BrandB/ModelY)',
+    'X-Ray (BrandC/ModelZ)',
+    'X-Ray (BrandD/ModelW)'
+  ];
 
-  // Since it's "For Month X Year Y", presenting a single data point is often dull.
-  // However, specifically for "Analytical" dashboards, often you want to see the Trend LEADING up to that month.
-  // OR you want to see the specific stats for that month compared to others?
-  // Let's create a chart with 2 datasets: 
-  // 1. Failure Count (Bar)
-  // 2. Recurrent Failure Rate (Line)
-  // We will display 12 months of the selected year for context, and highlight the selected month?
-  // Or just display random data.
-
-  const labels = thaiMonths;
-  const failureData = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)); // 0-10 failures
-  const rfrData = Array.from({ length: 12 }, () => Math.floor(Math.random() * 30)); // 0-30 %
+  // Generate mock data for each machine
+  const failureData = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)); // 0-10 failures
+  const rfrData = Array.from({ length: 4 }, () => Math.floor(Math.random() * 30)); // 0-30 %
 
   myChart = new Chart(ctx, {
     type: 'bar',
@@ -142,7 +135,7 @@ const renderChart = (month, year) => {
       labels: labels,
       datasets: [
         {
-          label: 'จำนวนครั้งที่เครื่องขัดข้อง (Failure Rate)',
+          label: 'จำนวนครั้งที่เครื่องขัดข้อง (Failure Count)',
           data: failureData,
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',
@@ -157,7 +150,9 @@ const renderChart = (month, year) => {
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderWidth: 2,
           yAxisID: 'y1',
-          tension: 0.3
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 7
         }
       ]
     },
@@ -169,6 +164,10 @@ const renderChart = (month, year) => {
           beginAtZero: true,
           type: 'linear',
           position: 'left',
+          max: 10,
+          ticks: {
+            stepSize: 1
+          },
           title: {
             display: true,
             text: 'จำนวนครั้ง (Count)'
@@ -178,17 +177,19 @@ const renderChart = (month, year) => {
           beginAtZero: true,
           type: 'linear',
           position: 'right',
+          max: 30,
+          ticks: {
+            stepSize: 3,
+            callback: function (value) {
+              return value + "%"
+            }
+          },
           grid: {
             drawOnChartArea: false, // only want the grid lines for one axis to show up
           },
           title: {
             display: true,
             text: 'อัตราการเสียซ้ำ (%)'
-          },
-          ticks: {
-            callback: function (value) {
-              return value + "%"
-            }
           }
         }
       },
