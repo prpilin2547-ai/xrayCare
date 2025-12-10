@@ -1,9 +1,8 @@
 <template>
   <MainLayout>
     <div class="container-fluid p-4">
-      <h1 class="mb-4">Analytical</h1>
+      <h1 class="mb-4">Analytical Report</h1>
 
-      <!-- Filter Section -->
       <div class="row g-3 align-items-end mb-4">
         <div class="col-md-3">
           <label for="monthSelect" class="form-label">เดือน</label>
@@ -31,39 +30,61 @@
         </div>
       </div>
 
-      <!-- Graph Section -->
-      <div class="card shadow-sm" v-if="showGraph">
-        <div class="card-header bg-white py-3">
-          <h5 class="card-title m-0 text-primary">
-            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Count) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
-            <span v-if="displayMonth && displayYear">
-              ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
-            </span>
-            <span v-else>
-              ประจำเดือน _____ ปี _____
-            </span>
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-            <canvas id="analyticalChart"></canvas>
+      <div v-if="showGraph" class="row g-4">
+
+        <div class="col-lg-8">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+              <h5 class="card-title m-0 text-primary">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
+                กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure
+                Rate)
+                <small class="text-muted d-block mt-1" style="font-size: 0.8em;">
+                  ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
+                </small>
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas id="analyticalChart"></canvas>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div class="col-lg-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+              <h5 class="card-title m-0 text-success">
+                <i class="bi bi-pie-chart-fill me-2"></i>
+                ผลการทดสอบ QC & Dose
+              </h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                <canvas id="qcChart"></canvas>
+              </div>
+              <div class="mt-3 text-center text-muted small">
+                สัดส่วนการผ่านเกณฑ์มาตรฐานกรมวิทย์ฯ
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Initial Placeholder if not searched (Optional based on requirements, but user said "show header... but not month year until filled") -->
-      <!-- The requirements said: "When entering this page first time... show header words but NOT month/year... shows month/year ONLY after filling form and clicking search" -->
-      <!-- My implementation above handles this with v-if logic on the span texts. -->
       <div v-else class="card shadow-sm">
         <div class="card-header bg-white py-3">
-          <h5 class="card-title m-0 text-primary">
-            กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Count) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure Rate)
-            ประจำเดือน _____ ปี _____
+          <h5 class="card-title m-0 text-secondary">
+            รายงานข้อมูลเชิงสถิติ (Analytical Dashboard)
           </h5>
         </div>
         <div class="card-body d-flex justify-content-center align-items-center"
           style="height: 400px; background-color: #f8f9fa;">
-          <p class="text-muted">กรุณากรอกข้อมูลและกดปุ่มค้นหาเพื่อแสดงข้อมูล</p>
+          <div class="text-center text-muted">
+            <i class="bi bi-clipboard-data display-4 mb-3"></i>
+            <p>กรุณากรอกข้อมูลและกดปุ่มค้นหาเพื่อแสดงข้อมูลวิเคราะห์</p>
+          </div>
         </div>
       </div>
 
@@ -72,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, nextTick } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 import Chart from 'chart.js/auto';
 
@@ -88,36 +109,33 @@ const selectedYear = ref('');
 const displayMonth = ref('');
 const displayYear = ref('');
 const showGraph = ref(false);
-let myChart = null;
+
+// Chart Instances
+let performanceChart = null;
+let qcChart = null;
 
 // Methods
 const handleSearch = () => {
-  // Only show the graph when both month and year are selected
   if (selectedMonth.value && selectedYear.value) {
     showGraph.value = true;
     displayMonth.value = selectedMonth.value;
     displayYear.value = selectedYear.value;
 
-    // Wait for DOM update to ensure canvas exists
     nextTick(() => {
-      renderChart(selectedMonth.value, selectedYear.value);
+      renderPerformanceChart();
+      renderQCChart();
     });
   } else {
-    // Hide the graph if either month or year is not selected
     showGraph.value = false;
-    displayMonth.value = '';
-    displayYear.value = '';
   }
 };
 
-const renderChart = (month, year) => {
+// 1. Render Combo Chart (Failure Count + RFR) -> ปรับปรุงข้อมูลตามรูปภาพ
+const renderPerformanceChart = () => {
   const ctx = document.getElementById('analyticalChart');
+  if (performanceChart) performanceChart.destroy();
 
-  if (myChart) {
-    myChart.destroy();
-  }
-
-  // X-axis labels: 4 X-ray machines
+  // ปรับ Label ให้สื่อความหมายตาม Case ในรูป (หรือใช้ชื่อเครื่องปกติก็ได้)
   const labels = [
     'X-Ray (BrandA/ModelX)',
     'X-Ray (BrandB/ModelY)',
@@ -125,71 +143,72 @@ const renderChart = (month, year) => {
     'X-Ray (BrandD/ModelW)'
   ];
 
-  // Generate mock data for each machine
-  const failureData = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)); // 0-10 failures
-  const rfrData = Array.from({ length: 4 }, () => Math.floor(Math.random() * 30)); // 0-30 %
+  // DATA MAPPING ตามรูปภาพ:
+  // 1. แท่งสูง + จุดต่ำ = Aging/Overused
+  // 2. แท่งสูง + จุดสูง = Critical
+  // 3. แท่งเตี้ย + จุดสูง = Poor Repair
+  // 4. แท่งเตี้ย + จุดต่ำ = Healthy
 
-  myChart = new Chart(ctx, {
+  const failureData = [15, 12, 3, 1];      // Bar (แกนซ้าย): สูง, สูง, ต่ำ, ต่ำ
+  const rfrData = [5, 85, 60, 0];     // Line (แกนขวา): ต่ำ, สูง, สูง, ต่ำ
+
+  performanceChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
-          label: 'จำนวนครั้งที่เครื่องขัดข้อง (Failure Count)',
+          label: 'จำนวนแจ้งซ่อม (ครั้ง)',
           data: failureData,
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          backgroundColor: 'rgba(54, 162, 235, 0.7)', // สีฟ้า (Blue Bar)
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
-          yAxisID: 'y',
+          order: 2,
+          yAxisID: 'y'
         },
         {
-          label: 'อัตราการเสียซ้ำ (Recurrent Failure Rate %)',
+          label: 'อัตราการเสียซ้ำ (RFR %)',
           data: rfrData,
           type: 'line',
-          borderColor: 'rgba(255, 99, 132, 1)',
+          borderColor: 'rgba(255, 99, 132, 1)',     // สีแดง (Red Dot/Line)
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderWidth: 2,
+          borderWidth: 3,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: 'rgba(255, 99, 132, 1)',
+          pointRadius: 6,           // ขนาดจุด
+          pointHoverRadius: 8,
+          order: 1,
           yAxisID: 'y1',
-          tension: 0.3,
-          pointRadius: 5,
-          pointHoverRadius: 7
+          tension: 0.3
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       scales: {
         y: {
-          beginAtZero: true,
           type: 'linear',
+          display: true,
           position: 'left',
-          max: 10,
-          ticks: {
-            stepSize: 1
-          },
-          title: {
-            display: true,
-            text: 'จำนวนครั้ง (Count)'
-          }
+          beginAtZero: true,
+          title: { display: true, text: 'จำนวนครั้ง (Count)' },
+          grid: { drawOnChartArea: true }
         },
         y1: {
-          beginAtZero: true,
           type: 'linear',
+          display: true,
           position: 'right',
-          max: 30,
+          min: 0,
+          max: 100, // ล็อกแกนขวาไว้ที่ 0-100%
+          title: { display: true, text: 'อัตราการเสียซ้ำ (%)' },
+          grid: { drawOnChartArea: false },
           ticks: {
-            stepSize: 3,
-            callback: function (value) {
-              return value + "%"
-            }
-          },
-          grid: {
-            drawOnChartArea: false, // only want the grid lines for one axis to show up
-          },
-          title: {
-            display: true,
-            text: 'อัตราการเสียซ้ำ (%)'
+            callback: function (value) { return value + "%" }
           }
         }
       },
@@ -203,9 +222,7 @@ const renderChart = (month, year) => {
               }
               if (context.parsed.y !== null) {
                 label += context.parsed.y;
-                if (context.dataset.yAxisID === 'y1') {
-                  label += '%';
-                }
+                if (context.dataset.type === 'line') label += '%';
               }
               return label;
             }
@@ -216,28 +233,50 @@ const renderChart = (month, year) => {
   });
 };
 
+// 2. Render Donut Chart (QC Pass/Fail)
+const renderQCChart = () => {
+  const ctx = document.getElementById('qcChart');
+  if (qcChart) qcChart.destroy();
+
+  const qcData = [95, 5];
+
+  qcChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Pass (ผ่านเกณฑ์)', 'Fail (ไม่ผ่านเกณฑ์)'],
+      datasets: [{
+        data: qcData,
+        backgroundColor: ['#28a745', '#dc3545'],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return ` ${context.label}: ${context.parsed}%`;
+            }
+          }
+        }
+      }
+    }
+  });
+};
 </script>
 
 <style scoped>
-/* Optional: Ensure Bootstrap icons if not globally imported */
-/* @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"); */
-
-.page-title {
-  color: #0d6efd;
-}
-
 .chart-container {
   position: relative;
   margin: auto;
-  height: 400px;
 }
 
-/* Light gray color for placeholder text */
-.form-select.placeholder-selected {
+.placeholder-selected {
   color: #6c757d;
-}
-
-.form-select:not(.placeholder-selected) {
-  color: #212529;
 }
 </style>
