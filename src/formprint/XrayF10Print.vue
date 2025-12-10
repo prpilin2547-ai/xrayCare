@@ -106,76 +106,69 @@
           </div>
         </div>
 
-<!-- ตารางค่าความสว่าง (เหมือน PDF ต้นฉบับ รูปที่ 1) -->
-<!-- ตารางค่าความสว่าง -->
 <table class="f10-table">
   <thead>
     <tr>
-      <th class="col-run">ครั้งที่</th>
-      <th class="col-iav">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
-      <th class="col-bg">Background (I<sub>BG</sub>)</th>
+      <th>ครั้งที่</th>
+      <th colspan="2">ความสว่างแสงไฟ (IAV)</th>
+      <th colspan="2">Background (IBG)</th>
     </tr>
   </thead>
 
   <tbody>
-    <!-- แถวที่ 2: ครั้งที่ 1 -->
+
+    <!-- แถวที่ 2–3 : ผสานคอลัมน์ที่ 1 -->
     <tr>
-  <td class="col-run">1</td>
-
-  <!-- ตารางย่อย 2×2 ใต้ IAV -->
-  <td>
-    <div class="quad-box">
-      <div></div><div></div>
-      <div></div><div></div>
-    </div>
-  </td>
-
-  <!-- BG ยังเป็น 2×2 กล่องเหมือนเดิม -->
-  <td>
-    <div class="quad-box">
-      <div></div><div></div>
-      <div></div><div></div>
-    </div>
-  </td>
-</tr>
-
-    <!-- แถวที่ 3: ครั้งที่ 2 -->
-    <tr>
-      <td class="col-run">2</td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
+      <td rowspan="2">1</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
 
-    <!-- แถวที่ 4: ครั้งที่ 3 -->
     <tr>
-      <td class="col-run">3</td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
-      <td>
-        <div class="quad-box">
-          <div></div><div></div>
-          <div></div><div></div>
-        </div>
-      </td>
+      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- แถวที่ 4–5 : ผสานคอลัมน์ที่ 1 -->
+    <tr>
+      <td rowspan="2">2</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- แถวที่ 6–7 : ผสานคอลัมน์ที่ 1 -->
+    <tr>
+      <td rowspan="2">3</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
   </tbody>
 </table>
-
-
 
         <!-- ส่วนคำนวณ IAV / IBG / ILBD -->
         <div class="formula-block">
@@ -376,9 +369,36 @@ onMounted(async () => {
 .f10-table th,
 .f10-table td {
   border: 0.4pt solid #000;
-  padding: 1.5mm 1mm;
+  padding: 7mm 1mm;
   text-align: center;
   vertical-align: middle;
+}
+
+/* ลดขนาดความกว้างคอลัมน์หัวตาราง */
+.f10-table th:nth-child(1),   /* ครั้งที่ */
+.f10-table td:nth-child(1) {
+  width: 15mm !important;     /* เดิมกว้างเกินไป */
+}
+
+.f10-table th:nth-child(2),   /* IAV */
+.f10-table td:nth-child(2) {
+  width: 35mm !important;     /* ลดขนาดลง */
+}
+
+/* คอลัมน์ที่ 3 และ คอลัมน์ที่ 5 ให้กว้างขึ้น */
+.f10-table th:nth-child(3),
+.f10-table td:nth-child(3) {
+  width: 35mm !important;   /* เพิ่มความกว้าง */
+}
+
+.f10-table th:nth-child(4),   /* BG */
+.f10-table td:nth-child(4) {
+  width: 35mm !important;     /* ลดขนาดลง */
+}
+
+.f10-table th:nth-child(5),
+.f10-table td:nth-child(5) {
+  width: 35mm !important;   /* เพิ่มความกว้าง */
 }
 
 /* ความกว้างคอลัมน์ให้เหมือนฟอร์มรูปที่ 1 */
@@ -499,7 +519,6 @@ onMounted(async () => {
 .quad-box > div {
   border: 0.4pt solid #000;
 }
-
 
 }
 </style>

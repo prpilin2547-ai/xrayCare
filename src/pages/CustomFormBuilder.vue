@@ -613,12 +613,17 @@
         </div>
       </div>
       <!-- /template-shell -->
+      <!-- Floating actions (bottom-right) -->
+      <!-- <div class="floating-actions">
+        <button class="btn-outline" type="button" @click="goBack">Cancel</button>
+        <button class="btn-primary" type="button" @click="handleSaveForm">Save Template</button>
+      </div> -->
     </div>
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -674,19 +679,22 @@ const generateId = (prefix = 'cf_') => {
 }
 
 // ---------- editor mode switch ----------
-const switchMode = (mode) => {
+const switchMode = async (mode) => {
   if (mode === editorMode.value) return
 
-  // ก่อนออกจาก visual ให้ sync richContent
-  if (editorMode.value === 'visual') {
+  // ก่อนเปลี่ยนโหมดให้ sync richContent เสมอ (ไม่ว่าจะออกจากโหมดไหน)
+  if (editorMode.value === 'visual' && richEditorRef.value) {
     syncRichContent()
   }
 
   editorMode.value = mode
 
-  // เข้าสู่ visual อีกครั้ง → render richContent ลง editor
-  if (mode === 'visual' && richEditorRef.value) {
-    richEditorRef.value.innerHTML = richContent.value
+  // เข้าสู่ visual อีกครั้ง → รอให้ DOM พร้อมก่อน render richContent ลง editor
+  if (mode === 'visual') {
+    await nextTick()
+    if (richEditorRef.value) {
+      richEditorRef.value.innerHTML = richContent.value
+    }
   }
 }
 
@@ -727,11 +735,26 @@ const applyHighlightColor = () => {
 }
 
 // ---------- field operations ----------
+// insert HTML into the rich editor at the current cursor (fallback: append)
+const insertHtmlAtCursor = (html) => {
+  if (!richEditorRef.value) return
+  richEditorRef.value.focus()
+  try {
+    document.execCommand('insertHTML', false, html)
+  } catch (e) {
+    // fallback: append
+    richEditorRef.value.insertAdjacentHTML('beforeend', html)
+  }
+  syncRichContent()
+}
+
 const addField = (type) => {
   const id = generateId('fld_')
+  const fieldName = 'f_' + generateId().slice(-8) // field name ไม่ซ้ำ
+  
   const base = {
     id,
-    name: 'f_' + generateId().slice(-8), // field name ไม่ซ้ำ
+    name: fieldName,
     type,
     label: '',
     placeholder: '',
@@ -743,11 +766,53 @@ const addField = (type) => {
     base.options = ['ตัวเลือก 1', 'ตัวเลือก 2']
   }
 
+  // เพิ่มเข้า fields array ก่อน
   fields.value.push(base)
   selectedFieldIndex.value = fields.value.length - 1
 
   if (type === 'dropdown') {
     dropdownOptionText.value = base.options.join('\n')
+  }
+
+  // สร้าง HTML สำหรับแสดงใน visual editor
+  let html = ''
+  const labelText = type === 'short-text' ? 'Enter text' : 'Field'
+
+  switch (type) {
+    case 'short-text':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="text" placeholder="Enter" /></div></div>`
+      break
+    case 'long-text':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><textarea class="editor-textarea" placeholder="Enter longer text"></textarea></div></div>`
+      break
+    case 'number':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="number" placeholder="" /></div></div>`
+      break
+    case 'date':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><input class="editor-input" type="date" /></div></div>`
+      break
+    case 'dropdown':
+      {
+        const opts = '<option>ตัวเลือก 1</option><option>ตัวเลือก 2</option>'
+        html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control"><select class="editor-select">${opts}</select></div></div>`
+      }
+      break
+    case 'checkbox':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label><input type="checkbox" /> ${labelText}</label></div>`
+      break
+    case 'image':
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label><div class="editor-control image-placeholder">Image placeholder</div></div>`
+      break
+    default:
+      html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label></div>`
+  }
+
+  // เพิ่มลงใน visual editor
+  if (editorMode.value === 'visual' && richEditorRef.value) {
+    insertHtmlAtCursor(html)
+  } else {
+    // keep richContent in sync so HTML mode shows it
+    richContent.value += html
   }
 }
 
@@ -1401,6 +1466,44 @@ input:checked + .slider:before {
 }
 .preview-template-control {
   margin-bottom: 2px;
+}
+
+/* editor inserted field blocks (inside rich editor) */
+.editor-field {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+  margin: 8px 0;
+  background: #fafafa;
+}
+.editor-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.editor-control .editor-input,
+.editor-control .editor-textarea,
+.editor-control .editor-select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 0.9rem;
+}
+.editor-control .editor-textarea {
+  min-height: 70px;
+}
+
+/* floating action buttons (bottom-right) */
+.floating-actions {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  display: flex;
+  gap: 10px;
+  z-index: 60;
 }
 
 /* responsive */
