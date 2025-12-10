@@ -70,89 +70,65 @@
         >
           <table class="f2-table">
             <thead>
-              <tr>
-                <th class="col-left">
-                  เดือน/รายการ/วันที่
-                </th>
-                <th
-                  v-for="d in 20"
-                  :key="d"
-                  class="col-day"
-                >
-                  {{ d }}
-                </th>
-              </tr>
-            </thead>
-<tbody>
-  <!-- แถวที่ 1 : เดือน -->
   <tr>
-    <!-- คอลัมน์ซ้าย -->
-    <td class="col-left align-center">
-      เดือน
-      <div>
-        <span class="dotted-line">{{ section.monthLabel }}</span>
-      </div>
+    <!-- รวมคอลัมน์ 1–2 แล้ว -->
+    <th class="col-left" colspan="2">เดือน/รายการ/วันที่</th>
+
+    <!-- คอลัมน์ 3–22 = ตัวเลข 1–20 -->
+    <th
+      v-for="d in 20"
+      :key="'hd-' + d"
+      class="col-day"
+    >
+      {{ d }}
+    </th>
+  </tr>
+</thead>
+
+<tbody>
+  <!-- แถวที่ 2 -->
+  <tr>
+    <td class="col-month" rowspan="3">
+  <div class="month-wrapper">
+    <div>เดือน</div>
+    <span class="underline month-line">{{ section.monthLabel }}</span>
+  </div>
+</td>
+
+
+    <!-- คอลัมน์ที่ 2 -->
+    <td class="col-second">
+      ผลการทดสอบ<br>Pass (✓) / Fail (✗)
     </td>
 
     <!-- คอลัมน์วันที่ -->
-    <td
-      v-for="d in 20"
-      :key="'m-' + d"
-      class="col-day"
-    >
-      &nbsp;
-    </td>
+    <td v-for="d in 20" :key="'r2-'+d" class="col-day">&nbsp;</td>
   </tr>
 
-  <!-- แถวที่ 2 : ผลการทดสอบ -->
+  <!-- แถวที่ 3 -->
   <tr>
-    <td class="col-left align-left">
-      <div class="cell-left-wrapper">
-        <div>ผลการทดสอบ</div>
-        <div>Pass (✓) / Fail (✗)</div>
-      </div>
+    <!-- คอลัมน์ที่ 1 ไม่ต้องมี (ถูก rowspan ไว้แล้ว) -->
+
+    <td class="col-second">
+      สภาพผิดปกติ<br>
+      ของแผ่น<br>
+      หรือตำแหน่งบนภาพ
     </td>
 
-    <td
-      v-for="d in 20"
-      :key="'r-' + d"
-      class="col-day"
-    >
-      <span v-if="section.results[d] === 'pass'">✓</span>
-      <span v-else-if="section.results[d] === 'fail'">✗</span>
-    </td>
+    <td v-for="d in 20" :key="'r3-'+d" class="col-day">&nbsp;</td>
   </tr>
 
-  <!-- แถวที่ 3 : สภาพผิดปกติ -->
+  <!-- แถวที่ 4 -->
   <tr>
-    <td class="col-left align-left">
-      <div class="cell-left-wrapper multi-line">
-        <div>สภาพผิดปกติ</div>
-        <div>ของแผ่น</div>
-        <div>หรือตำแหน่งบนภาพ</div>
-      </div>
+    <!-- คอลัมน์ที่ 1 ไม่ต้องมี -->
+
+    <td class="col-second">
+      ผู้ตรวจสอบ
     </td>
 
-    <td
-      v-for="d in 20"
-      :key="'a-' + d"
-      class="col-day align-left"
-    >
-      {{ section.appearance[d] || '' }}
-    </td>
-  </tr>
-
-  <!-- แถวที่ 4 : ผู้ตรวจสอบ -->
-  <tr>
-    <td class="col-left align-left">
-      <div class="cell-left-wrapper">
-        ผู้ตรวจสอบ
-      </div>
-    </td>
-
-    <td colspan="20" class="align-left">
-      <span class="bottom-line">{{ section.inspector || record.inspector }}</span>
-    </td>
+    <td class="col-day align-left" colspan="20">
+    &nbsp;
+  </td>
   </tr>
 </tbody>
 
@@ -315,14 +291,14 @@ onMounted(async () => {
 .f2-table th,
 .f2-table td {
   border: 0.4pt solid #000;
-  padding: 1.5mm 1mm;
+  padding: 1mm 0.5mm;
   vertical-align: middle;
   text-align: center;
 }
 
 /* หัวคอลัมน์ซ้ายให้จัดกลาง แต่แถวอื่นชิดซ้าย */
 .col-left {
-  width: 42mm;               /* แคบลงให้ใกล้ต้นฉบับ */
+  width: 36mm;               /* แคบลงให้ใกล้ต้นฉบับ */
 }
 
 .f2-table td.col-left {
@@ -330,7 +306,17 @@ onMounted(async () => {
 }
 
 .col-day {
-  width: 7mm;
+  width: 5.2mm !important;
+  padding: 0.5mm 0 !important;
+}
+
+/* คอลัมน์ที่ 2 ของสามแถว ให้ความกว้างเท่ากัน */
+.col-second {
+  width: 28mm !important;
+  text-align: left !important;
+  padding-left: 2mm !important;
+  vertical-align: top !important; /* ให้ข้อความเริ่มบนเหมือนต้นฉบับ */
+  line-height: 1.2;
 }
 
 .align-left {
@@ -355,7 +341,7 @@ onMounted(async () => {
 
 .dotted-line {
   display: inline-block;
-  min-width: 30mm;
+  min-width: 18mm;
 }
 
 /* *** แก้: bottom-line ไม่ให้มีเส้นใต้ในช่องผู้ตรวจสอบ *** */
@@ -364,6 +350,33 @@ onMounted(async () => {
   min-width: 90mm;
   border-bottom: none !important;  /* ตัดเส้นใต้ทั้งหมด */
 }
+
+/* คอลัมน์เดือน (แถวที่ 1) */
+.col-month {
+  width: 24mm !important;     /* ← ลดขนาดลงจาก 36mm */
+  vertical-align: middle !important;
+  text-align: center !important;
+  padding: 0 !important;
+}
+
+/* กล่องภายใน ให้จัดกลางทั้งแนวตั้งและแนวนอน */
+.month-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;    /* กึ่งกลางแนวตั้ง */
+  align-items: center;        /* กึ่งกลางแนวนอน */
+  height: 100%;
+  gap: 2mm;
+}
+
+/* เส้นดำใต้เดือน */
+.month-line {
+  border-bottom: 0.4pt solid #000;
+  min-width: 12mm;            /* ← สั้นลงตามที่ต้องการ */
+  display: inline-block;
+  margin-top: 1mm;
+}
+
 
 /* Print mode */
 @page {

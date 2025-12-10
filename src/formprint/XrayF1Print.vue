@@ -48,71 +48,94 @@
               <!-- เว้นให้เขียนเองบนกระดาษ -->
             </span>
           </div>
-        </div>
 
-        <!-- แถว "วันที่ / ผู้ทดสอบ" แนวนอน (ชิดกับตารางหลัก) -->
-        <table class="qc-meta-table">
-          <tr>
-            <td class="qc-meta-date">
-              วันที่ :
-              <span class="underline underline-small">
-                <!-- เว้นให้เขียนเองบนกระดาษ -->
-              </span>
-            </td>
-            <td class="qc-meta-tester">
-              ผู้ทดสอบ :
-              <span class="underline underline-wide">
-                <!-- เว้นให้เขียนเองบนกระดาษ -->
-              </span>
-            </td>
-          </tr>
-        </table>
+          <!-- ตารางใหม่ 7 แถว 32 คอลัมน์ -->
+<div class="table-wrapper">
+  <table class="qc-table">
+    <colgroup>
+    <col class="col-item-width" />
 
-        <!-- ตารางหลัก -->
-        <div class="table-wrapper">
-          <table class="qc-table">
-            <thead>
-              <!-- แถวชื่อหัวกลุ่ม -->
-              <tr>
-                <th class="col-item" rowspan="2">
-                  รายการตรวจสอบ
-                </th>
-                <th class="col-days-group" colspan="31">
-                  ผลการตรวจสอบ Pass (✓)  Fail (✗) ของวันที่
-                </th>
-              </tr>
-              <!-- แถวเลขวันที่ 1–31 -->
-              <tr>
-                <th
-                  v-for="d in 31"
-                  :key="'head-day-' + d"
-                  class="col-day col-day-head"
-                >
-                  {{ d }}
-                </th>
-              </tr>
-            </thead>
+    <!-- คอลัมน์วันที่ 1–31 -->
+    <col v-for="i in 31" :key="'c'+i" class="col-day-width" />
+  </colgroup>
+    <tbody>
 
-            <tbody>
-              <!-- แถวรายการตรวจสอบจริง -->
-              <tr v-for="(row, idx) in record.rows" :key="'row-' + idx">
-                <td class="col-item">
-                  {{ row.name }}
-                </td>
-                <td
-                  v-for="d in 31"
-                  :key="'row-' + idx + '-day-' + d"
-                  class="col-day"
-                >
-                  <span v-if="row.resultsByDay[d] === 'pass'">✓</span>
-                  <span v-else-if="row.resultsByDay[d] === 'fail'">✗</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- ====================== แถวที่ 1 (4 คอลัมน์ แต่ยาวเท่าแถวอื่น) ====================== -->
+<tr>
+  <td class="col-item">วันที่ :</td>
+  <td class="col-item"></td>
+  <td class="col-item">ผู้ทดสอบ :</td>
+
+  <!-- คอลัมน์สุดท้ายครอบ 29 คอลัมน์ = รวม 32 คอลัมน์ -->
+  <td class="col-item" colspan="29"></td>
+</tr>
+
+      <!-- ====================== แถวที่ 2 ====================== -->
+      <tr>
+        <!-- คอลัมน์ที่ 2 -->
+        <td class="col-item" rowspan="2">รายการตรวจสอบ</td>
+
+        <td class="col-item" colspan="31">
+          ผลการตรวจสอบ Pass (✓) Fail (✗) ของวันที่
+        </td>
+      </tr>
+
+      <tr>
+  <td class="col-item">&nbsp;</td>
+
+  <td
+  v-for="d in 31"
+  :key="'day-'+d"
+  class="col-day col-day-head"
+  :class="{ 'first-day': d === 1 }"
+>
+  {{ d }}
+</td>
+
+</tr>
+
+
+      <!-- ====================== แถวที่ 4 ====================== -->
+      <tr>
+        <td class="col-item">
+          สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ
+        </td>
+
+        <td v-for="c in 31" :key="'r4-'+c" class="col-day">&nbsp;</td>
+      </tr>
+
+      <!-- ====================== แถวที่ 5 ====================== -->
+      <tr>
+        <td class="col-item">
+          ระบบล็อกและเบรก : ทำงานได้อย่างถูกต้อง
+        </td>
+
+        <td v-for="c in 31" :key="'r5-'+c" class="col-day">&nbsp;</td>
+      </tr>
+
+      <!-- ====================== แถวที่ 6 ====================== -->
+      <tr>
+        <td class="col-item">
+          เตียง หลอดเอกซเรย์ และบักกี้ : เคลื่อนที่ได้อย่างราบเรียบ
+        </td>
+
+        <td v-for="c in 31" :key="'r6-'+c" class="col-day">&nbsp;</td>
+      </tr>
+
+      <!-- ====================== แถวที่ 7 ====================== -->
+      <tr>
+        <td class="col-item">
+          X-ray tube warm-up : ด้วยค่าเทคนิคที่บริษัทแนะนำ
+        </td>
+
+        <td v-for="c in 31" :key="'r7-'+c" class="col-day">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -194,13 +217,13 @@ onMounted(() => {
 
 /* ----------------- A4 sheet (แนวนอน) ----------------- */
 .sheet-a4 {
-  width: 297mm;        /* กว้างเท่าด้านยาวของ A4 */
-  min-height: 210mm;   /* สูงเท่าด้านสั้นของ A4 */
+  width: 297mm;          /* ด้านยาวของ A4 */
+  height: 210mm;         /* ด้านสั้นของ A4 */
   background: white;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 4mm rgba(0,0,0,0.15);
   display: flex;
-  font-family: "TH Sarabun New", "Tahoma", sans-serif;
-  font-size: 10.5pt;   /* ฟอนต์หลักหน้า */
+  flex-direction: column;
+  font-family: "TH Sarabun New", Tahoma, sans-serif;
 }
 
 /* ----------------- form area ----------------- */
@@ -234,6 +257,49 @@ onMounted(() => {
   font-weight: 700;
 }
 
+.qc-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 16pt !important;
+}
+
+.qc-table td,
+.qc-table th {
+  font-size: 11pt !important;   /* บังคับทุกเซลล์ในตารางให้เป็น 16pt */
+  border: 0.4pt solid #000;
+  padding: 1mm 0.5mm;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.col-item {
+  width: 55mm;
+  text-align: left;
+  padding-left: 2mm;
+  line-height: 1.2;
+}
+
+/* คอลัมน์ที่ 1 (รายการตรวจสอบ) */
+.col-item-width {
+  width: 55mm;              /* ตายตัว */
+}
+
+.col-day {
+  width: calc((100% - 55mm) / 31); /* (ความกว้างทั้งหมด - คอลัมน์รายการ) / 31 ช่อง */
+  text-align: center;
+  padding: 1mm 0;
+}
+
+/* คอลัมน์วันที่ 1–31 */
+.col-day-width {
+  width: calc((100% - 55mm) / 31);
+}
+
+.col-day-head {
+  font-weight: bold;
+}
+
 .meta-label {
   margin-left: 8mm;
 }
@@ -247,11 +313,11 @@ onMounted(() => {
 }
 
 .underline-short {
-  min-width: 35mm;
+  min-width: 50mm;
 }
 
 .underline-long {
-  min-width: 70mm;
+  min-width: 95mm;
 }
 
 .underline-small {
@@ -270,6 +336,15 @@ onMounted(() => {
   font-size: 10pt;
 }
 
+.qc-table td,
+.qc-table th {
+  border: 0.4pt solid #000;
+  padding: 1mm 0.5mm;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 11pt !important;
+}
+
 .qc-meta-table td {
   border: 0.4pt solid #000;
   padding: 0.8mm 1.5mm;
@@ -283,60 +358,28 @@ onMounted(() => {
   width: 60%;
 }
 
-/* ----------------- Table ----------------- */
-.table-wrapper {
-  flex: 1;
-}
-
-/* ลดขนาดตัวอักษรในตารางหลักอีกเล็กน้อยให้ตัวเลขไม่เบียดกัน */
-.qc-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 7.8pt;
-}
-
-.qc-table th,
-.qc-table td {
-  border: 0.4pt solid #000;
-  padding: 0.7mm 0.7mm;   /* ลด padding ใน cell */
-  vertical-align: middle;
-  text-align: center;
-  line-height: 1.1;       /* ให้บรรทัดเตี้ยลงเล็กน้อย */
-}
-
-/* หัวคอลัมน์วันที่ให้เป็นตัวบางและอยู่กึ่งกลางช่อง */
-.qc-table th.col-day-head {
-  font-weight: 400;   /* ไม่ bold */
-  text-align: center;
-}
-
-/* คอลัมน์ข้อความ (ให้ชิดซ้ายของช่อง) */
-.col-item {
-  width: 50mm;        /* หดลงเล็กน้อย เพื่อเพิ่มพื้นที่ให้ช่องวันที่ */
-  text-align: left;
-}
-
 /* เพิ่มความเฉพาะเจาะจง: ตัวหนังสือในช่องรายการตรวจสอบชิดซ้ายจริง ๆ */
 .qc-table td.col-item {
   text-align: left;
   padding-left: 2mm;
 }
 
-/* กลุ่มหัววันที่ */
-.col-days-group {
-  text-align: center;
+
+/* ลบกรอบรอบแถว วันที่ / ผู้ทดสอบ */
+.no-border-row td {
+  border: none !important;
 }
 
-/* คอลัมน์วัน: ให้กว้างขึ้นเล็กน้อยและตัวเลขอยู่กึ่งกลาง */
-.col-day {
-  width: 6.2mm;       /* ขยายจาก 6mm นิดหน่อย */
-  text-align: center;
+/* ลดขนาดช่องวันที่ช่องแรกเท่านั้น */
+.first-day {
+  width: 3mm !important;
+  max-width: 3mm !important;
+  min-width: 3mm !important;
 }
 
 /* ----------------- print CSS ----------------- */
 @page {
-  size: A4 landscape;  /* แนวนอน */
+  size: A4 landscape;
   margin: 10mm;
 }
 
