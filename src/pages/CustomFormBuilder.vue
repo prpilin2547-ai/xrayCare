@@ -299,7 +299,229 @@
             </div>
           </div>
 
-          <!-- คำอธิบาย: ฟิลด์ทั้งหมดถูกจัดการใน Visual Editor แล้ว -->
+          <!-- Main layout: left preview + right settings -->
+          <div class="builder-body">
+            <!-- Left column: preview ของฟิลด์ -->
+            <div class="left-column">
+              <div class="preview-card">
+                <h2 class="preview-title">ตัวอย่างช่องบันทึกผล</h2>
+                <p class="preview-subtitle">
+                  ด้านล่างเป็นตัวอย่างฟิลด์ที่ระบบจะใช้เก็บข้อมูลจริง
+                </p>
+
+                <form class="preview-form" @submit.prevent>
+                  <div
+                    v-for="(field, index) in fields"
+                    :key="field.id"
+                    class="preview-field"
+                    :class="{ selected: selectedFieldIndex === index }"
+                    @click.stop="selectField(index)"
+                  >
+                    <div class="preview-field-header">
+                      <label class="preview-label">
+                        {{ field.label || 'ชื่อฟิลด์ (ตั้งค่าด้านขวา)' }}
+                        <span v-if="field.required" class="required-star">*</span>
+                      </label>
+                      <div class="preview-field-actions">
+                        <span class="field-name-tag">{{ field.name }}</span>
+                        <button
+                          type="button"
+                          class="icon-btn"
+                          title="ลบฟิลด์"
+                          @click.stop="removeField(index)"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="preview-input-wrapper">
+                      <template v-if="field.type === 'short-text'">
+                        <input
+                          type="text"
+                          class="preview-input"
+                          :placeholder="field.placeholder || 'ใส่ข้อความ...'"
+                          disabled
+                        />
+                      </template>
+
+                      <template v-else-if="field.type === 'long-text'">
+                        <textarea
+                          class="preview-textarea"
+                          :placeholder="field.placeholder || 'ใส่รายละเอียด...'"
+                          disabled
+                        ></textarea>
+                      </template>
+
+                      <template v-else-if="field.type === 'number'">
+                        <input
+                          type="number"
+                          class="preview-input"
+                          :placeholder="field.placeholder || 'ใส่ตัวเลข...'"
+                          disabled
+                        />
+                      </template>
+
+                      <template v-else-if="field.type === 'date'">
+                        <input type="date" class="preview-input" disabled />
+                      </template>
+
+                      <template v-else-if="field.type === 'dropdown'">
+                        <select class="preview-input" disabled>
+                          <option v-if="!field.options?.length">
+                            -- ตัวเลือก --
+                          </option>
+                          <option
+                            v-for="(opt, idx) in field.options"
+                            :key="idx"
+                            :value="opt"
+                          >
+                            {{ opt }}
+                          </option>
+                        </select>
+                      </template>
+
+                      <template v-else-if="field.type === 'checkbox'">
+                        <label class="checkbox-line">
+                          <input type="checkbox" disabled />
+                          <span>{{ field.placeholder || 'ตัวเลือก' }}</span>
+                        </label>
+                      </template>
+
+                      <template v-else-if="field.type === 'image'">
+                        <div class="image-placeholder">
+                          พื้นที่แนบรูปภาพ (ผู้ใช้จะอัปโหลดจริงตอนบันทึกผล)
+                        </div>
+                      </template>
+                    </div>
+
+                    <div v-if="field.note" class="preview-note">
+                      {{ field.note }}
+                    </div>
+                  </div>
+
+                  <div v-if="!fields.length" class="empty-hint">
+                    ยังไม่มีฟิลด์ในฟอร์ม กดไอคอน Form Elements ด้านบนเพื่อเพิ่มฟิลด์
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Right column: ตั้งค่าฟิลด์ -->
+            <div class="right-column">
+              <div class="settings-card" v-if="selectedField">
+                <h3 class="settings-title">ตั้งค่าฟิลด์</h3>
+                <p class="settings-subtitle">
+                  แก้ไขชื่อฟิลด์ Placeholder ตัวเลือก และคุณสมบัติอื่น ๆ
+                </p>
+
+                <div class="settings-row">
+                  <label class="settings-label">ประเภทฟิลด์</label>
+                  <div class="settings-pill">
+                    {{ fieldTypeLabel(selectedField.type) }}
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-label">Field ID / Name (ไม่ซ้ำ)</label>
+                  <input
+                    v-model="selectedField.name"
+                    type="text"
+                    class="settings-input"
+                    readonly
+                  />
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-label">ชื่อฟิลด์ (Label)</label>
+                  <input
+                    v-model="selectedField.label"
+                    type="text"
+                    class="settings-input"
+                    placeholder="เช่น ความหนา (mm), รายละเอียดปัญหา"
+                  />
+                </div>
+
+                <div class="settings-row" v-if="selectedField.type !== 'image'">
+                  <label class="settings-label">
+                    Placeholder / คำอธิบายสั้น ๆ
+                  </label>
+                  <input
+                    v-model="selectedField.placeholder"
+                    type="text"
+                    class="settings-input"
+                    placeholder="ข้อความตัวอย่างในช่อง"
+                  />
+                </div>
+
+                <div
+                  class="settings-row"
+                  v-if="selectedField.type === 'dropdown'"
+                >
+                  <label class="settings-label">
+                    ตัวเลือก Dropdown (หนึ่งบรรทัดต่อหนึ่งตัวเลือก)
+                  </label>
+                  <textarea
+                    v-model="dropdownOptionText"
+                    class="settings-textarea"
+                    rows="4"
+                    placeholder="เช่น&#10;ผ่าน&#10;ไม่ผ่าน&#10;รอทดสอบใหม่"
+                    @input="updateDropdownOptions"
+                  ></textarea>
+                </div>
+
+                <div
+                  class="settings-row"
+                  v-if="selectedField.type === 'checkbox'"
+                >
+                  <label class="settings-label">ข้อความข้าง Checkbox</label>
+                  <input
+                    v-model="selectedField.placeholder"
+                    type="text"
+                    class="settings-input"
+                    placeholder="เช่น ยืนยันว่าตรวจสอบแล้ว"
+                  />
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-label">
+                    หมายเหตุ (จะแสดงตัวเล็กใต้ฟิลด์)
+                  </label>
+                  <textarea
+                    v-model="selectedField.note"
+                    class="settings-textarea"
+                    rows="3"
+                    placeholder="เช่น กรอกเป็นหน่วย mm, กรอกเฉพาะตัวเลข"
+                  ></textarea>
+                </div>
+
+                <div class="settings-row inline">
+                  <label class="settings-label">บังคับกรอก</label>
+                  <label class="switch">
+                    <input v-model="selectedField.required" type="checkbox" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="settings-row">
+                  <button
+                    type="button"
+                    class="btn-danger"
+                    @click="deleteSelected"
+                  >
+                    ลบฟิลด์นี้
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-card empty" v-else>
+                <h3 class="settings-title">เลือกฟิลด์เพื่อแก้ไข</h3>
+                <p class="settings-subtitle">
+                  คลิกฟิลด์ในตัวอย่างด้านซ้ายเพื่อดูรายละเอียดและแก้ไขค่าต่าง ๆ
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ===== HTML MODE: แก้ HTML โดยตรง (เฉพาะส่วน Rich Text) ===== -->
@@ -530,7 +752,29 @@ const addField = (type) => {
   const id = generateId('fld_')
   const fieldName = 'f_' + generateId().slice(-8) // field name ไม่ซ้ำ
   
-  // สร้าง HTML สำหรับแสดงใน visual editor เท่านั้น
+  const base = {
+    id,
+    name: fieldName,
+    type,
+    label: '',
+    placeholder: '',
+    required: false,
+    note: ''
+  }
+
+  if (type === 'dropdown') {
+    base.options = ['ตัวเลือก 1', 'ตัวเลือก 2']
+  }
+
+  // เพิ่มเข้า fields array ก่อน
+  fields.value.push(base)
+  selectedFieldIndex.value = fields.value.length - 1
+
+  if (type === 'dropdown') {
+    dropdownOptionText.value = base.options.join('\n')
+  }
+
+  // สร้าง HTML สำหรับแสดงใน visual editor
   let html = ''
   const labelText = type === 'short-text' ? 'Enter text' : 'Field'
 
@@ -563,7 +807,7 @@ const addField = (type) => {
       html = `<div class="editor-field" data-field-id="${id}" data-field-name="${fieldName}"><label>${labelText}</label></div>`
   }
 
-  // เพิ่มใน visual editor เท่านั้น ไม่ push เข้า fields array
+  // เพิ่มลงใน visual editor
   if (editorMode.value === 'visual' && richEditorRef.value) {
     insertHtmlAtCursor(html)
   } else {
