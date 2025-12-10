@@ -55,44 +55,163 @@
           </div>
         </div>
 
-        <!-- ===== ตาราง QC หลัก ===== -->
         <table class="qc-table">
-          <thead>
-            <tr>
-              <th class="col-test">Test Date</th>
-              <th class="col-baseline">aseline</th>
-              <th class="col-action">Action level</th>
-              <th class="col-defect">Defect level</th>
-            </tr>
-          </thead>
+  <thead>
+    <tr>
+      <th>Test Date</th>
+      <th>baseline</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>Action level</th>
+      <th>Defect level</th>
+    </tr>
+  </thead>
 
-          <tbody>
-            <!-- ใช้ v-for วาดแต่ละแถว จากข้อมูลใน tests -->
-            <tr
-              v-for="item in tests"
-              :key="item.id"
-              :class="{ 'group-row': item.isGroup }"
-            >
-              <td class="col-test align-left">
-                <span v-if="item.isGroup" class="group-title">
-                  {{ item.label }}
-                </span>
-                <span v-else>
-                  {{ item.label }}
-                </span>
-              </td>
-              <td class="col-baseline align-left">
-                {{ item.baseline }}
-              </td>
-              <td class="col-action align-left">
-                {{ item.actionLevel }}
-              </td>
-              <td class="col-defect align-left">
-                {{ item.defectLevel }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <tbody>
+  <!-- แถว 1 เป็น header จึงเริ่มกำหนดจากแถวที่ 2 -->
+
+  <!-- แถว 2 -->
+  <tr>
+    <td>Image Uniformity</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 3 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 4 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 5 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 6 -->
+  <tr>
+    <td>Depth of Penetration (cm)</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 7 -->
+  <tr>
+    <td>Vertical Distance Accuracy Actual distance………………………….mm</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 8 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 9 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 10 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 11 -->
+  <tr>
+    <td>Horizontal Distance Accuracy Actual distance………………………….mm</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 12 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 13 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 14 -->
+  <tr>
+    <td>Lateral Resolution Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 15 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 16 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 17 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 18 -->
+  <tr>
+    <td>Axial Resolution</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 19 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 20 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 21 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 22 -->
+  <tr>
+    <td>Image Geometry (Cyst Imaging) Actual diameter………………….mm</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 23 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 24 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 25 -->
+  <tr>
+    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 26 -->
+  <tr>
+    <td>No. of Gray Scale Objects</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+
+  <!-- แถว 27 -->
+  <tr>
+    <td>Dead zone (mm)</td>
+    <td></td><td></td><td></td><td></td><td></td><td></td>
+  </tr>
+</tbody>
+</table>
+
         </div>
       </div>
     </div>
