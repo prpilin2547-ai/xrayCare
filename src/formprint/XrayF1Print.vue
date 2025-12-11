@@ -35,15 +35,15 @@
             </span>
           </div>
           <div class="meta-row">
-            <span>ความถี่ : </span>
+            <span class="label-bold">ความถี่ : </span>
             <span>{{ record.frequency }}</span>
           </div>
           <div class="meta-row">
-            <span>เครื่องเอกซเรย์ :</span>
+            <span class="label-bold">เครื่องเอกซเรย์ :</span>
             <span class="underline underline-long">
               <!-- เว้นให้เขียนเองบนกระดาษ -->
             </span>
-            <span class="meta-label">เดือน :</span>
+            <span class="meta-label label-bold">เดือน :</span>
             <span class="underline underline-short">
               <!-- เว้นให้เขียนเองบนกระดาษ -->
             </span>
@@ -61,16 +61,18 @@
 
     <!-- ====================== แถว 1 ====================== -->
 <tr>
-  <td>วันที่ :</td>
+  <td class="bold-cell">วันที่ :</td>
   <td colspan="10"></td>
-  <td colspan="8">ผู้ทดสอบ :</td>
+  <td colspan="8" class="bold-cell">ผู้ทดสอบ :</td>
   <td colspan="13"></td>
 </tr>
 
     <!-- ====================== แถว 2 ====================== -->
     <tr>
-      <td rowspan="2">รายการตรวจสอบ</td>
-      <td colspan="31">ผลการตรวจสอบ Pass (✓) Fail (✗) ของวันที่</td>
+      <td rowspan="2" class="bold-cell">รายการตรวจสอบ</td>
+      <td colspan="31" class="bold-cell">
+        ผลการตรวจสอบ Pass (✓) Fail (✗) ของวันที่
+      </td>
     </tr>
 
     <!-- ====================== แถว 3 ====================== -->
@@ -80,25 +82,37 @@
 
     <!-- ====================== แถว 4 ====================== -->
     <tr>
-      <td>สายไฟ : ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ</td>
+      <td>
+        <span class="bold-only">สายไฟ :</span>
+        <span> ไม่พบรอยแตก ไม่บิดงอ ไม่พันเป็นปม และไม่มีอุปกรณ์ที่มีน้ำหนักมากวางทับสายไฟ</span>
+      </td>
       <td v-for="i in 31" :key="'r4c'+i"></td>
     </tr>
 
     <!-- ====================== แถว 5 ====================== -->
     <tr>
-      <td>ระบบล็อกและเบรก : ทำงานได้อย่างถูกต้อง</td>
+      <td>
+        <span class="bold-only">ระบบล็อกและเบรก :</span>
+        <span> ทำงานได้อย่างถูกต้อง</span>
+      </td>
       <td v-for="i in 31" :key="'r5c'+i"></td>
     </tr>
 
     <!-- ====================== แถว 6 ====================== -->
     <tr>
-      <td>เตียง หลอดเอกซเรย์ และบักกี้ : เคลื่อนที่ได้อย่างราบเรียบ</td>
+      <td>
+        <span class="bold-only">เตียง หลอดเอกซเรย์ และบักกี้ :</span>
+        <span> เคลื่อนที่ได้อย่างราบเรียบ</span>
+      </td>
       <td v-for="i in 31" :key="'r6c'+i"></td>
     </tr>
 
     <!-- ====================== แถวใหม่ (แถวสุดท้าย) ====================== -->
     <tr>
-      <td>X-ray tube warm-up : ด้วยค่าเทคนิคที่บริษัทแนะนำ</td>
+      <td>
+        <span class="bold-only">X-ray tube warm-up :</span>
+        <span> ด้วยค่าเทคนิคที่บริษัทแนะนำ</span>
+      </td>
       <td v-for="i in 31" :key="'lastRow'+i"></td>
     </tr>
 
@@ -163,6 +177,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+* {
+  font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
+  font-size: 16pt !important;
+  font-weight: 400;
+}
+
 /* ----------------- พื้นฐานหน้า ----------------- */
 .print-root {
   background: #e5e7eb;
@@ -176,6 +196,10 @@ onMounted(() => {
 /* แถบปุ่มด้านบน */
 .print-toolbar {
   margin-bottom: 8px;
+}
+
+.bold-only {
+  font-weight: 700 !important;
 }
 
 .btn-print {
@@ -198,10 +222,15 @@ onMounted(() => {
   font-family: "TH Sarabun New", Tahoma, sans-serif;
 }
 
+.sheet-inner {
+  width: 185mm;
+  padding: 28mm 0 16mm;   /* เพิ่มด้านบนจาก 18mm → 28mm */
+}
+
 /* ----------------- form area ----------------- */
 .form-area {
   flex: 1;
-  padding: 8mm 8mm 8mm 8mm;  /* ลด padding เพื่อให้ตารางกว้างขึ้น */
+  padding: 20mm 8mm 8mm 8mm;   /* เพิ่มด้านบนจาก 8mm → 20mm */
   display: flex;
   flex-direction: column;
 }
@@ -213,6 +242,7 @@ onMounted(() => {
   padding: 3mm 0;
   font-weight: 700;
   margin-bottom: 5mm;
+  font-size: 18pt !important;
 }
 
 /* ข้อมูลหัวฟอร์มแนวนอน */
@@ -229,16 +259,21 @@ onMounted(() => {
   font-weight: 700;
 }
 
+.label-bold {
+  font-weight: 700 !important;
+}
+
 .qc-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 16pt !important;
+  margin-top: 10mm;
 }
 
 .qc-table td,
 .qc-table th {
-  font-size: 11pt !important;   /* บังคับทุกเซลล์ในตารางให้เป็น 16pt */
+  font-size: 16pt !important;
   border: 0.4pt solid #000;
   padding: 1mm 0.5mm;
   text-align: center;
@@ -314,7 +349,12 @@ onMounted(() => {
   padding: 1mm 0.5mm;
   text-align: center;
   vertical-align: middle;
-  font-size: 11pt !important;
+  font-size: 14pt !important;
+}
+
+.qc-table td span,
+.qc-table th span {
+  font-size: 14pt !important;
 }
 
 .qc-meta-table td {
@@ -334,6 +374,10 @@ onMounted(() => {
 .qc-table td.col-item {
   text-align: left;
   padding-left: 2mm;
+}
+
+.bold-cell {
+  font-weight: 700 !important;
 }
 
 
@@ -370,6 +414,12 @@ onMounted(() => {
   .print-toolbar {
     display: none;
   }
+
+  .title-main {
+  font-size: 16pt !important;
+  font-weight: 700;
+}
+
 }
 </style>
 
