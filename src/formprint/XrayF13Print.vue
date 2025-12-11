@@ -73,24 +73,26 @@
 
   <!-- แถว 2 -->
   <tr>
-    <td>Image Uniformity</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Image Uniformity</td>
   </tr>
 
   <!-- แถว 3 -->
-  <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
+<tr>
+  <td>Vertical band (y/n)</td>
+  <td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
 
-  <!-- แถว 4 -->
-  <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
+<!-- แถว 4 -->
+<tr>
+  <td>Horizontal band (y/n)</td>
+  <td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
 
-  <!-- แถว 5 -->
-  <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
+<!-- แถว 5 -->
+<tr>
+  <td>Artifacts (y/n)</td>
+  <td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
 
   <!-- แถว 6 -->
   <tr>
@@ -100,109 +102,107 @@
 
   <!-- แถว 7 -->
   <tr>
-    <td>Vertical Distance Accuracy Actual distance………………………….mm</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Vertical Distance Accuracy Actual distance………………………….mm</td>
   </tr>
 
   <!-- แถว 8 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Pin 1-3) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 9 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Pin 3-5) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 10 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Pin 6-8) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 11 -->
   <tr>
-    <td>Horizontal Distance Accuracy Actual distance………………………….mm</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Horizontal Distance Accuracy Actual distance………………………….mm</td>
   </tr>
 
   <!-- แถว 12 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 13 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 14 -->
   <tr>
-    <td>Lateral Resolution Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Lateral Resolution Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm</td>
   </tr>
 
   <!-- แถว 15 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 16 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Mid) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 17 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 18 -->
   <tr>
-    <td>Axial Resolution</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Axial Resolution</td>
   </tr>
 
   <!-- แถว 19 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 20 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Mid) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 21 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 22 -->
   <tr>
-    <td>Image Geometry (Cyst Imaging) Actual diameter………………….mm</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">Image Geometry (Cyst Imaging) Actual diameter………………….mm</td>
   </tr>
 
   <!-- แถว 23 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Near) Cyst: Height / Width
+Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 24 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Mid) Cyst: Height / Width<br />
+Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 25 -->
   <tr>
-    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    <td>(Far) Cyst: Height / Width<br />
+Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
   </tr>
 
   <!-- แถว 26 -->
   <tr>
-    <td>No. of Gray Scale Objects</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
+    <td colspan="7">No. of Gray Scale Objects</td>
   </tr>
+
 
   <!-- แถว 27 -->
   <tr>
@@ -510,6 +510,14 @@ onMounted(async () => {
   border: 0.4pt solid #000;
   padding: 1.5mm 1.5mm;
   vertical-align: top;
+}
+
+/* ขยายความกว้างของคอลัมน์ที่ 1 ทุกแถว */
+.qc-table td:first-child,
+.qc-table th:first-child {
+  width: 60mm !important;   /* ← ปรับ mm ตามต้องการ */
+  max-width: 60mm !important;
+  min-width: 60mm !important;
 }
 
 .col-test {
