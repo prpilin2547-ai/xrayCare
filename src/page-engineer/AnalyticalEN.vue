@@ -31,46 +31,26 @@
       </div>
 
       <div v-if="showGraph" class="row g-4">
-
-        <div class="col-lg-8">
+        <div class="col-12">
           <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3">
               <h5 class="card-title m-0 text-primary">
                 <i class="bi bi-bar-chart-line-fill me-2"></i>
-                กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำ (Recurrent Failure
-                Rate)
+                กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำชนิดการตรวจแบบ Daily
+                Check
+                <div>(Recurrent Failure Rate)</div>
                 <small class="text-muted d-block mt-1" style="font-size: 0.8em;">
                   ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
                 </small>
               </h5>
             </div>
             <div class="card-body">
-              <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+              <div class="chart-container" style="position: relative; height: 500px; width: 100%;">
                 <canvas id="analyticalChart"></canvas>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="col-lg-4">
-          <div class="card shadow-sm h-100">
-            <div class="card-header bg-white py-3">
-              <h5 class="card-title m-0 text-success">
-                <i class="bi bi-pie-chart-fill me-2"></i>
-                ผลการทดสอบ QC & Dose
-              </h5>
-            </div>
-            <div class="card-body d-flex flex-column justify-content-center align-items-center">
-              <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
-                <canvas id="qcChart"></canvas>
-              </div>
-              <div class="mt-3 text-center text-muted small">
-                สัดส่วนการผ่านเกณฑ์มาตรฐานกรมวิทย์ฯ
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <div v-else class="card shadow-sm">
@@ -88,20 +68,96 @@
         </div>
       </div>
 
+      <div v-if="showGraph" class="row g-4 mt-2">
+        <div class="col-12">
+          <h5 class="text-secondary mb-3">
+            <i class="bi bi-file-earmark-medical-fill me-2"></i>สรุปสถานะเครื่องเอกซเรย์ประจำเดือน
+          </h5>
+        </div>
+
+        <div class="col-md-6 col-xl-3" v-for="(machine, index) in machineSummaries" :key="index">
+          <div class="card h-100 border-0 shadow-sm" :class="machine.borderClass">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="fw-bold text-dark" :title="machine.name">
+                  {{ machine.name }}
+                </h6>
+                <span class="badge rounded-pill" :class="machine.badgeClass">
+                  {{ machine.statusText }}
+                </span>
+              </div>
+
+              <div class="mb-3 text-center p-2 bg-light rounded">
+                <small class="text-muted">ยอดแจ้งซ่อมรวม</small>
+                <div class="h3 fw-bold mb-0" :class="machine.textClass">
+                  {{ machine.totalFailures }} <span class="fs-6 text-muted">ครั้ง</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <h6 class="text-secondary" style="font-size: 0.8rem; font-weight: 600;">
+                  <i class="bi bi-list-check me-1"></i>รายละเอียดรายหัวข้อ:
+                </h6>
+                <div class="table-responsive">
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.8rem;">
+                    <thead class="text-muted" style="border-bottom: 1px solid #dee2e6;">
+                      <tr>
+                        <th class="fw-normal">รายการ</th>
+                        <th class="text-center fw-normal">เสีย</th>
+                        <th class="text-end fw-normal text-danger">ซ้ำ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(item, idx) in machine.breakdown" :key="idx">
+                        <td class="text-truncate" style="max-width: 100px;" :title="item.name">
+                          {{ idx + 1 }}. {{ item.shortName }}
+                        </td>
+                        <td class="text-center">
+                          {{ item.issues }}
+                        </td>
+                        <td class="text-end"
+                          :class="{ 'fw-bold text-danger': item.recurrent > 0, 'text-muted': item.recurrent === 0 }">
+                          {{ item.recurrent }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div v-if="machine.majorIssue" class="alert p-2 mb-0" :class="machine.alertClass"
+                style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                <strong>ปัญหาหลัก:</strong> {{ machine.majorIssue }}
+                <div>(อัตราเสียซ้ำ {{ machine.rfrValue }}%)</div>
+              </div>
+              <div v-else class="alert alert-success p-2 mb-0" style="font-size: 0.8rem;">
+                <i class="bi bi-check-circle-fill me-1"></i> ประสิทธิภาพสมบูรณ์ ไม่พบการเสียซ้ำ
+              </div>
+
+              <div class="mt-3 pt-2 border-top">
+                <small class="text-secondary d-block fw-bold">
+                  <i class="bi bi-lightbulb-fill me-1 text-warning"></i>คำแนะนำ:
+                </small>
+                <small class="text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+                  {{ machine.recommendation }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, computed } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 import Chart from 'chart.js/auto';
 
 // Constants
-const thaiMonths = [
-  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-];
+const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
 // State
 const selectedMonth = ref('');
@@ -110,9 +166,103 @@ const displayMonth = ref('');
 const displayYear = ref('');
 const showGraph = ref(false);
 
-// Chart Instances
 let performanceChart = null;
-let qcChart = null;
+
+// =========================================================
+// Data & Logic (Updated to support detailed breakdown count)
+// =========================================================
+const machineSummaries = computed(() => {
+  const names = ['X-Ray (BrandA/ModelX)', 'X-Ray (BrandB/ModelY)', 'X-Ray (BrandC/ModelZ)', 'X-Ray (BrandD/ModelW)'];
+
+  // ข้อมูลดิบ: กำหนดจำนวนครั้งที่เสีย (Issues) และ เสียซ้ำ (Recurrent) ของแต่ละหัวข้อ
+  // เพื่อให้ข้อมูลสอดคล้องกับกราฟที่เราต้องการ (เช่น BrandB เบรกเสียซ้ำเยอะ)
+  const rawData = [
+    // Machine 1 (BrandA): สายไฟเสียเยอะ
+    {
+      breakdown: [
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 8, recurrent: 6 }, // 6/15 = 40% RFR
+        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 4, recurrent: 3 }, // 3/15 = 20%
+        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
+        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 0 }
+      ]
+    },
+    // Machine 2 (BrandB): เบรกวิกฤต
+    {
+      breakdown: [
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 1, recurrent: 0 },
+        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 7, recurrent: 6 }, // 6/10 = 60% RFR
+        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 1, recurrent: 0 },
+        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 1 } // 1/10 = 10%
+      ]
+    },
+    // Machine 3 (BrandC): การเคลื่อนที่เริ่มแย่
+    {
+      breakdown: [
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
+        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 2, recurrent: 1 }, // 1/5 = 20%
+        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
+        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 0, recurrent: 0 }
+      ]
+    },
+    // Machine 4 (BrandD): ปกติ
+    {
+      breakdown: [
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
+        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 0, recurrent: 0 },
+        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 1, recurrent: 0 },
+        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 0 }
+      ]
+    }
+  ];
+
+  return names.map((name, index) => {
+    const data = rawData[index];
+
+    // คำนวณยอดรวมอัตโนมัติจาก Breakdown
+    const totalFailures = data.breakdown.reduce((sum, item) => sum + item.issues, 0);
+
+    // หา RFR สูงสุดเพื่อระบุปัญหาหลัก
+    let maxRFR = 0;
+    let maxIssueName = '';
+
+    // คำนวณ RFR ของแต่ละ Item เพื่อส่งไปวาดกราฟ (ใน Computed นี้เราใช้เพื่อหา Major Issue)
+    data.breakdown.forEach(item => {
+      // สูตร RFR % = (Recurrent / TotalFailures) * 100
+      const rfr = totalFailures > 0 ? (item.recurrent / totalFailures) * 100 : 0;
+      if (rfr > maxRFR) {
+        maxRFR = rfr;
+        maxIssueName = item.name;
+      }
+    });
+
+    // Grading Logic
+    let status = 'normal';
+    if (maxRFR >= 50) status = 'critical';
+    else if (maxRFR >= 30 || totalFailures >= 10) status = 'warning';
+
+    return {
+      name: name,
+      totalFailures: totalFailures,
+      breakdown: data.breakdown, // ส่งข้อมูลรายละเอียดไปแสดงในตาราง
+      majorIssue: maxRFR > 0 ? maxIssueName : null,
+      rfrValue: maxRFR.toFixed(0),
+
+      // Styling
+      borderClass: status === 'critical' ? 'border-danger border-2' : (status === 'warning' ? 'border-warning border-2' : 'border-success border-2'),
+      badgeClass: status === 'critical' ? 'bg-danger' : (status === 'warning' ? 'bg-warning text-dark' : 'bg-success'),
+      textClass: status === 'critical' ? 'text-danger' : (status === 'warning' ? 'text-warning' : 'text-success'),
+      alertClass: status === 'critical' ? 'alert-danger' : 'alert-warning',
+      statusText: status === 'critical' ? 'วิกฤต (อันตราย)' : (status === 'warning' ? 'ต้องเฝ้าระวัง' : 'ปกติ'),
+      recommendation: getRecommendation(status, maxIssueName)
+    };
+  });
+});
+
+const getRecommendation = (status, issue) => {
+  if (status === 'critical') return `หยุดใช้งานทันที! และแจ้งช่างตรวจสอบ ${issue} อย่างละเอียด เนื่องจากมีความเสี่ยงสูงต่อความปลอดภัย`;
+  if (status === 'warning') return `ควรวางแผนเปลี่ยนอะไหล่ ${issue} หรือตรวจสอบหาสาเหตุที่แท้จริงเพื่อลด Downtime`;
+  return 'เครื่องอยู่ในสภาพดี ควรบำรุงรักษาเชิงป้องกัน (PM) ตามรอบปกติ';
+};
 
 // Methods
 const handleSearch = () => {
@@ -120,37 +270,28 @@ const handleSearch = () => {
     showGraph.value = true;
     displayMonth.value = selectedMonth.value;
     displayYear.value = selectedYear.value;
-
-    nextTick(() => {
-      renderPerformanceChart();
-      renderQCChart();
-    });
+    nextTick(() => renderPerformanceChart());
   } else {
     showGraph.value = false;
   }
 };
 
-// 1. Render Combo Chart (Failure Count + RFR) -> ปรับปรุงข้อมูลตามรูปภาพ
 const renderPerformanceChart = () => {
   const ctx = document.getElementById('analyticalChart');
   if (performanceChart) performanceChart.destroy();
 
-  // ปรับ Label ให้สื่อความหมายตาม Case ในรูป (หรือใช้ชื่อเครื่องปกติก็ได้)
-  const labels = [
-    'X-Ray (BrandA/ModelX)',
-    'X-Ray (BrandB/ModelY)',
-    'X-Ray (BrandC/ModelZ)',
-    'X-Ray (BrandD/ModelW)'
-  ];
+  // ดึงข้อมูลจาก machineSummaries มาพลอตกราฟ เพื่อให้ข้อมูลตรงกันเป๊ะ
+  const summaries = machineSummaries.value;
+  const labels = summaries.map(m => m.name);
+  const failureData = summaries.map(m => m.totalFailures);
 
-  // DATA MAPPING ตามรูปภาพ:
-  // 1. แท่งสูง + จุดต่ำ = Aging/Overused
-  // 2. แท่งสูง + จุดสูง = Critical
-  // 3. แท่งเตี้ย + จุดสูง = Poor Repair
-  // 4. แท่งเตี้ย + จุดต่ำ = Healthy
-
-  const failureData = [15, 12, 3, 1];      // Bar (แกนซ้าย): สูง, สูง, ต่ำ, ต่ำ
-  const rfrData = [5, 85, 60, 0];     // Line (แกนขวา): ต่ำ, สูง, สูง, ต่ำ
+  // Helper ดึง % RFR จาก Breakdown
+  const getRFRArray = (indexInBreakdown) => {
+    return summaries.map(m => {
+      const item = m.breakdown[indexInBreakdown];
+      return m.totalFailures > 0 ? ((item.recurrent / m.totalFailures) * 100).toFixed(1) : 0;
+    });
+  };
 
   performanceChart = new Chart(ctx, {
     type: 'bar',
@@ -158,109 +299,88 @@ const renderPerformanceChart = () => {
       labels: labels,
       datasets: [
         {
-          label: 'จำนวนแจ้งซ่อม (ครั้ง)',
+          label: 'จำนวนแจ้งซ่อมทั้งหมด (ครั้ง)',
           data: failureData,
-          backgroundColor: 'rgba(54, 162, 235, 0.7)', // สีฟ้า (Blue Bar)
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
-          order: 2,
+          order: 5,
           yAxisID: 'y'
         },
         {
-          label: 'อัตราการเสียซ้ำ (RFR %)',
-          data: rfrData,
+          label: 'RFR: สายไฟ',
+          data: getRFRArray(0),
           type: 'line',
-          borderColor: 'rgba(255, 99, 132, 1)',     // สีแดง (Red Dot/Line)
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderWidth: 3,
-          pointBackgroundColor: '#fff',
-          pointBorderColor: 'rgba(255, 99, 132, 1)',
-          pointRadius: 6,           // ขนาดจุด
-          pointHoverRadius: 8,
+          borderColor: '#dc3545',
+          backgroundColor: '#dc3545',
+          borderWidth: 2,
+          pointStyle: 'circle',
+          pointRadius: 5,
+          tension: 0.3,
           order: 1,
-          yAxisID: 'y1',
-          tension: 0.3
+          yAxisID: 'y1'
+        },
+        {
+          label: 'RFR: ระบบล็อกและเบรก',
+          data: getRFRArray(1),
+          type: 'line',
+          borderColor: '#ffc107',
+          backgroundColor: '#ffc107',
+          borderWidth: 2,
+          pointStyle: 'triangle',
+          pointRadius: 6,
+          tension: 0.3,
+          order: 2,
+          yAxisID: 'y1'
+        },
+        {
+          label: 'RFR: การเคลื่อนที่ (เตียง/หลอด)',
+          data: getRFRArray(2),
+          type: 'line',
+          borderColor: '#6f42c1',
+          backgroundColor: '#6f42c1',
+          borderWidth: 2,
+          pointStyle: 'rect',
+          pointRadius: 6,
+          tension: 0.3,
+          order: 3,
+          yAxisID: 'y1'
+        },
+        {
+          label: 'RFR: Tube Warm-up',
+          data: getRFRArray(3),
+          type: 'line',
+          borderColor: '#198754',
+          backgroundColor: '#198754',
+          borderWidth: 2,
+          pointStyle: 'rectRot',
+          pointRadius: 6,
+          tension: 0.3,
+          order: 4,
+          yAxisID: 'y1'
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
+      interaction: { mode: 'index', intersect: false },
       scales: {
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          beginAtZero: true,
-          title: { display: true, text: 'จำนวนครั้ง (Count)' },
-          grid: { drawOnChartArea: true }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          min: 0,
-          max: 100, // ล็อกแกนขวาไว้ที่ 0-100%
-          title: { display: true, text: 'อัตราการเสียซ้ำ (%)' },
-          grid: { drawOnChartArea: false },
-          ticks: {
-            callback: function (value) { return value + "%" }
-          }
-        }
+        y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'จำนวนครั้งที่เสีย (Count)' } },
+        y1: { type: 'linear', display: true, position: 'right', min: 0, max: 100, title: { display: true, text: 'อัตราการเสียซ้ำ (RFR %)' }, grid: { drawOnChartArea: false }, ticks: { callback: v => v + "%" } }
       },
       plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
         tooltip: {
           callbacks: {
             label: function (context) {
               let label = context.dataset.label || '';
-              if (label) {
-                label += ': ';
-              }
+              if (label) label += ': ';
               if (context.parsed.y !== null) {
                 label += context.parsed.y;
-                if (context.dataset.type === 'line') label += '%';
+                if (context.dataset.type === 'line') label += '%'; else label += ' ครั้ง';
               }
               return label;
-            }
-          }
-        }
-      }
-    }
-  });
-};
-
-// 2. Render Donut Chart (QC Pass/Fail)
-const renderQCChart = () => {
-  const ctx = document.getElementById('qcChart');
-  if (qcChart) qcChart.destroy();
-
-  const qcData = [95, 5];
-
-  qcChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Pass (ผ่านเกณฑ์)', 'Fail (ไม่ผ่านเกณฑ์)'],
-      datasets: [{
-        data: qcData,
-        backgroundColor: ['#28a745', '#dc3545'],
-        hoverOffset: 4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              return ` ${context.label}: ${context.parsed}%`;
             }
           }
         }
