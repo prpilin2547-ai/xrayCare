@@ -179,7 +179,7 @@ onMounted(() => {
 <style scoped>
 * {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
-  font-size: 16pt !important;
+  font-size: 11pt !important;
   font-weight: 400;
 }
 
@@ -242,7 +242,7 @@ onMounted(() => {
   padding: 3mm 0;
   font-weight: 700;
   margin-bottom: 5mm;
-  font-size: 18pt !important;
+  font-size: 11pt !important;
 }
 
 /* ข้อมูลหัวฟอร์มแนวนอน */
@@ -267,13 +267,13 @@ onMounted(() => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 16pt !important;
+  font-size: 11pt !important;
   margin-top: 10mm;
 }
 
 .qc-table td,
 .qc-table th {
-  font-size: 16pt !important;
+  font-size: 11pt !important;
   border: 0.4pt solid #000;
   padding: 1mm 0.5mm;
   text-align: center;
@@ -340,7 +340,7 @@ onMounted(() => {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 0.5mm;  /* ชิดกับตารางหลักมากขึ้น */
-  font-size: 10pt;
+  font-size: 11pt;
 }
 
 .qc-table td,
@@ -349,12 +349,12 @@ onMounted(() => {
   padding: 1mm 0.5mm;
   text-align: center;
   vertical-align: middle;
-  font-size: 14pt !important;
+  font-size: 11pt !important;
 }
 
 .qc-table td span,
 .qc-table th span {
-  font-size: 14pt !important;
+  font-size: 11pt !important;
 }
 
 .qc-meta-table td {
@@ -391,6 +391,29 @@ onMounted(() => {
   width: 3mm !important;
   max-width: 3mm !important;
   min-width: 3mm !important;
+}
+
+/* แถวที่ 2 คอลัมน์ที่ 1 : รายการตรวจสอบ ชิดบน แต่กึ่งกลางแนวนอน */
+.qc-table tr:nth-child(2) td:first-child {
+  vertical-align: top !important;
+  padding-top: 1mm !important;
+  text-align: center !important;
+}
+
+/* แถวที่ 2 คอลัมน์ที่ 1 : รายการตรวจสอบ ชิดบน แต่กึ่งกลางแนวนอน */
+.qc-table tr:nth-child(2) td:first-child {
+  vertical-align: top !important;
+  padding-top: 1mm !important;
+  text-align: center !important;
+}
+
+/* คอลัมน์ที่ 1 แถวที่ 3–6 : ข้อความชิดซ้าย */
+.qc-table tr:nth-child(4) td:first-child,
+.qc-table tr:nth-child(5) td:first-child,
+.qc-table tr:nth-child(6) td:first-child,
+.qc-table tr:nth-child(7) td:first-child {
+  text-align: left !important;
+  padding-left: 2mm !important;
 }
 
 /* ----------------- print CSS ----------------- */
