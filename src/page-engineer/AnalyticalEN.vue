@@ -70,7 +70,7 @@
 
       <div v-if="showGraph" class="row g-4 mt-2">
         <div class="col-12">
-          <h5 class="text-secondary mb-3">
+          <h5 class="text-primary mb-3">
             <i class="bi bi-file-earmark-medical-fill me-2"></i>สรุปสถานะเครื่องเอกซเรย์ประจำเดือน
           </h5>
         </div>
@@ -88,7 +88,7 @@
               </div>
 
               <div class="mb-3 text-center p-2 bg-light rounded">
-                <small class="text-muted">ยอดแจ้งซ่อมรวม</small>
+                <small class="text-muted">จำนวนครั้งที่เสียทั้งหมด</small>
                 <div class="h3 fw-bold mb-0" :class="machine.textClass">
                   {{ machine.totalFailures }} <span class="fs-6 text-muted">ครั้ง</span>
                 </div>
@@ -96,7 +96,7 @@
 
               <div class="mb-3">
                 <h6 class="text-secondary" style="font-size: 0.8rem; font-weight: 600;">
-                  <i class="bi bi-list-check me-1"></i>รายละเอียดรายหัวข้อ:
+                  <i class="bi bi-list-check me-1"></i>รายละเอียดรายหัวข้อ :
                 </h6>
                 <div class="table-responsive">
                   <table class="table table-sm table-borderless mb-0" style="font-size: 0.8rem;">
@@ -128,7 +128,7 @@
               <div v-if="machine.majorIssue" class="alert p-2 mb-0" :class="machine.alertClass"
                 style="font-size: 0.8rem;">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                <strong>ปัญหาหลัก:</strong> {{ machine.majorIssue }}
+                <strong>ปัญหาหลัก :</strong> {{ machine.majorIssue }}
                 <div>(อัตราเสียซ้ำ {{ machine.rfrValue }}%)</div>
               </div>
               <div v-else class="alert alert-success p-2 mb-0" style="font-size: 0.8rem;">
@@ -181,36 +181,36 @@ const machineSummaries = computed(() => {
     {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 8, recurrent: 6 }, // 6/15 = 40% RFR
-        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 4, recurrent: 3 }, // 3/15 = 20%
-        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
-        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 0 }
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 4, recurrent: 3 }, // 3/15 = 20%
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
       ]
     },
     // Machine 2 (BrandB): เบรกวิกฤต
     {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 1, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 7, recurrent: 6 }, // 6/10 = 60% RFR
-        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 1, recurrent: 0 },
-        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 1 } // 1/10 = 10%
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 7, recurrent: 6 }, // 6/10 = 60% RFR
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 1, recurrent: 0 },
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 1 } // 1/10 = 10%
       ]
     },
     // Machine 3 (BrandC): การเคลื่อนที่เริ่มแย่
     {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 2, recurrent: 1 }, // 1/5 = 20%
-        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
-        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 0, recurrent: 0 }
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 2, recurrent: 1 }, // 1/5 = 20%
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 0, recurrent: 0 }
       ]
     },
     // Machine 4 (BrandD): ปกติ
     {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ล็อก/เบรก', issues: 0, recurrent: 0 },
-        { name: 'เตียง หลอด และบักกี้', shortName: 'การเคลื่อนที่', issues: 1, recurrent: 0 },
-        { name: 'X-ray tube warm-up', shortName: 'Warm-up', issues: 1, recurrent: 0 }
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 0, recurrent: 0 },
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 1, recurrent: 0 },
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
       ]
     }
   ];
@@ -308,7 +308,7 @@ const renderPerformanceChart = () => {
           yAxisID: 'y'
         },
         {
-          label: 'RFR: สายไฟ',
+          label: 'RFR : สายไฟ',
           data: getRFRArray(0),
           type: 'line',
           borderColor: '#dc3545',
@@ -321,7 +321,7 @@ const renderPerformanceChart = () => {
           yAxisID: 'y1'
         },
         {
-          label: 'RFR: ระบบล็อกและเบรก',
+          label: 'RFR : ระบบล็อกและเบรก',
           data: getRFRArray(1),
           type: 'line',
           borderColor: '#ffc107',
@@ -334,7 +334,7 @@ const renderPerformanceChart = () => {
           yAxisID: 'y1'
         },
         {
-          label: 'RFR: การเคลื่อนที่ (เตียง/หลอด)',
+          label: 'RFR : การเคลื่อนที่ (เตียง/หลอด/บักกี้)',
           data: getRFRArray(2),
           type: 'line',
           borderColor: '#6f42c1',
@@ -347,7 +347,7 @@ const renderPerformanceChart = () => {
           yAxisID: 'y1'
         },
         {
-          label: 'RFR: Tube Warm-up',
+          label: 'RFR : Tube Warm-up',
           data: getRFRArray(3),
           type: 'line',
           borderColor: '#198754',
