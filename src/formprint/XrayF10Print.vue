@@ -29,8 +29,9 @@
             แบบบันทึก F10 : แบบบันทึกการตรวจสอบความสว่างแสงไฟ
           </div>
           <div class="title-sub">
-            ความถี่ : ทุก 1 เดือน
-          </div>
+  <span class="freq-label">ความถี่ :</span>
+  <span class="freq-value">ทุก 1 เดือน</span>
+</div>
         </div>
 
         <!-- ข้อมูลเครื่อง / หน่วยงาน -->
@@ -110,8 +111,8 @@
   <thead>
     <tr>
       <th>ครั้งที่</th>
-      <th colspan="2">ความสว่างแสงไฟ (IAV)</th>
-      <th colspan="2">Background (IBG)</th>
+      <th colspan="2">ความสว่างแสงไฟ (I<sub>AV</sub>)</th>
+      <th colspan="2">Background (I<sub>BG</sub>)</th>
     </tr>
   </thead>
 
@@ -171,39 +172,39 @@
 </table>
 
         <!-- ส่วนคำนวณ IAV / IBG / ILBD -->
-        <div class="formula-block">
-          <div class="formula-row">
-            I<sub>AV</sub> :
-            <span class="underline formula">
-              {{ record.iav }}
-            </span>
-          </div>
+<div class="formula-block">
+  <div class="formula-row">
+    <strong>I<sub>AV</sub> :</strong>
+    <span class="underline formula">
+      {{ record.iav }}
+    </span>
+  </div>
 
-          <div class="formula-row">
-            I<sub>BG(AV)</sub> :
-            <span class="underline formula">
-              {{ record.ibg }}
-            </span>
-          </div>
+  <div class="formula-row">
+    <strong>I<sub>BG(AV)</sub> :</strong>
+    <span class="underline formula">
+      {{ record.ibg }}
+    </span>
+  </div>
 
-          <div class="formula-row">
-            I<sub>LBD</sub> = I<sub>AV</sub> - I<sub>BG(AV)</sub> =
-            <span class="underline formula-wide">
-              {{ record.ilbd }}
-            </span>
-          </div>
-        </div>
+  <div class="formula-row">
+    <strong>ILBD = I<sub>AV</sub> - I<sub>BG(AV)</sub> =</strong>
+    <span class="underline formula-wide">
+      {{ record.ilbd }}
+    </span>
+  </div>
+</div>
 
         <!-- ลายเซ็นผู้ทดสอบ -->
         <div class="signature-block">
           <div class="sig-row sig-row-name">
-            ลงชื่อ.......................................................................ผู้ทดสอบ
+            ลงชื่อ.........................................................ผู้ทดสอบ
           </div>
           <div class="sig-row sig-row-parenthesis">
             (...........................................................................)
           </div>
           <div class="sig-row">
-            ตำแหน่ง.................................................................................
+            ตำแหน่ง...................................................................
           </div>
         </div>
       </div>
@@ -259,7 +260,7 @@ onMounted(async () => {
 /* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -283,7 +284,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* ===== แผ่น A4 ===== */
@@ -309,22 +310,22 @@ onMounted(async () => {
 
 .title-main {
   font-weight: 700;
-  font-size: 13pt;
-  margin-bottom: 3mm;
+  font-size: 18pt;
+  margin-bottom: 1.5mm;
 }
 
 .title-sub {
-  font-size: 11pt;
-  margin-bottom: 3mm;
+  font-size: 16pt;
+  margin-bottom: 1.5mm;
 }
 
 .meta-block {
   margin-left: 0;
-  margin-bottom: 6mm;
+  margin-bottom: 4mm;
 }
 
 .meta-row {
-  margin-bottom: 3mm;
+  margin-bottom: 1.5mm;
 }
 
 .meta-row-grid {
@@ -347,7 +348,7 @@ onMounted(async () => {
 
 .underline {
   border-bottom: 0.4pt solid #000;
-  min-height: 6mm;
+  min-height: 1mm;
   padding: 0 2mm;
   display: inline-block;
 }
@@ -373,6 +374,15 @@ onMounted(async () => {
   text-align: center;
   vertical-align: middle;
 }
+/* ทำให้หัวตาราง F10 เป็นตัวหนา */
+.f10-table thead th {
+  font-weight: 700 !important;
+}
+/* ทำให้ข้อความสูตร IAV / IBG / ILBD เป็นตัวหนา */
+.formula-row strong {
+  font-weight: 700 !important;
+}
+
 
 /* ลดขนาดความกว้างคอลัมน์หัวตาราง */
 .f10-table th:nth-child(1),   /* ครั้งที่ */
@@ -450,6 +460,15 @@ onMounted(async () => {
   text-indent: 3mm;
 }
 
+.freq-label {
+  font-weight: 700 !important; /* ตัวหนา */
+}
+
+.freq-value {
+  font-weight: 400 !important; /* ตัวบาง */
+}
+
+
 /* ===== PRINT ===== */
 @page {
   size: A4 portrait;
@@ -521,4 +540,4 @@ onMounted(async () => {
 }
 
 }
-</style>
+</style> 

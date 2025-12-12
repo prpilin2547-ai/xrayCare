@@ -165,7 +165,7 @@
     ลงชื่อ .................................................. ผู้ทดสอบ
   </div>
   <div class="sig-line sig-row">
-    ( ........................................ )
+    ( ................................................................. )
   </div>
   <div class="sig-line sig-row">
     ตำแหน่ง ..........................................................
@@ -232,7 +232,7 @@ onMounted(async () => {
 /* ฟอนต์ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
 
@@ -256,7 +256,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* กระดาษ A4 */
@@ -272,7 +272,7 @@ onMounted(async () => {
 .sheet-inner {
   width: 180mm;
   padding: 18mm 0 14mm;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* หัวฟอร์ม – ชิดซ้าย */
@@ -285,12 +285,12 @@ onMounted(async () => {
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 13pt !important;
+  font-size: 18pt !important;
 }
 
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* เส้นกรอกข้อมูล */
@@ -299,7 +299,7 @@ onMounted(async () => {
   min-height: 6mm;
   padding: 0 2mm;
   display: inline-block;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 .long { min-width: 70mm; }
@@ -337,7 +337,7 @@ onMounted(async () => {
   padding: 2mm 1mm;
   vertical-align: middle;
   text-align: center;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* ความกว้างคอลัมน์ EI แบบสัดส่วน 40 / 20 / 20 / 20 */
@@ -369,13 +369,13 @@ onMounted(async () => {
 .signature-block {
   margin-top: 20mm;   /* ← ขยับลง (ปรับเป็น 15–30mm ได้ตามต้องการ) */
   text-align: right;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 
 .sig-line {
   margin-bottom: 3mm;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* การพิมพ์ */

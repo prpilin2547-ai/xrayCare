@@ -211,7 +211,7 @@ onMounted(async () => {
 /* ฟอนต์พื้นฐานทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;   /* ✅ ถูกต้อง */
   font-weight: 400;
 }
 
@@ -235,7 +235,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* A4 */
@@ -261,7 +261,7 @@ onMounted(async () => {
 
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;
+  font-size: 18pt !important;
   text-align: left;
   margin-bottom: 2mm;
 }
@@ -379,26 +379,7 @@ onMounted(async () => {
   margin-top: 8mm;
 }
 
-/* การพิมพ์ */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
-@media print {
-  .print-toolbar {
-    display: none;
-  }
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
-  /* ประโยคหัวข้อ = ตัวหนา */
+/* ประโยคหัวข้อ = ตัวหนา */
 .note-title {
   font-weight: 700 !important;
 }
@@ -438,6 +419,27 @@ onMounted(async () => {
   font-weight: 400 !important;
   font-style: italic !important;
 }
+
+/* การพิมพ์ */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  .print-toolbar {
+    display: none;
+  }
+  .print-root {
+    background: #ffffff;
+    padding: 0;
+  }
+  .sheet-a4 {
+    box-shadow: none;
+    width: auto;
+    min-height: auto;
+  }
+  
 
 }
 </style>

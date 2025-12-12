@@ -29,26 +29,27 @@
             แบบบันทึก F9 : การตรวจสอบคุณภาพเสื้อตะกั่วและการหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์
           </div>
           <div class="title-sub">
-            ความถี่ : {{ record.frequency }}
+            <strong>ความถี่ :</strong>
+            <span class="freq-value">{{ record.frequency }}</span>
           </div>
         </div>
 
         <!-- ตารางเดียว ต่อทั้งภายนอก + ภายใน -->
         <table class="f9-table">
           <thead>
-            <!-- แถวหัวคอลัมน์ -->
-            <tr>
-              <th class="col-no">ลำดับที่</th>
-              <th>หมายเลขอุปกรณ์</th>
-              <th>ชนิดของอุปกรณ์</th>
-              <th>อายุการใช้งาน</th>
-              <th>วันที่ตรวจสอบ</th>
-              <th>ชนิดของความชำรุดเสียหาย</th>
-              <th>ตำแหน่ง</th>
-              <th>ขนาด</th>
-              <th>วิธีการจัดเก็บ</th>
-              <th>ผู้บันทึก</th>
-            </tr>
+  <!-- แถวหัวคอลัมน์ -->
+  <tr class="header-top">
+    <th class="col-no">ลำดับที่</th>
+    <th>หมายเลขอุปกรณ์</th>
+    <th>ชนิดของอุปกรณ์</th>
+    <th>อายุการใช้งาน</th>
+    <th>วันที่ตรวจสอบ</th>
+    <th>ชนิดของความชำรุดเสียหาย</th>
+    <th>ตำแหน่ง</th>
+    <th>ขนาด</th>
+    <th>วิธีการจัดเก็บ</th>
+    <th>ผู้บันทึก</th>
+  </tr>
             <!-- หัวส่วนที่ 1 : ภายนอก -->
             <tr>
               <th colspan="10" class="section-title">
@@ -182,13 +183,13 @@
         <!-- ลายเซ็นด้านล่าง -->
         <div class="signature-block">
           <div class="sig-row">
-            ลงชื่อ.................................................................ผู้ทดสอบ
+            ลงชื่อ........................................................ผู้ทดสอบ
           </div>
           <div class="sig-row">
-            (.................................................................)
+            (...........................................................................)
           </div>
           <div class="sig-row">
-            ตำแหน่ง.............................................................
+            ตำแหน่ง.................................................................
           </div>
         </div>
       </div>
@@ -264,7 +265,7 @@ onMounted(async () => {
 /* FONT ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -289,7 +290,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* แผ่น A4 */
@@ -316,12 +317,12 @@ onMounted(async () => {
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 11pt;
+  font-size: 18pt;
 }
 
 .title-sub {
   margin-bottom: 2mm;
-  font-size: 11pt;
+  font-size: 16pt;
   text-align: left;
 }
 
@@ -330,7 +331,7 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 .f9-table th,
@@ -345,7 +346,7 @@ onMounted(async () => {
   font-weight: 700;
   text-align: left !important;
   padding-left: 3mm;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 .col-no {
@@ -365,6 +366,33 @@ onMounted(async () => {
   white-space: nowrap;
   padding-right: 0 !important;
 }
+/* ความถี่ : ตัวหนา */
+.title-sub strong {
+  font-weight: 700;
+}
+
+/* ทุก 6 เดือน ตัวบาง */
+.freq-value {
+  font-weight: 400;
+}
+
+
+.title-sub span,
+.title-sub *:not(:first-child) {
+  font-weight: 400;
+}
+
+/* ทำให้หัวตาราง (เฉพาะแถวชื่อคอลัมน์) เป็นตัวหนา */
+.f9-table thead tr:first-child th {
+  font-weight: 700;
+}
+/* ทำให้หัวคอลัมน์ชิดด้านบน */
+.f9-table thead tr.header-top th {
+  vertical-align: top !important;
+  padding-top: 1mm;      /* ชิดบนแบบสวย ไม่ติดขอบ */
+  padding-bottom: 1.5mm;
+}
+
 
 /* PRINT */
 @page {

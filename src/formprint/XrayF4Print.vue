@@ -55,7 +55,7 @@
             <tr>
               <th class="col-no"><span class="bold-text">ลำดับที่</span></th>
               <th class="col-desc"><span class="bold-text">รายการตรวจสอบ</span></th>
-              <th class="col-result"><span class="bold-text">ผ่าน (✓) / ไม่ผ่าน (✗)</span></th>
+              <th class="col-result"><span class="bold-text">ผ่าน (✓)<br> ไม่ผ่าน (✗)</span></th>
               <th class="col-remark"><span class="bold-text">หมายเหตุ</span></th>
             </tr>
           </thead>
@@ -236,7 +236,7 @@ onMounted(async () => {
 /* ตั้งค่ามาตรฐานทั้งหน้า = 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
 
@@ -287,13 +287,13 @@ onMounted(async () => {
 /* คำว่า "แบบบันทึก F4…" = 13pt */
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;
+  font-size: 18pt !important;
   margin-bottom: 3mm;
 }
 
 /* บรรทัดอื่นของ header = 11pt */
 .title-sub {
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   margin-bottom: 3mm;
   line-height: 1.4;
 }
@@ -327,12 +327,11 @@ onMounted(async () => {
   flex: 1;
 }
 
-/* ================= ตาราง (ฟอนต์ 10pt) ================= */
 .f4-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 10pt !important;      /* ★ 10 pt ทั้งตาราง */
+  font-size: 14pt !important;   /* ← ตาราง = 14 */
 }
 
 .f4-table th {
@@ -340,18 +339,18 @@ onMounted(async () => {
   padding: 1.5mm 1mm;
   text-align: center;
   vertical-align: middle;
-  font-size: 10pt !important;
+  font-size: 14pt !important;   /* ← ตาราง = 14 */
   font-weight: 700 !important;
 }
 
-/* ข้อความในเซลล์ทั่วไปชิดซ้าย */
 .f4-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 1mm;
   vertical-align: middle;
   text-align: left !important;
-  font-size: 10pt !important;
+  font-size: 14pt !important;   /* ← ตาราง = 14 */
 }
+
 
 /* ★ ลำดับที่ (1–15) ให้อยู่กึ่งกลางช่อง */
 .f4-table td.col-no {
@@ -366,17 +365,24 @@ onMounted(async () => {
   font-weight: 700;
 }
 
+/* เลขลำดับที่ 1–15 ชิดขอบบน */
+.f4-table td.col-no {
+  vertical-align: top !important;
+  padding-top: 1mm;   /* ปรับได้ ถ้าอยากให้ติดมากขึ้น */
+}
+
+
 /* คอลัมน์ */
 .col-no {
-  width: 12mm;
+  width: 14mm;
 }
 
 .col-desc {
-  width: 90mm;
+  width: 75mm;
 }
 
 .col-result {
-  width: 22mm;
+  width: 30mm;
 }
 
 .col-remark {
@@ -386,7 +392,7 @@ onMounted(async () => {
 /* หมายเหตุ */
 .note-block {
   margin-top: 4mm;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 .note-line {
@@ -395,7 +401,7 @@ onMounted(async () => {
 
 .footer-note {
   margin-top: 3mm;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* ความถี่ : ตัวหนา */
