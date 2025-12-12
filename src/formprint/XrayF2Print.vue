@@ -48,7 +48,6 @@
         <div class="meta-inline">
           <div class="meta-row-inline">
             <span>ความถี่ :</span>
-            <!-- ยังใช้ class meta-short แต่ไปตัดเส้นใน CSS -->
             <span class="underline meta-short">
               {{ record.frequency }}
             </span>
@@ -89,8 +88,8 @@
   <!-- แถวที่ 2 -->
   <tr>
     <td class="col-month" rowspan="3">
-  <div class="month-wrapper">
-    <div>เดือน</div>
+      <div class="month-wrapper">
+      <div class="month-label">เดือน</div>
     <span class="underline month-line">{{ section.monthLabel }}</span>
   </div>
 </td>
@@ -225,17 +224,22 @@ onMounted(async () => {
 /* หัวฟอร์ม */
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;
+  font-size: 11pt !important;
   text-align: left;
   margin-bottom: 4mm;
 }
 
 .title-center-block {
   text-align: center;
+  margin-top: 10mm;   /* ← ขยับลง (ปรับได้ 3–6mm ตามต้องการ) */
 }
 
 .title-sub {
   margin-bottom: 2mm;
+}
+
+.title-center-block .title-sub {
+  font-weight: 700;
 }
 
 /* ความถี่ + หมายเลข IP */
@@ -248,7 +252,9 @@ onMounted(async () => {
 }
 
 
-.meta-row-inline {
+  /* ความถี่ : ตัวหนา */
+.meta-row-inline span:first-child {
+  font-weight: 700;
   margin-bottom: 2mm;
 }
 
@@ -257,12 +263,14 @@ onMounted(async () => {
   min-width: 28mm;
   margin-left: 4px;
   border-bottom: none !important;  /* ตัดเส้นใต้ */
+  font-weight: 400 !important;
 }
 
 /* ยังให้หมายเลข IP มีเส้นอยู่ตามเดิม */
 .meta-long {
   min-width: 50mm;
   margin-left: 4px;
+  font-weight: 400;
 }
 
 /* เส้นกรอกข้อมูล (ทั่วไป) */
@@ -337,6 +345,10 @@ onMounted(async () => {
 
 .multi-line div {
   line-height: 1.2;
+}
+
+.month-label {
+  font-weight: 700;
 }
 
 .dotted-line {

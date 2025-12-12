@@ -95,11 +95,11 @@
             </tr>
 
             <!-- ความส่องสว่าง (Luminance) -->
-<tr>
-  <td colspan="5" class="section-title">
-    ความส่องสว่าง (Luminance)
-  </td>
-</tr>
+            <tr>
+              <td colspan="5" class="section-title">
+                ความส่องสว่าง (Luminance)
+              </td>
+            </tr>
 
 <!-- แถว 1: กรอบที่มีระดับสีเทาวางซ้อนกัน -->
 <tr>
@@ -182,11 +182,14 @@
 
             <!-- ข้อคิดเห็น (ผสานเซลล์ + ชิดซ้าย + ตัวหนาแค่ label) -->
             <tr>
-              <td colspan="5" class="merged-left">
-                <span class="bold-text">ข้อคิดเห็น</span><br />
-                {{ record.comment }}
+              <td colspan="5" rowspan="2" class="merged-left">
+                ข้อคิดเห็น
               </td>
-            </tr>
+          </tr>
+
+          <tr>
+            <!-- ไม่ต้องมี <td> ใด ๆ -->
+          </tr>
           </tbody>
         </table>
       </div>
@@ -300,7 +303,7 @@ function handlePrint () {
 /* ★ title-main = 13pt ตามที่ต้องการ */
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important; 
+  font-size: 11pt !important; 
   margin-bottom: 2mm;
 }
 
@@ -391,5 +394,12 @@ function handlePrint () {
   text-align: right !important;
   padding-right: 3mm !important; /* เล็กน้อยให้สวยงาม */
 }
+
+/* คอลัมน์ label แถว วันที่ / ผู้ทดสอบ ให้ชิดขวา */
+.right-label {
+  text-align: right !important;
+  padding-right: 3mm !important;
+}
+
 }
 </style>

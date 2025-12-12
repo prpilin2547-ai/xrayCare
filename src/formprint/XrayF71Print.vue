@@ -30,15 +30,17 @@
           </div>
 
           <div class="title-sub">
-            ความถี่ : {{ header.frequency }}
+            <span class="bold-label">ความถี่ :</span>
+            <span class="normal-text">{{ header.frequency }}</span>
           </div>
+
 
           <!-- เครื่องเอกซเรย์ยี่ห้อ / รุ่น อยู่นอกตาราง -->
           <div class="title-sub machine-row">
-            เครื่องเอกซเรย์ยี่ห้อ :
-            <span class="underline medium">{{ header.machineBrand }}</span>
-            รุ่น
-            <span class="underline medium">{{ header.machineModel }}</span>
+            <span class="bold-label">เครื่องเอกซเรย์ยี่ห้อ :</span>
+            <span class="underline brand-line">{{ header.machineBrand }}</span>
+              รุ่น
+            <span class="underline model-line">{{ header.machineModel }}</span>
           </div>
         </div>
 
@@ -328,6 +330,14 @@ onMounted(async () => {
   line-height: 1.45;
 }
 
+.bold-label {
+  font-weight: 700;
+}
+
+.normal-text {
+  font-weight: 400;
+}
+
 /* แถวหัว section (บรรทัด Beam Alignment ต้องมีความเบี่ยงเบน...) */
 /* ทำให้หัวข้อ section ชิดซ้ายของเซลล์จริงๆ */
 .section-title {
@@ -410,10 +420,24 @@ onMounted(async () => {
 
 /* 2) ทำให้คำว่า cm อยู่ขวาและเป็นตัวบาง */
 .cm-cell {
-  text-align: right !important;
-  font-weight: 400 !important;
+  text-align: right !important;   /* ชิดขวาของช่อง */
+  font-weight: 400 !important;    /* ตัวบาง */
+  padding-right: 2mm !important;  /* เว้นขอบเล็กน้อยให้สวย */
 }
 
+.brand-line {
+  min-width: 55mm;   /* ยี่ห้อ → ยาวขึ้น */
+}
+
+.model-line {
+  min-width: 45mm;   /* รุ่น → ยาวขึ้น */
+}
+
+/* ทำให้คำว่า Note (ทั้ง 2 จุด) เป็นตัวบางและเอียงเท่านั้น */
+.main-table th:last-child {
+  font-weight: 400 !important;
+  font-style: italic !important;
+}
 
 }
 </style>
