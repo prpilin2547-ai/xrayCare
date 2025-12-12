@@ -28,7 +28,8 @@
             (Consistency of Exposure Index)
           </div>
           <div class="title-sub">
-            ความถี่ : ทุก 3 เดือน
+            <span class="freq-label">ความถี่ :</span>
+            <span class="freq-value">ทุก 3 เดือน</span>
           </div>
         </div>
 
@@ -136,19 +137,19 @@
 
     <!-- เทคนิค -->
     <tr>
-      <td class="align-left">
-        เทคนิคการถ่ายภาพ<br />{{ record.technique }}
-      </td>
-      <td class="align-left">
-        kV<br />{{ record.kv }}
-      </td>
-      <td class="align-left">
-        mAs<br />{{ record.mas }}
-      </td>
-      <td class="align-left">
-        Dose (mGy)<br />{{ record.dose }}
-      </td>
-    </tr>
+  <td class="align-center">
+    เทคนิคการถ่ายภาพ<br />{{ record.technique }}
+  </td>
+  <td class="align-center">
+    kV<br />{{ record.kv }}
+  </td>
+  <td class="align-center">
+    mAs<br />{{ record.mas }}
+  </td>
+  <td class="align-center">
+    Dose (mGy)<br />{{ record.dose }}
+  </td>
+</tr>
 
     <!-- แถวว่าง -->
     <tr class="empty-row">
@@ -159,17 +160,17 @@
 </table>
 
         <!-- ================= ลายเซ็น ================= -->
-        <div class="signature-block">
-          <div class="sig-line">
-            ลงชื่อ .................................................. ผู้ทดสอบ
-          </div>
-          <div class="sig-line">
-            ( {{ record.testerName || '........................................' }} )
-          </div>
-          <div class="sig-line">
-            ตำแหน่ง ..........................................................
-          </div>
-        </div>
+<div class="signature-block">
+  <div class="sig-line sig-row">
+    ลงชื่อ .................................................. ผู้ทดสอบ
+  </div>
+  <div class="sig-line sig-row">
+    ( ........................................ )
+  </div>
+  <div class="sig-line sig-row">
+    ตำแหน่ง ..........................................................
+  </div>
+</div>
       </div>
     </div>
   </div>
@@ -318,6 +319,10 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
+.align-center {
+  text-align: center !important;
+}
+
 .ei-header th {
   font-weight: bold;
 }
@@ -362,10 +367,11 @@ onMounted(async () => {
 
 /* ลายเซ็น – ชิดขอบขวาให้ตรงกับขอบตาราง */
 .signature-block {
-  margin-top: 12mm;
+  margin-top: 20mm;   /* ← ขยับลง (ปรับเป็น 15–30mm ได้ตามต้องการ) */
   text-align: right;
   font-size: 11pt !important;
 }
+
 
 .sig-line {
   margin-bottom: 3mm;
@@ -426,5 +432,23 @@ onMounted(async () => {
   height: 10mm;
 }
 
+/* ตัวอักษรในตาราง F6 เป็นตัวบางทั้งหมด */
+.f6-table td,
+.f6-table th {
+  font-weight: 400 !important;
+}
+
+/* แถวเทคนิคการถ่ายภาพ ให้ข้อความกึ่งกลางช่อง */
+.f6-table tr:last-of-type td {
+  text-align: center !important;
+}
+
+.freq-label {
+  font-weight: 700;   /* ตัวหนา */
+}
+
+.freq-value {
+  font-weight: 400;   /* ตัวบาง */
+}
 
 </style>

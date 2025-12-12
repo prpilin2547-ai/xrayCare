@@ -33,7 +33,6 @@
             <span class="bold-text">ความถี่ :</span> ทุก 3 เดือน
           </div>
 
-
           <div class="title-sub header-row-inline">
             เครื่องเอกซเรย์ยี่ห้อ
           <span class="underline long"></span>
@@ -53,22 +52,12 @@
         <!-- ================= ตารางตรวจสอบ ================= -->
         <table class="f4-table">
           <thead>
-            <th class="col-no">
-              <span class="bold-text">ลำดับที่</span>
-            </th>
-
-            <th class="col-desc">
-              <span class="bold-text">รายการตรวจสอบ</span>
-            </th>
-
-            <th class="col-result">
-              <span class="bold-text">ผ่าน (✓) / ไม่ผ่าน (✗)</span>
-            </th>
-
-            <th class="col-remark">
-              <span class="bold-text">หมายเหตุ</span>
-            </th>
-
+            <tr>
+              <th class="col-no"><span class="bold-text">ลำดับที่</span></th>
+              <th class="col-desc"><span class="bold-text">รายการตรวจสอบ</span></th>
+              <th class="col-result"><span class="bold-text">ผ่าน (✓) / ไม่ผ่าน (✗)</span></th>
+              <th class="col-remark"><span class="bold-text">หมายเหตุ</span></th>
+            </tr>
           </thead>
 
           <tbody>
@@ -316,6 +305,11 @@ onMounted(async () => {
   width: 100%;
 }
 
+/* ตัวหนา */
+.bold-text {
+  font-weight: 700;
+}
+
 /* underline — ให้เส้นยาวจนสุดขอบเท่าตาราง */
 .underline {
   border-bottom: 0.4pt solid #000;
@@ -347,6 +341,7 @@ onMounted(async () => {
   text-align: center;
   vertical-align: middle;
   font-size: 10pt !important;
+  font-weight: 700 !important;
 }
 
 /* ข้อความในเซลล์ทั่วไปชิดซ้าย */
@@ -361,11 +356,14 @@ onMounted(async () => {
 /* ★ ลำดับที่ (1–15) ให้อยู่กึ่งกลางช่อง */
 .f4-table td.col-no {
   text-align: center !important;
+  font-weight: 400;   /* ← ตัวบาง */
 }
+
 
 /* ถ้าต้องการให้ช่องผล (ผ่าน/ไม่ผ่าน) อยู่กลางด้วย */
 .f4-table td.col-result {
   text-align: center !important;
+  font-weight: 700;
 }
 
 /* คอลัมน์ */
@@ -398,6 +396,16 @@ onMounted(async () => {
 .footer-note {
   margin-top: 3mm;
   font-size: 11pt !important;
+}
+
+/* ความถี่ : ตัวหนา */
+.freq-label {
+  font-weight: 700;
+}
+
+/* ค่า (ทุก 3 เดือน) ตัวบาง */
+.freq-value {
+  font-weight: 400;
 }
 
 /* Print mode */
