@@ -22,11 +22,12 @@
     <div class="sheet-a4">
       <div class="sheet-inner">
         <!-- ===== หัวฟอร์ม ===== -->
-        <div class="header-main">
-          <div class="title-main">
-            แบบบันทึก F13 : แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวนด์ : B-mode QC Test
+        <div class="header-main align-with-table">
+        <div class="title-main">
+          แบบบันทึก F13 : แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวนด์ : B-mode QC Test
           </div>
         </div>
+
 
         <!-- ข้อมูลเครื่อง / ผู้ตรวจ -->
         <div class="machine-block">
@@ -57,161 +58,303 @@
 
         <table class="qc-table">
   <thead>
-    <tr>
-      <th>Test Date</th>
-      <th>baseline</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th>Action level</th>
-      <th>Defect level</th>
-    </tr>
-  </thead>
-
-  <tbody>
-  <!-- แถว 1 เป็น header จึงเริ่มกำหนดจากแถวที่ 2 -->
-
-  <!-- แถว 2 -->
-  <tr>
-    <td colspan="7">Image Uniformity</td>
+  <tr class="force-left">
+    <th>Test Date</th>
+    <th>baseline</th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>Action level</th>
+    <th>Defect level</th>
   </tr>
+</thead>
+  <tbody>
 
-  <!-- แถว 3 -->
+<tr>
+  <td colspan="7" style="font-weight:700; text-align:left;">
+    Image Uniformity
+  </td>
+</tr>
+
+
 <tr>
   <td>Vertical band (y/n)</td>
-  <td></td><td></td><td></td><td></td><td></td><td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- คอลัมน์ 6 : Action level (ผสานแถว 3–4) -->
+  <td rowspan="2">
+    ≥ 4 dB or any change<br>
+    from baseline
+  </td>
+
+  <!-- คอลัมน์ 7 : Defect level (ผสานแถว 3–4) -->
+  <td rowspan="2">
+    ≥ 6 dB or any change<br>
+    from baseline
+  </td>
 </tr>
 
-<!-- แถว 4 -->
+
 <tr>
   <td>Horizontal band (y/n)</td>
-  <td></td><td></td><td></td><td></td><td></td><td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่ต้องมี td คอลัมน์ 6 และ 7 -->
 </tr>
 
-<!-- แถว 5 -->
 <tr>
   <td>Artifacts (y/n)</td>
   <td></td><td></td><td></td><td></td><td></td><td></td>
 </tr>
 
-  <!-- แถว 6 -->
-  <tr>
-    <td>Depth of Penetration (cm)</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
+<tr>
+  <td><strong>Depth of Penetration (cm)</strong></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
 
-  <!-- แถว 7 -->
-  <tr>
-    <td colspan="7">Vertical Distance Accuracy Actual distance………………………….mm</td>
-  </tr>
+  <!-- คอลัมน์ที่ 6 : Action level -->
+  <td>± 6 mm</td>
 
-  <!-- แถว 8 -->
-  <tr>
-    <td>(Pin 1-3) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 9 -->
-  <tr>
-    <td>(Pin 3-5) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 10 -->
-  <tr>
-    <td>(Pin 6-8) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 11 -->
-  <tr>
-    <td colspan="7">Horizontal Distance Accuracy Actual distance………………………….mm</td>
-  </tr>
-
-  <!-- แถว 12 -->
-  <tr>
-    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 13 -->
-  <tr>
-    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 14 -->
-  <tr>
-    <td colspan="7">Lateral Resolution Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm</td>
-  </tr>
-
-  <!-- แถว 15 -->
-  <tr>
-    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 16 -->
-  <tr>
-    <td>(Mid) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 17 -->
-  <tr>
-    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 18 -->
-  <tr>
-    <td colspan="7">Axial Resolution</td>
-  </tr>
-
-  <!-- แถว 19 -->
-  <tr>
-    <td>(Near) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 20 -->
-  <tr>
-    <td>(Mid) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 21 -->
-  <tr>
-    <td>(Far) Measured (mm)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 22 -->
-  <tr>
-    <td colspan="7">Image Geometry (Cyst Imaging) Actual diameter………………….mm</td>
-  </tr>
-
-  <!-- แถว 23 -->
-  <tr>
-    <td>(Near) Cyst: Height / Width
-Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 24 -->
-  <tr>
-    <td>(Mid) Cyst: Height / Width<br />
-Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 25 -->
-  <tr>
-    <td>(Far) Cyst: Height / Width<br />
-Image quality (normal/noise)</td><td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
-
-  <!-- แถว 26 -->
-  <tr>
-    <td colspan="7">No. of Gray Scale Objects</td>
-  </tr>
+  <!-- คอลัมน์ที่ 7 : Defect level -->
+  <td>± 10 mm</td>
+</tr>
 
 
-  <!-- แถว 27 -->
-  <tr>
-    <td>Dead zone (mm)</td>
-    <td></td><td></td><td></td><td></td><td></td><td></td>
-  </tr>
+<tr>
+  <td colspan="7" style="text-align:left;">
+  <strong>Vertical Distance Accuracy</strong>
+  Actual distance………………………….mm
+</td>
+</tr>
+
+
+<tr>
+  <td>(Pin 1-3) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- คอลัมน์ที่ 6 : Action level (rowspan 3) -->
+  <td rowspan="3">± 1.5 mm or 1.5%</td>
+
+  <!-- คอลัมน์ที่ 7 : Defect level (rowspan 3) -->
+  <td rowspan="3">± 2.0 mm or 2%</td>
+</tr>
+
+
+<tr>
+  <td>(Pin 3-5) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td>(Pin 6-8) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td colspan="7" style="text-align:left;">
+    <strong>Horizontal Distance Accuracy</strong>
+    Actual distance………………………….mm
+  </td>
+</tr>
+
+
+<tr>
+  <td>(Near) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- คอลัมน์ 6 -->
+  <td rowspan="2">± 2.0 mm or 2%</td>
+
+  <!-- คอลัมน์ 7 -->
+  <td rowspan="2">± 3.0 mm or 3%</td>
+</tr>
+
+<tr>
+  <td>(Far) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+
+
+
+<tr>
+  <td colspan="7" style="text-align:left;">
+    <strong>Lateral Resolution</strong>
+    Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm
+  </td>
+</tr>
+
+<tr>
+  <td>(Near) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- ผสานคอลัมน์ 6–7 และแถว 15–17 -->
+  <td colspan="2" rowspan="3">
+    width &lt;1.5 mm, freq ≥ 5 MHz<br>
+    width &lt;3 mm, 3.5 ≤ freq &lt; 5 MHz<br>
+    width ≤4 mm, freq &lt; 3.5 MHz
+  </td>
+</tr>
+
+
+<tr>
+  <td>(Mid) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td>(Far) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
+</tr>
+
+<tr>
+  <td colspan="7" style="font-weight:700; text-align:left;">
+    Axial Resolution
+  </td>
+</tr>
+
+<tr>
+  <td>(Near) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- ผสานคอลัมน์ 6–7 และแถว 19–21 -->
+  <td colspan="2" rowspan="3">
+    <strong>Action level:</strong> 1 mm<br>
+    or 2 mm if freq &lt; 4 MHz<br>
+    <strong>Defect level &gt;1 mm</strong>
+  </td>
+</tr>
+
+
+<tr>
+  <td>(Mid) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td>(Far) Measured (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td colspan="7" style="text-align:left;">
+    <strong>Image Geometry (Cyst Imaging)</strong>
+    Actual diameter………………….mm
+  </td>
+</tr>
+
+<tr>
+  <td>(Near) Cyst: Height / Width<br>
+      Image quality (normal/noise)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- ผสานคอลัมน์ 6–7 และแถว 23–25 -->
+  <td colspan="2" rowspan="3">
+    Major distortion or any change from baseline<br>
+    Height/Width ≥20%
+  </td>
+</tr>
+
+
+<tr>
+  <td>(Mid) Cyst: Height / Width<br>
+      Image quality (normal/noise)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td>(Far) Cyst: Height / Width<br>
+      Image quality (normal/noise)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
+</tr>
+
+
+<tr>
+  <td colspan="7" style="font-weight:700; text-align:left;">
+    No. of Gray Scale Objects
+  </td>
+</tr>
+
+<tr>
+  <td>Dead zone (mm)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+
+  <!-- ผสานคอลัมน์ที่ 6 และ 7 -->
+  <td colspan="2">
+    7 mm; freq 3 MHz<br>
+    5 mm; 3 MHz &lt; freq &lt; 7 MHz<br>
+    3 mm; freq 7 MHz
+  </td>
+</tr>
+
+
 </tbody>
 </table>
-
         </div>
       </div>
     </div>
@@ -415,7 +558,7 @@ onMounted(async () => {
 /* ฟอนต์ทั้งหน้า = 11pt */
 * {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -466,7 +609,7 @@ onMounted(async () => {
 /* << ตัวเดียวที่ใหญ่กว่า = 13pt >> */
 .title-main {
   font-weight: 700;
-  font-size: 13pt;   /* ยกเว้นหัวข้อนี้ */
+  font-size: 18pt;   /* ยกเว้นหัวข้อนี้ */
   margin-bottom: 2mm;
 }
 
@@ -494,8 +637,12 @@ onMounted(async () => {
   min-width: 25mm;
 }
 .underline.long {
-  min-width: 45mm;
+  min-width: 35mm;
 }
+.qc-table thead th {
+  font-weight: 700;
+}
+
 
 /* ตาราง QC */
 .qc-table {
@@ -512,13 +659,13 @@ onMounted(async () => {
   vertical-align: top;
 }
 
-/* ขยายความกว้างของคอลัมน์ที่ 1 ทุกแถว */
 .qc-table td:first-child,
 .qc-table th:first-child {
-  width: 60mm !important;   /* ← ปรับ mm ตามต้องการ */
-  max-width: 60mm !important;
-  min-width: 60mm !important;
+  width: 50mm !important;
+  max-width: 50mm !important;
+  min-width: 50mm !important;
 }
+
 
 .col-test {
   width: 35%;
@@ -565,6 +712,43 @@ onMounted(async () => {
 .signature-line {
   margin-bottom: 3mm;
 }
+
+/* เพิ่มความกว้าง Action level */
+.qc-table th:nth-child(6),
+.qc-table td:nth-child(6) {
+  width: 28mm !important;
+}
+
+/* เพิ่มความกว้าง Defect level */
+.qc-table th:nth-child(7),
+.qc-table td:nth-child(7) {
+  width: 28mm !important;
+}
+/* บังคับให้ตัวอักษรทุกตัวในตารางมีขนาด 14pt */
+.qc-table,
+.qc-table th,
+.qc-table td {
+  font-size: 14pt !important;
+}
+
+/* ค่าเริ่มต้น: คอลัมน์ที่ 1 ชิดขอบขวาทุกแถว */
+.qc-table tbody td:first-child {
+  text-align: right;
+  padding-right: 2mm;
+}
+
+/* ยกเว้นแถวหัวข้อ / group title ให้ชิดซ้าย */
+.qc-table tr.no-right-align td:first-child {
+  text-align: left !important;
+  padding-right: 1.5mm;
+}
+/* บังคับชิดซ้าย เฉพาะแถวที่กำหนด */
+.qc-table tr.force-left td:first-child,
+.qc-table tr.force-left th {
+  text-align: left !important;
+  padding-left: 1.5mm;
+}
+
 
 /* โหมดพิมพ์ */
 @page {

@@ -29,7 +29,8 @@
             แบบบันทึก F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ
           </div>
           <div class="title-sub">
-            ความถี่ : ทุก 1 เดือน
+            <span class="freq-label">ความถี่ :</span>
+            <span class="freq-value">ทุก 1 เดือน</span>
           </div>
         </div>
 
@@ -248,7 +249,7 @@ onMounted(async () => {
 /* ฟอนต์: TH Sarabun New และฐานทั้งหน้า 11pt */
 * {
   font-family: "TH Sarabun New", Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 .print-root {
@@ -271,7 +272,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* A4 */
@@ -300,12 +301,12 @@ onMounted(async () => {
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 13pt;
+  font-size: 18pt;
 }
 
 /* ความถี่ = 11pt */
 .title-sub {
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* meta block */
@@ -423,6 +424,16 @@ onMounted(async () => {
 /* ขยับวงเล็บได้ถ้าต้องการจูนเพิ่ม */
 .sign-row-parenthesis {
   text-indent: 8mm;
+}
+
+/* ความถี่ : ตัวหนา */
+.freq-label {
+  font-weight: 700;
+}
+
+/* ทุก 1 เดือน : ตัวบาง */
+.freq-value {
+  font-weight: 400;
 }
 
 /* การพิมพ์ */

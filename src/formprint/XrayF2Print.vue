@@ -73,14 +73,13 @@
     <!-- รวมคอลัมน์ 1–2 แล้ว -->
     <th class="col-left" colspan="2">เดือน/รายการ/วันที่</th>
 
-    <!-- คอลัมน์ 3–22 = ตัวเลข 1–20 -->
     <th
-      v-for="d in 20"
-      :key="'hd-' + d"
-      class="col-day"
-    >
-      {{ d }}
-    </th>
+  v-for="d in 20"
+  :key="'hd-' + d"
+  class="col-day"
+>
+  <span v-if="index === 0">{{ d }}</span>
+</th>
   </tr>
 </thead>
 
@@ -171,10 +170,10 @@ onMounted(async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ฟอนต์ทั้งหน้า = 11 pt */
+/* ฟอนต์ทั้งหน้า */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* พื้นหลังหน้า */
@@ -221,21 +220,20 @@ onMounted(async () => {
   padding: 18mm 0 14mm;
 }
 
-/* หัวฟอร์ม */
 .title-main {
   font-weight: 700;
-  font-size: 11pt !important;
+  font-size: 18pt !important;   /* ← เฉพาะบรรทัดนี้ */
   text-align: left;
-  margin-bottom: 4mm;
+  margin-bottom: 1mm;
 }
 
 .title-center-block {
   text-align: center;
-  margin-top: 10mm;   /* ← ขยับลง (ปรับได้ 3–6mm ตามต้องการ) */
+  margin-top: 4mm;   /* ← ขยับลง (ปรับได้ 3–6mm ตามต้องการ) */
 }
 
 .title-sub {
-  margin-bottom: 2mm;
+  margin-bottom: 0.5mm;
 }
 
 .title-center-block .title-sub {
@@ -244,7 +242,7 @@ onMounted(async () => {
 
 /* ความถี่ + หมายเลข IP */
 .meta-inline {
-  margin-top: 8mm;
+  margin-top: 4mm;
   margin-bottom: 6mm;
   text-align: left;
   margin-left: 0 !important;     /* ← เลื่อนมาชิดซ้าย */
@@ -363,13 +361,13 @@ onMounted(async () => {
   border-bottom: none !important;  /* ตัดเส้นใต้ทั้งหมด */
 }
 
-/* คอลัมน์เดือน (แถวที่ 1) */
 .col-month {
-  width: 24mm !important;     /* ← ลดขนาดลงจาก 36mm */
+  width: 13mm !important;   /* ← ลดจาก 24mm */
   vertical-align: middle !important;
   text-align: center !important;
   padding: 0 !important;
 }
+
 
 /* กล่องภายใน ให้จัดกลางทั้งแนวตั้งและแนวนอน */
 .month-wrapper {
