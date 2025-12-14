@@ -94,10 +94,10 @@
               ลงชื่อ..............................................................ผู้ทดสอบ
             </div>
             <div class="sign-line">
-              (.................................................................)
+              (.................................................................................)
             </div>
             <div class="sign-line">
-              ตำแหน่ง.........................................................
+              ตำแหน่ง.....................................................................
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ onMounted(async () => {
 /* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -168,7 +168,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* กระดาษ A4 */
@@ -195,7 +195,7 @@ onMounted(async () => {
 
 .title-main {
   font-weight: 700;
-  font-size: 13pt;
+  font-size: 18pt;
 }
 
 /* ตาราง F11 */
@@ -203,7 +203,7 @@ onMounted(async () => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 .f11-table th,
@@ -214,6 +214,22 @@ onMounted(async () => {
   vertical-align: middle;
   height: 9mm;
 }
+
+/* ===== หัวตาราง F11 : ตัวหนา + ชิดบน ===== */
+.f11-table thead th {
+  font-weight: 700;          /* ตัวหนา */
+  vertical-align: top;       /* ชิดด้านบนของช่อง */
+  padding-top: 1mm;          /* ระยะจากขอบบนเล็กน้อย */
+  padding-bottom: 0.5mm;     /* ลดด้านล่าง */
+  line-height: 1.15;         /* บรรทัดชิดกันแบบฟอร์มราชการ */
+}
+
+/* ทำให้ชื่อบริเวณฉายรังสี ชิดขอบซ้ายของตาราง */
+.f11-table tbody td.align-left {
+  text-align: left !important;
+  padding-left: 1mm !important;   /* ลดระยะจากขอบซ้าย */
+}
+
 
 /* คอลัมน์ตามฟอร์มราชการ */
 .col-region {
@@ -249,7 +265,7 @@ onMounted(async () => {
 
 .sign-line {
   margin-bottom: 2mm;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* ให้วงเล็บ "(" ตรงกับตัว อ. ในคำว่า "ลงชื่อ" */

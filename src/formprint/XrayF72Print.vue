@@ -209,7 +209,7 @@ onMounted(async () => {
 /* ฟอนต์พื้นฐานทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
 
@@ -233,7 +233,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* A4 */
@@ -259,7 +259,7 @@ onMounted(async () => {
 
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;
+  font-size: 18pt !important;
   text-align: left;
   margin-bottom: 2mm;
 }
@@ -369,24 +369,8 @@ onMounted(async () => {
   margin-top: 8mm;
 }
 
-/* การพิมพ์ */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
-@media print {
-  .print-toolbar {
-    display: none;
-  }
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
+.sheet-inner {
+    padding: 18mm 0 16mm !important;
   }
   /* ประโยคหัวข้อ = ตัวหนา */
 .note-title {
@@ -408,12 +392,51 @@ onMounted(async () => {
   font-weight: 700 !important; /* คงความหนาของข้อความตามเดิม */
 }
 
-/* 2) ทำให้คำว่า cm อยู่ขวาและเป็นตัวบาง */
+/* ทำให้คำว่า cm ชิดขอบขวาของช่องตาราง และเป็นตัวบาง */
 .cm-cell {
   text-align: right !important;
   font-weight: 400 !important;
+  padding-right: 1mm !important; /* ชิดขอบจริง ไม่ลอย */
 }
 
+/* ทำให้คำว่า "ความถี่ :" เป็นตัวหนา */
+.title-sub {
+  font-weight: 700 !important;
+}
+
+/* ทำให้คำว่า "ทุก 6 เดือน" เป็นตัวบาง */
+.title-sub span {
+  font-weight: 400 !important;
+}
+
+/* ทำให้คำว่า "เครื่องเอกซเรย์ยี่ห้อ :" เป็นตัวหนา */
+.machine-row {
+  font-weight: 700 !important;
+}
+
+/* แต่ค่าที่กรอก / เส้น underline เป็นตัวบาง */
+.machine-row .underline {
+  font-weight: 400 !important;
+}
+
+/* การพิมพ์ */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  .print-toolbar {
+    display: none;
+  }
+
+  .print-root {
+    background: #ffffff;
+    padding: 0;
+  }
+  .sheet-a4 {
+    width: 210mm !important;
+  }
 
 }
 </style>

@@ -179,7 +179,7 @@ onMounted(() => {
 <style scoped>
 * {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
 
@@ -242,12 +242,12 @@ onMounted(() => {
   padding: 3mm 0;
   font-weight: 700;
   margin-bottom: 5mm;
-  font-size: 11pt !important;
+  font-size: 18pt !important;
 }
 
 /* ข้อมูลหัวฟอร์มแนวนอน */
 .form-meta {
-  font-size: 11pt;
+  font-size: 16pt;
   margin-bottom: 3mm;
 }
 
@@ -256,6 +256,7 @@ onMounted(() => {
 }
 
 .meta-strong {
+  font-size: 18pt !important;
   font-weight: 700;
 }
 
@@ -267,13 +268,13 @@ onMounted(() => {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   margin-top: 10mm;
 }
 
 .qc-table td,
 .qc-table th {
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   border: 0.4pt solid #000;
   padding: 1mm 0.5mm;
   text-align: center;
@@ -343,19 +344,22 @@ onMounted(() => {
   font-size: 11pt;
 }
 
+/* ตัวอักษรในตารางทั้งหมด = 16pt */
 .qc-table td,
 .qc-table th {
   border: 0.4pt solid #000;
   padding: 1mm 0.5mm;
   text-align: center;
   vertical-align: middle;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
+/* span ภายในตารางให้เป็น 16pt ด้วย */
 .qc-table td span,
 .qc-table th span {
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
+
 
 .qc-meta-table td {
   border: 0.4pt solid #000;

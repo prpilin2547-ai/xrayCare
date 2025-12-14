@@ -250,12 +250,12 @@ function handlePrint () {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* ตั้งค่าฟอนต์มาตรฐานทั้งหน้า = 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
+
 
 .print-root {
   background: #e5e7eb;   
@@ -277,7 +277,7 @@ function handlePrint () {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* A4 */
@@ -300,16 +300,16 @@ function handlePrint () {
   margin-bottom: 6mm;
 }
 
-/* ★ title-main = 13pt ตามที่ต้องการ */
 .title-main {
   font-weight: 700;
-  font-size: 11pt !important; 
+  font-size: 18pt !important;   /* ← เฉพาะ F3 */
   margin-bottom: 2mm;
 }
 
+
 /* บรรทัดรอง → 11pt */
 .title-sub {
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 /* ตาราง */
@@ -317,14 +317,14 @@ function handlePrint () {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 .f3-table td {
   border: 0.4pt solid #000;
   padding: 1.5mm 2mm;
   vertical-align: middle;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
 }
 
 .label-col {
@@ -370,6 +370,18 @@ function handlePrint () {
   min-width: 50mm;
   min-height: 6mm;
 }
+/* ลดความกว้างด้านบน–ล่างของทุกช่องในตาราง */
+.f3-table td,
+.f3-table th {
+  padding-top: 0.2mm !important;
+  padding-bottom: 0.2mm !important;
+}
+
+/* คอลัมน์ label แถว วันที่ / ผู้ทดสอบ ให้ชิดขวา */
+.right-label {
+  text-align: right !important;
+  padding-right: 3mm !important;
+}
 
 /* Print */
 @page {
@@ -394,12 +406,6 @@ function handlePrint () {
   text-align: right !important;
   padding-right: 3mm !important; /* เล็กน้อยให้สวยงาม */
 }
-
-/* คอลัมน์ label แถว วันที่ / ผู้ทดสอบ ให้ชิดขวา */
-.right-label {
-  text-align: right !important;
-  padding-right: 3mm !important;
 }
 
-}
 </style>

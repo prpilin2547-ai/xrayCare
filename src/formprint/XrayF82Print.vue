@@ -27,7 +27,8 @@
             {{ record.formTitle }}
           </div>
           <div class="title-sub">
-            ความถี่ : {{ record.frequency }}
+            <span class="freq-label">ความถี่ :</span>
+            <span class="freq-value">{{ record.frequency }}</span>
           </div>
         </div>
 
@@ -64,13 +65,13 @@
         <!-- ลายเซ็น -->
         <div class="signature-block">
           <div class="sig-line">
-            ลงชื่อ.................................................................ผู้ทดสอบ
+            ลงชื่อ............................................................ผู้ทดสอบ
           </div>
           <div class="sig-line">
-            (.................................................................)
+            (..............................................................................)
           </div>
           <div class="sig-line">
-            ตำแหน่ง...........................................................................
+            ตำแหน่ง.....................................................................
           </div>
         </div>
       </div>
@@ -166,7 +167,7 @@ onMounted(async () => {
 /* ฟอนต์ TH Sarabun ทั้งหน้า + ขนาดพื้นฐาน 11pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -191,7 +192,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt;
+  font-size: 16pt;
 }
 
 /* A4 */
@@ -214,20 +215,20 @@ onMounted(async () => {
    ============================ */
 .header-main {
   text-align: left !important;
-  margin-bottom: 10mm;
+  margin-bottom: 4mm;
 }
 
 /* หัวข้อใหญ่ */
 .title-main {
   font-weight: 700;
   margin-bottom: 2mm;
-  font-size: 13pt;
+  font-size: 18pt;
   text-align: left !important;
 }
 
 /* ความถี่ */
 .title-sub {
-  font-size: 11pt;
+  font-size: 16pt;
   text-align: left !important;
 }
 
@@ -278,7 +279,7 @@ onMounted(async () => {
    ============================ */
 .signature-block {
   margin-top: 20mm;
-  font-size: 11pt;
+  font-size: 16pt;
   text-align: right !important;     /* ← ชิดขวาทั้งบล็อก */
   padding-right: 5mm;               /* ← ขยับชิดขวาแบบสวยงาม */
 }
@@ -286,6 +287,22 @@ onMounted(async () => {
 .sig-line {
   margin-bottom: 4mm;
 }
+/* ความถี่ : ตัวหนา */
+.freq-label {
+  font-weight: 700;
+}
+
+/* ทุก 6 เดือน = ตัวบาง */
+.freq-value {
+  font-weight: 400;
+}
+
+/* ลดความกว้างบน–ล่างของแถวแรก (หัวตาราง) เท่านั้น */
+.f82-table thead th {
+  padding-top: 1.5mm !important;
+  padding-bottom: 1.5mm !important;
+}
+
 
 /* ============================
    PRINT

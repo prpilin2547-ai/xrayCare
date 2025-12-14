@@ -29,8 +29,9 @@
             แบบบันทึก F8-1 : การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR
           </div>
           <div class="title-sub">
-            ความถี่ : {{ header.frequency }}
-          </div>
+            <span class="label-strong">ความถี่ :</span>
+            <span class="label-normal">{{ header.frequency }}</span>
+          </div>  
         </div>
 
         <!-- ตารางหลัก ROI 80% -->
@@ -122,7 +123,7 @@
             ลงชื่อ.............................................................ผู้ทดสอบ
           </div>
           <div class="sig-row">
-            (............................................................)
+            (..............................................................................)
           </div>
           <div class="sig-row">
             ตำแหน่ง.......................................................................
@@ -174,7 +175,7 @@ onMounted(async () => {
 /* ฟอนต์ทั้งหน้า = 11pt ตัวบาง */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
 }
 
@@ -225,7 +226,7 @@ onMounted(async () => {
 /* ชื่อแบบบันทึกให้ 13pt หนา */
 .title-main {
   font-weight: 700;
-  font-size: 13pt !important;
+  font-size: 18pt !important;
   margin-bottom: 2mm;
 }
 
@@ -244,6 +245,11 @@ onMounted(async () => {
   border-collapse: collapse;
   table-layout: auto;
 }
+.f81-table thead th {
+  padding-top: 0.8mm !important;
+  padding-bottom: 0.8mm !important;
+}
+
 
 /* หัวตาราง: ให้บางแต่ไม่ต้องสูงมาก */
 .f81-table th {
@@ -251,7 +257,7 @@ onMounted(async () => {
   padding: 1.2mm 0.8mm;
   vertical-align: middle;
   text-align: center;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
   white-space: nowrap;
 }
@@ -262,7 +268,7 @@ onMounted(async () => {
   padding: 3mm 2mm;          /* ← ทำให้ช่องว่างด้านล่างทั้ง 5 แถวกว้าง/สูงเท่าตารางบน */
   vertical-align: middle;
   text-align: center;
-  font-size: 11pt !important;
+  font-size: 16pt !important;
   font-weight: 400;
   white-space: nowrap;
 }
@@ -286,7 +292,7 @@ onMounted(async () => {
 
 /* จุดไข่ปลาในหัว P/F */
 .pf-head {
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
 }
 
@@ -303,6 +309,14 @@ onMounted(async () => {
 .sig-row {
   margin-bottom: 3mm;
   white-space: nowrap;
+}
+
+.label-strong {
+  font-weight: 700 !important; /* ตัวหนา */
+}
+
+.label-normal {
+  font-weight: 400 !important; /* ตัวบาง */
 }
 
 /* ตั้งค่าหน้ากระดาษตอนพิมพ์ */
@@ -339,6 +353,7 @@ onMounted(async () => {
 .col-result {
   text-align: center;
 }
+
 
 }
 </style>
