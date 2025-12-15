@@ -20,6 +20,7 @@
                                 <th>ลำดับ</th>
                                 <th>อุปกรณ์</th>
                                 <th>ห้องตรวจ</th>
+                                <th>วันที่แจ้ง</th>
                                 <th>รายละเอียด</th>
                                 <th>สถานะ</th>
                                 <th>รายละเอียด</th>
@@ -32,6 +33,7 @@
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ getEquipmentText(item) }}</td>
                                 <td>{{ getRoomText(item) }}</td>
+                                <td>{{ item.requestDate || '-' }}</td>
                                 <td>{{ item.detail }}</td>
                                 <td class="status" :class="getStatusCellClass(item.statusText)">
                                     {{ item.statusText }}
@@ -177,6 +179,20 @@
                             </div>
                         </div>
 
+                        <!-- วันที่แจ้งซ่อม (ใหม่) -->
+                        <div class="row mt-3">
+                            <label class="label">วันที่แจ้งซ่อม :</label>
+                            <div class="field d-flex align-items-center gap-2">
+                                <button type="button"
+                                    class="btn btn-light border d-flex align-items-center justify-content-center"
+                                    style="width: 40px; height: 38px;" @click="openCalendar">
+                                    <i class="bi bi-calendar-event"></i>
+                                </button>
+                                <input type="text" v-model="requestDate" class="form-control form-control-sm"
+                                    placeholder="วว ด.ด. ปปปป" readonly @click="openCalendar" />
+                            </div>
+                        </div>
+
                         <!-- รายละเอียด -->
                         <div class="mt-3">
                             <label class="label">รายละเอียด :</label>
@@ -220,6 +236,36 @@
             </div>
         </div>
     </div>
+
+    <!-- ================== MODAL: ปฏิทิน (Thai) ================== -->
+    <!-- z-index ต้องมากกว่า modal ปกติ (1055) -->
+    <div v-if="isCalendarVisible" class="calendar-popup-overlay" @click="isCalendarVisible = false">
+        <div class="calendar-popup-box" @click.stop>
+            <div class="calendar-header">
+                <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
+                <!-- แสดง เดือน (ไทย) ปี (พ.ศ.) -->
+                <span class="month-title">{{ thaiMonthYear }}</span>
+                <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
+            </div>
+
+            <div class="calendar-grid">
+                <!-- วันในสัปดาห์ (ไทย) -->
+                <div v-for="d in thaiWeekdays" :key="d" class="weekday">
+                    {{ d }}
+                </div>
+
+                <div v-for="cell in daysGrid" :key="cell.key" class="day-cell" :class="{
+                    'is-empty': !cell.day,
+                    'is-today': cell.isToday,
+                    'is-selected': cell.isSelected
+                }" @click="cell.day ? selectDate(cell.date) : null">
+                    <div class="day-number">
+                        <span v-if="cell.day">{{ cell.day }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -237,6 +283,7 @@ const fileName = ref('')
 const detail = ref('')
 const selectedEquipment = ref('')
 const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
+const requestDate = ref('')        // วันที่แจ้งซ่อม (ใหม่)
 const selectedItem = ref(null)
 const showError = ref(false) // Validation alert
 
@@ -262,6 +309,7 @@ const defaultItems = [
         id: 1,
         equipment: 'X-ray general รุ่น xxx',
         room: 'ห้อง 1',
+        requestDate: '14 ธ.ค. 2568', // data ตัวอย่าง
         detail: 'ระบบล็อกและเบรก',
         statusText: 'รอซ่อม'
     }
@@ -304,6 +352,98 @@ onMounted(() => {
         backdrop: 'static'
     })
 })
+
+// ------------------- CALENDAR LOGIC (THAI) -------------------
+const isCalendarVisible = ref(false)
+const today = new Date()
+const currentMonth = ref(today.getMonth())
+const currentYear = ref(today.getFullYear())
+
+const thaiMonthNames = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+]
+const thaiMonthAbbrs = [
+    'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+    'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+]
+const thaiWeekdays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส']
+
+// Header ปฏิทิน: มกราคม 2568 (พ.ศ.)
+const thaiMonthYear = computed(() => {
+    return `${thaiMonthNames[currentMonth.value]} ${currentYear.value + 543}`
+})
+
+// แปลงวันที่ (Date object) -> "14 ธ.ค. 2568"
+const formatThaiDate = (dateObj) => {
+    const day = dateObj.getDate()
+    const monthIndex = dateObj.getMonth()
+    const yearBE = dateObj.getFullYear() + 543
+    return `${day} ${thaiMonthAbbrs[monthIndex]} ${yearBE}`
+}
+
+// Grid
+const daysGrid = computed(() => {
+    const cells = []
+    const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
+    const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        cells.push({ key: `empty-${i}`, day: null })
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(currentYear.value, currentMonth.value, d)
+
+        // เช็ควันนี้
+        const isToday =
+            d === today.getDate() &&
+            currentMonth.value === today.getMonth() &&
+            currentYear.value === today.getFullYear()
+
+        // เช็คว่าเลือกอยู่นี่ไหม (เทียบ string อาจจะยาก เทียบคร่าวๆ)
+        // เนื่องจากเราเก็บเป็น String ไทย "14 ธ.ค. 2568" การ reverse กลับมา check object อาจยุ่งยาก
+        // แต่เพื่อความง่าย ถ้า string ตรงกันถือว่าใช่
+        const dateStr = formatThaiDate(dateObj)
+        const isSelected = (requestDate.value === dateStr)
+
+        cells.push({
+            key: `day-${d}`,
+            day: d,
+            date: dateObj,
+            isToday,
+            isSelected
+        })
+    }
+
+    // เติมท้ายให้ครบ 42 ช่อง (optional)
+    const totalCells = 42
+    const cellsToFill = totalCells - cells.length
+    for (let i = 0; i < cellsToFill; i++) {
+        cells.push({ key: `empty-post-${i}`, day: null })
+    }
+
+    return cells.slice(0, 42)
+})
+
+const changeMonth = (delta) => {
+    const newDate = new Date(currentYear.value, currentMonth.value + delta, 1)
+    currentMonth.value = newDate.getMonth()
+    currentYear.value = newDate.getFullYear()
+}
+
+const selectDate = (dateObj) => {
+    requestDate.value = formatThaiDate(dateObj)
+    isCalendarVisible.value = false
+}
+
+const openCalendar = () => {
+    // default to current month/year 
+    // (Advance: ถ้าย้อนกลับจาก string "14 ธ.ค. 2568" มา set currentMonth ได้จะดีมาก แต่ user ไม่ได้ request strict)
+    isCalendarVisible.value = true
+}
+
+// -------------------------------------------------------------
 
 // ฟังก์ชันทำความสะอาดข้อมูลเก่า
 const cleanupOldData = (itemsToClean) => {
@@ -451,7 +591,7 @@ const closeDetail = () => {
 
 // เพิ่มข้อมูลใหม่ + กลับไปตาราง
 const submitForm = () => {
-    if (!selectedEquipment.value || !selectedRoom.value || !detail.value) {
+    if (!selectedEquipment.value || !selectedRoom.value || !detail.value || !requestDate.value) {
         showError.value = true
         return
     }
@@ -465,6 +605,7 @@ const submitForm = () => {
         id: newId,
         equipment: selectedEquipment.value,
         room: selectedRoom.value,
+        requestDate: requestDate.value,
         detail: detail.value,
         statusText: 'รอซ่อม',                // สถานะเริ่มต้น
         imageData: uploadedImageData.value || null // เก็บรูปไปกับ item
@@ -473,6 +614,7 @@ const submitForm = () => {
     // เคลียร์ฟอร์ม
     selectedEquipment.value = ''
     selectedRoom.value = ''
+    requestDate.value = ''
     detail.value = ''
     fileName.value = ''
     uploadedImageData.value = ''
@@ -795,9 +937,115 @@ ul.content-list li::before {
     max-width: 600px;
     background: white;
     border-radius: 4px;
-    overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+
+/* ================= CALENDAR STYLES (Scoped for this Page) ================= */
+.calendar-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2060;
+    /* Higher than Bootstrap Model (1055) */
+}
+
+.calendar-popup-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 16px 18px 18px;
+    width: 320px;
+    box-shadow:
+        0 22px 50px rgba(15, 23, 42, 0.4),
+        0 0 0 1px rgba(148, 163, 184, 0.4);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.month-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    background-color: #eef2ff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.nav-btn:hover {
+    background-color: #e0e7ff;
+    transform: translateY(-1px);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 6px;
+    column-gap: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.weekday {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.day-cell {
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.day-cell.is-empty {
+    pointer-events: none;
+}
+
+.day-number span {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.day-number span:hover {
+    background-color: #e5e7eb;
+}
+
+/* วันนี้ */
+.day-cell.is-today .day-number span {
+    border: 1px solid #6366f1;
+}
+
+/* วันที่เลือก */
+.day-cell.is-selected .day-number span {
+    background-color: #4f46e5;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
 
 .cursor-pointer {
     cursor: pointer;

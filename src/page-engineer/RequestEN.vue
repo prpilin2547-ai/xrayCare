@@ -16,6 +16,7 @@
                 <th>ลำดับ</th>
                 <th>อุปกรณ์</th>
                 <th>ห้องตรวจ</th>
+                <th>วันที่แจ้ง</th>
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
                 <th>รายละเอียด</th>
@@ -27,6 +28,7 @@
                 <td>{{ item.id }}</td>
                 <td>{{ getEquipmentText(item) }}</td>
                 <td>{{ getRoomText(item) }}</td>
+                <td>{{ item.requestDate || '-' }}</td>
                 <td>{{ item.detail }}</td>
                 <td class="status" :class="getStatusCellClass(item.statusText)">
                   {{ item.statusText }}
