@@ -427,14 +427,41 @@ let monthlyChartInstance = null
 const repairItems = ref([])
 
 const loadRepairItems = () => {
+  // ข้อมูลตัวอย่างสำหรับทั้ง 4 เครื่อง (ใช้เสมอเพื่อให้กราฟแสดงครบ)
+  const sampleData = [
+    // BrandA - มีข้อมูลหลายเดือน
+    { id: 1001, equipment: 'X-ray general รุ่น xxx', room: 'ห้อง 1', requestDate: '5 ม.ค. 2568', detail: 'สายไฟ', statusText: 'รอซ่อม' },
+    { id: 1002, equipment: 'X-ray general รุ่น xxx', room: 'ห้อง 1', requestDate: '15 ก.พ. 2568', detail: 'ระบบล็อกและเบรก', statusText: 'รอซ่อม' },
+    { id: 1003, equipment: 'X-ray general รุ่น xxx', room: 'ห้อง 1', requestDate: '20 มี.ค. 2568', detail: 'สายไฟ', statusText: 'ดำเนินการแล้ว' },
+    { id: 1004, equipment: 'X-ray general รุ่น xxx', room: 'ห้อง 1', requestDate: '10 ธ.ค. 2568', detail: 'เตียง หลอดเอกซเรย์ และบักกี้', statusText: 'รอซ่อม' },
+    { id: 1005, equipment: 'X-ray general รุ่น xxx', room: 'ห้อง 1', requestDate: '25 ธ.ค. 2568', detail: 'X-ray tube warm-up', statusText: 'รอซ่อม' },
+
+    // BrandB - มีข้อมูลบางเดือน
+    { id: 1006, equipment: 'X-ray general รุ่น yyyy', room: 'ห้อง 2', requestDate: '8 เม.ย. 2568', detail: 'ระบบล็อกและเบรก', statusText: 'รอซ่อม' },
+    { id: 1007, equipment: 'X-ray general รุ่น yyyy', room: 'ห้อง 2', requestDate: '12 พ.ค. 2568', detail: 'สายไฟ', statusText: 'อยู่ระหว่างดำเนินการ' },
+    { id: 1008, equipment: 'X-ray general รุ่น yyyy', room: 'ห้อง 2', requestDate: '18 มิ.ย. 2568', detail: 'เตียง หลอดเอกซเรย์ และบักกี้', statusText: 'ดำเนินการแล้ว' },
+
+    // BrandC - มีข้อมูลน้อย
+    { id: 1009, equipment: 'X-ray general รุ่น zzzz', room: 'ห้อง 3', requestDate: '3 ก.ค. 2568', detail: 'X-ray tube warm-up', statusText: 'รอซ่อม' },
+    { id: 1010, equipment: 'X-ray general รุ่น zzzz', room: 'ห้อง 3', requestDate: '22 ส.ค. 2568', detail: 'ระบบล็อกและเบรก', statusText: 'ดำเนินการแล้ว' },
+
+    // BrandD - มีข้อมูลน้อยมาก
+    { id: 1011, equipment: 'X-ray general รุ่น aaaa', room: 'ห้อง 4', requestDate: '14 ก.ย. 2568', detail: 'สายไฟ', statusText: 'รอซ่อม' }
+  ]
+
   const stored = localStorage.getItem(STORAGE_KEY)
+  let storedData = []
+
   if (stored) {
     try {
-      repairItems.value = JSON.parse(stored)
+      storedData = JSON.parse(stored)
     } catch (e) {
-      repairItems.value = []
+      storedData = []
     }
   }
+
+  // รวมข้อมูลตัวอย่างกับข้อมูลจาก localStorage เสมอ
+  repairItems.value = [...sampleData, ...storedData]
 }
 
 // สร้างรายการปีที่มีข้อมูล
