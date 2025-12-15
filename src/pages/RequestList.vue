@@ -89,7 +89,15 @@
                         <div class="mb-3">
                             <strong>หมายเหตุ</strong>
                             <ul class="content-list">
-                                <li>ระบบล็อกติดขัด</li>
+                                <li>{{ selectedItem.remarks || '-' }}</li>
+                            </ul>
+                        </div>
+
+                        <!-- วันที่แจ้ง (ใหม่) -->
+                        <div class="mb-3">
+                            <strong>วันที่แจ้ง</strong>
+                            <ul class="content-list">
+                                <li>{{ selectedItem.requestDate || '-' }}</li>
                             </ul>
                         </div>
 
@@ -193,12 +201,27 @@
                             </div>
                         </div>
 
-                        <!-- รายละเอียด -->
+                        <!-- รายละเอียด (Dropdown) -->
                         <div class="mt-3">
                             <label class="label">รายละเอียด :</label>
                             <div class="field">
-                                <textarea v-model="detail" class="textarea-input form-control"
-                                    placeholder="เพิ่มรายละเอียด"></textarea>
+                                <select v-model="detail" class="pill-btn form-control form-control-sm">
+                                    <option value="">เลือกรายละเอียด</option>
+                                    <option value="สายไฟ">สายไฟ</option>
+                                    <option value="ระบบล็อกและเบรก">ระบบล็อกและเบรก</option>
+                                    <option value="เตียง หลอดเอกซเรย์ และบักกี้">เตียง หลอดเอกซเรย์ และบักกี้</option>
+                                    <option value="X-ray tube warm-up">X-ray tube warm-up</option>
+                                    <option value="ส่วนอื่นเพิ่มเติม">ส่วนอื่นเพิ่มเติม</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- หมายเหตุ (ใหม่) -->
+                        <div class="mt-3">
+                            <label class="label">หมายเหตุ :</label>
+                            <div class="field">
+                                <textarea v-model="remarks" class="textarea-input form-control"
+                                    placeholder="เพิ่มหมายเหตุ"></textarea>
                             </div>
                         </div>
 
@@ -281,6 +304,7 @@ const fileInput = ref(null)
 const fileName = ref('')
 
 const detail = ref('')
+const remarks = ref('')           // หมายเหตุ (ใหม่)
 const selectedEquipment = ref('')
 const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
 const requestDate = ref('')        // วันที่แจ้งซ่อม (ใหม่)
@@ -311,6 +335,7 @@ const defaultItems = [
         room: 'ห้อง 1',
         requestDate: '14 ธ.ค. 2568', // data ตัวอย่าง
         detail: 'ระบบล็อกและเบรก',
+        remarks: 'ระบบล็อกติดขัด',
         statusText: 'รอซ่อม'
     }
 ]
@@ -607,6 +632,7 @@ const submitForm = () => {
         room: selectedRoom.value,
         requestDate: requestDate.value,
         detail: detail.value,
+        remarks: remarks.value,          // เพิ่มหมายเหตุ
         statusText: 'รอซ่อม',                // สถานะเริ่มต้น
         imageData: uploadedImageData.value || null // เก็บรูปไปกับ item
     })
@@ -616,6 +642,7 @@ const submitForm = () => {
     selectedRoom.value = ''
     requestDate.value = ''
     detail.value = ''
+    remarks.value = ''               // เคลียร์หมายเหตุ
     fileName.value = ''
     uploadedImageData.value = ''
     if (fileInput.value) {

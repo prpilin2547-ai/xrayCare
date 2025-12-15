@@ -16,7 +16,7 @@
                 <th>ลำดับ</th>
                 <th>อุปกรณ์</th>
                 <th>ห้องตรวจ</th>
-                <th>วันที่แจ้ง</th>
+                <th>วันที่ได้รับแจ้ง</th>
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
                 <th>รายละเอียด</th>
@@ -24,8 +24,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in items" :key="item.id">
-                <td>{{ item.id }}</td>
+              <tr v-for="(item, index) in items" :key="item.id">
+                <td>{{ index + 1 }}</td>
                 <td>{{ getEquipmentText(item) }}</td>
                 <td>{{ getRoomText(item) }}</td>
                 <td>{{ item.requestDate || '-' }}</td>
@@ -87,7 +87,15 @@
             <div class="mb-3">
               <strong>หมายเหตุ</strong>
               <ul class="content-list">
-                <li>ระบบล็อกติดขัด</li>
+                <li>{{ selectedItem.remarks || '-' }}</li>
+              </ul>
+            </div>
+
+            <!-- วันที่ได้รับแจ้ง (ใหม่) -->
+            <div class="mb-3">
+              <strong>วันที่ได้รับแจ้ง</strong>
+              <ul class="content-list">
+                <li>{{ selectedItem.requestDate || '-' }}</li>
               </ul>
             </div>
 
@@ -195,7 +203,9 @@ const defaultItems = [
     id: 1,
     equipment: 'X-ray general รุ่น xxx',
     room: 'ห้อง 1',
+    requestDate: '14 ธ.ค. 2568',
     detail: 'ระบบล็อกและเบรก',
+    remarks: 'ระบบล็อกติดขัด',
     statusText: 'รอซ่อม'
   }
 ]
@@ -388,6 +398,55 @@ td {
   padding: 10px 8px;
   text-align: center;
   border: 1px solid #9ca3af;
+}
+
+/* Fixed column widths for uniform alignment */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 60px;
+  min-width: 60px;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 180px;
+  min-width: 180px;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 100px;
+  min-width: 100px;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 130px;
+  min-width: 130px;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 150px;
+  min-width: 150px;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 180px;
+  min-width: 180px;
+}
+
+th:nth-child(7),
+td:nth-child(7) {
+  width: 100px;
+  min-width: 100px;
+}
+
+th:nth-child(8),
+td:nth-child(8) {
+  width: 80px;
+  min-width: 80px;
 }
 
 thead th {
