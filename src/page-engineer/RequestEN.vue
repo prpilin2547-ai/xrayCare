@@ -238,6 +238,11 @@ onMounted(() => {
     }
   })
   window.addEventListener('storage-local-update', loadItems)
+
+  // รอให้ DOM render เสร็จก่อนสร้างกราฟ
+  setTimeout(() => {
+    createChart()
+  }, 100)
 })
 
 // บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
@@ -357,6 +362,184 @@ const deleteItem = (id) => {
 
   items.value = items.value.filter((i) => i.id !== id)
 }
+
+// ================== Chart Logic ==================
+const chartCanvas = ref(null)
+const selectedYear = ref(2568) // ปี พ.ศ. เริ่มต้น
+let chartInstance = null
+
+// สร้างรายการปีที่มีข้อมูล
+const availableYears = computed(() => {
+  const years = new Set()
+  items.value.forEach(item => {
+    if (item.requestDate) {
+      // แยกปีจาก requestDate เช่น "14 ธ.ค. 2568"
+      const yearMatch = item.requestDate.match(/(\d{4})/)
+      if (yearMatch) {
+        years.add(parseInt(yearMatch[1]))
+      }
+    }
+  })
+  // ถ้าไม่มีข้อมูล ให้แสดงปีปัจจุบัน
+  if (years.size === 0) {
+    years.add(2568)
+  }
+  return Array.from(years).sort((a, b) => b - a) // เรียงจากมากไปน้อย
+})
+
+// ฟังก์ชันแปลงเดือนไทยเป็นตัวเลข
+const thaiMonthToNumber = (monthStr) => {
+  const months = {
+    'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5,
+    'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11
+  }
+  return months[monthStr] !== undefined ? months[monthStr] : -1
+}
+
+// คำนวณข้อมูลสำหรับกราฟ
+const chartData = computed(() => {
+  const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
+
+  // หาชนิดเครื่องทั้งหมด
+  const equipmentTypes = [...new Set(items.value.map(item => getEquipmentText(item)))]
+
+  // สร้างโครงสร้างข้อมูลสำหรับแต่ละชนิดเครื่อง
+  const datasets = equipmentTypes.map((equipment, index) => {
+    const monthlyData = new Array(12).fill(0)
+
+    // นับจำนวนครั้งที่เสียในแต่ละเดือน
+    items.value.forEach(item => {
+      if (getEquipmentText(item) === equipment && item.requestDate) {
+        const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+        if (match) {
+          const monthStr = match[2]
+          const year = parseInt(match[3])
+          const monthIndex = thaiMonthToNumber(monthStr)
+
+          if (year === selectedYear.value && monthIndex !== -1) {
+            monthlyData[monthIndex]++
+          }
+        }
+      }
+    })
+
+    // สีสำหรับแต่ละชนิดเครื่อง
+    const colors = [
+      'rgba(255, 99, 132, 0.8)',
+      'rgba(54, 162, 235, 0.8)',
+      'rgba(255, 206, 86, 0.8)',
+      'rgba(75, 192, 192, 0.8)',
+      'rgba(153, 102, 255, 0.8)',
+      'rgba(255, 159, 64, 0.8)'
+    ]
+
+    return {
+      label: equipment,
+      data: monthlyData,
+      backgroundColor: colors[index % colors.length],
+      borderColor: colors[index % colors.length].replace('0.8', '1'),
+      borderWidth: 1
+    }
+  })
+
+  return {
+    labels: monthNames,
+    datasets: datasets
+  }
+})
+
+// สร้าง/อัพเดทกราฟ
+const createChart = () => {
+  if (!chartCanvas.value) return
+
+  // ทำลายกราฟเก่า
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
+  const ctx = chartCanvas.value.getContext('2d')
+
+  // ต้อง import Chart.js ก่อน
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js is not loaded')
+    return
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: chartData.value,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 12
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: `จำนวนครั้งที่เครื่องเสียรายเดือน ปี ${selectedYear.value}`,
+          font: {
+            family: 'Sarabun, sans-serif',
+            size: 16,
+            weight: 'bold'
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'เดือน',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'จำนวนครั้ง',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            stepSize: 1,
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+// เมื่อเปลี่ยนปี ให้อัพเดทกราฟ
+watch(selectedYear, () => {
+  createChart()
+})
+
+// เมื่อข้อมูลเปลี่ยน ให้อัพเดทกราฟ
+watch(items, () => {
+  if (chartCanvas.value) {
+    createChart()
+  }
+}, { deep: true })
 </script>
 
 <style scoped>
@@ -714,5 +897,68 @@ ul.content-list li::before {
   text-decoration: underline;
   cursor: pointer;
   /* เมาส์เป็นรูปมือ */
+}
+
+/* ================== Chart Styles ================== */
+.chart-section {
+  margin-top: 40px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1f2937;
+}
+
+.year-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.year-selector label {
+  font-weight: 500;
+  margin: 0;
+  color: #4b5563;
+}
+
+.year-selector select {
+  width: 120px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.year-selector select:hover {
+  border-color: #9ca3af;
+}
+
+.year-selector select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
 }
 </style>
