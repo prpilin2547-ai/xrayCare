@@ -146,13 +146,41 @@
             </div>
           </div>
         </div>
+
+        <!-- ================== กราฟแสดงจำนวนครั้งที่เสียรายเดือน ================== -->
+        <div class="col-12 mt-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h5 class="card-title m-0 text-primary">
+                  <i class="bi bi-bar-chart-fill me-2"></i>กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate)
+                  ชนิดการตรวจแบบ Daily Check รายเดือนตลอดทั้งปี
+                </h5>
+                <div class="year-selector">
+                  <label for="monthlyYearSelect" class="me-2">ปี:</label>
+                  <select id="monthlyYearSelect" v-model="selectedMonthlyYear" class="form-select form-select-sm"
+                    style="width: 120px;">
+                    <option v-for="year in availableYears" :key="year" :value="year">
+                      {{ year }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="monthly-chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas ref="monthlyChartCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </MainLayout>
 </template>
 
 <script setup>
-import { ref, nextTick, computed } from 'vue';
+import { ref, nextTick, computed, onMounted, watch } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 import Chart from 'chart.js/auto';
 
@@ -388,6 +416,245 @@ const renderPerformanceChart = () => {
     }
   });
 };
+
+// ================== Monthly Chart Logic ==================
+const STORAGE_KEY = 'repair_items'
+const monthlyChartCanvas = ref(null)
+const selectedMonthlyYear = ref(2568)
+let monthlyChartInstance = null
+
+// โหลดข้อมูลจาก localStorage
+const repairItems = ref([])
+
+const loadRepairItems = () => {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (stored) {
+    try {
+      repairItems.value = JSON.parse(stored)
+    } catch (e) {
+      repairItems.value = []
+    }
+  }
+}
+
+// สร้างรายการปีที่มีข้อมูล
+const availableYears = computed(() => {
+  const years = new Set()
+  repairItems.value.forEach(item => {
+    if (item.requestDate) {
+      const yearMatch = item.requestDate.match(/(\d{4})/)
+      if (yearMatch) {
+        years.add(parseInt(yearMatch[1]))
+      }
+    }
+  })
+  if (years.size === 0) {
+    years.add(2568)
+  }
+  return Array.from(years).sort((a, b) => b - a)
+})
+
+// ฟังก์ชันแปลงเดือนไทยเป็นตัวเลข
+const thaiMonthToNumber = (monthStr) => {
+  const months = {
+    'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5,
+    'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11
+  }
+  return months[monthStr] !== undefined ? months[monthStr] : -1
+}
+
+// helper แสดงชื่ออุปกรณ์
+const getEquipmentText = (item) => {
+  if (item.room) return item.equipment
+  return item.equipment.replace(/\s*ห้อง\s*\d+\s*$/, '')
+}
+
+// แปลงชื่ออุปกรณ์เป็น Brand/Model format
+const mapEquipmentToBrand = (equipmentName) => {
+  const mapping = {
+    'X-ray general รุ่น xxx': 'X-Ray (BrandA/ModelX)',
+    'X-ray general รุ่น yyyy': 'X-Ray (BrandB/ModelY)',
+    'X-ray general รุ่น zzzz': 'X-Ray (BrandC/ModelZ)',
+    'X-ray general รุ่น aaaa': 'X-Ray (BrandD/ModelW)'
+  }
+  return mapping[equipmentName] || equipmentName
+}
+
+// คำนวณข้อมูลสำหรับกราฟรายเดือน
+const monthlyChartData = computed(() => {
+  const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
+
+  // กำหนดชนิดเครื่องทั้งหมด 4 เครื่องให้แสดงเสมอ
+  const equipmentTypes = [
+    'X-ray general รุ่น xxx',
+    'X-ray general รุ่น yyyy',
+    'X-ray general รุ่น zzzz',
+    'X-ray general รุ่น aaaa'
+  ]
+
+  const brandEquipmentTypes = [
+    'X-Ray (BrandA/ModelX)',
+    'X-Ray (BrandB/ModelY)',
+    'X-Ray (BrandC/ModelZ)',
+    'X-Ray (BrandD/ModelW)'
+  ]
+
+  // สีสำหรับแต่ละชนิดเครื่อง (สีสดใสแยกชัดเจน)
+  const colors = [
+    'rgba(255, 99, 132, 0.8)',   // แดง - BrandA
+    'rgba(54, 162, 235, 0.8)',   // น้ำเงิน - BrandB
+    'rgba(255, 206, 86, 0.8)',   // เหลือง - BrandC
+    'rgba(75, 192, 192, 0.8)'    // เขียว - BrandD
+  ]
+
+  // สร้างโครงสร้างข้อมูลสำหรับแต่ละชนิดเครื่อง
+  const datasets = equipmentTypes.map((equipment, index) => {
+    const monthlyData = new Array(12).fill(0)
+
+    // นับจำนวนครั้งที่เสียในแต่ละเดือน
+    repairItems.value.forEach(item => {
+      if (getEquipmentText(item) === equipment && item.requestDate) {
+        const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+        if (match) {
+          const monthStr = match[2]
+          const year = parseInt(match[3])
+          const monthIndex = thaiMonthToNumber(monthStr)
+
+          if (year === selectedMonthlyYear.value && monthIndex !== -1) {
+            monthlyData[monthIndex]++
+          }
+        }
+      }
+    })
+
+    return {
+      label: brandEquipmentTypes[index],  // ใช้ชื่อ Brand/Model
+      data: monthlyData,
+      backgroundColor: colors[index],
+      borderColor: colors[index].replace('0.8', '1'),
+      borderWidth: 1
+    }
+  })
+
+  return {
+    labels: monthNames,
+    datasets: datasets
+  }
+})
+
+// สร้าง/อัพเดทกราฟรายเดือน
+const createMonthlyChart = () => {
+  if (!monthlyChartCanvas.value) return
+
+  // ทำลายกราฟเก่า
+  if (monthlyChartInstance) {
+    monthlyChartInstance.destroy()
+  }
+
+  const ctx = monthlyChartCanvas.value.getContext('2d')
+
+  monthlyChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: monthlyChartData.value,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 12
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: `จำนวนครั้งที่เครื่องเสียรายเดือน ปี ${selectedMonthlyYear.value}`,
+          font: {
+            family: 'Sarabun, sans-serif',
+            size: 16,
+            weight: 'bold'
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'เดือน',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'จำนวนครั้ง',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            stepSize: 1,
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+// เมื่อเปลี่ยนปี ให้อัพเดทกราฟ
+watch(selectedMonthlyYear, () => {
+  if (showGraph.value) {
+    createMonthlyChart()
+  }
+})
+
+// เมื่อแสดงกราฟ ให้สร้างกราฟรายเดือน
+watch(showGraph, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      loadRepairItems()
+      createMonthlyChart()
+    })
+  }
+})
+
+// โหลดข้อมูลเมื่อ component mount
+onMounted(() => {
+  loadRepairItems()
+
+  // Listen for storage changes
+  window.addEventListener('storage', (event) => {
+    if (event.key === STORAGE_KEY) {
+      loadRepairItems()
+      if (showGraph.value && monthlyChartCanvas.value) {
+        createMonthlyChart()
+      }
+    }
+  })
+
+  window.addEventListener('storage-local-update', () => {
+    loadRepairItems()
+    if (showGraph.value && monthlyChartCanvas.value) {
+      createMonthlyChart()
+    }
+  })
+})
 </script>
 
 <style scoped>
