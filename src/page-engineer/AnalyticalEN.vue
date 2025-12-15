@@ -102,7 +102,7 @@
                   <table class="table table-sm table-borderless mb-0" style="font-size: 0.8rem;">
                     <thead class="text-muted" style="border-bottom: 1px solid #dee2e6;">
                       <tr>
-                        <th class="fw-normal">รายการ</th>
+                        <th class="fw-normal">รายการ </th>
                         <th class="text-center fw-normal">เสีย</th>
                         <th class="text-end fw-normal text-danger">ซ้ำ</th>
                       </tr>
