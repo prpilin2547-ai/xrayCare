@@ -20,19 +20,19 @@
         <!-- Admin Summary Cards -->
         <div class="cards-row">
           <div class="card summary-card">
-            <p class="card-label date">DATE</p>
+            <p class="card-label date">วัน/เดือน/ปี</p>
             <p class="card-value">{{ displayDate }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label purple">EQUIPMENT</p>
+            <p class="card-label purple">จำนวนเครื่องทั้งหมด</p>
             <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label orange">PENDING</p>
+            <p class="card-label orange">รอดำเนินการ</p>
             <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label blue">REPAIR REQUESTS</p>
+            <p class="card-label blue">การแจ้งซ่อม</p>
             <p class="card-value">{{ hasMachines ? '-' : '-' }}</p>
           </div>
         </div>
@@ -52,11 +52,11 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>No.</th>
-                  <th>Equipment (Brand/Model)</th>
-                  <th>Room</th>
-                  <th>Caretaker</th>
-                  <th>Status</th>
+                  <th>ลำดับ</th>
+                  <th>อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
+                  <th>ห้องตรวจ</th>
+                  <th>ผู้ดูแลเครื่อง</th>
+                  <th>สถานะ</th>
                 </tr>
               </thead>
               <tbody v-if="hasMachines">
@@ -105,23 +105,23 @@
         <!-- Engineer Summary Cards -->
         <div class="cards-row">
           <div class="card summary-card">
-            <p class="card-label pink">DATE</p>
+            <p class="card-label pink">วัน/เดือน/ปี</p>
             <p class="card-value">{{ displayDate }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label blue">EQUIPMENT</p>
+            <p class="card-label blue">จำนวนเครื่องทั้งหมด</p>
             <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label red">PENDING REPAIR</p>
+            <p class="card-label red">รอซ่อม</p>
             <p class="card-value">{{ hasMachines ? '2' : '-' }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label orange">IN PROGRESS</p>
+            <p class="card-label orange">อยู่ระหว่างดำเนินการ</p>
             <p class="card-value">{{ hasMachines ? '1' : '-' }}</p>
           </div>
           <div class="card summary-card">
-            <p class="card-label green">COMPLETED</p>
+            <p class="card-label green">ดำเนินการแล้ว</p>
             <p class="card-value">{{ hasMachines ? '1' : '-' }}</p>
           </div>
         </div>
@@ -167,7 +167,7 @@ import { ref } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
 // ข้อมูลทั้งหมดเป็น mock data อยู่ในฝั่ง frontend เท่านั้น ไม่มีการเรียก backend
-const displayDate = '10 Nov 2025';
+const displayDate = '16 ธ.ค. 2568';
 const hasMachines = ref(true);
 
 const adminChecklistRows = [
@@ -178,10 +178,10 @@ const adminChecklistRows = [
 ];
 
 const engineerRequests = ref([
-  { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'อยู่ระหว่างดำเนินการ' },
+  { id: 1, name: 'X-Ray (BrandA/ModelX)', room: '1', status: 'อยู่ระหว่างดำเนินการ' },
+  { id: 2, name: 'X-Ray (BrandB/ModelY)', room: '2', status: 'อยู่ระหว่างดำเนินการ' },
+  { id: 3, name: 'X-Ray (BrandC/ModelZ)', room: '3', status: 'อยู่ระหว่างดำเนินการ' },
+  { id: 4, name: 'X-Ray (BrandD/ModelW)', room: '4', status: 'อยู่ระหว่างดำเนินการ' },
 ]);
 </script>
 

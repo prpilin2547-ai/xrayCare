@@ -798,7 +798,7 @@ ul.content-list li::before {
 
 /* Footer Buttons */
 .footer-actions {
-  margin-top: 80px;
+  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
   gap: 20px;
