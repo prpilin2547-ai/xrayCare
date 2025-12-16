@@ -757,6 +757,7 @@ td {
     padding: 10px 8px;
     text-align: center;
     border: 1px solid #9ca3af;
+    white-space: nowrap;
 }
 
 thead th {
@@ -766,6 +767,7 @@ thead th {
 
 tbody td {
     background: #e5e5e5;
+    white-space: nowrap;
 }
 
 .status.pending {
