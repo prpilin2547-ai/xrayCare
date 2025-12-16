@@ -109,7 +109,7 @@
                     </thead>
                     <tbody>
                       <tr v-for="(item, idx) in machine.breakdown" :key="idx">
-                        <td class="text-truncate" style="max-width: 100px;" :title="item.name">
+                        <td class="text-truncate" style="max-width: 100px; white-space: pre-line;" :title="item.name">
                           {{ idx + 1 }}. {{ item.shortName }}
                         </td>
                         <td class="text-center">
@@ -399,7 +399,7 @@ const machineSummaries = computed(() => {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 8, recurrent: 6 }, // 6/15 = 40% RFR
         { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 4, recurrent: 3 }, // 3/15 = 20%
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
         { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
       ]
     },
@@ -408,7 +408,7 @@ const machineSummaries = computed(() => {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 1, recurrent: 0 },
         { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 7, recurrent: 6 }, // 6/10 = 60% RFR
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 1, recurrent: 0 },
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 1, recurrent: 0 },
         { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 1 } // 1/10 = 10%
       ]
     },
@@ -417,7 +417,7 @@ const machineSummaries = computed(() => {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
         { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 2, recurrent: 1 }, // 1/5 = 20%
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
         { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 0, recurrent: 0 }
       ]
     },
@@ -426,7 +426,7 @@ const machineSummaries = computed(() => {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
         { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 0, recurrent: 0 },
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์ และบักกี้', issues: 1, recurrent: 0 },
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 1, recurrent: 0 },
         { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
       ]
     }

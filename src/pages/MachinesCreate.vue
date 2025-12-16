@@ -15,9 +15,9 @@
             </div>
             <div class="form-input">
               <input id="machineName" v-model="machineName" type="text"
-                placeholder="เช่น เครื่อง x-ray shimazu รุ่น AAA" />
+                placeholder="เช่น X-Ray (BrandA/ModelX)" />
               <p class="form-example">
-                ตัวอย่าง: เครื่อง x-ray shimazu รุ่น AAA
+                ตัวอย่าง: X-Ray (BrandA/ModelX)
               </p>
             </div>
           </div>

@@ -318,10 +318,10 @@ const previewImageSrc = ref('')        // src ที่จะแสดงใน 
 
 // list อุปกรณ์ (เอาคำว่า "ห้อง X" ออกแล้ว)
 const equipmentOptions = [
-    'X-ray general รุ่น xxx',
-    'X-ray general รุ่น yyyy',
-    'X-ray general รุ่น zzzz',
-    'X-ray general รุ่น aaaa'
+    'X-Ray (BrandA/ModelX)',
+    'X-Ray (BrandB/ModelY)',
+    'X-Ray (BrandC/ModelZ)',
+    'X-Ray (BrandD/ModelW)'
 ]
 
 // list ห้องตรวจ

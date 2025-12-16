@@ -6,23 +6,23 @@
 
       <div class="cards-row">
         <div class="card summary-card">
-          <p class="card-label pink">DATE</p>
+          <p class="card-label pink">วัน/เดือน/ปี</p>
           <p class="card-value">{{ displayDate }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label blue">EQUIPMENT</p>
+          <p class="card-label blue">จำนวนเครื่องทั้งหมด</p>
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label red">PENDING REPAIR</p>
+          <p class="card-label red">รอซ่อม</p>
           <p class="card-value">{{ hasPendingrepair ? '2' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label orange">IN PROGRESS</p>
+          <p class="card-label orange">อยู่ระหว่างดำเนินการ</p>
           <p class="card-value">{{ hasProgress ? '1' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label green">COMPLETED</p>
+          <p class="card-label green">ดำเนินการแล้ว</p>
           <p class="card-value">{{ hasCompleted ? '1' : '-' }}</p>
         </div>
       </div>
@@ -64,7 +64,7 @@
 import { ref } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
-const displayDate = '10 Nov 2025';
+const displayDate = '16 ธ.ค. 2568';
 
 // mock flag สำหรับตัวเลข cards
 const hasMachines = ref(true);
