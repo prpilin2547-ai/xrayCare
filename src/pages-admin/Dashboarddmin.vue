@@ -171,10 +171,10 @@ const displayDate = '10 Nov 2025';
 const hasMachines = ref(true);
 
 const adminChecklistRows = [
-  { no: 1, equipment: 'Shimazu', room: '1', caretaker: 'ศุภกร' },
-  { no: 2, equipment: 'Carestream', room: '2', caretaker: 'พรไพลิน' },
-  { no: 3, equipment: 'Konica', room: '3', caretaker: 'เบญจรัตน์' },
-  { no: 4, equipment: 'Toshiba', room: '4', caretaker: 'ขยัน' }
+  { no: 1, equipment: 'X-Ray (BrandA/ModelX)', room: '1', caretaker: 'ศุภกร' },
+  { no: 2, equipment: 'X-Ray (BrandB/ModelY)', room: '2', caretaker: 'พรไพลิน' },
+  { no: 3, equipment: 'X-Ray (BrandC/ModelZ)', room: '3', caretaker: 'เบญจรัตน์' },
+  { no: 4, equipment: 'X-Ray (BrandD/ModelW)', room: '4', caretaker: 'ขยัน' }
 ];
 
 const engineerRequests = ref([
@@ -343,10 +343,9 @@ tbody tr:nth-child(even) {
   font-weight: 500;
 }
 
-/* ปรับตามข้อ 2: ตัด cursor: pointer ออก แต่คงสีฟ้า + ขีดเส้นใต้เดิม */
+/* ปรับตามข้อ 2: ตัด cursor: pointer ออก และลบขีดเส้นใต้ + เปลี่ยนสีเป็นดำ */
 .equipment-cell {
-  color: #2563eb;
-  text-decoration: underline;
+  color: #000;
 }
 
 /* --- Request Table Specifics (Engineer) --- */
