@@ -104,8 +104,7 @@
                     <thead class="text-muted" style="border-bottom: 1px solid #dee2e6;">
                       <tr>
                         <th class="fw-normal">รายการ </th>
-                        <th class="text-center fw-normal">เสีย</th>
-                        <th class="text-end fw-normal text-danger">ซ้ำ</th>
+                        <th class="text-end fw-normal">จำนวนที่เสีย</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -113,12 +112,8 @@
                         <td class="text-truncate" style="max-width: 100px; white-space: pre-line;" :title="item.name">
                           {{ idx + 1 }}. {{ item.shortName }}
                         </td>
-                        <td class="text-center">
+                        <td class="text-end">
                           {{ item.issues }}
-                        </td>
-                        <td class="text-end"
-                          :class="{ 'fw-bold text-danger': item.recurrent > 0, 'text-muted': item.recurrent === 0 }">
-                          {{ item.recurrent }}
                         </td>
                       </tr>
                     </tbody>
@@ -130,7 +125,7 @@
                 style="font-size: 0.8rem;">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i>
                 <strong>ปัญหาหลัก :</strong> {{ machine.majorIssue }}
-                <div>(อัตราเสียซ้ำ {{ machine.rfrValue }}%)</div>
+                <div>(อัตราเสียซ้ำ {{ machine.isMultipleMajor ? 'อย่างละ ' : '' }}{{ machine.rfrValue }}%)</div>
               </div>
               <div v-else class="alert alert-success p-2 mb-0" style="font-size: 0.8rem;">
                 <i class="bi bi-check-circle-fill me-1"></i> ประสิทธิภาพสมบูรณ์ ไม่พบการเสียซ้ำ
@@ -299,40 +294,40 @@ const machineSummaries = computed(() => {
   // ข้อมูลดิบ: กำหนดจำนวนครั้งที่เสีย (Issues) และ เสียซ้ำ (Recurrent) ของแต่ละหัวข้อ
   // เพื่อให้ข้อมูลสอดคล้องกับกราฟที่เราต้องการ (เช่น BrandB เบรกเสียซ้ำเยอะ)
   const rawData = [
-    // Machine 1 (BrandA): สายไฟเสียเยอะ
+    // Machine 1 (BrandA): วิกฤต (อันตราย) - สายไฟเสียเยอะ
     {
       breakdown: [
-        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 8, recurrent: 6 }, // 6/15 = 40% RFR
-        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 4, recurrent: 3 }, // 3/15 = 20%
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 2, recurrent: 1 }, // 1/15 = 6.7%
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 8, recurrent: 6 }, // 8/15 = 53.3% RFR -> Critical
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 4, recurrent: 3 },
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 2, recurrent: 1 },
         { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
       ]
     },
-    // Machine 2 (BrandB): เบรกวิกฤต
+    // Machine 2 (BrandB): ต้องเฝ้าระวัง - เบรกเสียบ่อย
+    {
+      breakdown: [
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 2, recurrent: 0 },
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 4, recurrent: 2 }, // 4/10 = 40% RFR (>=30) -> Warning
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 3, recurrent: 0 },
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
+      ]
+    },
+    // Machine 3 (BrandC): ต้องเฝ้าระวัง - การเคลื่อนที่เริ่มแย่
     {
       breakdown: [
         { name: 'สายไฟ', shortName: 'สายไฟ', issues: 1, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 7, recurrent: 6 }, // 6/10 = 60% RFR
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 1, recurrent: 0 },
-        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 1 } // 1/10 = 10%
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 2, recurrent: 1 },
+        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 3, recurrent: 2 }, // 3/8 = 37.5% RFR (>=30) -> Warning
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 2, recurrent: 0 }
       ]
     },
-    // Machine 3 (BrandC): การเคลื่อนที่เริ่มแย่
+    // Machine 4 (BrandD): ปกติ - เสียน้อย
     {
       breakdown: [
-        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 2, recurrent: 1 }, // 1/5 = 20%
-        { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 3, recurrent: 2 }, // 2/5 = 40% RFR
-        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 0, recurrent: 0 }
-      ]
-    },
-    // Machine 4 (BrandD): ปกติ
-    {
-      breakdown: [
-        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 0, recurrent: 0 },
-        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 0, recurrent: 0 },
+        { name: 'สายไฟ', shortName: 'สายไฟ', issues: 1, recurrent: 0 },
+        { name: 'ระบบล็อกและเบรก', shortName: 'ระบบล็อกและเบรก', issues: 1, recurrent: 0 },
         { name: 'เตียง หลอดเอกซเรย์ และบักกี้', shortName: 'เตียง หลอดเอกซเรย์\nและบักกี้', issues: 1, recurrent: 0 },
-        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 }
+        { name: 'X-ray tube warm-up', shortName: 'X-ray tube warm-up', issues: 1, recurrent: 0 } // Max RFR 25% (<30) and Total 4 (<10) -> Normal
       ]
     }
   ];
@@ -345,17 +340,21 @@ const machineSummaries = computed(() => {
 
     // หา RFR สูงสุดเพื่อระบุปัญหาหลัก
     let maxRFR = 0;
-    let maxIssueName = '';
+    let maxIssues = [];
 
     // คำนวณ RFR ของแต่ละ Item เพื่อส่งไปวาดกราฟ (ใน Computed นี้เราใช้เพื่อหา Major Issue)
     data.breakdown.forEach(item => {
-      // สูตร RFR % = (Recurrent / TotalFailures) * 100
-      const rfr = totalFailures > 0 ? (item.recurrent / totalFailures) * 100 : 0;
-      if (rfr > maxRFR) {
+      // สูตร RFR % = (จำนวนครั้งในแต่ละรายการ / จำนวนครั้งเสียทั้งหมด) * 100
+      const rfr = totalFailures > 0 ? (item.issues / totalFailures) * 100 : 0;
+      if (rfr > maxRFR && rfr > 0) {
         maxRFR = rfr;
-        maxIssueName = item.name;
+        maxIssues = [item.name];
+      } else if (rfr === maxRFR && rfr > 0) {
+        maxIssues.push(item.name);
       }
     });
+
+    const majorIssueName = maxIssues.join(', ');
 
     // Grading Logic
     let status = 'normal';
@@ -366,16 +365,17 @@ const machineSummaries = computed(() => {
       name: name,
       totalFailures: totalFailures,
       breakdown: data.breakdown, // ส่งข้อมูลรายละเอียดไปแสดงในตาราง
-      majorIssue: maxRFR > 0 ? maxIssueName : null,
+      majorIssue: maxRFR > 0 ? majorIssueName : null,
+      isMultipleMajor: maxIssues.length > 1,
       rfrValue: maxRFR.toFixed(0),
 
       // Styling
       borderClass: status === 'critical' ? 'border-danger border-2' : (status === 'warning' ? 'border-warning border-2' : 'border-success border-2'),
       badgeClass: status === 'critical' ? 'bg-danger' : (status === 'warning' ? 'bg-warning text-dark' : 'bg-success'),
       textClass: status === 'critical' ? 'text-danger' : (status === 'warning' ? 'text-warning' : 'text-success'),
-      alertClass: status === 'critical' ? 'alert-danger' : 'alert-warning',
+      alertClass: status === 'critical' ? 'alert-danger' : (status === 'warning' ? 'alert-warning' : 'alert-success'),
       statusText: status === 'critical' ? 'วิกฤต (อันตราย)' : (status === 'warning' ? 'ต้องเฝ้าระวัง' : 'ปกติ'),
-      recommendation: getRecommendation(status, maxIssueName)
+      recommendation: getRecommendation(status, majorIssueName)
     };
   });
 });
@@ -411,7 +411,7 @@ const renderPerformanceChart = () => {
   const getRFRArray = (indexInBreakdown) => {
     return summaries.map(m => {
       const item = m.breakdown[indexInBreakdown];
-      return m.totalFailures > 0 ? ((item.recurrent / m.totalFailures) * 100).toFixed(1) : 0;
+      return m.totalFailures > 0 ? ((item.issues / m.totalFailures) * 100).toFixed(1) : 0;
     });
   };
 

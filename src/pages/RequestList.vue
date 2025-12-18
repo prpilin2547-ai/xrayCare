@@ -106,7 +106,7 @@
                             <button v-if="selectedItem && selectedItem.imageData" class="btn btn-file shadow-sm"
                                 @click="openImageModal(selectedItem.imageData)">
                                 ไฟล์ภาพ
-                                <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
+                                <i class="bi bi-camera-fill ms-2"></i>
                             </button>
 
                             <div class="status-display">
@@ -124,7 +124,7 @@
         <div v-if="showImageModal" class="modal-overlay">
             <div class="modal-card image-modal-card">
                 <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">รูปภาพ</h5>
+                    <h5 class="m-0">ไฟล์รูปภาพ</h5>
                     <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
                 </div>
                 <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
@@ -133,7 +133,7 @@
                         <img v-if="previewImageSrc" :src="previewImageSrc" alt="Request Image"
                             class="img-fluid shadow-sm mb-3" />
                         <p class="text-muted">
-                            รูปภาพที่อัปโหลดไว้ในรายการแจ้งซ่อม
+                            รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม
                         </p>
                     </div>
                 </div>
@@ -191,13 +191,13 @@
                         <div class="row mt-3">
                             <label class="label">วันที่แจ้งซ่อม :</label>
                             <div class="field d-flex align-items-center gap-2">
+                                <input type="text" v-model="requestDate" class="form-control form-control-sm"
+                                    placeholder="DD/MM/YYYY" readonly @click="openCalendar" />
                                 <button type="button"
                                     class="btn btn-light border d-flex align-items-center justify-content-center"
                                     style="width: 40px; height: 38px;" @click="openCalendar">
                                     <i class="bi bi-calendar-event"></i>
                                 </button>
-                                <input type="text" v-model="requestDate" class="form-control form-control-sm"
-                                    placeholder="วว ด.ด. ปปปป" readonly @click="openCalendar" />
                             </div>
                         </div>
 
@@ -260,20 +260,20 @@
         </div>
     </div>
 
-    <!-- ================== MODAL: ปฏิทิน (Thai) ================== -->
+    <!-- ================== MODAL: ปฏิทิน (English) ================== -->
     <!-- z-index ต้องมากกว่า modal ปกติ (1055) -->
     <div v-if="isCalendarVisible" class="calendar-popup-overlay" @click="isCalendarVisible = false">
         <div class="calendar-popup-box" @click.stop>
             <div class="calendar-header">
                 <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
-                <!-- แสดง เดือน (ไทย) ปี (พ.ศ.) -->
-                <span class="month-title">{{ thaiMonthYear }}</span>
+                <!-- แสดง เดือน (English) ปี (ค.ศ.) -->
+                <span class="month-title">{{ englishMonthYear }}</span>
                 <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
             </div>
 
             <div class="calendar-grid">
-                <!-- วันในสัปดาห์ (ไทย) -->
-                <div v-for="d in thaiWeekdays" :key="d" class="weekday">
+                <!-- วันในสัปดาห์ (English) -->
+                <div v-for="d in englishWeekdays" :key="d" class="weekday">
                     {{ d }}
                 </div>
 
@@ -318,10 +318,10 @@ const previewImageSrc = ref('')        // src ที่จะแสดงใน 
 
 // list อุปกรณ์ (เอาคำว่า "ห้อง X" ออกแล้ว)
 const equipmentOptions = [
-    'X-Ray (BrandA/ModelX)',
-    'X-Ray (BrandB/ModelY)',
-    'X-Ray (BrandC/ModelZ)',
-    'X-Ray (BrandD/ModelW)'
+    'X-ray general shimazu รุ่น xxx',
+    'X-ray general carestream รุ่น xxx',
+    'X-ray general konica รุ่น xxx',
+    'X-ray general toshiba รุ่น xxx'
 ]
 
 // list ห้องตรวจ
@@ -333,7 +333,7 @@ const defaultItems = [
         id: 1,
         equipment: 'X-ray general รุ่น xxx',
         room: 'ห้อง 1',
-        requestDate: '14 ธ.ค. 2568', // data ตัวอย่าง
+        requestDate: '14/12/2025', // DD/MM/YYYY format
         detail: 'ระบบล็อกและเบรก',
         remarks: 'ระบบล็อกติดขัด',
         statusText: 'รอซ่อม'
@@ -378,33 +378,29 @@ onMounted(() => {
     })
 })
 
-// ------------------- CALENDAR LOGIC (THAI) -------------------
+// ------------------- CALENDAR LOGIC (ENGLISH) -------------------
 const isCalendarVisible = ref(false)
 const today = new Date()
 const currentMonth = ref(today.getMonth())
 const currentYear = ref(today.getFullYear())
 
-const thaiMonthNames = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+const englishMonthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
 ]
-const thaiMonthAbbrs = [
-    'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-    'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-]
-const thaiWeekdays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส']
+const englishWeekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-// Header ปฏิทิน: มกราคม 2568 (พ.ศ.)
-const thaiMonthYear = computed(() => {
-    return `${thaiMonthNames[currentMonth.value]} ${currentYear.value + 543}`
+// Header ปฏิทิน: December 2025 (ค.ศ.)
+const englishMonthYear = computed(() => {
+    return `${englishMonthNames[currentMonth.value]} ${currentYear.value}`
 })
 
-// แปลงวันที่ (Date object) -> "14 ธ.ค. 2568"
-const formatThaiDate = (dateObj) => {
-    const day = dateObj.getDate()
-    const monthIndex = dateObj.getMonth()
-    const yearBE = dateObj.getFullYear() + 543
-    return `${day} ${thaiMonthAbbrs[monthIndex]} ${yearBE}`
+// แปลงวันที่ (Date object) -> "18/12/2025"
+const formatEnglishDate = (dateObj) => {
+    const day = String(dateObj.getDate()).padStart(2, '0')
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    const year = dateObj.getFullYear()
+    return `${day}/${month}/${year}`
 }
 
 // Grid
@@ -426,10 +422,8 @@ const daysGrid = computed(() => {
             currentMonth.value === today.getMonth() &&
             currentYear.value === today.getFullYear()
 
-        // เช็คว่าเลือกอยู่นี่ไหม (เทียบ string อาจจะยาก เทียบคร่าวๆ)
-        // เนื่องจากเราเก็บเป็น String ไทย "14 ธ.ค. 2568" การ reverse กลับมา check object อาจยุ่งยาก
-        // แต่เพื่อความง่าย ถ้า string ตรงกันถือว่าใช่
-        const dateStr = formatThaiDate(dateObj)
+        // เช็คว่าเลือกอยู่นี่ไหม (เทียบ string DD/MM/YYYY)
+        const dateStr = formatEnglishDate(dateObj)
         const isSelected = (requestDate.value === dateStr)
 
         cells.push({
@@ -458,13 +452,12 @@ const changeMonth = (delta) => {
 }
 
 const selectDate = (dateObj) => {
-    requestDate.value = formatThaiDate(dateObj)
+    requestDate.value = formatEnglishDate(dateObj)
     isCalendarVisible.value = false
 }
 
 const openCalendar = () => {
-    // default to current month/year 
-    // (Advance: ถ้าย้อนกลับจาก string "14 ธ.ค. 2568" มา set currentMonth ได้จะดีมาก แต่ user ไม่ได้ request strict)
+    // default to current month/year
     isCalendarVisible.value = true
 }
 
@@ -743,7 +736,11 @@ const deleteItem = (id) => {
 
 /* ตาราง */
 .table-wrapper {
-    max-width: 800px;
+    max-width: 100%;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 14px 16px;
+    border: 1px solid #e5e7eb;
 }
 
 .table {
@@ -754,20 +751,16 @@ const deleteItem = (id) => {
 
 th,
 td {
-    padding: 10px 8px;
     text-align: center;
-    border: 1px solid #9ca3af;
-    white-space: nowrap;
+    padding: 6px 4px;
 }
 
-thead th {
-    background: #93c5fd;
-    font-weight: 600;
+thead tr {
+    border-bottom: 1px solid #e5e7eb;
 }
 
-tbody td {
-    background: #e5e5e5;
-    white-space: nowrap;
+tbody tr:nth-child(even) {
+    background: #f9fafb;
 }
 
 .status.pending {
@@ -829,7 +822,7 @@ tbody td {
 
 /* Box Header */
 .box-header {
-    background-color: #ffcc99;
+    background-color: rgb(229, 229, 229);
     border-bottom: 1px solid #000;
     display: flex;
     min-height: 60px;
@@ -855,6 +848,7 @@ tbody td {
 
 /* Box Body */
 .box-body {
+    background-color: white;
     padding: 30px;
     position: relative;
     min-height: 300px;
@@ -887,6 +881,7 @@ ul.content-list li::before {
 
 .btn-status-base {
     border: 1px solid #333;
+    border-radius: 6px;
     color: black;
     height: 50px;
     display: flex;
@@ -901,28 +896,46 @@ ul.content-list li::before {
 
 /* สีสถานะใช้ร่วมกับ RequestEN */
 .status-waiting {
-    background-color: #ff5c5c;
+    color: #ef4444;
+    font-weight: 600;
+    background-color: white;
 }
 
 .status-progress {
-    background-color: #ffb347;
+    color: #f59e0b;
+    font-weight: 600;
+    background-color: white;
 }
 
 .status-completed {
-    background-color: #8be296;
+    background-color: white;
 }
 
-/* ปุ่มไฟล์ภาพ */
+/* ปุ่ศไฟล์ภาพ */
 .btn-file {
-    background-color: #9ebd6e;
-    border: 1px solid #333;
-    color: black;
+    background-color: white;
+    border: 1px solid #00d42a;
+    color: #00d42a;
     width: 140px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
+    border-radius: 6px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-file i {
+    color: #00d42a;
+}
+
+.btn-file:hover {
+    color: #00d42a;
+    background-color: white;
+    border-color: #00d42a;
+    transform: scale(1.1);
 }
 
 /* กล่องชื่อไฟล์ + ปุ่มกากบาท */

@@ -104,7 +104,7 @@
               <!-- ปุ่มไฟล์ภาพ -->
               <button class="btn btn-file shadow-sm" @click="openImageModal">
                 ไฟล์ภาพ
-                <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
+                <i class="bi bi-camera-fill ms-2"></i>
               </button>
 
               <!-- ปุ่มสถานะแบบ Dropdown -->
@@ -165,7 +165,7 @@
                 <img v-if="currentImageSrc" :src="currentImageSrc" alt="Request Image"
                   class="img-fluid shadow-sm mb-3" />
                 <p class="text-muted" v-if="currentImageSrc">
-                  รูปภาพที่ส่งมาจากนักรังสี
+                  รูปภาพที่แนบโดยนักรังสีการแพทย์
                 </p>
                 <p class="text-muted" v-else>
                   ยังไม่มีรูปภาพจากนักรังสี
@@ -567,7 +567,11 @@ watch(items, () => {
 
 /* ตาราง */
 .table-wrapper {
-  max-width: 800px;
+  max-width: 100%;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px 16px;
+  border: 1px solid #e5e7eb;
 }
 
 .table {
@@ -578,10 +582,8 @@ watch(items, () => {
 
 th,
 td {
-  padding: 10px 8px;
   text-align: center;
-  border: 1px solid #9ca3af;
-  white-space: nowrap;
+  padding: 6px 4px;
 }
 
 /* Fixed column widths for uniform alignment */
@@ -633,13 +635,12 @@ td:nth-child(8) {
   min-width: 80px;
 }
 
-thead th {
-  background: #93c5fd;
-  font-weight: 600;
+thead tr {
+  border-bottom: 1px solid #e5e7eb;
 }
 
-tbody td {
-  background: #e5e5e5;
+tbody tr:nth-child(even) {
+  background: #f9fafb;
 }
 
 .status.pending {
@@ -682,18 +683,30 @@ tbody td {
   margin: 0;
 }
 
+/* ปุ่มกากบาทมุมขวาบน */
+.close-modal-btn {
+  margin-left: auto;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  transition: 0.2s;
+}
+
+.close-modal-btn:hover {
+  transform: scale(1.1);
+}
+
 /* Main Box */
 .main-box {
   border: 1px solid #000;
   background-color: #d9d9d9;
   border-radius: 4px;
   overflow: hidden;
-  margin-top: 40px;
 }
 
 /* Box Header */
 .box-header {
-  background-color: #ffcc99;
+  background-color: rgb(229, 229, 229);
   border-bottom: 1px solid #000;
   display: flex;
   min-height: 60px;
@@ -719,6 +732,7 @@ tbody td {
 
 /* Box Body */
 .box-body {
+  background-color: white;
   padding: 30px;
   position: relative;
   min-height: 450px;
@@ -751,19 +765,34 @@ ul.content-list li::before {
 }
 
 .btn-file {
-  background-color: #9ebd6e;
-  border: 1px solid #333;
-  color: black;
+  background-color: white;
+  border: 1px solid #00d42a;
+  color: #00d42a;
   width: 140px;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
+  border-radius: 6px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.btn-file i {
+  color: #00d42a;
+}
+
+.btn-file:hover {
+  color: #00d42a;
+  background-color: white;
+  border-color: #00d42a;
+  transform: scale(1.1);
 }
 
 .btn-status-base {
   border: 1px solid #333;
+  border-radius: 6px;
   color: black;
   height: 50px;
   display: flex;
@@ -777,15 +806,21 @@ ul.content-list li::before {
 
 /* Status Colors */
 .status-waiting {
-  background-color: #ff5c5c;
+  color: #ef4444;
+  font-weight: 600;
+  background-color: white;
 }
 
 .status-progress {
-  background-color: #ffb347;
+  color: #f59e0b;
+  font-weight: 600;
+  background-color: white;
 }
 
 .status-completed {
-  background-color: #8be296;
+  background-color: white;
+  color: #0eb54b;
+  font-weight: 600;
 }
 
 /* กล่องเลือกสถานะ */
@@ -805,12 +840,23 @@ ul.content-list li::before {
 }
 
 .btn-save {
-  background-color: #8be296;
-  border: 1px solid #333;
-  color: black;
+  background-color: white;
+  border: 1px solid #6200EA;
+  color: #6200EA;
   width: 160px;
   height: 50px;
   font-size: 1.1rem;
+  border-radius: 6px;
+  transition: 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-save:hover {
+  color: #6200EA;
+  background-color: white;
+  border-color: #6200EA;
+  transform: scale(1.1);
 }
 
 /* Modal Styles */

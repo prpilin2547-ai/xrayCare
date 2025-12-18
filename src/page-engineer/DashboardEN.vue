@@ -6,23 +6,23 @@
 
       <div class="cards-row">
         <div class="card summary-card">
-          <p class="card-label pink">วัน/เดือน/ปี</p>
+          <p class="card-label pink">DATE</p>
           <p class="card-value">{{ displayDate }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label blue">จำนวนเครื่องทั้งหมด</p>
+          <p class="card-label blue">EQUIPMENT</p>
           <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label red">รอซ่อม</p>
+          <p class="card-label red">PENDING REPAIR</p>
           <p class="card-value">{{ hasPendingrepair ? '2' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label orange">อยู่ระหว่างดำเนินการ</p>
+          <p class="card-label orange">IN PROGRESS</p>
           <p class="card-value">{{ hasProgress ? '1' : '-' }}</p>
         </div>
         <div class="card summary-card">
-          <p class="card-label green">ดำเนินการแล้ว</p>
+          <p class="card-label green">COMPLETED</p>
           <p class="card-value">{{ hasCompleted ? '1' : '-' }}</p>
         </div>
       </div>
@@ -41,10 +41,10 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ลำดับ</th>
-            <th>อุปกรณ์ (ยี่ห้อ/รุ่น)</th>
-            <th>ห้องตรวจ</th>
-            <th>สถานะการแจ้งซ่อม</th>
+            <th>No.</th>
+            <th>Equipment (Brand/Model)</th>
+            <th>Room</th>
+            <th>Repair Status</th>
           </tr>
         </thead>
         <tbody>
@@ -61,10 +61,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
-const displayDate = '16 ธ.ค. 2568';
+// Abbreviated month names for displayDate
+const monthNamesShort = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+// Display current date in format: "18 Dec 2025"
+const displayDate = computed(() => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = monthNamesShort[now.getMonth()];
+  const year = now.getFullYear();
+  return `${day} ${month} ${year}`;
+});
 
 // mock flag สำหรับตัวเลข cards
 const hasMachines = ref(true);
@@ -73,10 +86,10 @@ const hasProgress = ref(true);
 const hasCompleted = ref(true);
 
 const repairRequests = ref([
-  { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'อยู่ระหว่างดำเนินการ' },
-  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'อยู่ระหว่างดำเนินการ' }
+  { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'IN PROGRESS' },
+  { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'IN PROGRESS' },
+  { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'IN PROGRESS' },
+  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'IN PROGRESS' }
 ]);
 </script>
 
@@ -145,7 +158,8 @@ const repairRequests = ref([
 
 /* REQUEST SECTION HEADER */
 .request-section {
-  margin-top: 20px;
+  margin-top: 25px;
+  margin-bottom: 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
