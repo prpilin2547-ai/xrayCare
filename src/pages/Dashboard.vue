@@ -59,7 +59,7 @@
               <td>{{ row.machine_name }}</td>
               <td>{{ row.room }}</td>
               <td>{{ row.caretaker }}</td>
-              <td class="status pending">รอดำเนินการ</td>
+              <td class="status pending">PENDING</td>
               <td>
                 <button @click="goToDairyCheck(row.equipment)" class="check-btn">
                   CHECK
@@ -70,7 +70,12 @@
 
           <tbody v-else>
             <tr v-for="n in 4" :key="n">
-              <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
           </tbody>
         </table>
@@ -103,31 +108,19 @@
           <div class="calendar-grid">
 
             <!-- WEEKDAY -->
-            <div
-              v-for="d in weekdays"
-              :key="d"
-              class="weekday fw-semibold text-muted"
-            >
+            <div v-for="d in weekdays" :key="d" class="weekday fw-semibold text-muted">
               {{ d }}
             </div>
 
             <!-- DAYS -->
-            <div
-              v-for="cell in calendarCells"
-              :key="cell.key"
-              class="day-cell"
-              :class="{ empty: !cell.day, today: isToday(cell.day) }"
-              @click="cell.day && openDayPopup(cell)"
-            >
+            <div v-for="cell in calendarCells" :key="cell.key" class="day-cell"
+              :class="{ empty: !cell.day, today: isToday(cell.day) }" @click="cell.day && openDayPopup(cell)">
               <div v-if="cell.day" class="day-number">
                 <span>{{ cell.day }}</span>
               </div>
 
               <!-- tag-stack เหมือนหน้า PM (ฟ้า/แดง/เขียว) -->
-              <div
-                class="tag-stack"
-                v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)"
-              >
+              <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)">
                 <!-- Monthly Check -->
                 <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
                   <span class="star">★</span>
@@ -200,7 +193,21 @@ const router = useRouter();
 
 /* ---------------- Table Data ---------------- */
 const hasMachines = ref(true);
-const displayDate = "10 Nov 2025";
+
+// Abbreviated month names for displayDate
+const monthNamesShort = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+// Display current date in format: "18 Dec 2025"
+const displayDate = computed(() => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = monthNamesShort[now.getMonth()];
+  const year = now.getFullYear();
+  return `${day} ${month} ${year}`;
+});
 
 const sampleRows = ref([
   { rid: "001", equipment: "XRay-Alpha", machine_name: "X-Ray (BrandA/ModelX)", room: "Room 101", caretaker: "John" },
@@ -223,11 +230,11 @@ const currentMonth = ref(today.getMonth());
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const weekdayFull = [
-  "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 ];
 const monthNames = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December"
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
 const headerDateText = computed(() =>
@@ -914,7 +921,7 @@ tbody tr:nth-child(even) {
   color: #111827;
 }
 
-.popup-list li + li {
+.popup-list li+li {
   margin-top: 2px;
 }
 
