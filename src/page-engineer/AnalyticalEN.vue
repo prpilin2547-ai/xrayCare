@@ -3,154 +3,15 @@
     <div class="container-fluid p-4">
       <h1 class="mb-4">Analytical Report</h1>
 
-      <div class="row g-3 align-items-end mb-4">
-        <div class="col-md-3">
-          <label for="monthSelect" class="form-label">เดือน</label>
-          <select id="monthSelect" class="form-select" :class="{ 'placeholder-selected': !selectedMonth }"
-            v-model="selectedMonth" aria-label="Select Month">
-            <option value="" style="color: #6c757d;">กรุณาเลือกเดือน</option>
-            <option v-for="(month, index) in thaiMonths" :key="index" :value="month" style="color: #212529;">
-              {{ month }}
-            </option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label for="yearSelect" class="form-label">ปี</label>
-          <select id="yearSelect" class="form-select" :class="{ 'placeholder-selected': !selectedYear }"
-            v-model="selectedYear" aria-label="Select Year">
-            <option value="" style="color: #6c757d;">กรุณาเลือกปี</option>
-            <option value="2568" style="color: #212529;">2568</option>
-            <option value="2569" style="color: #212529;">2569</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <button type="button" class="btn btn-primary w-100" @click="handleSearch">
-            <i class="bi bi-search me-2"></i>ค้นหา
-          </button>
-        </div>
-      </div>
-
-      <div v-if="showGraph" class="row g-4">
+      <!-- ================== กราฟแสดงจำนวนครั้งที่เสียรายเดือน (แสดงทันทีเมื่อเข้าหน้า) ================== -->
+      <div class="row g-4">
         <div class="col-12">
-          <div class="card shadow-sm h-100">
-            <div class="card-header bg-white py-3">
-              <h5 class="card-title m-0 text-primary">
-                <i class="bi bi-bar-chart-line-fill me-2"></i>
-                กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำชนิดการตรวจแบบ Daily
-                Check
-                <div>(Recurrent Failure Rate)</div>
-                <small class="text-muted d-block mt-1" style="font-size: 0.8em;">
-                  ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
-                </small>
-              </h5>
-            </div>
-            <div class="card-body">
-              <div class="chart-container" style="position: relative; height: 500px; width: 100%;">
-                <canvas id="analyticalChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="card shadow-sm">
-        <div class="card-header bg-white py-3">
-          <h5 class="card-title m-0 text-secondary">
-            รายงานข้อมูลเชิงสถิติ (Analytical Dashboard)
-          </h5>
-        </div>
-        <div class="card-body d-flex justify-content-center align-items-center"
-          style="height: 400px; background-color: #f8f9fa;">
-          <div class="text-center text-muted">
-            <i class="bi bi-clipboard-data display-4 mb-3"></i>
-            <p>กรุณากรอกข้อมูลและกดปุ่มค้นหาเพื่อแสดงข้อมูลวิเคราะห์</p>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="showGraph" class="row g-4 mt-2">
-        <div class="col-12">
-          <h5 class="text-primary mb-3">
-            <i class="bi bi-file-earmark-medical-fill me-2"></i>สรุปสถานะเครื่องเอกซเรย์ประจำเดือน{{ displayMonth }} ปี
-            {{ displayYear }}
-          </h5>
-        </div>
-
-        <div class="col-md-6 col-xl-3" v-for="(machine, index) in machineSummaries" :key="index">
-          <div class="card h-100 border-0 shadow-sm" :class="machine.borderClass">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h6 class="fw-bold text-dark" :title="machine.name">
-                  {{ machine.name }}
-                </h6>
-                <span class="badge rounded-pill" :class="machine.badgeClass">
-                  {{ machine.statusText }}
-                </span>
-              </div>
-
-              <div class="mb-3 text-center p-2 bg-light rounded">
-                <small class="text-muted">จำนวนครั้งที่เสียทั้งหมด</small>
-                <div class="h3 fw-bold mb-0" :class="machine.textClass">
-                  {{ machine.totalFailures }} <span class="fs-6 text-muted">ครั้ง</span>
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <h6 class="text-secondary" style="font-size: 0.8rem; font-weight: 600;">
-                  <i class="bi bi-list-check me-1"></i>รายละเอียดรายหัวข้อ :
-                </h6>
-                <div class="table-responsive">
-                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.8rem;">
-                    <thead class="text-muted" style="border-bottom: 1px solid #dee2e6;">
-                      <tr>
-                        <th class="fw-normal">รายการ </th>
-                        <th class="text-end fw-normal">จำนวนที่เสีย</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item, idx) in machine.breakdown" :key="idx">
-                        <td class="text-truncate" style="max-width: 100px; white-space: pre-line;" :title="item.name">
-                          {{ idx + 1 }}. {{ item.shortName }}
-                        </td>
-                        <td class="text-end">
-                          {{ item.issues }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div v-if="machine.majorIssue" class="alert p-2 mb-0" :class="machine.alertClass"
-                style="font-size: 0.8rem;">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                <strong>ปัญหาหลัก :</strong> {{ machine.majorIssue }}
-                <div>(อัตราเสียซ้ำ {{ machine.isMultipleMajor ? 'อย่างละ ' : '' }}{{ machine.rfrValue }}%)</div>
-              </div>
-              <div v-else class="alert alert-success p-2 mb-0" style="font-size: 0.8rem;">
-                <i class="bi bi-check-circle-fill me-1"></i> ประสิทธิภาพสมบูรณ์ ไม่พบการเสียซ้ำ
-              </div>
-
-              <div class="mt-3 pt-2 border-top">
-                <small class="text-secondary d-block fw-bold">
-                  <i class="bi bi-lightbulb-fill me-1 text-warning"></i>คำแนะนำ:
-                </small>
-                <small class="text-muted" style="font-size: 0.8rem; line-height: 1.4;">
-                  {{ machine.recommendation }}
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ================== กราฟแสดงจำนวนครั้งที่เสียรายเดือน ================== -->
-        <div class="col-12 mt-4">
           <div class="card shadow-sm">
             <div class="card-header bg-white py-3">
               <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h5 class="card-title m-0 text-primary">
                   <i class="bi bi-bar-chart-fill me-2"></i>กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate)
-                  ชนิดการตรวจแบบ Daily Check รายเดือนตลอดทั้งปี
+                  ชนิดการตรวจแบบ Daily Check ประจำปี {{ selectedMonthlyYear }}
                 </h5>
                 <div class="year-selector">
                   <label for="monthlyYearSelect" class="me-2">ปี:</label>
@@ -263,6 +124,224 @@
             </div>
           </div>
         </div>
+
+        <!-- ================== RFR Summary Cards ================== -->
+        <div class="col-12 mt-3">
+          <div class="row g-3">
+            <!-- Card 1: ภาพรวม RFR ทั้งปี -->
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #0d6efd !important;">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                      <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0" style="font-size: 0.85rem;">ภาพรวม RFR ทั้งปี</h6>
+                      <small class="text-muted" style="font-size: 0.75rem;">อัตราการเสียซ้ำรวมปี {{ selectedMonthlyYear
+                      }}</small>
+                    </div>
+                  </div>
+                  <div class="text-center py-3">
+                    <h2 class="display-4 fw-bold text-primary mb-1">{{ averageYearlyRFR }}</h2>
+                    <p class="text-muted mb-0">%</p>
+                  </div>
+                  <div class="border-top pt-3 mt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="text-muted" style="font-size: 0.85rem;">
+                        <i class="bi bi-info-circle me-1"></i>เฉลี่ยต่อเดือน
+                      </span>
+                      <span class="fw-bold text-dark">{{ averageYearlyRFR }}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: หมวดหมู่ที่ต้องโฟกัส (RFR สูงสุด) -->
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #dc3545 !important;">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                      <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0" style="font-size: 0.85rem;">หมวดหมู่ที่ต้องโฟกัส</h6>
+                      <small class="text-muted" style="font-size: 0.75rem;">พบปัญหาซ้ำบ่อยที่สุด</small>
+                    </div>
+                  </div>
+                  <div class="text-center py-3">
+                    <h5 class="fw-bold text-dark mb-2">{{ highestRFRCategory.name }}</h5>
+                    <div class="d-flex justify-content-center align-items-baseline">
+                      <h3 class="display-6 fw-bold text-danger mb-0">{{ highestRFRCategory.rfr }}</h3>
+                      <span class="text-muted ms-2">%</span>
+                    </div>
+                  </div>
+                  <div class="border-top pt-3 mt-3">
+                    <small class="text-muted d-block text-center" style="font-size: 0.8rem;">
+                      <i class="bi bi-info-circle me-1"></i>ควรตรวจสอบและแก้ไขปัญหาเชิงลึก
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: ประสิทธิภาพการซ่อม -->
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #ffc107 !important;">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                      <i class="bi bi-calendar-event text-warning fs-4"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0" style="font-size: 0.85rem;">ประสิทธิภาพการซ่อม</h6>
+                      <small class="text-muted" style="font-size: 0.75rem;">เดือนที่มี RFR สูงสุด</small>
+                    </div>
+                  </div>
+                  <div class="text-center py-3">
+                    <h5 class="fw-bold text-dark mb-2">{{ peakMonth.name }}</h5>
+                    <div class="d-flex justify-content-center align-items-baseline">
+                      <h3 class="display-6 fw-bold text-warning mb-0">{{ peakMonth.count }}</h3>
+                      <span class="text-muted ms-2">ครั้ง</span>
+                    </div>
+                  </div>
+                  <div class="border-top pt-3 mt-3">
+                    <small class="text-muted d-block text-center" style="font-size: 0.8rem;">
+                      <i class="bi bi-lightbulb me-1"></i>ตรวจสอบคุณภาพการซ่อมในช่วงนี้
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================== กราฟ RFR และสรุปสถานะเครื่อง (ย้ายมาด้านล่าง) ================== -->
+      <div class="row g-3 align-items-end mt-4 mb-3">
+        <div class="col-md-3">
+          <label for="monthSelect" class="form-label">เดือน</label>
+          <select id="monthSelect" class="form-select" :class="{ 'placeholder-selected': !selectedMonth }"
+            v-model="selectedMonth" aria-label="Select Month">
+            <option value="" style="color: #6c757d;">กรุณาเลือกเดือน</option>
+            <option v-for="(month, index) in thaiMonths" :key="index" :value="month" style="color: #212529;">
+              {{ month }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="yearSelect" class="form-label">ปี</label>
+          <select id="yearSelect" class="form-select" :class="{ 'placeholder-selected': !selectedYear }"
+            v-model="selectedYear" aria-label="Select Year">
+            <option value="" style="color: #6c757d;">กรุณาเลือกปี</option>
+            <option value="2568" style="color: #212529;">2568</option>
+            <option value="2569" style="color: #212529;">2569</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-primary w-100" @click="handleSearch">
+            <i class="bi bi-search me-2"></i>ค้นหา
+          </button>
+        </div>
+      </div>
+
+      <div v-if="showGraph" class="row g-4">
+        <div class="col-12">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+              <h5 class="card-title m-0 text-primary">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
+                กราฟแสดงจำนวนครั้งที่เครื่องขัดข้อง (Failure Rate) เปรียบเทียบกับ อัตราการเสียซ้ำชนิดการตรวจแบบ Daily
+                Check
+                <div>(Recurrent Failure Rate)</div>
+                <small class="text-muted d-block mt-1" style="font-size: 0.8em;">
+                  ประจำเดือน {{ displayMonth }} ปี {{ displayYear }}
+                </small>
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container" style="position: relative; height: 500px; width: 100%;">
+                <canvas id="analyticalChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <h5 class="text-primary mb-3">
+            <i class="bi bi-file-earmark-medical-fill me-2"></i>สรุปสถานะเครื่องเอกซเรย์ประจำเดือน{{ displayMonth }} ปี
+            {{ displayYear }}
+          </h5>
+        </div>
+
+        <div class="col-md-6 col-xl-3" v-for="(machine, index) in machineSummaries" :key="index">
+          <div class="card h-100 border-0 shadow-sm" :class="machine.borderClass">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="fw-bold text-dark" :title="machine.name">
+                  {{ machine.name }}
+                </h6>
+                <span class="badge rounded-pill" :class="machine.badgeClass">
+                  {{ machine.statusText }}
+                </span>
+              </div>
+
+              <div class="mb-3 text-center p-2 bg-light rounded">
+                <small class="text-muted">จำนวนครั้งที่เสียทั้งหมด</small>
+                <div class="h3 fw-bold mb-0" :class="machine.textClass">
+                  {{ machine.totalFailures }} <span class="fs-6 text-muted">ครั้ง</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <h6 class="text-secondary" style="font-size: 0.8rem; font-weight: 600;">
+                  <i class="bi bi-list-check me-1"></i>รายละเอียดรายหัวข้อ :
+                </h6>
+                <div class="table-responsive">
+                  <table class="table table-sm table-borderless mb-0" style="font-size: 0.8rem;">
+                    <thead class="text-muted" style="border-bottom: 1px solid #dee2e6;">
+                      <tr>
+                        <th class="fw-normal">รายการ </th>
+                        <th class="text-end fw-normal">จำนวนที่เสีย</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(item, idx) in machine.breakdown" :key="idx">
+                        <td class="text-truncate" style="max-width: 100px; white-space: pre-line;" :title="item.name">
+                          {{ idx + 1 }}. {{ item.shortName }}
+                        </td>
+                        <td class="text-end">
+                          {{ item.issues }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div v-if="machine.majorIssue" class="alert p-2 mb-0" :class="machine.alertClass"
+                style="font-size: 0.8rem;">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                <strong>ปัญหาหลัก :</strong> {{ machine.majorIssue }}
+                <div>(อัตราเสียซ้ำ {{ machine.isMultipleMajor ? 'อย่างละ ' : '' }}{{ machine.rfrValue }}%)</div>
+              </div>
+              <div v-else class="alert alert-success p-2 mb-0" style="font-size: 0.8rem;">
+                <i class="bi bi-check-circle-fill me-1"></i> ประสิทธิภาพสมบูรณ์ ไม่พบการเสียซ้ำ
+              </div>
+
+              <div class="mt-3 pt-2 border-top">
+                <small class="text-secondary d-block fw-bold">
+                  <i class="bi bi-lightbulb-fill me-1 text-warning"></i>คำแนะนำ:
+                </small>
+                <small class="text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+                  {{ machine.recommendation }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </MainLayout>
@@ -281,7 +360,7 @@ const selectedMonth = ref('');
 const selectedYear = ref('');
 const displayMonth = ref('');
 const displayYear = ref('');
-const showGraph = ref(false);
+const showGraph = ref(false); // RFR chart visibility
 
 let performanceChart = null;
 
@@ -595,7 +674,11 @@ const availableYears = computed(() => {
     if (item.requestDate) {
       const yearMatch = item.requestDate.match(/(\d{4})/)
       if (yearMatch) {
-        years.add(parseInt(yearMatch[1]))
+        const year = parseInt(yearMatch[1])
+        // กรองเฉพาะปี พ.ศ. 2568 และ 2569 เท่านั้น
+        if (year === 2568 || year === 2569) {
+          years.add(year)
+        }
       }
     }
   })
@@ -658,8 +741,16 @@ const monthlyChartData = computed(() => {
     'rgba(75, 192, 192, 0.8)'    // เขียว - BrandD
   ]
 
-  // สร้างโครงสร้างข้อมูลสำหรับแต่ละชนิดเครื่อง
-  const datasets = equipmentTypes.map((equipment, index) => {
+  // หมวดหมู่การตรวจ
+  const inspectionCategories = [
+    'สายไฟ',
+    'ระบบล็อกและเบรก',
+    'เตียง หลอดเอกซเรย์ และบักกี้',
+    'X-ray tube warm-up'
+  ]
+
+  // สร้างโครงสร้างข้อมูลสำหรับแต่ละชนิดเครื่อง (Bar charts)
+  const barDatasets = equipmentTypes.map((equipment, index) => {
     const monthlyData = new Array(12).fill(0)
 
     // นับจำนวนครั้งที่เสียในแต่ละเดือน
@@ -686,13 +777,71 @@ const monthlyChartData = computed(() => {
       borderWidth: 1,
       barPercentage: 0.8,
       categoryPercentage: 0.9,
-      stack: 'stack' + index  // แยก stack ให้แต่ละเครื่องไม่ซ้อนกัน
+      stack: 'stack' + index,  // แยก stack ให้แต่ละเครื่องไม่ซ้อนกัน
+      yAxisID: 'y'
+    }
+  })
+
+  // คำนวณ RFR สำหรับแต่ละหมวดหมู่ในแต่ละเดือน
+  const rfrDatasets = inspectionCategories.map((category, categoryIndex) => {
+    const rfrData = new Array(12).fill(0)
+
+    // สำหรับแต่ละเดือน
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      let categoryCount = 0
+      let totalCount = 0
+
+      // นับจำนวนครั้งที่เสียในหมวดหมู่นี้และทั้งหมดในเดือนนี้
+      repairItems.value.forEach(item => {
+        if (item.requestDate && item.detail) {
+          const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+          if (match) {
+            const monthStr = match[2]
+            const year = parseInt(match[3])
+            const itemMonthIndex = thaiMonthToNumber(monthStr)
+
+            if (year === selectedMonthlyYear.value && itemMonthIndex === monthIndex) {
+              totalCount++
+              if (item.detail === category) {
+                categoryCount++
+              }
+            }
+          }
+        }
+      })
+
+      // คำนวณ RFR %
+      rfrData[monthIndex] = totalCount > 0 ? parseFloat(((categoryCount / totalCount) * 100).toFixed(1)) : 0
+    }
+
+    // กำหนดสีและ point style ตามหมวดหมู่
+    const rfrColors = ['#dc3545', '#ffc107', '#6f42c1', '#198754']
+    const pointStyles = ['circle', 'triangle', 'rect', 'rectRot']
+    const rfrLabels = [
+      'RFR : สายไฟ',
+      'RFR : ระบบล็อกและเบรก',
+      'RFR : การเคลื่อนที่ (เตียง/หลอด/บักกี้)',
+      'RFR : Tube Warm-up'
+    ]
+
+    return {
+      label: rfrLabels[categoryIndex],
+      data: rfrData,
+      type: 'line',
+      borderColor: rfrColors[categoryIndex],
+      backgroundColor: rfrColors[categoryIndex],
+      borderWidth: 2,
+      pointStyle: pointStyles[categoryIndex],
+      pointRadius: 5,
+      tension: 0.3,
+      yAxisID: 'y1',
+      order: categoryIndex + 1
     }
   })
 
   return {
     labels: monthNames,
-    datasets: datasets
+    datasets: [...barDatasets, ...rfrDatasets]
   }
 })
 
@@ -784,6 +933,112 @@ const peakMonth = computed(() => {
   }
 })
 
+// หมวดหมู่ที่มี RFR สูงสุด
+const highestRFRCategory = computed(() => {
+  const categories = [
+    { name: 'สายไฟ', displayName: 'สายไฟ' },
+    { name: 'ระบบล็อกและเบรก', displayName: 'ระบบล็อกและเบรก' },
+    { name: 'เตียง หลอดเอกซเรย์ และบักกี้', displayName: 'การเคลื่อนที่' },
+    { name: 'X-ray tube warm-up', displayName: 'Tube Warm-up' }
+  ]
+
+  let maxRFR = 0
+  let topCategory = categories[0]
+
+  categories.forEach(category => {
+    let categoryCount = 0
+    let totalCount = 0
+
+    repairItems.value.forEach(item => {
+      if (item.requestDate && item.detail) {
+        const yearMatch = item.requestDate.match(/(\d{4})/)
+        const year = yearMatch ? parseInt(yearMatch[1]) : 0
+
+        if (year === selectedMonthlyYear.value) {
+          totalCount++
+          if (item.detail === category.name) {
+            categoryCount++
+          }
+        }
+      }
+    })
+
+    const rfr = totalCount > 0 ? (categoryCount / totalCount) * 100 : 0
+    if (rfr > maxRFR) {
+      maxRFR = rfr
+      topCategory = category
+    }
+  })
+
+  return {
+    name: topCategory.displayName,
+    rfr: maxRFR.toFixed(1)
+  }
+})
+
+// ค่าเฉลี่ย RFR ของปี
+const averageYearlyRFR = computed(() => {
+  const categories = [
+    'สายไฟ',
+    'ระบบล็อกและเบรก',
+    'เตียง หลอดเอกซเรย์ และบักกี้',
+    'X-ray tube warm-up'
+  ]
+
+  let totalRFR = 0
+  let validMonths = 0
+
+  // คำนวณ RFR เฉลี่ยของแต่ละเดือน
+  for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+    let monthTotal = 0
+
+    repairItems.value.forEach(item => {
+      if (item.requestDate && item.detail) {
+        const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+        if (match) {
+          const monthStr = match[2]
+          const year = parseInt(match[3])
+          const itemMonthIndex = thaiMonthToNumber(monthStr)
+
+          if (year === selectedMonthlyYear.value && itemMonthIndex === monthIndex) {
+            monthTotal++
+          }
+        }
+      }
+    })
+
+    if (monthTotal > 0) {
+      // คำนวณ RFR เฉลี่ยของเดือนนี้
+      let monthRFRSum = 0
+      categories.forEach(category => {
+        let categoryCount = 0
+
+        repairItems.value.forEach(item => {
+          if (item.requestDate && item.detail) {
+            const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+            if (match) {
+              const monthStr = match[2]
+              const year = parseInt(match[3])
+              const itemMonthIndex = thaiMonthToNumber(monthStr)
+
+              if (year === selectedMonthlyYear.value && itemMonthIndex === monthIndex && item.detail === category) {
+                categoryCount++
+              }
+            }
+          }
+        })
+
+        monthRFRSum += (categoryCount / monthTotal) * 100
+      })
+
+      totalRFR += monthRFRSum / categories.length
+      validMonths++
+    }
+  }
+
+  return validMonths > 0 ? (totalRFR / validMonths).toFixed(1) : '0.0'
+})
+
 
 // สร้าง/อัพเดทกราฟรายเดือน
 const createMonthlyChart = () => {
@@ -808,11 +1063,13 @@ const createMonthlyChart = () => {
       },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'bottom',
           labels: {
+            usePointStyle: true,
+            padding: 15,
             font: {
               family: 'Sarabun, sans-serif',
-              size: 12
+              size: 11
             }
           }
         },
@@ -831,7 +1088,18 @@ const createMonthlyChart = () => {
               return 'เดือน: ' + context[0].label
             },
             label: function (context) {
-              return context.dataset.label + ': ' + context.parsed.y + ' ครั้ง'
+              let label = context.dataset.label || ''
+              if (label) label += ': '
+              if (context.parsed.y !== null) {
+                label += context.parsed.y
+                // ถ้าเป็น line dataset (RFR) ให้แสดง %
+                if (context.dataset.type === 'line') {
+                  label += '%'
+                } else {
+                  label += ' ครั้ง'
+                }
+              }
+              return label
             }
           }
         }
@@ -857,11 +1125,14 @@ const createMonthlyChart = () => {
           }
         },
         y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
           stacked: false,
           beginAtZero: true,
           title: {
             display: true,
-            text: 'จำนวนครั้ง',
+            text: 'จำนวนครั้งที่เสีย (Count)',
             font: {
               family: 'Sarabun, sans-serif',
               size: 14
@@ -869,6 +1140,32 @@ const createMonthlyChart = () => {
           },
           ticks: {
             stepSize: 1,
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          min: 0,
+          max: 100,
+          title: {
+            display: true,
+            text: 'อัตราการเสียซ้ำ (RFR %)',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          grid: {
+            drawOnChartArea: false
+          },
+          ticks: {
+            callback: function (value) {
+              return value + '%'
+            },
             font: {
               family: 'Sarabun, sans-serif'
             }
@@ -881,30 +1178,23 @@ const createMonthlyChart = () => {
 
 // เมื่อเปลี่ยนปี ให้อัพเดทกราฟ
 watch(selectedMonthlyYear, () => {
-  if (showGraph.value) {
-    createMonthlyChart()
-  }
-})
-
-// เมื่อแสดงกราฟ ให้สร้างกราฟรายเดือน
-watch(showGraph, (newVal) => {
-  if (newVal) {
-    nextTick(() => {
-      loadRepairItems()
-      createMonthlyChart()
-    })
-  }
+  createMonthlyChart()
 })
 
 // โหลดข้อมูลเมื่อ component mount
 onMounted(() => {
   loadRepairItems()
 
+  // สร้างกราฟรายเดือนทันทีเมื่อโหลดหน้า
+  nextTick(() => {
+    createMonthlyChart()
+  })
+
   // Listen for storage changes
   window.addEventListener('storage', (event) => {
     if (event.key === STORAGE_KEY) {
       loadRepairItems()
-      if (showGraph.value && monthlyChartCanvas.value) {
+      if (monthlyChartCanvas.value) {
         createMonthlyChart()
       }
     }
@@ -912,7 +1202,7 @@ onMounted(() => {
 
   window.addEventListener('storage-local-update', () => {
     loadRepairItems()
-    if (showGraph.value && monthlyChartCanvas.value) {
+    if (monthlyChartCanvas.value) {
       createMonthlyChart()
     }
   })
