@@ -276,13 +276,13 @@
           <div class="history-filters">
             <input v-model="filters.device" class="history-input" placeholder="ค้นหาตามชื่อเครื่อง..." />
 
-            <select v-model="filters.form" class="history-input">
+            <!-- <select v-model="filters.form" class="history-input">
               <option value="">เลือกแบบบันทึก</option>
               <option>dairy check</option>
               <option>monthly check(1 month)</option>
               <option>monthly check(3 month)</option>
               <option>monthly check(6 month)</option>
-            </select>
+            </select> -->
 
             <input type="date" v-model="filters.date" class="history-input" />
 
