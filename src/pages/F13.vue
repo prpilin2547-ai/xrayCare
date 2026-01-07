@@ -187,9 +187,9 @@
               <tr class="header-row">
                 <th class="test-header">Test Date</th>
                 <th class="baseline-header">baseline</th>
-<th></th>
-                <th></th>
-                <th></th>
+<th>1</th>
+                <th>2</th>
+                <th>3</th>
                 <th class="action-header">Action level</th>
                 <th class="defect-header">Defect level</th>
               </tr>

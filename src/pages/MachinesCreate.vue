@@ -14,10 +14,9 @@
               <label for="machineName">เครื่อง x-ray (ระบุชื่อ,ยี่ห้อ,รุ่น):</label>
             </div>
             <div class="form-input">
-              <input id="machineName" v-model="machineName" type="text"
-                placeholder="เช่น เครื่อง x-ray shimazu รุ่น AAA" />
+              <input id="machineName" v-model="machineName" type="text" placeholder="เช่น X-Ray (BrandA/ModelX)" />
               <p class="form-example">
-                ตัวอย่าง: เครื่อง x-ray shimazu รุ่น AAA
+                ตัวอย่าง: X-Ray (BrandA/ModelX)
               </p>
             </div>
           </div>
@@ -534,14 +533,15 @@ const handleSave = () => {
   color: #000;
 }
 
-/* ===== ตารางเครื่องที่ลงทะเบียน (สไตล์คล้าย Analytical) ===== */
+/* ===== ตารางเครื่องที่ลงทะเบียน (สไตล์เหมือน Dashboard CHECKLIST) ===== */
 .registered-panel {
   width: 100%;
   max-width: 820px;
   margin-top: 8px;
-  background: #f3f4f6;
-  border-radius: 16px;
-  padding: 12px 14px;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px 16px;
+  border: 1px solid #e5e7eb;
 }
 
 .table-responsive {
@@ -557,23 +557,18 @@ const handleSave = () => {
 
 .registered-table th,
 .registered-table td {
-  border: 1px solid #d1d5db;
-  padding: 8px 6px;
   text-align: center;
+  padding: 6px 4px;
 }
 
-/* หัวตารางสีเทาอ่อน ตัวหนา */
-.registered-table thead th {
-  background: #e5e7eb;
-  font-weight: 700;
-  color: #000;
+/* หัวตารางมีเส้นขีดล่าง */
+.registered-table thead tr {
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* แถวข้อมูลพื้นหลังขาว ตัวบาง */
-.registered-table tbody tr td {
-  background: #ffffff;
-  font-weight: 400;
-  color: #000;
+/* แถวข้อมูลสลับสีพื้นหลัง */
+.registered-table tbody tr:nth-child(even) {
+  background: #f9fafb;
 }
 
 /* ===============  เพิ่มส่วนนี้เข้าไป =============== */
@@ -585,7 +580,8 @@ const handleSave = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999; /* ให้ซ้อนทับทุกอย่าง */
+  z-index: 999;
+  /* ให้ซ้อนทับทุกอย่าง */
 }
 
 .calendar-popup-box {
@@ -681,5 +677,6 @@ const handleSave = () => {
   color: #ffffff;
   transform: translateY(-1px);
 }
+
 /* ============= จบส่วนที่เพิ่ม ============= */
 </style>

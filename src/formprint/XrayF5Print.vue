@@ -165,7 +165,7 @@ onMounted(async () => {
 /* ฟอนต์ทั้งหน้า = 11 pt */
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 11pt;
+  font-size: 16pt;
   font-weight: 400;
   line-height: 1.4;
 }
@@ -191,7 +191,7 @@ onMounted(async () => {
   border-radius: 999px;
   border: 1px solid #4b5563;
   cursor: pointer;
-  font-size: 11pt; /* ยังเป็น 11 ตามทั้งหน้า */
+  font-size: 16pt; /* ยังเป็น 11 ตามทั้งหน้า */
 }
 
 /* กระดาษ A4 */
@@ -218,14 +218,14 @@ onMounted(async () => {
 /* คำว่า “แบบบันทึก F5 …” = 13pt (ตัวเดียวที่ใหญ่กว่า) */
 .title-main {
   font-weight: 700;
-  font-size: 13pt;   /* ยกเว้นบรรทัดนี้ */
+  font-size: 18pt;   /* ยกเว้นบรรทัดนี้ */
   margin-bottom: 2mm;
   text-align: left;
 }
 
 /* ความถี่ / หมายเลขแผ่น = 11pt และชิดซ้าย */
 .title-sub {
-  font-size: 11pt;
+  font-size: 16pt;
   margin-bottom: 2mm;
   text-align: left;
 }
@@ -284,6 +284,13 @@ onMounted(async () => {
 .align-left {
   text-align: left;
 }
+.merged-text {
+    line-height: 2.5 !important; /* ระยะห่างเท่ากับ summary-box */
+  }
+  .bold-text {
+  font-weight: 700 !important;
+}
+
 
 /* print */
 @page {
@@ -304,14 +311,7 @@ onMounted(async () => {
     width: auto;
     min-height: auto;
   }
-
-  .merged-text {
-    line-height: 2.5 !important; /* ระยะห่างเท่ากับ summary-box */
-  }
-  .bold-text {
-  font-weight: 700 !important;
 }
 
-}
 </style>
 

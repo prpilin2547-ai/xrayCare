@@ -16,6 +16,7 @@
                 <th>ลำดับ</th>
                 <th>อุปกรณ์</th>
                 <th>ห้องตรวจ</th>
+                <th>วันที่ได้รับแจ้ง</th>
                 <th>รายละเอียด</th>
                 <th>สถานะ</th>
                 <th>รายละเอียด</th>
@@ -23,10 +24,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in items" :key="item.id">
-                <td>{{ item.id }}</td>
+              <tr v-for="(item, index) in items" :key="item.id">
+                <td>{{ index + 1 }}</td>
                 <td>{{ getEquipmentText(item) }}</td>
                 <td>{{ getRoomText(item) }}</td>
+                <td>{{ item.requestDate || '-' }}</td>
                 <td>{{ item.detail }}</td>
                 <td class="status" :class="getStatusCellClass(item.statusText)">
                   {{ item.statusText }}
@@ -85,7 +87,15 @@
             <div class="mb-3">
               <strong>หมายเหตุ</strong>
               <ul class="content-list">
-                <li>ระบบล็อกติดขัด</li>
+                <li>{{ selectedItem.remarks || '-' }}</li>
+              </ul>
+            </div>
+
+            <!-- วันที่ได้รับแจ้ง (ใหม่) -->
+            <div class="mb-3">
+              <strong>วันที่ได้รับแจ้ง</strong>
+              <ul class="content-list">
+                <li>{{ selectedItem.requestDate || '-' }}</li>
               </ul>
             </div>
 
@@ -94,7 +104,7 @@
               <!-- ปุ่มไฟล์ภาพ -->
               <button class="btn btn-file shadow-sm" @click="openImageModal">
                 ไฟล์ภาพ
-                <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
+                <i class="bi bi-camera-fill ms-2"></i>
               </button>
 
               <!-- ปุ่มสถานะแบบ Dropdown -->
@@ -155,7 +165,7 @@
                 <img v-if="currentImageSrc" :src="currentImageSrc" alt="Request Image"
                   class="img-fluid shadow-sm mb-3" />
                 <p class="text-muted" v-if="currentImageSrc">
-                  รูปภาพที่ส่งมาจากนักรังสี
+                  รูปภาพที่แนบโดยนักรังสีการแพทย์
                 </p>
                 <p class="text-muted" v-else>
                   ยังไม่มีรูปภาพจากนักรังสี
@@ -193,7 +203,9 @@ const defaultItems = [
     id: 1,
     equipment: 'X-ray general รุ่น xxx',
     room: 'ห้อง 1',
+    requestDate: '14 ธ.ค. 2568',
     detail: 'ระบบล็อกและเบรก',
+    remarks: 'ระบบล็อกติดขัด',
     statusText: 'รอซ่อม'
   }
 ]
@@ -226,6 +238,11 @@ onMounted(() => {
     }
   })
   window.addEventListener('storage-local-update', loadItems)
+
+  // รอให้ DOM render เสร็จก่อนสร้างกราฟ
+  setTimeout(() => {
+    createChart()
+  }, 100)
 })
 
 // บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
@@ -345,6 +362,184 @@ const deleteItem = (id) => {
 
   items.value = items.value.filter((i) => i.id !== id)
 }
+
+// ================== Chart Logic ==================
+const chartCanvas = ref(null)
+const selectedYear = ref(2568) // ปี พ.ศ. เริ่มต้น
+let chartInstance = null
+
+// สร้างรายการปีที่มีข้อมูล
+const availableYears = computed(() => {
+  const years = new Set()
+  items.value.forEach(item => {
+    if (item.requestDate) {
+      // แยกปีจาก requestDate เช่น "14 ธ.ค. 2568"
+      const yearMatch = item.requestDate.match(/(\d{4})/)
+      if (yearMatch) {
+        years.add(parseInt(yearMatch[1]))
+      }
+    }
+  })
+  // ถ้าไม่มีข้อมูล ให้แสดงปีปัจจุบัน
+  if (years.size === 0) {
+    years.add(2568)
+  }
+  return Array.from(years).sort((a, b) => b - a) // เรียงจากมากไปน้อย
+})
+
+// ฟังก์ชันแปลงเดือนไทยเป็นตัวเลข
+const thaiMonthToNumber = (monthStr) => {
+  const months = {
+    'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5,
+    'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11
+  }
+  return months[monthStr] !== undefined ? months[monthStr] : -1
+}
+
+// คำนวณข้อมูลสำหรับกราฟ
+const chartData = computed(() => {
+  const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
+
+  // หาชนิดเครื่องทั้งหมด
+  const equipmentTypes = [...new Set(items.value.map(item => getEquipmentText(item)))]
+
+  // สร้างโครงสร้างข้อมูลสำหรับแต่ละชนิดเครื่อง
+  const datasets = equipmentTypes.map((equipment, index) => {
+    const monthlyData = new Array(12).fill(0)
+
+    // นับจำนวนครั้งที่เสียในแต่ละเดือน
+    items.value.forEach(item => {
+      if (getEquipmentText(item) === equipment && item.requestDate) {
+        const match = item.requestDate.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+        if (match) {
+          const monthStr = match[2]
+          const year = parseInt(match[3])
+          const monthIndex = thaiMonthToNumber(monthStr)
+
+          if (year === selectedYear.value && monthIndex !== -1) {
+            monthlyData[monthIndex]++
+          }
+        }
+      }
+    })
+
+    // สีสำหรับแต่ละชนิดเครื่อง
+    const colors = [
+      'rgba(255, 99, 132, 0.8)',
+      'rgba(54, 162, 235, 0.8)',
+      'rgba(255, 206, 86, 0.8)',
+      'rgba(75, 192, 192, 0.8)',
+      'rgba(153, 102, 255, 0.8)',
+      'rgba(255, 159, 64, 0.8)'
+    ]
+
+    return {
+      label: equipment,
+      data: monthlyData,
+      backgroundColor: colors[index % colors.length],
+      borderColor: colors[index % colors.length].replace('0.8', '1'),
+      borderWidth: 1
+    }
+  })
+
+  return {
+    labels: monthNames,
+    datasets: datasets
+  }
+})
+
+// สร้าง/อัพเดทกราฟ
+const createChart = () => {
+  if (!chartCanvas.value) return
+
+  // ทำลายกราฟเก่า
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
+  const ctx = chartCanvas.value.getContext('2d')
+
+  // ต้อง import Chart.js ก่อน
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js is not loaded')
+    return
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: chartData.value,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 12
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: `จำนวนครั้งที่เครื่องเสียรายเดือน ปี ${selectedYear.value}`,
+          font: {
+            family: 'Sarabun, sans-serif',
+            size: 16,
+            weight: 'bold'
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'เดือน',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'จำนวนครั้ง',
+            font: {
+              family: 'Sarabun, sans-serif',
+              size: 14
+            }
+          },
+          ticks: {
+            stepSize: 1,
+            font: {
+              family: 'Sarabun, sans-serif'
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+// เมื่อเปลี่ยนปี ให้อัพเดทกราฟ
+watch(selectedYear, () => {
+  createChart()
+})
+
+// เมื่อข้อมูลเปลี่ยน ให้อัพเดทกราฟ
+watch(items, () => {
+  if (chartCanvas.value) {
+    createChart()
+  }
+}, { deep: true })
 </script>
 
 <style scoped>
@@ -372,7 +567,11 @@ const deleteItem = (id) => {
 
 /* ตาราง */
 .table-wrapper {
-  max-width: 800px;
+  max-width: 100%;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px 16px;
+  border: 1px solid #e5e7eb;
 }
 
 .table {
@@ -383,18 +582,65 @@ const deleteItem = (id) => {
 
 th,
 td {
-  padding: 10px 8px;
   text-align: center;
-  border: 1px solid #9ca3af;
+  padding: 6px 4px;
 }
 
-thead th {
-  background: #93c5fd;
-  font-weight: 600;
+/* Fixed column widths for uniform alignment */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 60px;
+  min-width: 60px;
 }
 
-tbody td {
-  background: #e5e5e5;
+th:nth-child(2),
+td:nth-child(2) {
+  width: 180px;
+  min-width: 180px;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 100px;
+  min-width: 100px;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 130px;
+  min-width: 130px;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 150px;
+  min-width: 150px;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 180px;
+  min-width: 180px;
+}
+
+th:nth-child(7),
+td:nth-child(7) {
+  width: 100px;
+  min-width: 100px;
+}
+
+th:nth-child(8),
+td:nth-child(8) {
+  width: 80px;
+  min-width: 80px;
+}
+
+thead tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:nth-child(even) {
+  background: #f9fafb;
 }
 
 .status.pending {
@@ -437,18 +683,30 @@ tbody td {
   margin: 0;
 }
 
+/* ปุ่มกากบาทมุมขวาบน */
+.close-modal-btn {
+  margin-left: auto;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  transition: 0.2s;
+}
+
+.close-modal-btn:hover {
+  transform: scale(1.1);
+}
+
 /* Main Box */
 .main-box {
   border: 1px solid #000;
   background-color: #d9d9d9;
   border-radius: 4px;
   overflow: hidden;
-  margin-top: 40px;
 }
 
 /* Box Header */
 .box-header {
-  background-color: #ffcc99;
+  background-color: rgb(229, 229, 229);
   border-bottom: 1px solid #000;
   display: flex;
   min-height: 60px;
@@ -474,6 +732,7 @@ tbody td {
 
 /* Box Body */
 .box-body {
+  background-color: white;
   padding: 30px;
   position: relative;
   min-height: 450px;
@@ -506,19 +765,34 @@ ul.content-list li::before {
 }
 
 .btn-file {
-  background-color: #9ebd6e;
-  border: 1px solid #333;
-  color: black;
+  background-color: white;
+  border: 1px solid #00d42a;
+  color: #00d42a;
   width: 140px;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
+  border-radius: 6px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.btn-file i {
+  color: #00d42a;
+}
+
+.btn-file:hover {
+  color: #00d42a;
+  background-color: white;
+  border-color: #00d42a;
+  transform: scale(1.1);
 }
 
 .btn-status-base {
   border: 1px solid #333;
+  border-radius: 6px;
   color: black;
   height: 50px;
   display: flex;
@@ -532,15 +806,21 @@ ul.content-list li::before {
 
 /* Status Colors */
 .status-waiting {
-  background-color: #ff5c5c;
+  color: #ef4444;
+  font-weight: 600;
+  background-color: white;
 }
 
 .status-progress {
-  background-color: #ffb347;
+  color: #f59e0b;
+  font-weight: 600;
+  background-color: white;
 }
 
 .status-completed {
-  background-color: #8be296;
+  background-color: white;
+  color: #0eb54b;
+  font-weight: 600;
 }
 
 /* กล่องเลือกสถานะ */
@@ -553,19 +833,30 @@ ul.content-list li::before {
 
 /* Footer Buttons */
 .footer-actions {
-  margin-top: 80px;
+  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
   gap: 20px;
 }
 
 .btn-save {
-  background-color: #8be296;
-  border: 1px solid #333;
-  color: black;
+  background-color: white;
+  border: 1px solid #6200EA;
+  color: #6200EA;
   width: 160px;
   height: 50px;
   font-size: 1.1rem;
+  border-radius: 6px;
+  transition: 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-save:hover {
+  color: #6200EA;
+  background-color: white;
+  border-color: #6200EA;
+  transform: scale(1.1);
 }
 
 /* Modal Styles */
@@ -653,5 +944,68 @@ ul.content-list li::before {
   text-decoration: underline;
   cursor: pointer;
   /* เมาส์เป็นรูปมือ */
+}
+
+/* ================== Chart Styles ================== */
+.chart-section {
+  margin-top: 40px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1f2937;
+}
+
+.year-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.year-selector label {
+  font-weight: 500;
+  margin: 0;
+  color: #4b5563;
+}
+
+.year-selector select {
+  width: 120px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.year-selector select:hover {
+  border-color: #9ca3af;
+}
+
+.year-selector select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
 }
 </style>

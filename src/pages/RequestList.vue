@@ -20,6 +20,7 @@
                                 <th>ลำดับ</th>
                                 <th>อุปกรณ์</th>
                                 <th>ห้องตรวจ</th>
+                                <th>วันที่แจ้ง</th>
                                 <th>รายละเอียด</th>
                                 <th>สถานะ</th>
                                 <th>รายละเอียด</th>
@@ -32,6 +33,7 @@
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ getEquipmentText(item) }}</td>
                                 <td>{{ getRoomText(item) }}</td>
+                                <td>{{ item.requestDate || '-' }}</td>
                                 <td>{{ item.detail }}</td>
                                 <td class="status" :class="getStatusCellClass(item.statusText)">
                                     {{ item.statusText }}
@@ -87,7 +89,15 @@
                         <div class="mb-3">
                             <strong>หมายเหตุ</strong>
                             <ul class="content-list">
-                                <li>ระบบล็อกติดขัด</li>
+                                <li>{{ selectedItem.remarks || '-' }}</li>
+                            </ul>
+                        </div>
+
+                        <!-- วันที่แจ้ง (ใหม่) -->
+                        <div class="mb-3">
+                            <strong>วันที่แจ้ง</strong>
+                            <ul class="content-list">
+                                <li>{{ selectedItem.requestDate || '-' }}</li>
                             </ul>
                         </div>
 
@@ -96,7 +106,7 @@
                             <button v-if="selectedItem && selectedItem.imageData" class="btn btn-file shadow-sm"
                                 @click="openImageModal(selectedItem.imageData)">
                                 ไฟล์ภาพ
-                                <i class="bi bi-camera-fill bg-white rounded-1 ms-2 px-1"></i>
+                                <i class="bi bi-camera-fill ms-2"></i>
                             </button>
 
                             <div class="status-display">
@@ -114,7 +124,7 @@
         <div v-if="showImageModal" class="modal-overlay">
             <div class="modal-card image-modal-card">
                 <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">รูปภาพ</h5>
+                    <h5 class="m-0">ไฟล์รูปภาพ</h5>
                     <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
                 </div>
                 <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
@@ -123,7 +133,7 @@
                         <img v-if="previewImageSrc" :src="previewImageSrc" alt="Request Image"
                             class="img-fluid shadow-sm mb-3" />
                         <p class="text-muted">
-                            รูปภาพที่อัปโหลดไว้ในรายการแจ้งซ่อม
+                            รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม
                         </p>
                     </div>
                 </div>
@@ -177,12 +187,41 @@
                             </div>
                         </div>
 
-                        <!-- รายละเอียด -->
+                        <!-- วันที่แจ้งซ่อม (ใหม่) -->
+                        <div class="row mt-3">
+                            <label class="label">วันที่แจ้งซ่อม :</label>
+                            <div class="field d-flex align-items-center gap-2">
+                                <input type="text" v-model="requestDate" class="form-control form-control-sm"
+                                    placeholder="DD/MM/YYYY" readonly @click="openCalendar" />
+                                <button type="button"
+                                    class="btn btn-light border d-flex align-items-center justify-content-center"
+                                    style="width: 40px; height: 38px;" @click="openCalendar">
+                                    <i class="bi bi-calendar-event"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- รายละเอียด (Dropdown) -->
                         <div class="mt-3">
                             <label class="label">รายละเอียด :</label>
                             <div class="field">
-                                <textarea v-model="detail" class="textarea-input form-control"
-                                    placeholder="เพิ่มรายละเอียด"></textarea>
+                                <select v-model="detail" class="pill-btn form-control form-control-sm">
+                                    <option value="">เลือกรายละเอียด</option>
+                                    <option value="สายไฟ">สายไฟ</option>
+                                    <option value="ระบบล็อกและเบรก">ระบบล็อกและเบรก</option>
+                                    <option value="เตียง หลอดเอกซเรย์ และบักกี้">เตียง หลอดเอกซเรย์ และบักกี้</option>
+                                    <option value="X-ray tube warm-up">X-ray tube warm-up</option>
+                                    <option value="ส่วนอื่นเพิ่มเติม">ส่วนอื่นเพิ่มเติม</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- หมายเหตุ (ใหม่) -->
+                        <div class="mt-3">
+                            <label class="label">หมายเหตุ :</label>
+                            <div class="field">
+                                <textarea v-model="remarks" class="textarea-input form-control"
+                                    placeholder="เพิ่มหมายเหตุ"></textarea>
                             </div>
                         </div>
 
@@ -220,6 +259,36 @@
             </div>
         </div>
     </div>
+
+    <!-- ================== MODAL: ปฏิทิน (English) ================== -->
+    <!-- z-index ต้องมากกว่า modal ปกติ (1055) -->
+    <div v-if="isCalendarVisible" class="calendar-popup-overlay" @click="isCalendarVisible = false">
+        <div class="calendar-popup-box" @click.stop>
+            <div class="calendar-header">
+                <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
+                <!-- แสดง เดือน (English) ปี (ค.ศ.) -->
+                <span class="month-title">{{ englishMonthYear }}</span>
+                <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
+            </div>
+
+            <div class="calendar-grid">
+                <!-- วันในสัปดาห์ (English) -->
+                <div v-for="d in englishWeekdays" :key="d" class="weekday">
+                    {{ d }}
+                </div>
+
+                <div v-for="cell in daysGrid" :key="cell.key" class="day-cell" :class="{
+                    'is-empty': !cell.day,
+                    'is-today': cell.isToday,
+                    'is-selected': cell.isSelected
+                }" @click="cell.day ? selectDate(cell.date) : null">
+                    <div class="day-number">
+                        <span v-if="cell.day">{{ cell.day }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -235,8 +304,10 @@ const fileInput = ref(null)
 const fileName = ref('')
 
 const detail = ref('')
+const remarks = ref('')           // หมายเหตุ (ใหม่)
 const selectedEquipment = ref('')
 const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
+const requestDate = ref('')        // วันที่แจ้งซ่อม (ใหม่)
 const selectedItem = ref(null)
 const showError = ref(false) // Validation alert
 
@@ -247,10 +318,10 @@ const previewImageSrc = ref('')        // src ที่จะแสดงใน 
 
 // list อุปกรณ์ (เอาคำว่า "ห้อง X" ออกแล้ว)
 const equipmentOptions = [
-    'X-ray general รุ่น xxx',
-    'X-ray general รุ่น yyyy',
-    'X-ray general รุ่น zzzz',
-    'X-ray general รุ่น aaaa'
+    'X-ray general shimazu รุ่น xxx',
+    'X-ray general carestream รุ่น xxx',
+    'X-ray general konica รุ่น xxx',
+    'X-ray general toshiba รุ่น xxx'
 ]
 
 // list ห้องตรวจ
@@ -262,7 +333,9 @@ const defaultItems = [
         id: 1,
         equipment: 'X-ray general รุ่น xxx',
         room: 'ห้อง 1',
+        requestDate: '14/12/2025', // DD/MM/YYYY format
         detail: 'ระบบล็อกและเบรก',
+        remarks: 'ระบบล็อกติดขัด',
         statusText: 'รอซ่อม'
     }
 ]
@@ -304,6 +377,91 @@ onMounted(() => {
         backdrop: 'static'
     })
 })
+
+// ------------------- CALENDAR LOGIC (ENGLISH) -------------------
+const isCalendarVisible = ref(false)
+const today = new Date()
+const currentMonth = ref(today.getMonth())
+const currentYear = ref(today.getFullYear())
+
+const englishMonthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+]
+const englishWeekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+// Header ปฏิทิน: December 2025 (ค.ศ.)
+const englishMonthYear = computed(() => {
+    return `${englishMonthNames[currentMonth.value]} ${currentYear.value}`
+})
+
+// แปลงวันที่ (Date object) -> "18/12/2025"
+const formatEnglishDate = (dateObj) => {
+    const day = String(dateObj.getDate()).padStart(2, '0')
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    const year = dateObj.getFullYear()
+    return `${day}/${month}/${year}`
+}
+
+// Grid
+const daysGrid = computed(() => {
+    const cells = []
+    const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1).getDay()
+    const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate()
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        cells.push({ key: `empty-${i}`, day: null })
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(currentYear.value, currentMonth.value, d)
+
+        // เช็ควันนี้
+        const isToday =
+            d === today.getDate() &&
+            currentMonth.value === today.getMonth() &&
+            currentYear.value === today.getFullYear()
+
+        // เช็คว่าเลือกอยู่นี่ไหม (เทียบ string DD/MM/YYYY)
+        const dateStr = formatEnglishDate(dateObj)
+        const isSelected = (requestDate.value === dateStr)
+
+        cells.push({
+            key: `day-${d}`,
+            day: d,
+            date: dateObj,
+            isToday,
+            isSelected
+        })
+    }
+
+    // เติมท้ายให้ครบ 42 ช่อง (optional)
+    const totalCells = 42
+    const cellsToFill = totalCells - cells.length
+    for (let i = 0; i < cellsToFill; i++) {
+        cells.push({ key: `empty-post-${i}`, day: null })
+    }
+
+    return cells.slice(0, 42)
+})
+
+const changeMonth = (delta) => {
+    const newDate = new Date(currentYear.value, currentMonth.value + delta, 1)
+    currentMonth.value = newDate.getMonth()
+    currentYear.value = newDate.getFullYear()
+}
+
+const selectDate = (dateObj) => {
+    requestDate.value = formatEnglishDate(dateObj)
+    isCalendarVisible.value = false
+}
+
+const openCalendar = () => {
+    // default to current month/year
+    isCalendarVisible.value = true
+}
+
+// -------------------------------------------------------------
 
 // ฟังก์ชันทำความสะอาดข้อมูลเก่า
 const cleanupOldData = (itemsToClean) => {
@@ -451,7 +609,7 @@ const closeDetail = () => {
 
 // เพิ่มข้อมูลใหม่ + กลับไปตาราง
 const submitForm = () => {
-    if (!selectedEquipment.value || !selectedRoom.value || !detail.value) {
+    if (!selectedEquipment.value || !selectedRoom.value || !detail.value || !requestDate.value) {
         showError.value = true
         return
     }
@@ -465,7 +623,9 @@ const submitForm = () => {
         id: newId,
         equipment: selectedEquipment.value,
         room: selectedRoom.value,
+        requestDate: requestDate.value,
         detail: detail.value,
+        remarks: remarks.value,          // เพิ่มหมายเหตุ
         statusText: 'รอซ่อม',                // สถานะเริ่มต้น
         imageData: uploadedImageData.value || null // เก็บรูปไปกับ item
     })
@@ -473,7 +633,9 @@ const submitForm = () => {
     // เคลียร์ฟอร์ม
     selectedEquipment.value = ''
     selectedRoom.value = ''
+    requestDate.value = ''
     detail.value = ''
+    remarks.value = ''               // เคลียร์หมายเหตุ
     fileName.value = ''
     uploadedImageData.value = ''
     if (fileInput.value) {
@@ -574,7 +736,11 @@ const deleteItem = (id) => {
 
 /* ตาราง */
 .table-wrapper {
-    max-width: 800px;
+    max-width: 100%;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 14px 16px;
+    border: 1px solid #e5e7eb;
 }
 
 .table {
@@ -585,18 +751,16 @@ const deleteItem = (id) => {
 
 th,
 td {
-    padding: 10px 8px;
     text-align: center;
-    border: 1px solid #9ca3af;
+    padding: 6px 4px;
 }
 
-thead th {
-    background: #93c5fd;
-    font-weight: 600;
+thead tr {
+    border-bottom: 1px solid #e5e7eb;
 }
 
-tbody td {
-    background: #e5e5e5;
+tbody tr:nth-child(even) {
+    background: #f9fafb;
 }
 
 .status.pending {
@@ -658,7 +822,7 @@ tbody td {
 
 /* Box Header */
 .box-header {
-    background-color: #ffcc99;
+    background-color: rgb(229, 229, 229);
     border-bottom: 1px solid #000;
     display: flex;
     min-height: 60px;
@@ -684,6 +848,7 @@ tbody td {
 
 /* Box Body */
 .box-body {
+    background-color: white;
     padding: 30px;
     position: relative;
     min-height: 300px;
@@ -716,6 +881,7 @@ ul.content-list li::before {
 
 .btn-status-base {
     border: 1px solid #333;
+    border-radius: 6px;
     color: black;
     height: 50px;
     display: flex;
@@ -730,28 +896,46 @@ ul.content-list li::before {
 
 /* สีสถานะใช้ร่วมกับ RequestEN */
 .status-waiting {
-    background-color: #ff5c5c;
+    color: #ef4444;
+    font-weight: 600;
+    background-color: white;
 }
 
 .status-progress {
-    background-color: #ffb347;
+    color: #f59e0b;
+    font-weight: 600;
+    background-color: white;
 }
 
 .status-completed {
-    background-color: #8be296;
+    background-color: white;
 }
 
-/* ปุ่มไฟล์ภาพ */
+/* ปุ่ศไฟล์ภาพ */
 .btn-file {
-    background-color: #9ebd6e;
-    border: 1px solid #333;
-    color: black;
+    background-color: white;
+    border: 1px solid #00d42a;
+    color: #00d42a;
     width: 140px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
+    border-radius: 6px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-file i {
+    color: #00d42a;
+}
+
+.btn-file:hover {
+    color: #00d42a;
+    background-color: white;
+    border-color: #00d42a;
+    transform: scale(1.1);
 }
 
 /* กล่องชื่อไฟล์ + ปุ่มกากบาท */
@@ -795,9 +979,115 @@ ul.content-list li::before {
     max-width: 600px;
     background: white;
     border-radius: 4px;
-    overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+
+/* ================= CALENDAR STYLES (Scoped for this Page) ================= */
+.calendar-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2060;
+    /* Higher than Bootstrap Model (1055) */
+}
+
+.calendar-popup-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 16px 18px 18px;
+    width: 320px;
+    box-shadow:
+        0 22px 50px rgba(15, 23, 42, 0.4),
+        0 0 0 1px rgba(148, 163, 184, 0.4);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.month-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    background-color: #eef2ff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.nav-btn:hover {
+    background-color: #e0e7ff;
+    transform: translateY(-1px);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 6px;
+    column-gap: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.weekday {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.day-cell {
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.day-cell.is-empty {
+    pointer-events: none;
+}
+
+.day-number span {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.day-number span:hover {
+    background-color: #e5e7eb;
+}
+
+/* วันนี้ */
+.day-cell.is-today .day-number span {
+    border: 1px solid #6366f1;
+}
+
+/* วันที่เลือก */
+.day-cell.is-selected .day-number span {
+    background-color: #4f46e5;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
 
 .cursor-pointer {
     cursor: pointer;
