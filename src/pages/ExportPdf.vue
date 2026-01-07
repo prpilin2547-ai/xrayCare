@@ -121,29 +121,48 @@
             </div>
 
             <!-- Date -->
-            <div class="form-group">
-              <label for="date">Date</label>
-              <div class="input-shell">
-                <div class="date-wrapper">
-                  <input
-                    id="date"
-                    v-model="date"
-                    type="text"
-                    placeholder="DD/MM/YYYY"
-                    maxlength="10"
-                    @input="formatDate"
-                    @keypress="onlyNumber"
-                  />
-                  <button
-                    type="button"
-                    class="date-icon"
-                    @click.stop="openCalendarFromInput"
-                  >
-                    📅
-                  </button>
-                </div>
-              </div>
-            </div>
+<div class="form-group">
+  <label for="date">Date</label>
+
+  <!-- ✅ ถ้าเลือก Daily check -> เลือกเฉพาะเดือน -->
+  <div v-if="isDailyMode" class="input-shell input-shell--plain" @click.stop>
+    <div class="select-wrapper">
+      <select
+        id="monthOnly"
+        v-model="monthOnly"
+        :class="{ 'select-placeholder': !monthOnly }"
+      >
+        <option value="" disabled>เลือกเดือน</option>
+        <option v-for="m in thaiMonths" :key="m.value" :value="m.value">
+          {{ m.label }}
+        </option>
+      </select>
+      <span class="arrow">▾</span>
+    </div>
+  </div>
+
+  <!-- ✅ ไม่ใช่ Daily -> ใช้ Date เดิมทั้งหมด -->
+  <div v-else class="input-shell">
+    <div class="date-wrapper">
+      <input
+        id="date"
+        v-model="date"
+        type="text"
+        placeholder="DD/MM/YYYY"
+        maxlength="10"
+        @input="formatDate"
+        @keypress="onlyNumber"
+      />
+      <button
+        type="button"
+        class="date-icon"
+        @click.stop="openCalendarFromInput"
+      >
+        📅
+      </button>
+    </div>
+  </div>
+</div>
           </form>
 
           <!-- ปุ่มตัวอย่างไฟล์ -> ไปหน้า XrayF1Print -->
@@ -157,7 +176,7 @@
 
       <!-- ป็อปอัพปฏิทิน -->
       <div
-        v-if="isCalendarVisible"
+        v-if="isCalendarVisible && !isDailyMode"
         class="calendar-popup-overlay"
         @click="isCalendarVisible = false"
       >
@@ -196,7 +215,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -227,6 +246,7 @@ const monthNames = [
   'September',
   'October',
   'November',
+  'December',
 ]
 
 const currentMonthYear = computed(() => {
@@ -345,6 +365,48 @@ const checklistGroups = [
     ],
   },
 ]
+// ✅ เดือนสำหรับ dropdown (มกราคม-ธันวาคม)
+const thaiMonths = [
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+]
+
+// ✅ เป็น true เมื่อมีการเลือก item ใดๆ ที่อยู่ในกลุ่ม Daily check
+const isDailyMode = computed(() => {
+  const dailyGroup = checklistGroups.find((g) => g.id === 'daily')
+  if (!dailyGroup) return false
+  const dailyIds = dailyGroup.items.map((i) => i.id)
+  return checklistType.value.some((id) => dailyIds.includes(id))
+})
+
+// ✅ dropdown เดือนผูกกับ date (เก็บเป็น "MM/YYYY")
+const monthOnly = computed({
+  get() {
+    if (!isDailyMode.value) return ''
+    const parts = date.value.split('/')
+    return parts.length === 2 ? parts[0] : ''
+  },
+  set(mm) {
+    const year = currentYear.value || today.getFullYear()
+    date.value = mm ? `${mm}/${year}` : ''
+  },
+})
+
+// ✅ ป้องกันปฏิทินเด้งค้าง ถ้าเปลี่ยนมาเป็น Daily mode
+watch(isDailyMode, (val) => {
+  if (val) isCalendarVisible.value = false
+})
+
 
 // ---------- date helper ----------
 const parseDateString = (str) => {
