@@ -184,7 +184,10 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
+const API_BASE = '/api/Xraycare'
+
 const dropdownOpen = ref(false)
+const loading = ref(false)
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
@@ -195,70 +198,32 @@ const selectStatus = (status) => {
   dropdownOpen.value = false
 }
 
-const STORAGE_KEY = 'repair_items'
+// ------------- ข้อมูลในตาราง (จาก API) -------------
+const items = ref([])
 
-// default ข้อมูลเริ่มต้น (อุปกรณ์ไม่มีคำว่า "ห้อง", แยก room ต่างหาก)
-const defaultItems = [
-  {
-    id: 1,
-    equipment: 'X-ray general รุ่น xxx',
-    room: 'ห้อง 1',
-    requestDate: '14 ธ.ค. 2568',
-    detail: 'ระบบล็อกและเบรก',
-    remarks: 'ระบบล็อกติดขัด',
-    statusText: 'รอซ่อม'
-  }
-]
-
-// ------------- ข้อมูลในตาราง (อ่านจาก localStorage) -------------
-const items = ref([...defaultItems])
-const isUpdating = ref(false) // Flag to prevent recursive updates
-
-const loadItems = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored) {
-    try {
-      isUpdating.value = true
-      items.value = JSON.parse(stored)
-      // Reset flag after DOM update cycle to ensure watcher doesn't trigger
-      setTimeout(() => {
-        isUpdating.value = false
-      }, 0)
-    } catch (e) {
-      items.value = [...defaultItems]
-    }
+async function loadItems() {
+  loading.value = true
+  try {
+    const res = await fetch(`${API_BASE}/GetAllRepairRequests`)
+    if (!res.ok) throw new Error('โหลดรายการแจ้งซ่อมไม่สำเร็จ')
+    const data = await res.json()
+    items.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    console.error(e)
+    items.value = []
+  } finally {
+    loading.value = false
   }
 }
 
 onMounted(() => {
   loadItems()
-  window.addEventListener('storage', (event) => {
-    if (event.key === STORAGE_KEY) {
-      loadItems()
-    }
-  })
-  window.addEventListener('storage-local-update', loadItems)
 
   // รอให้ DOM render เสร็จก่อนสร้างกราฟ
   setTimeout(() => {
     createChart()
   }, 100)
 })
-
-// บันทึกกลับ localStorage เวลา Engineer เปลี่ยนสถานะแล้วกด "บันทึก"
-watch(
-  items,
-  newItems => {
-    if (isUpdating.value) return // Skip if updating from storage
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
-      window.dispatchEvent(new Event('storage-local-update'))
-    } catch (error) {
-      console.error('Error saving to localStorage:', error)
-    }
-  },
-  { deep: true }
-)
 
 // item ที่ถูกเลือก (null = โหมดตาราง)
 const selectedItem = ref(null)
@@ -338,10 +303,25 @@ const closeImageModal = () => {
   currentImageSrc.value = ''
 }
 
-// บันทึกแล้วอัปเดตตาราง + กลับไปหน้าระบบแจ้งซ่อม
-const saveData = () => {
+// บันทึกสถานะผ่าน API แล้วกลับไปหน้าระบบแจ้งซ่อม
+const saveData = async () => {
   if (selectedItem.value) {
-    selectedItem.value.statusText = currentStatus.value
+    try {
+      const res = await fetch(`${API_BASE}/UpdateRepairStatus/${selectedItem.value.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statusText: currentStatus.value })
+      })
+      if (!res.ok) {
+        const err = await res.text()
+        throw new Error(err || 'บันทึกสถานะไม่สำเร็จ')
+      }
+      selectedItem.value.statusText = currentStatus.value
+    } catch (e) {
+      console.error(e)
+      alert(e.message || 'บันทึกสถานะไม่สำเร็จ กรุณาลองใหม่')
+      return
+    }
   }
   selectedItem.value = null
   isEditingStatus.value = false
@@ -355,12 +335,21 @@ const getStatusCellClass = (status) => {
   return ''
 }
 
-// ลบรายการแจ้งซ่อม (Engineer) + sync ไปนักรังสีผ่าน localStorage
-const deleteItem = (id) => {
-  const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
-  if (!confirmed) return
+// ลบรายการแจ้งซ่อม
+const deleteItem = async (id) => {
+  if (!window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')) return
 
-  items.value = items.value.filter((i) => i.id !== id)
+  try {
+    const res = await fetch(`${API_BASE}/DeleteRepairRequest/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'ลบไม่สำเร็จ')
+    }
+    items.value = items.value.filter((i) => i.id !== id)
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'ลบไม่สำเร็จ กรุณาลองใหม่')
+  }
 }
 
 // ================== Chart Logic ==================

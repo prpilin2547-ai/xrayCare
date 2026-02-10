@@ -160,30 +160,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 // --- State ---
 const searchQuery = ref('')
 const showModal = ref(false)
+const loading = ref(false)
 
-// --- ข้อมูลเริ่มต้น (Mock Data) ---
-const defaultUsers = [
-  { id: 1, username: 'xxxxxxxxx', password: 'password123', position: 'Admin' },
-  { id: 2, username: 'yyyyyyyyy', password: 'securepass', position: 'Radiological Technologist' },
-  { id: 3, username: 'zzzzzzzzz', password: 'userpass01', position: 'Engineer' },
-  { id: 4, username: 'ทดสอบ', password: 'password007', position: 'Radiological Technologist' }
-]
+const API_BASE = '/api/Xraycare'
 
-// ใช้แค่ใน memory (รีเฟรชหน้าหาย) ไม่มี backend / ไม่มี localStorage
-const users = ref(
-  defaultUsers.map(u => ({
-    ...u,
-    showPassword: false,
-    isEditing: false,
-    tempPassword: ''
-  }))
-)
+// รายการผู้ใช้จาก API
+const users = ref([])
+
+async function loadUsers() {
+  loading.value = true
+  try {
+    const res = await fetch(`${API_BASE}/GetAllUsers`)
+    if (!res.ok) throw new Error('โหลดรายการผู้ใช้ไม่สำเร็จ')
+    const data = await res.json()
+    users.value = (Array.isArray(data) ? data : []).map(u => ({
+      ...u,
+      showPassword: false,
+      isEditing: false,
+      tempPassword: ''
+    }))
+  } catch (e) {
+    console.error(e)
+    users.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadUsers()
+})
 
 // --- ฟอร์มสร้าง user ใหม่ ---
 const newUser = ref({
@@ -246,7 +258,7 @@ const closeModal = () => {
   showModal.value = false
 }
 
-const createAccount = () => {
+const createAccount = async () => {
   errors.value = {
     username: false,
     password: false,
@@ -277,22 +289,47 @@ const createAccount = () => {
 
   if (!isValid) return
 
-  users.value.push({
-    id: Date.now(),
-    username: newUser.value.username,
-    password: newUser.value.password,
-    position: newUser.value.position,
-    showPassword: false,
-    isEditing: false,
-    tempPassword: ''
-  })
-
-  showModal.value = false
+  try {
+    const res = await fetch(`${API_BASE}/AddUser`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: newUser.value.username,
+        password: newUser.value.password,
+        position: newUser.value.position
+      })
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'สร้างบัญชีไม่สำเร็จ')
+    }
+    const created = await res.json()
+    users.value.push({
+      ...created,
+      showPassword: false,
+      isEditing: false,
+      tempPassword: ''
+    })
+    showModal.value = false
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'สร้างบัญชีไม่สำเร็จ กรุณาลองใหม่')
+  }
 }
 
-const deleteUser = (id) => {
-  if (confirm('คุณต้องการลบบัญชีผู้ใช้นี้ใช่หรือไม่?')) {
+const deleteUser = async (id) => {
+  if (!confirm('คุณต้องการลบบัญชีผู้ใช้นี้ใช่หรือไม่?')) return
+
+  try {
+    const res = await fetch(`${API_BASE}/DeleteUser/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'ลบไม่สำเร็จ')
+    }
     users.value = users.value.filter(u => u.id !== id)
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'ลบไม่สำเร็จ กรุณาลองใหม่')
   }
 }
 
@@ -305,12 +342,27 @@ const startEdit = (user) => {
   user.isEditing = true
 }
 
-const saveEdit = (user) => {
-  if (user.tempPassword.trim()) {
+const saveEdit = async (user) => {
+  if (!user.tempPassword.trim()) {
+    alert('Password cannot be empty!')
+    return
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/UpdateUserPassword/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: user.tempPassword })
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'แก้ไขรหัสผ่านไม่สำเร็จ')
+    }
     user.password = user.tempPassword
     user.isEditing = false
-  } else {
-    alert('Password cannot be empty!')
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'แก้ไขรหัสผ่านไม่สำเร็จ กรุณาลองใหม่')
   }
 }
 
@@ -440,11 +492,15 @@ const cancelEdit = (user) => {
   justify-content: center;
   align-items: center;
   z-index: 1050;
+  overflow-y: auto;
+  padding: 20px 0;
 }
 
 .modal-card {
   background: white;
   padding: 35px;
+  max-height: 90vh;
+  overflow-y: auto;
   border-radius: 15px;
   width: 400px;
   position: relative;

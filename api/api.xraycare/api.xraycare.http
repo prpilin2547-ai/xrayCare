@@ -1,6 +1,18 @@
-@api.xraycare_HostAddress = http://localhost:5120
+@api.xraycare_HostAddress = http://localhost:8001
 
-GET {{api.xraycare_HostAddress}}/weatherforecast/
+### GET all machines
+GET {{api.xraycare_HostAddress}}/api/Xraycare/GetAllMachines
 Accept: application/json
+
+### POST add machine
+POST {{api.xraycare_HostAddress}}/api/Xraycare/AddMachine
+Content-Type: application/json
+
+{
+  "machineName": "X-Ray (BrandA/ModelX)",
+  "room": "2",
+  "registerDate": "25/11/2025",
+  "caretaker": "ศุภกร งามเมือง"
+}
 
 ###
