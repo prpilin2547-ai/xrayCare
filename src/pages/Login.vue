@@ -35,8 +35,10 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-login">
-          Login
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+
+        <button type="submit" class="btn-login" :disabled="isLoading">
+          {{ isLoading ? 'กำลังเข้าสู่ระบบ...' : 'Login' }}
         </button>
       </form>
     </div>
@@ -48,16 +50,73 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const API_BASE = '/api/Xraycare'
+
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const errorMsg = ref('')
+const isLoading = ref(false)
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
-const handleLogin = () => {
-  router.push('/dashboard')
+const handleLogin = async () => {
+  errorMsg.value = ''
+
+  if (!username.value.trim() || !password.value.trim()) {
+    errorMsg.value = 'กรุณากรอก Username และ Password'
+    return
+  }
+
+  isLoading.value = true
+
+  try {
+    const res = await fetch(`${API_BASE}/Login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username.value.trim(),
+        password: password.value
+      })
+    })
+
+    if (res.status === 401) {
+      errorMsg.value = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+      return
+    }
+
+    if (!res.ok) {
+      const errText = await res.text()
+      throw new Error(errText || 'เข้าสู่ระบบไม่สำเร็จ')
+    }
+
+    const user = await res.json()
+
+    // เก็บข้อมูลผู้ใช้ใน localStorage
+    localStorage.setItem('xraycare-user', JSON.stringify({
+      id: user.id,
+      username: user.username,
+      position: user.position
+    }))
+
+    // redirect ตาม position/role
+    const position = (user.position || '').toLowerCase()
+    if (position === 'admin') {
+      router.push('/admindashboard')
+    } else if (position === 'engineer') {
+      router.push('/engineerdashboard')
+    } else {
+      // Tech / นักรังสี / default
+      router.push('/dashboard')
+    }
+  } catch (e) {
+    console.error('Login error:', e)
+    errorMsg.value = e.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -181,8 +240,20 @@ input:focus {
   cursor: pointer;
 }
 
-.btn-login:hover {
+.btn-login:hover:not(:disabled) {
   background: #4c2faf;
+}
+
+.btn-login:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: 8px 0 0;
+  text-align: center;
 }
 .login-avatar {
   width: 80px;     /* ขนาดเดิมของ avatar */

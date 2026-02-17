@@ -720,18 +720,36 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+
+/* ---------- โหลดผู้ใช้จาก localStorage ---------- */
+const userName = ref('')
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(() => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) {
+      userName.value = stored.username
+      if (!deviceForm.value.tester) deviceForm.value.tester = stored.username
+    }
+  } catch (e) { /* ignore */ }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -911,16 +929,31 @@ const validateForm = () => {
 }
 
 /* บันทึกแล้วไปหน้า Dashboard */
-const saveForm = () => {
+const saveForm = async () => {
   if (!validateForm()) return
 
   const payload = {
-    deviceForm: deviceForm.value,
-    testData: testData.value,
-    summary: summary.value
+    formType: 'F13',
+    machineName: deviceForm.value.machineName || '',
+    room: '',
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      deviceForm: deviceForm.value,
+      testData: testData.value,
+      summary: summary.value
+    })
   }
 
-  console.log('F13 payload :', payload)
+  try {
+    await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
 
   router.push('/dashboard')
 }

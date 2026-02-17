@@ -5,6 +5,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+// CORS: ให้ frontend (Vite localhost:5173) เรียก API ได้
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Swagger/Swagger UI from Swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -43,6 +54,7 @@ app.UseSwaggerUI(c =>
 // }
 
 app.UseRouting();
+app.UseCors();
 
 // ถ้ามี Auth ก็เติมได้
 // app.UseAuthentication();

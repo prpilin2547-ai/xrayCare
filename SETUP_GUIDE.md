@@ -40,6 +40,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File C:\test4\reset_git.ps1
 5. Set remote ไป `https://github.com/prpilin2547-ai/xrayCare.git`
 6. Force-push ไป main branch
 
+### ใช้แอปจากเครื่องอื่นในเครือข่าย (Local IP)
+1. รัน dev server: `npm run dev`
+2. เปิดพอร์ตใน Windows Firewall (รัน PowerShell **เป็นผู้ดูแลระบบ**):
+```powershell
+powershell -ExecutionPolicy Bypass -File "d:\xrayCare\scripts\open-firewall-vite.ps1"
+```
+3. ดู IP ของเครื่อง (จาก `ipconfig` หรือบรรทัด **Network:** ตอนรัน `npm run dev`)
+4. จากมือถือ/เครื่องอื่นใน Wi‑Fi เดียวกัน เปิดเบราว์เซอร์ที่ `http://<IP>:5173` (เช่น `http://192.168.1.5:5173`)
+
 ### ขั้นตอนที่ 2: ทดสอบ Equipment Link
 1. รัน dev server:
 ```bash

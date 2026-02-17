@@ -250,18 +250,33 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+
+/* ---------- โหลดผู้ใช้จาก localStorage ---------- */
+const userName = ref('')
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(() => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -299,15 +314,28 @@ const removeItem = (index) => {
   }
 }
 
-const saveChecklist = () => {
-  // ในที่นี้แค่ console.log แทนการส่ง backend
-  console.log('บันทึกแบบฟอร์ม F9', {
-    date: todayText.value,
-    recorder: props.currentUserName,
-    items: items.value
-  })
+const saveChecklist = async () => {
+  const payload = {
+    formType: 'F9',
+    machineName: '',
+    room: '',
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      items: items.value
+    })
+  }
 
-  // เมื่อกดบันทึกให้เด้งไปหน้า Dashboard
+  try {
+    await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
+
   router.push('/dashboard')
 }
 </script>

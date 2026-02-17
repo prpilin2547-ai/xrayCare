@@ -77,15 +77,16 @@
 <script setup>
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const submitForm = () => {
-  alert('Mock: ส่งคำขอแจ้งซ่อมแล้ว (demo)')
+const router = useRouter()
 const detail = ref('')
 const fileInput = ref(null)
 const selectedFile = ref(null)
 const fileName = ref('')
+
 const triggerFileSelect = () => {
-  fileInput.value.click()
+  fileInput.value?.click()
 }
 
 const onFileSelected = (e) => {
@@ -97,6 +98,9 @@ const onFileSelected = (e) => {
   }
 }
 
+const submitForm = () => {
+  alert('Mock: ส่งคำขอแจ้งซ่อมแล้ว (demo)')
+  router.push('/requests')
 }
 </script>
 

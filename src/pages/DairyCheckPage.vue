@@ -135,26 +135,74 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   selectedDevice: {
     type: Object,
     default: () => ({
-      name: 'เครื่องเอกซเรย์ทั่วไป',
-      model: 'MODEL-XR-100',
-      room: 'X-Ray Room 1'
+      name: '',
+      model: '',
+      room: ''
     })
   },
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+
+/* ---------- ข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
+const deviceInfo = ref({ name: '', model: '', room: '' })
+const userName = ref('')
+
+const selectedDevice = computed(() =>
+  deviceInfo.value.name ? deviceInfo.value : props.selectedDevice
+)
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(async () => {
+  // โหลดผู้ใช้จาก localStorage
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+
+  // โหลดเครื่องจาก API แล้ว match กับ equipmentName ใน route params
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    if (res.ok) {
+      const machines = await res.json()
+      const equipmentName = route.params.equipmentName || ''
+      const found = machines.find(m => m.machineName === equipmentName)
+      if (found) {
+        const parts = found.machineName.split(' ')
+        deviceInfo.value = {
+          name: found.machineName,
+          model: parts.length > 2 ? parts.slice(2).join(' ') : found.machineName,
+          room: found.room || ''
+        }
+      } else if (machines.length > 0) {
+        const m = machines[0]
+        deviceInfo.value = {
+          name: m.machineName,
+          model: m.machineName,
+          room: m.room || ''
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load machines', e)
+  }
+})
 
 // วันเริ่มต้นที่กำหนด
 const startDate = ref(new Date("2025-08-21"))
@@ -248,20 +296,62 @@ const markAllPass = () => {
   plateEraseResult.value = 'pass'
 }
 
-const saveChecklist = () => {
+/* ---------- Helper: today key สำหรับ localStorage ---------- */
+const DAILY_CHECK_KEY = 'xraycare-dailyChecked'
+
+function getTodayKey() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${dd}`
+}
+
+const route = useRoute()
+
+const saveChecklist = async () => {
   const payload = {
-    device: props.selectedDevice,
-    date: todayText.value,
-    user: props.currentUserName,
-    checklist: checklistItems.value,
-    plateErase: {
-      result: plateEraseResult.value,
-      remark: plateEraseRemark.value,
-      fileName: plateEraseFileName.value
-    }
+    formType: 'F1_F2',
+    machineName: selectedDevice.value.name,
+    room: selectedDevice.value.room,
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      checklist: checklistItems.value,
+      plateErase: {
+        result: plateEraseResult.value,
+        remark: plateEraseRemark.value,
+        fileName: plateEraseFileName.value
+      }
+    })
   }
 
-  console.log('ข้อมูลที่ต้องบันทึก:', payload)
+  // ส่งข้อมูลไปยัง API
+  try {
+    const res = await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    if (!res.ok) console.error('SaveChecklist failed:', await res.text())
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
+
+  /* บันทึกว่าเครื่องนี้ถูก check แล้ววันนี้ */
+  try {
+    const todayKey = getTodayKey()
+    const stored = JSON.parse(localStorage.getItem(DAILY_CHECK_KEY) || '{}')
+    const todayChecked = stored[todayKey] || []
+    const equipmentName = route.params.equipmentName || ''
+    if (equipmentName && !todayChecked.includes(equipmentName)) {
+      todayChecked.push(equipmentName)
+    }
+    localStorage.setItem(DAILY_CHECK_KEY, JSON.stringify({ [todayKey]: todayChecked }))
+  } catch (e) {
+    console.error('Cannot save daily check to localStorage', e)
+  }
+
   router.push('/dashboard')
 }
 </script>

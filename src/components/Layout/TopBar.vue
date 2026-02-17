@@ -5,18 +5,27 @@
     </div>
     <div class="topbar-right">
       <i class="fa-solid fa-circle-user"></i>
-      <span class="user-text">Username ({{ role }})</span>
+      <span class="user-text">{{ displayUsername }}</span>
     </div>
   </header>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   role: { 
     type: String,
     default: 'Tech'
+  },
+  username: {
+    type: String,
+    default: ''
   }
 })
+
+const displayUsername = computed(() => props.username || 'Username')
+const displayRole = computed(() => props.role || 'Tech')
 </script>
 
 <style scoped>

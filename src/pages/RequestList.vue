@@ -143,7 +143,7 @@
 
     <!-- ================== MODAL: เพิ่มรายการแจ้งซ่อม ================== -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" ref="modalEl">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -165,7 +165,7 @@
                         <div class="row">
                             <label class="label">อุปกรณ์ :</label>
                             <div class="field">
-                                <select v-model="selectedEquipment" class="pill-btn form-control form-control-sm">
+                                <select v-model="selectedEquipment" class="form-select form-select-sm">
                                     <option value="">เลือกอุปกรณ์</option>
                                     <option v-for="eq in equipmentOptions" :key="eq" :value="eq">
                                         {{ eq }}
@@ -178,7 +178,7 @@
                         <div class="row mt-3">
                             <label class="label">ห้องตรวจ :</label>
                             <div class="field">
-                                <select v-model="selectedRoom" class="pill-btn form-control form-control-sm">
+                                <select v-model="selectedRoom" class="form-select form-select-sm">
                                     <option value="">เลือกห้องตรวจ</option>
                                     <option v-for="room in roomOptions" :key="room" :value="room">
                                         {{ room }}
@@ -190,14 +190,14 @@
                         <!-- วันที่แจ้งซ่อม (ใหม่) -->
                         <div class="row mt-3">
                             <label class="label">วันที่แจ้งซ่อม :</label>
-                            <div class="field d-flex align-items-center gap-2">
-                                <input type="text" v-model="requestDate" class="form-control form-control-sm"
-                                    placeholder="DD/MM/YYYY" readonly @click="openCalendar" />
-                                <button type="button"
-                                    class="btn btn-light border d-flex align-items-center justify-content-center"
-                                    style="width: 40px; height: 38px;" @click="openCalendar">
-                                    <i class="bi bi-calendar-event"></i>
-                                </button>
+                            <div class="field">
+                                <div class="date-wrapper">
+                                    <input type="text" v-model="requestDate" class="form-control form-control-sm"
+                                        placeholder="DD/MM/YYYY" readonly @click="openCalendar" />
+                                    <button type="button" class="date-icon" @click="openCalendar">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -205,7 +205,7 @@
                         <div class="mt-3">
                             <label class="label">รายละเอียด :</label>
                             <div class="field">
-                                <select v-model="detail" class="pill-btn form-control form-control-sm">
+                                <select v-model="detail" class="form-select form-select-sm">
                                     <option value="">เลือกรายละเอียด</option>
                                     <option value="สายไฟ">สายไฟ</option>
                                     <option value="ระบบล็อกและเบรก">ระบบล็อกและเบรก</option>
@@ -293,10 +293,11 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { Modal } from 'bootstrap'
 
-const STORAGE_KEY = 'repair_items'
+const API_BASE = '/api/Xraycare'
 
 const modalEl = ref(null)
 let modal = null
@@ -307,71 +308,69 @@ const detail = ref('')
 const remarks = ref('')           // หมายเหตุ (ใหม่)
 const selectedEquipment = ref('')
 const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
-const requestDate = ref('')        // วันที่แจ้งซ่อม (ใหม่)
+// วันที่แจ้งซ่อม — ค่าเริ่มต้นเป็นวันปัจจุบัน DD/MM/YYYY
+const _now = new Date()
+const _defaultDate = `${String(_now.getDate()).padStart(2, '0')}/${String(_now.getMonth() + 1).padStart(2, '0')}/${_now.getFullYear()}`
+const requestDate = ref(_defaultDate)
 const selectedItem = ref(null)
 const showError = ref(false) // Validation alert
+const loading = ref(false)
 
 // เพิ่มใหม่
 const uploadedImageData = ref('')      // เก็บ dataURL ของรูปที่อัปโหลด
 const showImageModal = ref(false)      // คุม modal รูป
 const previewImageSrc = ref('')        // src ที่จะแสดงใน modal
 
-// list อุปกรณ์ (เอาคำว่า "ห้อง X" ออกแล้ว)
-const equipmentOptions = [
-    'X-ray general shimazu รุ่น xxx',
-    'X-ray general carestream รุ่น xxx',
-    'X-ray general konica รุ่น xxx',
-    'X-ray general toshiba รุ่น xxx'
-]
+// list อุปกรณ์ (จาก API เครื่องที่ลงทะเบียน)
+const machines = ref([])
+const equipmentOptions = computed(() => machines.value.map(m => m.machineName))
+const roomOptions = computed(() => {
+    const rooms = machines.value.map(m => m.room).filter(Boolean)
+    return [...new Set(rooms)]
+})
 
-// list ห้องตรวจ
-const roomOptions = ['ห้อง 1', 'ห้อง 2', 'ห้อง 3', 'ห้อง 4']
-
-// default ข้อมูลเริ่มต้นในตาราง
-const defaultItems = [
-    {
-        id: 1,
-        equipment: 'X-ray general รุ่น xxx',
-        room: 'ห้อง 1',
-        requestDate: '14/12/2025', // DD/MM/YYYY format
-        detail: 'ระบบล็อกและเบรก',
-        remarks: 'ระบบล็อกติดขัด',
-        statusText: 'รอซ่อม'
+// เมื่อเลือกอุปกรณ์ → กำหนดห้องตรวจอัตโนมัติ
+watch(selectedEquipment, (eq) => {
+    if (!eq) return
+    const found = machines.value.find(m => m.machineName === eq)
+    if (found && found.room) {
+        selectedRoom.value = found.room
     }
-]
+})
 
-// items ใช้ร่วมกับ Engineer (ผ่าน localStorage)
-const items = ref([...defaultItems])
-const isUpdating = ref(false) // Flag to prevent recursive updates
+// items จาก API
+const items = ref([])
 
-const loadItems = () => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-        try {
-            isUpdating.value = true
-            items.value = JSON.parse(stored)
-            // Reset flag after DOM update cycle to ensure watcher doesn't trigger
-            setTimeout(() => {
-                isUpdating.value = false
-            }, 0)
-        } catch (e) {
-            items.value = [...defaultItems]
+async function loadMachines() {
+    try {
+        const res = await fetch(`${API_BASE}/GetAllMachines`)
+        if (res.ok) {
+            const data = await res.json()
+            machines.value = Array.isArray(data) ? data : []
         }
+    } catch (e) {
+        console.error('Load machines error:', e)
+    }
+}
+
+async function loadItems() {
+    loading.value = true
+    try {
+        const res = await fetch(`${API_BASE}/GetAllRepairRequests`)
+        if (!res.ok) throw new Error('โหลดรายการแจ้งซ่อมไม่สำเร็จ')
+        const data = await res.json()
+        items.value = Array.isArray(data) ? data : []
+    } catch (e) {
+        console.error(e)
+        items.value = []
+    } finally {
+        loading.value = false
     }
 }
 
 onMounted(() => {
+    loadMachines()
     loadItems()
-
-    // Listen for storage changes from other tabs/windows
-    window.addEventListener('storage', (event) => {
-        if (event.key === STORAGE_KEY) {
-            loadItems()
-        }
-    })
-
-    // Listen for local updates (same window)
-    window.addEventListener('storage-local-update', loadItems)
 
     modal = new Modal(modalEl.value, {
         backdrop: 'static'
@@ -462,54 +461,6 @@ const openCalendar = () => {
 }
 
 // -------------------------------------------------------------
-
-// ฟังก์ชันทำความสะอาดข้อมูลเก่า
-const cleanupOldData = (itemsToClean) => {
-    // ลบข้อมูลรูปภาพของรายการที่ดำเนินการแล้ว
-    const cleaned = itemsToClean.map(item => {
-        if (item.statusText === 'ดำเนินการแล้ว' && item.imageData) {
-            return { ...item, imageData: null }
-        }
-        return item
-    })
-
-    // จำกัดจำนวนรายการทั้งหมดไว้ที่ 50 รายการ (เก็บรายการล่าสุด)
-    if (cleaned.length > 50) {
-        return cleaned.slice(-50)
-    }
-
-    return cleaned
-}
-
-// sync items -> localStorage (ใช้ร่วมกับ RequestEN)
-watch(
-    items,
-    newItems => {
-        if (isUpdating.value) return // Skip if updating from storage
-        try {
-            const cleanedItems = cleanupOldData(newItems)
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedItems))
-            // อัพเดท items ด้วยข้อมูลที่ทำความสะอาดแล้ว (ไม่ทำให้เกิด loop เพราะมี isUpdating check)
-            if (cleanedItems.length !== newItems.length) {
-                items.value = cleanedItems
-            }
-            window.dispatchEvent(new Event('storage-local-update'))
-        } catch (error) {
-            console.error('Error saving to localStorage:', error)
-            // ถ้าเกิน quota ให้ลองลบข้อมูลรูปภาพทั้งหมด
-            if (error.name === 'QuotaExceededError') {
-                try {
-                    const itemsWithoutImages = newItems.map(item => ({ ...item, imageData: null }))
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itemsWithoutImages))
-                    alert('พื้นที่เก็บข้อมูลเต็ม รูปภาพบางส่วนถูกลบเพื่อประหยัดพื้นที่')
-                } catch (e) {
-                    alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลบรายการเก่าออก')
-                }
-            }
-        }
-    },
-    { deep: true }
-)
 
 // แสดงเฉพาะรายการที่ยังไม่ "ดำเนินการแล้ว"
 const activeItems = computed(() =>
@@ -608,41 +559,51 @@ const closeDetail = () => {
 }
 
 // เพิ่มข้อมูลใหม่ + กลับไปตาราง
-const submitForm = () => {
+const submitForm = async () => {
     if (!selectedEquipment.value || !selectedRoom.value || !detail.value || !requestDate.value) {
         showError.value = true
         return
     }
     showError.value = false
 
-    const newId = items.value.length
-        ? Math.max(...items.value.map(i => i.id)) + 1
-        : 1
+    try {
+        const res = await fetch(`${API_BASE}/AddRepairRequest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                equipment: selectedEquipment.value,
+                room: selectedRoom.value,
+                requestDate: requestDate.value,
+                detail: detail.value,
+                remarks: remarks.value,
+                statusText: 'รอซ่อม',
+                imageData: uploadedImageData.value || null
+            })
+        })
+        if (!res.ok) {
+            const err = await res.text()
+            throw new Error(err || 'บันทึกไม่สำเร็จ')
+        }
+        const created = await res.json()
+        items.value.push(created)
 
-    items.value.push({
-        id: newId,
-        equipment: selectedEquipment.value,
-        room: selectedRoom.value,
-        requestDate: requestDate.value,
-        detail: detail.value,
-        remarks: remarks.value,          // เพิ่มหมายเหตุ
-        statusText: 'รอซ่อม',                // สถานะเริ่มต้น
-        imageData: uploadedImageData.value || null // เก็บรูปไปกับ item
-    })
+        // เคลียร์ฟอร์ม
+        selectedEquipment.value = ''
+        selectedRoom.value = ''
+        requestDate.value = _defaultDate
+        detail.value = ''
+        remarks.value = ''
+        fileName.value = ''
+        uploadedImageData.value = ''
+        if (fileInput.value) {
+            fileInput.value.value = ''
+        }
 
-    // เคลียร์ฟอร์ม
-    selectedEquipment.value = ''
-    selectedRoom.value = ''
-    requestDate.value = ''
-    detail.value = ''
-    remarks.value = ''               // เคลียร์หมายเหตุ
-    fileName.value = ''
-    uploadedImageData.value = ''
-    if (fileInput.value) {
-        fileInput.value.value = ''
+        closeModal()
+    } catch (e) {
+        console.error(e)
+        alert(e.message || 'บันทึกไม่สำเร็จ กรุณาลองใหม่')
     }
-
-    closeModal()
 }
 
 // ลบไฟล์ที่อัปโหลด (กากบาท)
@@ -682,12 +643,21 @@ const detailStatusClass = computed(() => {
     return getStatusCellClass(selectedItem.value.statusText)
 })
 
-// ลบรายการแจ้งซ่อม (นักรังสี) + sync ไป Engineer ผ่าน localStorage
-const deleteItem = (id) => {
-    const confirmed = window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')
-    if (!confirmed) return
+// ลบรายการแจ้งซ่อม
+const deleteItem = async (id) => {
+    if (!window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')) return
 
-    items.value = items.value.filter((i) => i.id !== id)
+    try {
+        const res = await fetch(`${API_BASE}/DeleteRepairRequest/${id}`, { method: 'DELETE' })
+        if (!res.ok) {
+            const err = await res.text()
+            throw new Error(err || 'ลบไม่สำเร็จ')
+        }
+        items.value = items.value.filter((i) => i.id !== id)
+    } catch (e) {
+        console.error(e)
+        alert(e.message || 'ลบไม่สำเร็จ กรุณาลองใหม่')
+    }
 }
 </script>
 
@@ -1088,6 +1058,45 @@ ul.content-list li::before {
     transform: translateY(-1px);
 }
 
+
+/* date input + icon (เหมือน MachinesCreate) */
+.date-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding-right: 6px;
+    background: white;
+}
+
+.date-wrapper input {
+    border: none;
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    background: transparent;
+}
+
+.date-wrapper input:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.date-icon {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.date-icon:hover {
+    color: #111827;
+}
 
 .cursor-pointer {
     cursor: pointer;

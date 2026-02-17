@@ -361,29 +361,61 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { useRouter } from 'vue-router'
 
+const API_BASE = '/api/Xraycare'
+
 const props = defineProps({
   initial: Object,
-  currentUserName: String,
   selectedDevice: {
     type: Object,
-    default: () => ({
-      name: 'เครื่องเอกซเรย์ทั่วไป',
-      model: 'MODEL-XR-100',
-      room: 'X-Ray Room 1'
-    })
+    default: () => ({ name: '', model: '', room: '' })
   },
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const emit = defineEmits(['save'])
 const router = useRouter()
+
+/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
+const deviceInfo = ref({ name: '', model: '', room: '' })
+const userName = ref('')
+
+const selectedDevice = computed(() =>
+  deviceInfo.value.name ? deviceInfo.value : props.selectedDevice
+)
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(async () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    if (res.ok) {
+      const machines = await res.json()
+      if (machines.length > 0) {
+        const m = machines[0]
+        deviceInfo.value = {
+          name: m.machineName,
+          model: m.machineName,
+          room: m.room || ''
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load machines', e)
+  }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -469,22 +501,34 @@ const saveRemark = () => {
 }
 
 /* บันทึกฟอร์ม (frontend เท่านั้น) */
-const saveForm = () => {
-  // const payload = {
-  //   device: props.selectedDevice,
-  //   date: todayText.value,
-  //   user: props.currentUserName,
-  //   header: formHeader.value,
-  //   measurements: measurements.value,
-  //   iavAvg: iavAvg.value,
-  //   ibgAvg: ibgAvg.value,
-  //   ilbd: ilbd.value,
-  //   remark: remarkText.value
-  // }
-  router.push('/dashboard')
+const saveForm = async () => {
+  const payload = {
+    formType: 'F10',
+    machineName: selectedDevice.value.name || '',
+    room: selectedDevice.value.room || '',
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      header: formHeader.value,
+      measurements: measurements.value,
+      iavAvg: iavAvg.value,
+      ibgAvg: ibgAvg.value,
+      ilbd: ilbd.value,
+      remark: remarkText.value
+    })
+  }
 
-  console.log('📄 F10 Light Intensity Check payload:', payload)
-  alert('บันทึกข้อมูลบนหน้าเว็บเรียบร้อย (ยังไม่ส่งเข้า backend)')
+  try {
+    await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
+
+  router.push('/dashboard')
 }
 </script>
 

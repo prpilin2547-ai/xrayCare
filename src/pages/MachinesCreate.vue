@@ -72,8 +72,8 @@
             <button type="button" class="btn back" @click="goBack">
               Back
             </button>
-            <button type="submit" class="btn save">
-              Save
+            <button type="submit" class="btn save" :disabled="saving">
+              {{ saving ? 'กำลังบันทึก...' : 'Save' }}
             </button>
           </div>
         </form>
@@ -98,12 +98,17 @@
                 <th>ห้องตรวจ</th>
                 <th>ผู้ดูแลเครื่อง</th>
                 <th>วันที่ลงทะเบียนเครื่องครั้งแรก</th>
+                <th>จัดการ</th>
               </tr>
             </thead>
             <tbody>
+              <!-- โหลดข้อมูล -->
+              <tr v-if="loading">
+                <td colspan="6" class="text-center">กำลังโหลด...</td>
+              </tr>
               <!-- ตอนยังไม่มีข้อมูล แสดงแถวเปล่า -->
-              <tr v-if="machines.length === 0">
-                <td v-for="n in 5" :key="n">&nbsp;</td>
+              <tr v-else-if="machines.length === 0">
+                <td v-for="n in 6" :key="n">&nbsp;</td>
               </tr>
               <!-- ข้อมูลจากการกด Save -->
               <tr v-for="(m, index) in machines" :key="m.id">
@@ -112,6 +117,15 @@
                 <td>{{ m.room }}</td>
                 <td>{{ m.caretaker }}</td>
                 <td>{{ m.registerDate }}</td>
+                <td>
+                  <button
+                    class="btn-delete"
+                    :disabled="deleting === m.id"
+                    @click="handleDelete(m.id, m.machineName)"
+                  >
+                    {{ deleting === m.id ? 'กำลังลบ...' : 'ลบ' }}
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -150,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -159,11 +173,42 @@ const router = useRouter()
 // ฟอร์ม
 const machineName = ref('')
 const room = ref('')
-const registerDate = ref('')
+
+const todayDate = new Date()
+const todayStr =
+  String(todayDate.getDate()).padStart(2, '0') + '/' +
+  String(todayDate.getMonth() + 1).padStart(2, '0') + '/' +
+  todayDate.getFullYear()
+const registerDate = ref(todayStr)
+
 const caretaker = ref('')
 
-// เก็บรายการเครื่องที่ลงทะเบียน (frontend-only)
+// รายการเครื่องจาก API
 const machines = ref([])
+const loading = ref(false)
+const saving = ref(false)
+const deleting = ref(null)
+
+const API_BASE = '/api/Xraycare'
+
+async function loadMachines() {
+  loading.value = true
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    if (!res.ok) throw new Error('โหลดรายการเครื่องไม่สำเร็จ')
+    const data = await res.json()
+    machines.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    console.error(e)
+    machines.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadMachines()
+})
 
 // ---------- ปฏิทิน (ดึงมาจากหน้า Export PDF) ----------
 const isCalendarVisible = ref(false)
@@ -314,31 +359,67 @@ const formatDate = () => {
   registerDate.value = value
 }
 
+// ---------- ลบเครื่อง ----------
+async function handleDelete(id, name) {
+  if (!confirm(`ต้องการลบเครื่อง "${name}" หรือไม่?`)) return
+
+  deleting.value = id
+  try {
+    const res = await fetch(`${API_BASE}/DeleteMachine/${id}`, {
+      method: 'DELETE'
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'ลบไม่สำเร็จ')
+    }
+    machines.value = machines.value.filter(m => m.id !== id)
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'ลบไม่สำเร็จ กรุณาลองใหม่')
+  } finally {
+    deleting.value = null
+  }
+}
+
 // ---------- ปุ่มอื่น ๆ ----------
 const goBack = () => {
   router.push('/dashboard')
 }
 
-const handleSave = () => {
-  // เช็คให้กรอกครบ 4 ช่อง
+async function handleSave() {
   if (!machineName.value || !room.value || !registerDate.value || !caretaker.value) {
     alert('กรุณากรอกข้อมูลให้ครบทุกช่อง')
     return
   }
 
-  machines.value.push({
-    id: Date.now(),
-    machineName: machineName.value,
-    room: room.value,
-    registerDate: registerDate.value,
-    caretaker: caretaker.value
-  })
-
-  // ล้างฟอร์ม
-  machineName.value = ''
-  room.value = ''
-  registerDate.value = ''
-  caretaker.value = ''
+  saving.value = true
+  try {
+    const res = await fetch(`${API_BASE}/AddMachine`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        machineName: machineName.value,
+        room: room.value,
+        registerDate: registerDate.value,
+        caretaker: caretaker.value
+      })
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(err || 'บันทึกไม่สำเร็จ')
+    }
+    const created = await res.json()
+    machines.value.push(created)
+    machineName.value = ''
+    room.value = ''
+    registerDate.value = ''
+    caretaker.value = ''
+  } catch (e) {
+    console.error(e)
+    alert(e.message || 'บันทึกไม่สำเร็จ กรุณาลองใหม่')
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -569,6 +650,28 @@ const handleSave = () => {
 /* แถวข้อมูลสลับสีพื้นหลัง */
 .registered-table tbody tr:nth-child(even) {
   background: #f9fafb;
+}
+
+/* ปุ่มลบ */
+.btn-delete {
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid #ef4444;
+  background: white;
+  color: #ef4444;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-delete:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ===============  เพิ่มส่วนนี้เข้าไป =============== */
