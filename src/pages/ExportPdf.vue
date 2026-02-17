@@ -152,7 +152,7 @@
 
       <!-- ป็อปอัพปฏิทิน -->
       <div
-        v-if="isCalendarVisible"
+        v-if="isCalendarVisible && !isDailyMode"
         class="calendar-popup-overlay"
         @click="isCalendarVisible = false"
       >
@@ -389,6 +389,48 @@ const checklistGroups = [
     ],
   },
 ]
+// ✅ เดือนสำหรับ dropdown (มกราคม-ธันวาคม)
+const thaiMonths = [
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+]
+
+// ✅ เป็น true เมื่อมีการเลือก item ใดๆ ที่อยู่ในกลุ่ม Daily check
+const isDailyMode = computed(() => {
+  const dailyGroup = checklistGroups.find((g) => g.id === 'daily')
+  if (!dailyGroup) return false
+  const dailyIds = dailyGroup.items.map((i) => i.id)
+  return checklistType.value.some((id) => dailyIds.includes(id))
+})
+
+// ✅ dropdown เดือนผูกกับ date (เก็บเป็น "MM/YYYY")
+const monthOnly = computed({
+  get() {
+    if (!isDailyMode.value) return ''
+    const parts = date.value.split('/')
+    return parts.length === 2 ? parts[0] : ''
+  },
+  set(mm) {
+    const year = currentYear.value || today.getFullYear()
+    date.value = mm ? `${mm}/${year}` : ''
+  },
+})
+
+// ✅ ป้องกันปฏิทินเด้งค้าง ถ้าเปลี่ยนมาเป็น Daily mode
+watch(isDailyMode, (val) => {
+  if (val) isCalendarVisible.value = false
+})
+
 
 // ---------- date helper ----------
 const parseDateString = (str) => {
