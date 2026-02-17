@@ -161,26 +161,63 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   selectedDevice: {
     type: Object,
-    default: () => ({
-      name: 'เครื่องเอกซเรย์ทั่วไป',
-      model: 'MODEL-XR-100',
-      room: 'X-Ray Room 1'
-    })
+    default: () => ({ name: '', model: '', room: '' })
   },
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+const route = useRoute()
+
+/* ---------- โหลดข้อมูลเครื่องจาก API ---------- */
+const deviceInfo = ref({ name: '', model: '', room: '' })
+const userName = ref('')
+
+const selectedDevice = computed(() =>
+  deviceInfo.value.name ? deviceInfo.value : props.selectedDevice
+)
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(async () => {
+  // โหลด user จาก localStorage
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+
+  // โหลดข้อมูลเครื่อง
+  const equipName = route.params.equipmentName
+  if (equipName) {
+    try {
+      const res = await fetch(`${API_BASE}/GetAllMachines`)
+      if (res.ok) {
+        const list = await res.json()
+        const found = list.find(m => m.machineName === equipName)
+        if (found) {
+          deviceInfo.value = {
+            name: found.machineName || '',
+            model: found.model || '',
+            room: found.room || ''
+          }
+        }
+      }
+    } catch (e) { console.error('Load machine error:', e) }
+  }
+})
 
 const todayText = computed(() => {
   const d = new Date()

@@ -97,6 +97,40 @@ namespace api.xraycare.Controllers
             }
         }
 
+        // ===================== Login Endpoint =====================
+
+        // POST: api/xraycare/Login
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.username))
+                return BadRequest("username is required.");
+            if (string.IsNullOrWhiteSpace(request.password))
+                return BadRequest("password is required.");
+
+            try
+            {
+                var user = await _db.Users
+                    .FirstOrDefaultAsync(u => u.Username == request.username && u.Password == request.password);
+
+                if (user == null)
+                    return Unauthorized(new { message = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+
+                return Ok(new
+                {
+                    id = user.RID,
+                    username = user.Username,
+                    position = user.Position
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Login failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
+
         // ===================== User Endpoints =====================
 
         // GET: api/xraycare/GetAllUsers
@@ -329,6 +363,111 @@ namespace api.xraycare.Controllers
                 return StatusCode(500, message);
             }
         }
+
+        // ===================== Checklist Record Endpoints =====================
+
+        // GET: api/xraycare/GetAllChecklistRecords
+        [HttpGet("GetAllChecklistRecords")]
+        public async Task<IActionResult> GetAllChecklistRecords()
+        {
+            var list = await _db.ChecklistRecords
+                .OrderByDescending(c => c.RID)
+                .Select(c => new
+                {
+                    id = c.RID,
+                    formType = c.FormType,
+                    machineName = c.MachineName,
+                    room = c.Room,
+                    checkDate = c.CheckDate,
+                    tester = c.Tester,
+                    jsonData = c.JsonData
+                })
+                .ToListAsync();
+            return Ok(list);
+        }
+
+        // GET: api/xraycare/GetChecklistRecordsByForm/{formType}
+        [HttpGet("GetChecklistRecordsByForm/{formType}")]
+        public async Task<IActionResult> GetChecklistRecordsByForm(string formType)
+        {
+            var list = await _db.ChecklistRecords
+                .Where(c => c.FormType == formType)
+                .OrderByDescending(c => c.RID)
+                .Select(c => new
+                {
+                    id = c.RID,
+                    formType = c.FormType,
+                    machineName = c.MachineName,
+                    room = c.Room,
+                    checkDate = c.CheckDate,
+                    tester = c.Tester,
+                    jsonData = c.JsonData
+                })
+                .ToListAsync();
+            return Ok(list);
+        }
+
+        // POST: api/xraycare/SaveChecklist
+        [HttpPost("SaveChecklist")]
+        public async Task<IActionResult> SaveChecklist([FromBody] SaveChecklistRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.formType))
+                return BadRequest("formType is required.");
+
+            try
+            {
+                var record = new ChecklistRecord
+                {
+                    FormType = request.formType,
+                    MachineName = request.machineName ?? "",
+                    Room = request.room ?? "",
+                    CheckDate = request.checkDate ?? "",
+                    Tester = request.tester ?? "",
+                    JsonData = request.jsonData ?? ""
+                };
+                _db.ChecklistRecords.Add(record);
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    id = record.RID,
+                    formType = record.FormType,
+                    machineName = record.MachineName,
+                    room = record.Room,
+                    checkDate = record.CheckDate,
+                    tester = record.Tester
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SaveChecklist failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
+
+        // DELETE: api/xraycare/DeleteChecklistRecord/5
+        [HttpDelete("DeleteChecklistRecord/{id}")]
+        public async Task<IActionResult> DeleteChecklistRecord(int id)
+        {
+            try
+            {
+                var record = await _db.ChecklistRecords.FindAsync(id);
+                if (record == null)
+                    return NotFound($"ไม่พบรายการ Checklist ที่มี ID = {id}");
+
+                _db.ChecklistRecords.Remove(record);
+                await _db.SaveChangesAsync();
+
+                return Ok(new { message = "ลบรายการ Checklist สำเร็จ", id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DeleteChecklistRecord failed for ID {Id}", id);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
     }
 
     // ===================== Request DTOs =====================
@@ -367,5 +506,21 @@ namespace api.xraycare.Controllers
     public class UpdateRepairStatusDto
     {
         public string statusText { get; set; } = "";
+    }
+
+    public class LoginRequest
+    {
+        public string username { get; set; } = "";
+        public string password { get; set; } = "";
+    }
+
+    public class SaveChecklistRequest
+    {
+        public string formType { get; set; } = "";
+        public string? machineName { get; set; }
+        public string? room { get; set; }
+        public string? checkDate { get; set; }
+        public string? tester { get; set; }
+        public string? jsonData { get; set; }
     }
 }

@@ -2,7 +2,7 @@
   <div class="layout-root">
     <!-- พื้นหลังเทาเข้มด้านนอก -->
     <div class="layout-shell m-nav">
-      <TopBar :role="role" class="fixed-top"/>
+      <TopBar :role="userRole" :username="userName" class="fixed-top"/>
       <!-- แถบบนสีม่วง -->
       <!-- ส่วนล่าง: sidebar + เนื้อหา -->
       <div class="layout-body">
@@ -16,14 +16,27 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import SidebarNav from './SidebarNav.vue'
 import TopBar from './TopBar.vue'
 
 const route = useRoute()
 const router = useRouter()
-const role = 'Tech' // mock; ค่อยไปผูกกับ auth ทีหลัง
+
+/* ---------- อ่านข้อมูลผู้ใช้จาก localStorage ---------- */
+const userName = ref('')
+const userRole = ref('Tech')
+
+onMounted(() => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+    if (stored.position) userRole.value = stored.position
+  } catch (e) {
+    console.error('Cannot read user from localStorage', e)
+  }
+})
 
 const activeMenu = computed(() => {
   if (route.path.startsWith('/dashboard')) return 'dashboard'
@@ -40,6 +53,9 @@ const activeMenu = computed(() => {
   if (route.path.startsWith('/adminuseraccount')) return 'adminuseraccount'
   if (route.path.startsWith('/qc-forms')) return 'additionalforms'
   if (route.path.startsWith('/adminanalytical')) return 'adminanalytical'
+  if (route.path.startsWith('/custom-form-builder')) return 'additionalforms'
+  if (route.path.startsWith('/f9') || route.path.startsWith('/f11') || route.path.startsWith('/f12') || route.path.startsWith('/f13')) return 'additionalforms'
+  if (route.path.startsWith('/monthly-check') || route.path.startsWith('/checklist-next') || route.path.startsWith('/dairy-check')) return 'dashboard'
   return ''
 })
 
@@ -60,7 +76,10 @@ const onNavigate = (menu) => {
     case 'adminuseraccount': router.push('/adminuseraccount'); break
     case 'additionalforms': router.push('/qc-forms'); break
     case 'adminanalytical': router.push('/adminanalytical'); break
-    case 'logout': router.push('/login'); break
+    case 'logout':
+      localStorage.removeItem('xraycare-user')
+      router.push('/login')
+      break
   }
 }
 </script>

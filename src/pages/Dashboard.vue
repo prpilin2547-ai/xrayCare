@@ -15,15 +15,15 @@
         </div>
         <div class="card summary-card">
           <p class="card-label purple">EQUIPMENT</p>
-          <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
+          <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
         </div>
         <div class="card summary-card">
           <p class="card-label orange">PENDING</p>
-          <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
+          <p class="card-value">{{ hasMachines ? pendingCount : '-' }}</p>
         </div>
         <div class="card summary-card">
           <p class="card-label blue">REPAIR REQUESTS</p>
-          <p class="card-value">-</p>
+          <p class="card-value">{{ repairRequestCount || '-' }}</p>
         </div>
       </div>
 
@@ -190,9 +190,14 @@ import { useRouter } from "vue-router";
 import MainLayout from "../components/Layout/MainLayout.vue";
 
 const router = useRouter();
+const API_BASE = '/api/Xraycare';
 
-/* ---------------- Table Data ---------------- */
-const hasMachines = ref(true);
+/* ---------------- Table Data (จาก API) ---------------- */
+const machines = ref([]);
+const repairRequests = ref([]);
+const loading = ref(false);
+
+const hasMachines = computed(() => pendingMachines.value.length > 0);
 
 // Abbreviated month names for displayDate
 const monthNamesShort = [
@@ -209,12 +214,80 @@ const displayDate = computed(() => {
   return `${day} ${month} ${year}`;
 });
 
-const sampleRows = ref([
-  { rid: "001", equipment: "XRay-Alpha", machine_name: "X-Ray (BrandA/ModelX)", room: "Room 101", caretaker: "John" },
-  { rid: "002", equipment: "XRay-Beta", machine_name: "X-Ray (BrandB/ModelY)", room: "Room 102", caretaker: "Jane" },
-  { rid: "003", equipment: "XRay-Gamma", machine_name: "X-Ray (BrandC/ModelZ)", room: "Room 103", caretaker: "Mike" },
-  { rid: "004", equipment: "XRay-Delta", machine_name: "X-Ray (BrandD/ModelW)", room: "Room 104", caretaker: "Emily" }
-]);
+/* ---------- Daily Check: อ่านเครื่องที่ check แล้ววันนี้ ---------- */
+const DAILY_CHECK_KEY = 'xraycare-dailyChecked';
+
+function getTodayKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+const todayCheckedMachines = ref([]);
+
+function loadDailyChecked() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(DAILY_CHECK_KEY) || '{}');
+    todayCheckedMachines.value = stored[getTodayKey()] || [];
+  } catch (e) {
+    todayCheckedMachines.value = [];
+  }
+}
+
+/* เครื่องที่ยังไม่ได้ check วันนี้ */
+const pendingMachines = computed(() =>
+  machines.value.filter(m => !todayCheckedMachines.value.includes(m.machineName))
+);
+
+/* Summary card counts */
+const equipmentCount = computed(() => machines.value.length);
+const pendingCount = computed(() => pendingMachines.value.length);
+/* นับเฉพาะรายการที่ยังไม่เสร็จ (ไม่นับ ดำเนินการแล้ว / ซ่อมเสร็จ / COMPLETED) */
+const completedStatuses = ['ดำเนินการแล้ว', 'ซ่อมเสร็จ', 'completed'];
+const repairRequestCount = computed(() =>
+  repairRequests.value.filter(r => {
+    const s = (r.statusText || '').toLowerCase();
+    return !completedStatuses.includes(s);
+  }).length
+);
+
+/* สร้าง rows สำหรับตาราง CHECKLIST - แสดงเฉพาะเครื่องที่ยังไม่ได้ check วันนี้ */
+const sampleRows = computed(() =>
+  pendingMachines.value.map((m, index) => ({
+    rid: String(index + 1).padStart(3, '0'),
+    equipment: m.machineName || '-',
+    machine_name: m.machineName || '-',
+    room: m.room || '-',
+    caretaker: m.caretaker || '-'
+  }))
+);
+
+/* ---------- โหลดข้อมูลจาก API ---------- */
+async function loadMachines() {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`);
+    if (!res.ok) throw new Error('โหลดข้อมูลเครื่องไม่สำเร็จ');
+    const data = await res.json();
+    machines.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadMachines error:', e);
+    machines.value = [];
+  }
+}
+
+async function loadRepairRequests() {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllRepairRequests`);
+    if (!res.ok) throw new Error('โหลดข้อมูลแจ้งซ่อมไม่สำเร็จ');
+    const data = await res.json();
+    repairRequests.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadRepairRequests error:', e);
+    repairRequests.value = [];
+  }
+}
 
 function goToDairyCheck(equipmentName) {
   router.push({ name: "DairyCheckPage", params: { equipmentName } });
@@ -490,8 +563,17 @@ const popupFullDate = computed(() => {
   return `${w} ${d} ${m} ${y}`;
 });
 
-/* ---------- โหลดข้อมูลจาก localStorage ให้เหมือนหน้า PM ---------- */
-onMounted(() => {
+/* ---------- โหลดข้อมูลจาก localStorage + API ---------- */
+onMounted(async () => {
+  /* โหลด daily check data */
+  loadDailyChecked();
+
+  /* โหลดข้อมูลจาก API */
+  loading.value = true;
+  await Promise.all([loadMachines(), loadRepairRequests()]);
+  loading.value = false;
+
+  /* โหลด calendar data จาก localStorage (เหมือนหน้า PM) */
   try {
     const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY);
     if (savedEvents) {

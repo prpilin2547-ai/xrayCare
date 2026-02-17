@@ -173,7 +173,14 @@ const router = useRouter()
 // ฟอร์ม
 const machineName = ref('')
 const room = ref('')
-const registerDate = ref('')
+
+const todayDate = new Date()
+const todayStr =
+  String(todayDate.getDate()).padStart(2, '0') + '/' +
+  String(todayDate.getMonth() + 1).padStart(2, '0') + '/' +
+  todayDate.getFullYear()
+const registerDate = ref(todayStr)
+
 const caretaker = ref('')
 
 // รายการเครื่องจาก API

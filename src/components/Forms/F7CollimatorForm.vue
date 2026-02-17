@@ -5,13 +5,24 @@
         แบบบันทึก F7-1 : การทดสอบ Collimator and Beam Alignment
       </h5>
 
-      <!-- วิธีทดสอบ (radio) -->
+      <!-- วิธีทดสอบ (2 radio groups) -->
       <div class="border rounded-3 p-3 mb-3">
-        <div class="form-check small" v-for="(opt, idx) in tubeOptions" :key="opt.value">
-          <hr v-if="idx === 2" class="my-2" />
-          <input class="form-check-input" type="radio" :id="`tube-${opt.value}`" :value="opt.value"
-            v-model="form.tubeType" />
-          <label class="form-check-label" :for="`tube-${opt.value}`">
+        <!-- กลุ่ม 1: ขนาดหลอด -->
+        <div class="form-check small" v-for="opt in tubeSizeOptions" :key="opt.value">
+          <input class="form-check-input" type="radio" :id="`tubeSize-${opt.value}`" :value="opt.value"
+            v-model="form.tubeSize" />
+          <label class="form-check-label" :for="`tubeSize-${opt.value}`">
+            {{ opt.label }}
+          </label>
+        </div>
+
+        <hr class="my-2" />
+
+        <!-- กลุ่ม 2: วิธีทดสอบ -->
+        <div class="form-check small" v-for="opt in testMethodOptions" :key="opt.value">
+          <input class="form-check-input" type="radio" :id="`testMethod-${opt.value}`" :value="opt.value"
+            v-model="form.testMethod" />
+          <label class="form-check-label" :for="`testMethod-${opt.value}`">
             {{ opt.label }}
           </label>
         </div>
@@ -78,11 +89,7 @@
           <tbody>
             <tr v-for="row in form.beamAlignment" :key="row.id">
               <td>
-                <div class="d-flex align-items-center gap-2">
-                  <input class="form-check-input" type="radio" name="beam-category" :value="row.id"
-                    v-model="form.selectedBeamCategory" />
-                  <span>{{ row.label }}</span>
-                </div>
+                <span>{{ row.label }}</span>
               </td>
 
               <td class="text-center">
@@ -137,9 +144,12 @@ const props = defineProps({
 })
 const emit = defineEmits(['next'])
 
-const tubeOptions = [
+const tubeSizeOptions = [
   { value: 'small', label: 'หลอดใส่เล็ก' },
-  { value: 'large', label: 'หลอดใส่ใหญ่' },
+  { value: 'large', label: 'หลอดใส่ใหญ่' }
+]
+
+const testMethodOptions = [
   { value: 'tool', label: 'ทดสอบโดย Collimator/Beam alignment test tool' },
   { value: 'coins', label: 'ทดสอบโดย Coins for x-ray to light-beam alignment test' }
 ]
@@ -149,7 +159,8 @@ const form = ref({
   machineModel: '',
   testDate: '',
   tester: props.currentUserName || '',
-  tubeType: '',
+  tubeSize: '',
+  testMethod: '',
   lightMismatch: [
     { id: 'anode', label: 'ด้านแอโนด', value1: '', pass: false, fail: false, note: '' },
     { id: 'cathode', label: 'ด้านแคโทด', value1: '', pass: false, fail: false, note: '' },
@@ -161,14 +172,18 @@ const form = ref({
     { id: 'btw', label: '1.5° < X < 3°', pass: false, fail: false, note: '' },
     { id: 'ge3', label: '≥ 3°', pass: false, fail: false, note: '' }
   ],
-  selectedBeamCategory: '',
   remark: ''
 })
+
+const attachmentFileName = ref('')
+const onFileChange = (e) => {
+  const file = e.target.files[0]
+  attachmentFileName.value = file ? file.name : ''
+}
 
 const submitNext = () => {
   emit('next', form.value)
 }
-
 </script>
 
 <style scoped>

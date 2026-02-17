@@ -227,4 +227,33 @@ const router = createRouter({
   routes
 })
 
+// Authentication guard: protect all routes except /login
+const publicPaths = ['/login']
+router.beforeEach((to, _from, next) => {
+  const isPublic = publicPaths.includes(to.path)
+  let user
+  try {
+    user = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+  } catch {
+    user = {}
+  }
+  const isLoggedIn = !!(user && user.username)
+
+  if (isPublic) {
+    if (isLoggedIn) {
+      // Already logged in: redirect by role
+      const position = (user.position || '').toLowerCase()
+      if (position === 'admin') return next('/admindashboard')
+      if (position === 'engineer') return next('/engineerdashboard')
+      return next('/dashboard')
+    }
+    return next()
+  }
+
+  if (!isLoggedIn) {
+    return next('/login')
+  }
+  next()
+})
+
 export default router

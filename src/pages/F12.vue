@@ -127,27 +127,38 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   selectedDevice: {
     type: Object,
-    default: () => ({
-      name: 'เครื่องเอกซเรย์ทั่วไป',
-      model: 'MODEL-XR-100',
-      room: 'X-Ray Room 1'
-    })
+    default: () => ({ name: '', model: '', room: '' })
   },
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
 const route = useRoute()
+
+/* ---------- โหลดผู้ใช้จาก localStorage ---------- */
+const userName = ref('')
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(() => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -197,14 +208,29 @@ const saveRemark = () => {
   closeRemarkModal()
 }
 
-const saveChecklist = () => {
-  console.log({
-    device: props.selectedDevice,
-    date: todayText.value,
-    reason: selectedReason.value,
-    otherText: otherReasonText.value,
-    remark: remarkText.value
-  })
+const saveChecklist = async () => {
+  const payload = {
+    formType: 'F12',
+    machineName: '',
+    room: '',
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      reason: selectedReason.value,
+      otherText: otherReasonText.value,
+      remark: remarkText.value
+    })
+  }
+
+  try {
+    await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
 
   router.push('/dashboard')
 }

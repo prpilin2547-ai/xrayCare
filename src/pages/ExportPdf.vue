@@ -50,24 +50,15 @@
                   @click="toggleChecklistDropdown"
                 >
                   <div class="multiselect-display">
-                    <!-- แสดงคำว่า Checklist type ตอนยังไม่เลือกอะไร -->
                     <span
-                      v-if="!selectedItemLabels.length"
+                      v-if="!selectedItemLabel"
                       class="placeholder-checklist"
                     >
                       Checklist type
                     </span>
-
-                    <!-- แสดงหัวข้อที่เลือกแล้ว -->
-                    <div v-else class="chip-list">
-                      <span
-                        v-for="label in selectedItemLabels"
-                        :key="label"
-                        class="chip"
-                      >
-                        {{ label }}
-                      </span>
-                    </div>
+                    <span v-else class="chip">
+                      {{ selectedItemLabel }}
+                    </span>
                   </div>
                   <span class="arrow">▾</span>
                 </div>
@@ -83,32 +74,24 @@
                     class="multi-group"
                   >
                     <!-- หัวข้อหลัก: Daily check / 1 Month / ... -->
-                    <button
-                      type="button"
-                      class="multi-group-header"
-                      @click="toggleGroup(group.id)"
-                    >
-                      <span
-                        class="checkbox"
-                        :class="{ 'checkbox-checked': isGroupFullySelected(group.id) }"
-                      ></span>
+                    <div class="multi-group-header">
                       <span class="group-label">
                         {{ group.label }}
                       </span>
-                    </button>
+                    </div>
 
-                    <!-- รายการย่อยในหัวข้อนั้น -->
+                    <!-- รายการย่อย (เลือกได้แค่ 1 อัน) -->
                     <div class="multi-items">
                       <button
                         v-for="item in group.items"
                         :key="item.id"
                         type="button"
                         class="multi-item"
-                        @click="toggleItem(item.id)"
+                        @click="selectItem(item.id)"
                       >
                         <span
-                          class="checkbox"
-                          :class="{ 'checkbox-checked': isItemSelected(item.id) }"
+                          class="radio-dot"
+                          :class="{ 'radio-dot-checked': checklistType === item.id }"
                         ></span>
                         <span class="item-label">
                           {{ item.label }}
@@ -125,7 +108,19 @@
               <label for="date">Date</label>
               <div class="input-shell">
                 <div class="date-wrapper">
+                  <!-- Daily check → แสดงแค่เดือน/ปี -->
                   <input
+                    v-if="isDailyCheck"
+                    id="date"
+                    v-model="date"
+                    type="text"
+                    placeholder="MM/YYYY"
+                    maxlength="7"
+                    readonly
+                  />
+                  <!-- อื่นๆ → DD/MM/YYYY -->
+                  <input
+                    v-else
                     id="date"
                     v-model="date"
                     type="text"
@@ -148,7 +143,7 @@
 
           <!-- ปุ่มตัวอย่างไฟล์ -> ไปหน้า XrayF1Print -->
           <div class="preview-wrapper">
-            <button class="btn-primary" @click="goToXrayF1Print">
+            <button class="btn-primary" @click="goToXrayPrint">
               ตัวอย่างไฟล์
             </button>
           </div>
@@ -162,33 +157,61 @@
         @click="isCalendarVisible = false"
       >
         <div class="calendar-popup-box" @click.stop>
-          <div class="calendar-header">
-            <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
-            <span class="month-title">{{ currentMonthYear }}</span>
-            <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
-          </div>
-
-          <div class="calendar-grid">
-            <div class="weekday" v-for="d in weekdays" :key="d">
-              {{ d }}
+          <!-- Daily check → เลือกเดือนเท่านั้น -->
+          <template v-if="isDailyCheck">
+            <div class="calendar-header">
+              <button class="nav-btn" @click.stop="currentYear--">&lt;</button>
+              <span class="month-title">{{ currentYear }}</span>
+              <button class="nav-btn" @click.stop="currentYear++">&gt;</button>
             </div>
 
-            <div
-              v-for="cell in daysGrid"
-              :key="cell.key"
-              class="day-cell"
-              :class="{
-                'is-empty': !cell.day,
-                'is-today': cell.isToday,
-                'is-selected': cell.isSelected
-              }"
-              @click="cell.day ? selectDate(cell.date) : null"
-            >
-              <div class="day-number">
-                <span v-if="cell.day">{{ cell.day }}</span>
+            <div class="month-picker-grid">
+              <button
+                v-for="(name, idx) in monthPickerNames"
+                :key="idx"
+                type="button"
+                class="month-cell"
+                :class="{
+                  'is-selected': date === String(idx + 1).padStart(2, '0') + '/' + currentYear,
+                  'is-today': idx === today.getMonth() && currentYear === today.getFullYear()
+                }"
+                @click="selectMonth(idx)"
+              >
+                {{ name }}
+              </button>
+            </div>
+          </template>
+
+          <!-- อื่นๆ → เลือกวัน -->
+          <template v-else>
+            <div class="calendar-header">
+              <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
+              <span class="month-title">{{ currentMonthYear }}</span>
+              <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
+            </div>
+
+            <div class="calendar-grid">
+              <div class="weekday" v-for="d in weekdays" :key="d">
+                {{ d }}
+              </div>
+
+              <div
+                v-for="cell in daysGrid"
+                :key="cell.key"
+                class="day-cell"
+                :class="{
+                  'is-empty': !cell.day,
+                  'is-today': cell.isToday,
+                  'is-selected': cell.isSelected
+                }"
+                @click="cell.day ? selectDate(cell.date) : null"
+              >
+                <div class="day-number">
+                  <span v-if="cell.day">{{ cell.day }}</span>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
     </div>
@@ -196,16 +219,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
+const API_BASE = '/api/Xraycare'
 const router = useRouter()
 
 const machine = ref('')
-// checklistType เก็บ id ของ "รายการย่อย" ที่เลือก (เลือกได้หลายค่า)
-const checklistType = ref([])
-const date = ref('')
+// checklistType เก็บ id ของ "รายการย่อย" ที่เลือก (เลือกได้แค่ 1 อัน)
+const checklistType = ref('')
+/* ตั้งค่าเริ่มต้นเป็นวันที่ปัจจุบัน DD/MM/YYYY */
+const todayNow = new Date()
+const defaultDate = `${String(todayNow.getDate()).padStart(2, '0')}/${String(todayNow.getMonth() + 1).padStart(2, '0')}/${todayNow.getFullYear()}`
+const date = ref(defaultDate)
 
 const isCalendarVisible = ref(false)
 const isChecklistDropdownOpen = ref(false)
@@ -227,19 +254,36 @@ const monthNames = [
   'September',
   'October',
   'November',
+  'December',
 ]
 
 const currentMonthYear = computed(() => {
   return `${monthNames[currentMonth.value]} ${currentYear.value}`
 })
 
-// ---------- X-ray machine options ----------
-const machineOptions = {
-  'shimazu-aaa-room1': 'X-ray shimazu รุ่น AAA ห้อง 1',
-  'shimazu-bbb-room2': 'X-ray shimazu รุ่น BBB ห้อง 2',
-  'shimazu-ccc-room3': 'X-ray shimazu รุ่น CCC ห้อง 3',
-  'shimazu-ddd-room4': 'X-ray shimazu รุ่น DDD ห้อง 4',
-}
+// ---------- X-ray machine options (โหลดจาก API) ----------
+const machines = ref([])
+const machineOptions = computed(() => {
+  const opts = {}
+  machines.value.forEach(m => {
+    const key = `machine-${m.id}`
+    const label = `${m.machineName} ห้อง ${m.room || '-'}`
+    opts[key] = label
+  })
+  return opts
+})
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    if (res.ok) {
+      const data = await res.json()
+      machines.value = Array.isArray(data) ? data : []
+    }
+  } catch (e) {
+    console.error('Load machines error:', e)
+  }
+})
 
 // ---------- Checklist groups & items ----------
 const checklistGroups = [
@@ -477,69 +521,105 @@ const formatDate = () => {
   date.value = value
 }
 
-// ---------- Multi-select logic ----------
+// ---------- Single-select logic ----------
 const toggleChecklistDropdown = () => {
   isChecklistDropdownOpen.value = !isChecklistDropdownOpen.value
 }
 
-const isItemSelected = (id) => checklistType.value.includes(id)
+const selectItem = (id) => {
+  checklistType.value = checklistType.value === id ? '' : id
+  isChecklistDropdownOpen.value = false
+}
 
-const toggleItem = (id) => {
-  if (isItemSelected(id)) {
-    checklistType.value = checklistType.value.filter((v) => v !== id)
-  } else {
-    checklistType.value = [...checklistType.value, id]
+// เอา label ของรายการที่เลือกไปแสดง
+const selectedItemLabel = computed(() => {
+  if (!checklistType.value) return ''
+  for (const group of checklistGroups) {
+    const found = group.items.find((item) => item.id === checklistType.value)
+    if (found) return found.label
   }
-}
-
-const isGroupFullySelected = (groupId) => {
-  const group = checklistGroups.find((g) => g.id === groupId)
-  if (!group) return false
-  return group.items.every((item) => isItemSelected(item.id))
-}
-
-const toggleGroup = (groupId) => {
-  const group = checklistGroups.find((g) => g.id === groupId)
-  if (!group) return
-
-  const allSelected = isGroupFullySelected(groupId)
-
-  if (allSelected) {
-    checklistType.value = checklistType.value.filter(
-      (id) => !group.items.some((item) => item.id === id),
-    )
-  } else {
-    const newIds = [...checklistType.value]
-    group.items.forEach((item) => {
-      if (!newIds.includes(item.id)) {
-        newIds.push(item.id)
-      }
-    })
-    checklistType.value = newIds
-  }
-}
-
-// เอา label ของ "รายการย่อย" ที่เลือกไปใช้แสดงใน chip
-const selectedItemLabels = computed(() => {
-  const labels = []
-  checklistGroups.forEach((group) => {
-    group.items.forEach((item) => {
-      if (checklistType.value.includes(item.id)) {
-        labels.push(item.label)
-      }
-    })
-  })
-  return labels
+  return ''
 })
+
+// ---------- ตรวจว่าเลือก Daily check หรือไม่ ----------
+const isDailyCheck = computed(() => {
+  if (!checklistType.value) return false
+  const dailyGroup = checklistGroups.find((g) => g.id === 'daily')
+  if (!dailyGroup) return false
+  return dailyGroup.items.some((item) => item.id === checklistType.value)
+})
+
+// เมื่อเปลี่ยนชนิด checklist → ปรับรูปแบบวันที่อัตโนมัติ
+watch(isDailyCheck, (isDaily) => {
+  const now = new Date()
+  if (isDaily) {
+    // แสดงแค่เดือน/ปี
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    date.value = `${mm}/${now.getFullYear()}`
+  } else {
+    // แสดง DD/MM/YYYY
+    const dd = String(now.getDate()).padStart(2, '0')
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    date.value = `${dd}/${mm}/${now.getFullYear()}`
+  }
+})
+
+// ---------- Month picker logic (สำหรับ Daily check) ----------
+const monthPickerNames = [
+  'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+  'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.',
+]
+
+const selectMonth = (monthIndex) => {
+  const mm = String(monthIndex + 1).padStart(2, '0')
+  date.value = `${mm}/${currentYear.value}`
+  isCalendarVisible.value = false
+}
 
 // ปิด dropdown เมื่อคลิกพื้นหลัง
 const closeFloatingUI = () => {
   isChecklistDropdownOpen.value = false
 }
 
-// ---------- ไปหน้า XrayF1Print ----------
-const goToXrayF1Print = () => {
-  router.push({ name: 'XrayF1Print' })
+// ---------- Mapping checklist item → route name ----------
+const checklistRouteMap = {
+  'daily-care-xray': 'XrayF1Print',
+  'daily-erasure-ip': 'XrayF2Print',
+  '1m-lightbox': 'XrayF10Print',
+  '1m-repeat-rate': 'XrayF12Print',
+  '3m-display-qc': 'XrayF3Print',
+  '3m-record-xray': 'XrayF4Print',
+  '3m-uniformity': 'XrayF5Print',
+  '3m-exposure-index': 'XrayF6Print',
+  '6m-collimator': 'XrayF71Print',
+  '6m-collimator-bucky': 'XrayF72Print',
+  '6m-dark-noise-cr': 'XrayF81Print',
+  '6m-dark-noise-dr': 'XrayF82Print',
+  '6m-lead-apron': 'XrayF9Print',
+  'thickness-main': 'XrayF11Print',
+  'usg-bmode-main': 'XrayF13Print',
+}
+
+// ---------- ไปหน้า Print ตาม F ที่เลือก ----------
+const goToXrayPrint = () => {
+  if (!checklistType.value) {
+    alert('กรุณาเลือก Checklist type ก่อน')
+    return
+  }
+
+  const routeName = checklistRouteMap[checklistType.value]
+  if (!routeName) {
+    alert('ไม่พบแบบฟอร์มสำหรับรายการที่เลือก')
+    return
+  }
+
+  router.push({
+    name: routeName,
+    query: {
+      machine: machine.value,
+      date: date.value,
+    },
+  })
 }
 </script>
 
@@ -755,7 +835,6 @@ select::-ms-expand {
   background: transparent;
   border: none;
   padding: 4px 4px 4px 2px;
-  cursor: pointer;
 }
 
 .group-label {
@@ -819,6 +898,33 @@ select::-ms-expand {
 
 .checkbox-checked::after {
   content: '✓';
+}
+
+/* radio dot style (single select) */
+.radio-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  margin-top: 2px;
+  box-sizing: border-box;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radio-dot-checked {
+  border-color: #4f46e5;
+}
+
+.radio-dot-checked::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4f46e5;
 }
 
 /* date input */
@@ -951,6 +1057,40 @@ select::-ms-expand {
 
 .nav-btn:hover {
   background-color: #e0e7ff;
+  transform: translateY(-1px);
+}
+
+/* month picker grid (สำหรับ Daily check) */
+.month-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.month-cell {
+  padding: 10px 4px;
+  border: none;
+  border-radius: 12px;
+  background: #f3f4f6;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.month-cell:hover {
+  background: #e5e7eb;
+}
+
+.month-cell.is-today {
+  border: 1.5px solid #6366f1;
+}
+
+.month-cell.is-selected {
+  background: #4f46e5;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 

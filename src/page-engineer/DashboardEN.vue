@@ -11,19 +11,19 @@
         </div>
         <div class="card summary-card">
           <p class="card-label blue">EQUIPMENT</p>
-          <p class="card-value">{{ hasMachines ? '4' : '-' }}</p>
+          <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
         </div>
         <div class="card summary-card">
           <p class="card-label red">PENDING REPAIR</p>
-          <p class="card-value">{{ hasPendingrepair ? '2' : '-' }}</p>
+          <p class="card-value">{{ hasPendingrepair ? pendingRepairCount : '-' }}</p>
         </div>
         <div class="card summary-card">
           <p class="card-label orange">IN PROGRESS</p>
-          <p class="card-value">{{ hasProgress ? '1' : '-' }}</p>
+          <p class="card-value">{{ hasProgress ? inProgressCount : '-' }}</p>
         </div>
         <div class="card summary-card">
           <p class="card-label green">COMPLETED</p>
-          <p class="card-value">{{ hasCompleted ? '1' : '-' }}</p>
+          <p class="card-value">{{ hasCompleted ? completedCount : '-' }}</p>
         </div>
       </div>
     </div>
@@ -50,9 +50,9 @@
         <tbody>
           <tr v-for="(item, index) in repairRequests" :key="item.id">
             <td>{{ index + 1 }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.room }}</td>
-            <td class="status pending">{{ item.status }}</td>
+            <td>{{ item.equipment || '-' }}</td>
+            <td>{{ item.room || '-' }}</td>
+            <td class="status" :class="getStatusClass(item.statusText)">{{ item.statusText || '-' }}</td>
           </tr>
         </tbody>
       </table>
@@ -61,8 +61,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
+
+const API_BASE = '/api/Xraycare';
+
+/* ---------------- Data จาก API ---------------- */
+const machines = ref([]);
+const repairRequests = ref([]);
+const loading = ref(false);
 
 // Abbreviated month names for displayDate
 const monthNamesShort = [
@@ -79,18 +86,73 @@ const displayDate = computed(() => {
   return `${day} ${month} ${year}`;
 });
 
-// mock flag สำหรับตัวเลข cards
-const hasMachines = ref(true);
-const hasPendingrepair = ref(true);
-const hasProgress = ref(true);
-const hasCompleted = ref(true);
+/* Summary card computed */
+const hasMachines = computed(() => machines.value.length > 0);
+const equipmentCount = computed(() => machines.value.length);
 
-const repairRequests = ref([
-  { id: 1, name: 'X-ray general shimazu รุ่น xxx', room: '1', status: 'IN PROGRESS' },
-  { id: 2, name: 'X-ray general carestream รุ่น xxx', room: '2', status: 'IN PROGRESS' },
-  { id: 3, name: 'X-ray general konica รุ่น xxx', room: '3', status: 'IN PROGRESS' },
-  { id: 4, name: 'X-ray general toshiba รุ่น xxx', room: '4', status: 'IN PROGRESS' }
-]);
+const PENDING_STATUSES = ['รอซ่อม', 'PENDING'];
+const PROGRESS_STATUSES = ['อยู่ระหว่างดำเนินการ', 'กำลังซ่อม', 'IN PROGRESS'];
+const COMPLETED_STATUSES = ['ดำเนินการแล้ว', 'ซ่อมเสร็จ', 'COMPLETED'];
+
+const hasPendingrepair = computed(() =>
+  repairRequests.value.some(r => PENDING_STATUSES.includes(r.statusText))
+);
+const hasProgress = computed(() =>
+  repairRequests.value.some(r => PROGRESS_STATUSES.includes(r.statusText))
+);
+const hasCompleted = computed(() =>
+  repairRequests.value.some(r => COMPLETED_STATUSES.includes(r.statusText))
+);
+
+const pendingRepairCount = computed(() =>
+  repairRequests.value.filter(r => PENDING_STATUSES.includes(r.statusText)).length
+);
+const inProgressCount = computed(() =>
+  repairRequests.value.filter(r => PROGRESS_STATUSES.includes(r.statusText)).length
+);
+const completedCount = computed(() =>
+  repairRequests.value.filter(r => COMPLETED_STATUSES.includes(r.statusText)).length
+);
+
+/* Status class helper */
+function getStatusClass(status) {
+  if (!status) return '';
+  if (PENDING_STATUSES.includes(status)) return 'pending';
+  if (PROGRESS_STATUSES.includes(status)) return 'in-progress';
+  if (COMPLETED_STATUSES.includes(status)) return 'completed';
+  return 'pending';
+}
+
+/* ---------- โหลดข้อมูลจาก API ---------- */
+async function loadMachines() {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`);
+    if (!res.ok) throw new Error('โหลดข้อมูลเครื่องไม่สำเร็จ');
+    const data = await res.json();
+    machines.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadMachines error:', e);
+    machines.value = [];
+  }
+}
+
+async function loadRepairRequests() {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllRepairRequests`);
+    if (!res.ok) throw new Error('โหลดข้อมูลแจ้งซ่อมไม่สำเร็จ');
+    const data = await res.json();
+    repairRequests.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadRepairRequests error:', e);
+    repairRequests.value = [];
+  }
+}
+
+onMounted(async () => {
+  loading.value = true;
+  await Promise.all([loadMachines(), loadRepairRequests()]);
+  loading.value = false;
+});
 </script>
 
 <style scoped>
@@ -213,6 +275,14 @@ tbody tr:nth-child(even) {
 }
 
 .status.pending {
+  color: #ff0000;
+}
+
+.status.in-progress {
   color: #f97316;
+}
+
+.status.completed {
+  color: #0eb54b;
 }
 </style>

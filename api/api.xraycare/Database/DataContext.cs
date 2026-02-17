@@ -18,4 +18,5 @@ public class DataContext : DbContext
     public DbSet<Machine> Machines { get; set; }
     public DbSet<UserAccount> Users { get; set; }
     public DbSet<RepairRequest> RepairRequests { get; set; }
+    public DbSet<ChecklistRecord> ChecklistRecords { get; set; }
 }

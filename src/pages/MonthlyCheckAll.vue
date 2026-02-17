@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -83,22 +83,55 @@ import F7CollimatorBuckyForm from '../components/forms/F7CollimatorBuckyForm.vue
 import F8CRDarkNoiseForm from '../components/forms/F8CRDarkNoiseForm.vue'
 import F8DRDarkNoiseForm from '../components/forms/F8DRDarkNoiseForm.vue'
 
+const API_BASE = '/api/Xraycare'
+
 const props = defineProps({
   selectedDevice: {
     type: Object,
-    default: () => ({
-      name: 'เครื่องเอกซเรย์ทั่วไป',
-      model: 'MODEL-XR-100',
-      room: 'X-Ray Room 1'
-    })
+    default: () => ({ name: '', model: '', room: '' })
   },
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+
+/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
+const deviceInfo = ref({ name: '', model: '', room: '' })
+const userName = ref('')
+
+const selectedDevice = computed(() =>
+  deviceInfo.value.name ? deviceInfo.value : props.selectedDevice
+)
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(async () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+
+  try {
+    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    if (res.ok) {
+      const machines = await res.json()
+      if (machines.length > 0) {
+        const m = machines[0]
+        deviceInfo.value = {
+          name: m.machineName,
+          model: m.machineName,
+          room: m.room || ''
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load machines', e)
+  }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -147,20 +180,33 @@ const handleNext = (fromId, payload) => {
 }
 
 /* F8-2 เป็นตัวบันทึกสุดท้าย */
-const handleSave = (payloadF8_2) => {
+const handleSave = async (payloadF8_2) => {
   formF8_2.value = payloadF8_2
 
-  const allPayload = {
-    device: props.selectedDevice,
-    date: todayText.value,
-    user: props.currentUserName,
-    F7_1: formF7_1.value,
-    F7_2: formF7_2.value,
-    F8_1: formF8_1.value,
-    F8_2: formF8_2.value
+  const payload = {
+    formType: 'F7_F8',
+    machineName: selectedDevice.value.name,
+    room: selectedDevice.value.room,
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      F7_1: formF7_1.value,
+      F7_2: formF7_2.value,
+      F8_1: formF8_1.value,
+      F8_2: formF8_2.value
+    })
   }
 
-  console.log('📦 Monthly check (6 month only):', allPayload)
+  try {
+    const res = await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    if (!res.ok) console.error('SaveChecklist failed:', await res.text())
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
 
   router.push('/dashboard')
 }

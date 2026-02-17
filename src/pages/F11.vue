@@ -324,18 +324,33 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const props = defineProps({
   currentUserName: {
     type: String,
-    default: 'Demo User'
+    default: ''
   }
 })
 
 const router = useRouter()
+
+/* ---------- โหลดผู้ใช้จาก localStorage ---------- */
+const userName = ref('')
+const currentUserName = computed(() =>
+  userName.value || props.currentUserName || 'Demo User'
+)
+
+onMounted(() => {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    if (stored.username) userName.value = stored.username
+  } catch (e) { /* ignore */ }
+})
 
 const todayText = computed(() => {
   const d = new Date()
@@ -428,22 +443,35 @@ const validateForm = () => {
   return true
 }
 
-const saveForm = () => {
+const saveForm = async () => {
   if (!validateForm()) return
 
   const payload = {
-    formA: formA.value,
-    examRows: examRows.value.map((r) => ({
-      ...r,
-      regionResolved: r.region === 'other' ? r.regionOther : r.region
-    })),
-    formC: formC.value
+    formType: 'F11',
+    machineName: '',
+    room: formA.value.room || '',
+    checkDate: todayText.value,
+    tester: currentUserName.value,
+    jsonData: JSON.stringify({
+      formA: formA.value,
+      examRows: examRows.value.map((r) => ({
+        ...r,
+        regionResolved: r.region === 'other' ? r.regionOther : r.region
+      })),
+      formC: formC.value
+    })
   }
 
-  // ตอนนี้แค่ลอง log ข้อมูล ไม่มี backend
-//   console.log('F11 payload :', payload)
+  try {
+    await fetch(`${API_BASE}/SaveChecklist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch (e) {
+    console.error('SaveChecklist error:', e)
+  }
 
-  // หลังบันทึกเสร็จ ย้ายไปหน้า Dashboard
   router.push('/dashboard')
 }
 </script>
