@@ -1,3 +1,4 @@
+using System.Text.Json;
 using api.xraycare.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -386,6 +387,28 @@ namespace api.xraycare.Controllers
             return Ok(list);
         }
 
+        // GET: api/xraycare/GetChecklistRecord/5
+        [HttpGet("GetChecklistRecord/{id}")]
+        public async Task<IActionResult> GetChecklistRecord(int id)
+        {
+            var record = await _db.ChecklistRecords
+                .Where(c => c.RID == id)
+                .Select(c => new
+                {
+                    id = c.RID,
+                    formType = c.FormType,
+                    machineName = c.MachineName,
+                    room = c.Room,
+                    checkDate = c.CheckDate,
+                    tester = c.Tester,
+                    jsonData = c.JsonData
+                })
+                .FirstOrDefaultAsync();
+            if (record == null)
+                return NotFound($"ไม่พบรายการ Checklist ที่มี ID = {id}");
+            return Ok(record);
+        }
+
         // GET: api/xraycare/GetChecklistRecordsByForm/{formType}
         [HttpGet("GetChecklistRecordsByForm/{formType}")]
         public async Task<IActionResult> GetChecklistRecordsByForm(string formType)
@@ -482,7 +505,8 @@ namespace api.xraycare.Controllers
                     id = s.RID,
                     startDate = s.StartDate,
                     frequencyType = s.FrequencyType,
-                    description = s.Description
+                    description = s.Description,
+                    formTypes = s.FormTypes
                 })
                 .ToListAsync();
             return Ok(list);
@@ -499,11 +523,15 @@ namespace api.xraycare.Controllers
 
             try
             {
+                var formTypesJson = request.formTypes != null && request.formTypes.Count > 0
+                    ? JsonSerializer.Serialize(request.formTypes)
+                    : null;
                 var entity = new ScheduleConfig
                 {
                     StartDate = request.startDate,
                     FrequencyType = request.frequencyType,
-                    Description = request.description ?? ""
+                    Description = request.description ?? "",
+                    FormTypes = formTypesJson
                 };
                 _db.ScheduleConfigs.Add(entity);
                 await _db.SaveChangesAsync();
@@ -513,12 +541,55 @@ namespace api.xraycare.Controllers
                     id = entity.RID,
                     startDate = entity.StartDate,
                     frequencyType = entity.FrequencyType,
-                    description = entity.Description
+                    description = entity.Description,
+                    formTypes = entity.FormTypes
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AddScheduleConfig failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
+
+        // PUT: api/xraycare/UpdateScheduleConfig/5
+        [HttpPut("UpdateScheduleConfig/{id}")]
+        public async Task<IActionResult> UpdateScheduleConfig(int id, [FromBody] UpdateScheduleConfigRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request body is required.");
+            try
+            {
+                var entity = await _db.ScheduleConfigs.FindAsync(id);
+                if (entity == null)
+                    return NotFound($"ไม่พบ Schedule Config ที่มี ID = {id}");
+
+                if (!string.IsNullOrWhiteSpace(request.startDate))
+                    entity.StartDate = request.startDate;
+                if (!string.IsNullOrWhiteSpace(request.frequencyType))
+                    entity.FrequencyType = request.frequencyType;
+                if (request.description != null)
+                    entity.Description = request.description;
+                if (request.formTypes != null)
+                    entity.FormTypes = request.formTypes.Count > 0
+                        ? JsonSerializer.Serialize(request.formTypes)
+                        : null;
+
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    id = entity.RID,
+                    startDate = entity.StartDate,
+                    frequencyType = entity.FrequencyType,
+                    description = entity.Description,
+                    formTypes = entity.FormTypes
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateScheduleConfig failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
                 return StatusCode(500, message);
             }
@@ -562,13 +633,25 @@ namespace api.xraycare.Controllers
                     if (string.IsNullOrWhiteSpace(cfg.StartDate) || string.IsNullOrWhiteSpace(cfg.FrequencyType))
                         continue;
 
-                    var parts = cfg.StartDate.Split('/');
-                    if (parts.Length != 3) continue;
-
-                    if (!int.TryParse(parts[0], out int day) ||
-                        !int.TryParse(parts[1], out int month) ||
-                        !int.TryParse(parts[2], out int year))
-                        continue;
+                    int day, month, year;
+                    if (cfg.StartDate.Contains('-'))
+                    {
+                        var parts = cfg.StartDate.Split('-');
+                        if (parts.Length != 3) continue;
+                        if (!int.TryParse(parts[0], out year) ||
+                            !int.TryParse(parts[1], out month) ||
+                            !int.TryParse(parts[2], out day))
+                            continue;
+                    }
+                    else
+                    {
+                        var parts = cfg.StartDate.Split('/');
+                        if (parts.Length != 3) continue;
+                        if (!int.TryParse(parts[0], out day) ||
+                            !int.TryParse(parts[1], out month) ||
+                            !int.TryParse(parts[2], out year))
+                            continue;
+                    }
 
                     DateTime startDate;
                     try { startDate = new DateTime(year, month, day); }
@@ -685,5 +768,14 @@ namespace api.xraycare.Controllers
         public string startDate { get; set; } = "";
         public string frequencyType { get; set; } = "";
         public string? description { get; set; }
+        public List<string>? formTypes { get; set; }
+    }
+
+    public class UpdateScheduleConfigRequest
+    {
+        public string? startDate { get; set; }
+        public string? frequencyType { get; set; }
+        public string? description { get; set; }
+        public List<string>? formTypes { get; set; }
     }
 }

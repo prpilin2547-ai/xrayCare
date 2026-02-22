@@ -216,54 +216,54 @@ const handleSave = async (payloadF8_2) => {
 @import '../components/Forms/_formTableCommon.css';
 
 .checklist-page {
-  background: #ffffff;
+  padding: 0;
   min-height: calc(100vh - 56px);
-  padding: 24px 32px 32px;
 }
 
 .page-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
 }
 
 .pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
 .pill {
-  background: #ffb480;
-  color: #111827;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  background: #f1f5f9;
+  color: var(--text-secondary, #475569);
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.82rem;
   font-weight: 500;
   white-space: nowrap;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .pill-main {
-  color: #047857;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #6d28d9;
   font-weight: 700;
+  border-color: #c4b5fd;
 }
 
 .page-layout {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  gap: 24px;
 }
 
-/* sidebar */
 .form-sidebar {
-  width: 260px;
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 0 0 1px #e5e7eb;
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .sidebar-section-label {
@@ -271,26 +271,32 @@ const handleSave = async (payloadF8_2) => {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 6px;
 }
 
 .form-tab {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  margin-bottom: 8px;
-  transition: background 0.18s ease, transform 0.12s ease;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: var(--text-secondary, #475569);
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .form-tab:hover {
-  background: #e5e7eb;
-  transform: translateY(-1px);
+  background: #f1f5f9;
 }
 
 .form-tab.active {
-  background: #3b82f6;
-  color: #ffffff;
+  background: linear-gradient(135deg, rgba(108,60,224,0.1), rgba(139,92,246,0.06));
+  color: var(--purple-main, #6c3ce0);
+  font-weight: 600;
+  border-left: 3px solid var(--purple-main, #6c3ce0);
 }
 
 .form-code {
@@ -303,33 +309,29 @@ const handleSave = async (payloadF8_2) => {
   font-size: 0.85rem;
 }
 
-/* content */
 .form-content {
   flex: 1;
+  min-width: 0;
 }
 
 .section-label {
   font-size: 1rem;
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 10px;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 16px;
 }
 
-@media (max-width: 960px) {
-  .page-layout {
-    flex-direction: column;
-  }
-
-  .form-sidebar {
-    width: 100%;
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-  }
-
-  .form-tab {
-    flex: 1;
-    min-width: 170px;
-  }
+@media (max-width: 1024px) {
+  .page-layout { flex-direction: column; gap: 16px; }
+  .form-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .form-tab { padding: 8px 14px; font-size: 0.8rem; }
+  .form-content { width: 100%; }
+}
+@media (max-width: 640px) {
+  .checklist-page { padding: 0; }
+  .pill-row { gap: 6px; }
+  .pill { font-size: 0.75rem; padding: 5px 12px; }
+  .section-label { font-size: 0.9rem; }
+  .form-tab { padding: 7px 10px; font-size: 0.75rem; }
 }
 </style>

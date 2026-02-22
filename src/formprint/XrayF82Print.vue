@@ -19,8 +19,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -75,7 +74,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -133,34 +131,30 @@ function handlePrint () {
   window.print()
 }
 
-// โหลดข้อมูลจริงจาก backend
-onMounted(async () => {
-  const id = route.params.id
+const API_BASE = '/api/Xraycare'
 
+onMounted(async () => {
+  const id = route.query.id || route.params.id
+  if (!id) return
   try {
-    // แก้ URL ให้ตรงกับ API ของคุณเอง
-    // ตัวอย่างโครงข้อมูลที่คาดหวังจาก backend:
-    // {
-    //   formTitle: '...',
-    //   frequency: 'ทุก 6 เดือน',
-    //   rows: [
-    //     { fpdNo, fpdSize, id, ei, ddi, pixelMean },
-    //     ...
-    //   ]
-    // }
-    const res = await fetch(`/api/print/f8-2/${id}`)
-    if (res.ok) {
-      const data = await res.json()
-      if (data.formTitle) record.value.formTitle = data.formTitle
-      if (data.frequency) record.value.frequency = data.frequency
-      if (Array.isArray(data.rows)) record.value.rows = data.rows
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData)
+        if (parsed.formTitle !== undefined) record.value.formTitle = parsed.formTitle
+        if (parsed.frequency !== undefined) record.value.frequency = parsed.frequency
+        if (Array.isArray(parsed.rows)) record.value.rows = parsed.rows
+      } catch (_) {}
     }
-  } catch (err) {
-    console.error('โหลดข้อมูล F8-2 ไม่สำเร็จ', err)
+  } catch (e) {
+    console.error('Load checklist record error:', e)
   }
 })
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -169,45 +163,6 @@ onMounted(async () => {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 16pt;
   font-weight: 400;
-}
-
-/* พื้นหลัง print */
-.print-root {
-  background: #e5e7eb;
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ปุ่ม Print */
-.print-toolbar {
-  margin-bottom: 18px;
-}
-
-.btn-print {
-  padding: 6px 18px;
-  background: #fff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-  font-size: 16pt;
-}
-
-/* A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 180mm;
-  padding: 20mm 0 18mm;
 }
 
 /* ============================
@@ -304,28 +259,7 @@ onMounted(async () => {
 }
 
 
-/* ============================
-   PRINT
-   ============================ */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
+  .f82-table th, .f82-table td { border: 1px solid #000 !important; }
 }
 </style>

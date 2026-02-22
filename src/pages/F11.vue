@@ -477,104 +477,116 @@ const saveForm = async () => {
 </script>
 
 <style scoped>
-/* layout หลักเหมือนตัวอย่าง */
+/* Page wrapper */
 .checklist-page {
-  background: #ffffff;
-  min-height: calc(100vh - 56px);
-  padding: 24px 32px 32px;
+  padding: 0;
 }
 
-/* หัวข้อบนสุด */
+/* Page title */
 .page-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
 }
 
-/* แคปซูลด้านบน */
+/* Info pills */
 .pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
 .pill {
-  background: #ffb480;
-  color: #111827;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  background: #f1f5f9;
+  color: var(--text-secondary, #475569);
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.82rem;
   font-weight: 500;
   white-space: nowrap;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
-/* กล่องเนื้อหากลาง */
+/* Content panel */
 .content-panel {
-  background: #ffffff;
-  padding: 20px 24px 28px;
-  box-shadow: 0 0 0 1px #e5e5e5;
+  background: var(--bg-card, #ffffff);
+  padding: 24px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
 }
 
-/* ตาราง */
+/* Table wrapper */
 .table-wrapper {
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-md, 12px);
   overflow: hidden;
-  border: 1px solid #d4d4d4;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
+/* Check table */
 .check-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.check-table td {
-  padding: 10px 12px;
+.check-table td,
+.check-table th {
+  padding: 10px 14px;
   vertical-align: top;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-/* แถวหัวหลัก */
 .row-header-main td {
   font-weight: 700;
-  background: #55b4ff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
+  font-size: 0.85rem;
 }
 
-/* หัวคอลัมน์ */
 .row-header-columns td {
   font-weight: 600;
-  background: #f3f4f6;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
 }
 
-/* สลับสีแถว */
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
-  background: #f9fafb;
+  background: #ffffff;
 }
 .check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
-  background: #e5e7eb;
+  background: #f8fafc;
 }
 
 .cell-label {
   width: 20%;
+  color: var(--text-secondary, #475569);
 }
 
 .text-center {
   text-align: center;
 }
 
-/* input ต่าง ๆ */
-.input-text {
+/* Text inputs */
+.input-text,
+.input-select {
   width: 100%;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  padding: 6px 8px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.input-text:focus,
+.input-select:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
 }
 
 .input-number {
@@ -585,11 +597,17 @@ const saveForm = async () => {
   width: 100%;
   min-height: 80px;
   resize: vertical;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  padding: 6px 8px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.input-textarea:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
 }
 
 .small-textarea {
@@ -598,81 +616,97 @@ const saveForm = async () => {
 
 .field-label {
   font-size: 0.78rem;
-  font-weight: 500;
-  color: #4b5563;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
 }
 
-/* ปุ่มลบแถว */
+.mb-4 { margin-bottom: 4px; }
+
+/* Add/Remove buttons */
 .btn-remove-row {
-  margin-top: 6px;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  background: #f97373;
-  color: #ffffff;
+  margin-top: 8px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: var(--radius-sm, 8px);
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 150ms;
 }
 
 .btn-remove-row:hover {
-  background: #e15858;
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
-/* ปุ่มด้านล่าง */
+/* Action buttons */
 .actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
-.btn-remark,
 .btn-save {
   border: none;
-  border-radius: 4px;
-  padding: 8px 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 28px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-}
-
-.btn-remark {
-  background: #ff6b81;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
-}
-
-.btn-remark:hover {
-  background: #e0556a;
-}
-
-.btn-save {
-  background: #65d46e;
-  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-save:hover {
-  background: #4fb759;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.4);
 }
 
+.btn-remark {
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(244,63,94,0.3);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.btn-remark:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(244,63,94,0.4);
+}
+
+/* Required field indicator */
 .required {
-  color: #dc2626;
-  margin-left: 2px;
+  color: #ef4444;
 }
 
 .mb-16 {
   margin-bottom: 16px;
 }
 
-/* responsive */
-@media (max-width: 768px) {
-  .checklist-page {
-    padding: 16px;
-  }
-  .pill-row {
-    gap: 8px;
-  }
-  .pill {
-    font-size: 0.8rem;
-  }
+@media (max-width: 1024px) {
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .check-table { min-width: 500px; }
+}
+@media (max-width: 640px) {
+  .checklist-page { padding: 0; }
+  .pill-row { gap: 6px; }
+  .pill { font-size: 0.75rem; padding: 5px 12px; }
+  .content-panel { padding: 12px; border-radius: 12px; }
+  .actions { flex-wrap: wrap; }
+  .btn-save { padding: 8px 16px; font-size: 0.8rem; width: 100%; }
+  .btn-remark { padding: 8px 16px; font-size: 0.8rem; }
+  .btn-add { padding: 7px 14px; font-size: 0.78rem; }
+  .input-text, .input-select { font-size: 0.8rem; padding: 6px 8px; }
 }
 </style>

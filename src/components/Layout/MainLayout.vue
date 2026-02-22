@@ -1,22 +1,30 @@
 <template>
   <div class="layout-root">
-    <!-- พื้นหลังเทาเข้มด้านนอก -->
-    <div class="layout-shell m-nav">
-      <TopBar :role="userRole" :username="userName" class="fixed-top"/>
-      <!-- แถบบนสีม่วง -->
-      <!-- ส่วนล่าง: sidebar + เนื้อหา -->
-      <div class="layout-body">
-        <SidebarNav :active="activeMenu" @navigate="onNavigate" class="" />
-        <main class="layout-content">
-          <slot />
-        </main>
-      </div>
+    <TopBar
+      :role="userRole"
+      :username="userName"
+      class="topbar-fixed"
+      @toggle-sidebar="toggleSidebar"
+    />
+
+    <div class="layout-body">
+      <SidebarNav
+        :active="activeMenu"
+        :open="sidebarOpen"
+        @navigate="onNavigate"
+        @close="sidebarOpen = false"
+        class="sidebar-slot"
+        :class="{ 'sidebar-desktop': !isMobile }"
+      />
+      <main class="layout-content" :class="{ 'content-full': isMobile }">
+        <slot />
+      </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import SidebarNav from './SidebarNav.vue'
 import TopBar from './TopBar.vue'
@@ -24,11 +32,20 @@ import TopBar from './TopBar.vue'
 const route = useRoute()
 const router = useRouter()
 
-/* ---------- อ่านข้อมูลผู้ใช้จาก localStorage ---------- */
 const userName = ref('')
 const userRole = ref('Tech')
+const sidebarOpen = ref(false)
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
+
+function onResize() {
+  windowWidth.value = window.innerWidth
+  if (windowWidth.value > 1024) {
+    sidebarOpen.value = false
+  }
+}
 
 onMounted(() => {
+  window.addEventListener('resize', onResize)
   try {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
@@ -37,6 +54,16 @@ onMounted(() => {
     console.error('Cannot read user from localStorage', e)
   }
 })
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+})
+
+const isMobile = computed(() => windowWidth.value <= 1024)
+
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value
+}
 
 const activeMenu = computed(() => {
   if (route.path.startsWith('/dashboard')) return 'dashboard'
@@ -63,11 +90,11 @@ const onNavigate = (menu) => {
   switch (menu) {
     case 'dashboard': router.push('/dashboard'); break
     case 'equipment': router.push('/machines/create'); break
-    case 'checklist': router.push('/dashboard'); break // ยังเป็น mock
+    case 'checklist': router.push('/dashboard'); break
     case 'pm': router.push('/pm-schedule'); break
     case 'export': router.push('/export-pdf'); break
     case 'analytical': router.push('/analytics'); break
-    case 'request': router.push('/requests'); break // ยังเป็น mock
+    case 'request': router.push('/requests'); break
     case 'profile': router.push('/profile'); break
     case 'admindashboard': router.push('/admindashboard'); break
     case 'engineerdashboard': router.push('/engineerdashboard'); break
@@ -87,31 +114,62 @@ const onNavigate = (menu) => {
 <style scoped>
 .layout-root {
   min-height: 100vh;
-  background: #111111;
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: flex-start; */
+  background: var(--bg-body, #f0f2f5);
 }
 
-.layout-shell {
-  width: 100%;
-  min-height: 100vh;
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
+.topbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 
 .layout-body {
   display: flex;
-  flex: 1;
+  padding-top: var(--topbar-h, 60px);
+  min-height: 100vh;
+}
+
+.sidebar-desktop {
+  position: fixed;
+  top: var(--topbar-h, 60px);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w, 260px);
+  overflow-y: auto;
+  z-index: 90;
 }
 
 .layout-content {
   flex: 1;
-  padding: 24px 32px 32px;
+  margin-left: var(--sidebar-w, 260px);
+  padding: 28px 32px 40px;
+  overflow-y: auto;
+  background: var(--bg-body, #f0f2f5);
+  min-height: calc(100vh - var(--topbar-h, 60px));
 }
 
-.m-nav {
-  margin-top: 56px;
+.layout-content.content-full {
+  margin-left: 0;
+}
+
+/* ====== TABLET (<= 1024px) ====== */
+@media (max-width: 1024px) {
+  .layout-content {
+    margin-left: 0;
+    padding: 20px 20px 32px;
+  }
+}
+
+/* ====== MOBILE (<= 640px) ====== */
+@media (max-width: 640px) {
+  .layout-body {
+    padding-top: 52px;
+  }
+
+  .layout-content {
+    padding: 16px 12px 24px;
+  }
 }
 </style>

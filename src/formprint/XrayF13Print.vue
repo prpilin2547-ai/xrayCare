@@ -19,8 +19,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- ===== หัวฟอร์ม ===== -->
         <div class="header-main align-with-table">
         <div class="title-main">
@@ -355,9 +354,8 @@
 
 </tbody>
 </table>
-        </div>
       </div>
-    </div>
+  </div>
 </template>
 
 <script setup>
@@ -524,34 +522,29 @@ function handlePrint () {
   window.print()
 }
 
-onMounted(async () => {
-  const id = route.params.id
+const API_BASE = '/api/Xraycare'
 
-  // ตัวอย่างการดึงข้อมูลจาก backend (ปรับ URL / โครง response ตามระบบจริงของคุณ)
-  // try {
-  //   const res = await fetch(`/api/print/f13/${id}`)
-  //   const data = await res.json()
-  //
-  //   header.value = {
-  //     frequencyLabel: data.header.frequencyLabel,
-  //     probeInfo: data.header.probeInfo,
-  //     phantom: data.header.phantom,
-  //     power: data.header.power,
-  //     tgc: data.header.tgc,
-  //     gain: data.header.gain,
-  //     testDate: data.header.testDate
-  //   }
-  //
-  //   // ถ้า backend มีรายละเอียด baseline / action / defect แยกของแต่ละ test
-  //   // สามารถ map เข้ามาแทนค่าเริ่มต้นใน tests ได้
-  //   // ตัวอย่าง:
-  //   // tests.value = data.tests
-  // } catch (e) {
-  //   console.error('โหลดข้อมูล F13 ไม่สำเร็จ', e)
-  // }
+onMounted(async () => {
+  const id = route.query.id || route.params.id
+  if (!id) return
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData)
+        if (parsed.header && typeof parsed.header === 'object') Object.assign(header.value, parsed.header)
+        if (Array.isArray(parsed.tests)) tests.value = parsed.tests
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.error('Load checklist record error:', e)
+  }
 })
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -560,44 +553,6 @@ onMounted(async () => {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
   font-size: 16pt;
   font-weight: 400;
-}
-
-/* ===== พื้นหลัง & ปุ่ม ===== */
-.print-root {
-  background: #e5e7eb;   /* เทาอ่อนแบบภาพที่หนึ่ง */
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.print-toolbar {
-  margin-bottom: 16px;
-}
-
-.btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-}
-
-/* A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 185mm;
-  padding: 18mm 0 16mm;
-  /* ใช้ฟอนต์ 11pt จาก * */
 }
 
 /* Header */
@@ -750,24 +705,7 @@ onMounted(async () => {
 }
 
 
-/* โหมดพิมพ์ */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
+  .qc-table th, .qc-table td { border: 1px solid #000 !important; }
 }
 </style>

@@ -21,8 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -181,7 +180,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -234,15 +232,32 @@ function handlePrint() {
   window.print();
 }
 
+const API_BASE = '/api/Xraycare';
+
 // โหลดข้อมูลจริงจาก backend
 onMounted(async () => {
-  const id = route.params.id;
+  const id = route.query.id || route.params.id;
   if (!id) return;
-
-  // fetch ของจริงค่อยมาเติมภายหลัง
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData);
+        if (parsed.header && typeof parsed.header === 'object') Object.assign(header.value, parsed.header);
+        if (Array.isArray(parsed.reasons)) reasons.value = parsed.reasons;
+        if (parsed.summary && typeof parsed.summary === 'object') Object.assign(summary.value, parsed.summary);
+        if (parsed.footer && typeof parsed.footer === 'object') Object.assign(footer.value, parsed.footer);
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.error('Load checklist record error:', e);
+  }
 });
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");
 
@@ -250,45 +265,6 @@ onMounted(async () => {
 * {
   font-family: "TH Sarabun New", Tahoma, sans-serif !important;
   font-size: 16pt;
-}
-
-.print-root {
-  background: #e5e7eb;
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ปุ่ม print */
-.print-toolbar {
-  margin-bottom: 16px;
-}
-
-.btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-  font-size: 16pt;
-}
-
-/* A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 180mm;
-  padding: 18mm 0 14mm;
-  line-height: 1.2;
 }
 
 /* Header */
@@ -436,26 +412,7 @@ onMounted(async () => {
   font-weight: 400;
 }
 
-/* การพิมพ์ */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
+  .f12-table th, .f12-table td { border: 1px solid #000 !important; }
 }
 </style>

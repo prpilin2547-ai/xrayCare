@@ -168,7 +168,7 @@ onMounted(() => {
 
 <style scoped>
 .checklist-page {
-  background: #ffffff;
+  background: var(--bg-card, #ffffff);
   min-height: calc(100vh - 56px);
   padding: 24px 32px 32px;
 }
@@ -176,33 +176,35 @@ onMounted(() => {
 .page-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #000000;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  color: var(--text-main, #0f172a);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
 }
 
 .content-panel {
-  background: #ffffff;
-  padding: 20px 24px 28px;
-  box-shadow: 0 0 0 1px #e5e5e5;
+  background: var(--bg-card, #ffffff);
+  padding: 24px 28px 32px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
 }
 
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .section-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
 }
 
 .section-subtitle {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-secondary, #475569);
   margin-top: 4px;
 }
 
@@ -212,52 +214,52 @@ onMounted(() => {
 }
 
 .btn-outline {
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 8px 14px;
-  font-size: 0.82rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 16px;
+  font-size: 0.85rem;
   cursor: pointer;
-  background: #ffffff;
+  background: var(--bg-card, #fff);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-outline:hover {
-  background: #e5e7eb;
+  background: #f1f5f9;
 }
 
-/* Grid การ์ดแบบฟอร์ม */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .form-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f9fafb, #e5f3ff);
-  border-radius: 12px;
-  padding: 14px 14px 12px;
-  box-shadow: 0 0 0 1px #d1d5db;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s;
+  transition: all 250ms;
 }
 
 .form-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
-  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .form-code {
-  align-self: flex-start;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #1d4ed8;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 600;
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #7c3aed;
   margin-bottom: 10px;
 }
 
@@ -266,15 +268,15 @@ onMounted(() => {
 }
 
 .form-title {
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  margin: 8px 0 4px;
 }
 
 .form-desc {
-  font-size: 0.82rem;
-  color: #4b5563;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 8px;
 }
 
@@ -285,79 +287,70 @@ onMounted(() => {
 }
 
 .badge {
-  background: #e0f2fe;
-  color: #0369a1;
-  border-radius: 999px;
+  background: #f0fdf4;
+  color: #15803d;
+  border-radius: var(--radius-full, 9999px);
   padding: 2px 10px;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .btn-card {
-  margin-top: 10px;
-  align-self: flex-end;
   border: none;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.78rem;
   cursor: pointer;
-  background: #65d46e;
-  color: #ffffff;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: all var(--transition-fast, 150ms);
+  box-shadow: 0 2px 6px rgba(108, 60, 224, 0.25);
+  margin-top: 12px;
+  align-self: flex-start;
 }
 
 .btn-card:hover {
-  background: #4fb759;
-  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 60, 224, 0.35);
 }
 
-.empty-card {
-  grid-column: 1 / -1;
-  padding: 16px 12px;
-  border-radius: 12px;
-  background: #f9fafb;
-  border: 1px dashed #d1d5db;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-/* ปุ่มลบฟอร์ม */
 .btn-delete {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.9);
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
+  top: 12px;
+  right: 12px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: var(--radius-sm, 8px);
+  padding: 5px 12px;
+  font-size: 0.75rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: all var(--transition-fast, 150ms);
   z-index: 10;
 }
 
 .btn-delete:hover {
-  background: rgba(220, 38, 38, 1);
-  transform: scale(1.1);
+  background: #fee2e2;
 }
 
-/* responsive */
-@media (max-width: 900px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
+.empty-card {
+  grid-column: 1 / -1;
+  padding: 32px 24px;
+  border-radius: var(--radius-lg, 16px);
+  background: #f8fafc;
+  border: 1px dashed var(--border-soft, #e2e8f0);
+  font-size: 0.9rem;
+  color: var(--text-muted, #94a3b8);
+  text-align: center;
 }
 
-@media (max-width: 768px) {
-  .checklist-page {
-    padding: 16px;
-  }
+@media (max-width: 1024px) {
+  .form-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+}
+@media (max-width: 640px) {
+  .header-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-card { padding: 16px; }
+  .page-title { font-size: 1.2rem; }
 }
 </style>

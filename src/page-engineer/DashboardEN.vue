@@ -160,68 +160,84 @@ onMounted(async () => {
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .page-title {
   margin: 0;
+  color: var(--text-main, #0f172a);
 }
 
 .cards-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
-.card {
-  background: white;
-  border-radius: 14px;
-  padding: 12px 14px;
-  border: 1px solid #e5e7eb;
+.card.summary-card {
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  padding: 18px 20px;
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  transition: all var(--transition-base, 250ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-.summary-card .card-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  margin: 0 0 4px;
+.card.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
 }
 
-.summary-card .card-label.pink {
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.card-label.pink,
+.card-label.date {
   color: #db2777;
 }
 
-.summary-card .card-label.blue {
-  color: #0037ff;
+.card-label.blue {
+  color: #2563eb;
 }
 
-.summary-card .card-label.red {
-  color: #ff0000;
-}
-
-.summary-card .card-label.orange {
+.card-label.red {
   color: #f97316;
 }
 
-.summary-card .card-label.green {
-  color: #0eb54b;
+.card-label.orange {
+  color: #f97316;
 }
 
-.summary-card .card-value {
+.card-label.green {
+  color: #059669;
+}
+
+.card-value {
   margin: 0;
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
 }
 
-@media (max-width: 960px) {
-  .cards-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+@media (max-width: 1024px) {
+  .cards-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table { min-width: 500px; }
+}
+@media (max-width: 640px) {
+  .cards-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-card { padding: 14px 16px; }
+  .card-value { font-size: 1.2rem; }
 }
 
 /* REQUEST SECTION HEADER */
 .request-section {
-  margin-top: 25px;
-  margin-bottom: 25px;
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -236,53 +252,87 @@ onMounted(async () => {
 .dot-blue {
   width: 10px;
   height: 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full, 9999px);
   background: #3b82f6;
 }
 
 .checklist-text {
   font-weight: 600;
   font-size: 0.9rem;
+  color: var(--text-main, #0f172a);
 }
 
-/* TABLE (เหมือน Dashboard.vue) */
+/* TABLE */
 .table-card {
-  margin-top: 20px;
-  background: white;
-  border-radius: 14px;
-  padding: 12px 14px 16px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  overflow: hidden;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-th,
-td {
+.table thead {
+  background: #f8fafc;
+}
+
+.table th {
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
   text-align: left;
-  padding: 6px 4px;
 }
 
-thead tr {
-  border-bottom: 1px solid #e5e7eb;
+.table td {
+  padding: 12px 16px;
+  color: var(--text-secondary, #475569);
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
 }
 
-tbody tr:nth-child(even) {
-  background: #f9fafb;
+.table tbody tr {
+  transition: background var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-.status.pending {
-  color: #ff0000;
+.table tbody tr:hover {
+  background: #f8fafc;
 }
 
-.status.in-progress {
-  color: #f97316;
+/* Status badges */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.status.completed {
-  color: #0eb54b;
+.status.pending,
+.status[class*="pending"] {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status.in-progress,
+.status[class*="progress"] {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.status.completed,
+.status[class*="completed"] {
+  background: #f0fdf4;
+  color: #15803d;
 }
 </style>

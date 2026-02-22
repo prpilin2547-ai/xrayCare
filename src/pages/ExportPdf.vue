@@ -1,217 +1,170 @@
 <template>
   <MainLayout>
     <div class="page" @click="closeFloatingUI">
-      <!-- ฟอร์มหน้าแรก -->
-      <div class="form-section-wrapper">
-        <!-- แถบบาร์ด้านบน -->
-        <div class="page-header">
-          <span class="page-header-title">
-            Export Report
-          </span>
+      <!-- รายการบันทึก Checklist (ตาราง + filter) -->
+      <div class="table-section-wrapper">
+        <div class="table-section-header">
+          <span class="table-section-title">รายการบันทึก Checklist</span>
         </div>
-
-        <!-- กล่องฟอร์ม (ติดกับหัวข้อเลย) -->
-        <div class="form-panel" @click.stop>
-          <form class="form">
-            <!-- X-ray machine -->
-            <div class="form-group">
-              <label for="checklistTypeDisplay">X-ray machine</label>
-              <div class="input-shell input-shell--plain" @click.stop>
-                <div class="select-wrapper">
-                  <select
-                    id="xrayMachine"
-                    v-model="machine"
-                    :class="{ 'select-placeholder': !machine }"
-                  >
-                    <option value="" disabled>
-                      ชื่อรุ่น/ชื่อเครื่อง X-ray/หมายเลขห้อง
-                    </option>
-                    <option
-                      v-for="(label, value) in machineOptions"
-                      :key="value"
-                      :value="value"
-                    >
-                      {{ label }}
-                    </option>
-                  </select>
-                  <span class="arrow">▾</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Checklist type (multi-select) -->
-            <div class="form-group">
-              <label for="checklistTypeDisplay">Checklist type</label>
-              <div class="input-shell" @click.stop>
-                <!-- กล่องกดเลือก -->
-                <div
-                  id="checklistTypeDisplay"
-                  class="select-wrapper multiselect-trigger"
-                  @click="toggleChecklistDropdown"
+        <div class="table-panel" @click.stop>
+          <!-- แถบ Filter -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label>เครื่อง X-ray</label>
+              <select v-model="filterMachine" class="filter-select">
+                <option value="">ทั้งหมด</option>
+                <option
+                  v-for="(label, value) in machineOptions"
+                  :key="value"
+                  :value="value"
                 >
-                  <div class="multiselect-display">
-                    <span
-                      v-if="!selectedItemLabel"
-                      class="placeholder-checklist"
-                    >
-                      Checklist type
-                    </span>
-                    <span v-else class="chip">
-                      {{ selectedItemLabel }}
-                    </span>
-                  </div>
-                  <span class="arrow">▾</span>
-                </div>
-
-                <!-- รายการใน dropdown -->
-                <div
-                  v-if="isChecklistDropdownOpen"
-                  class="multiselect-dropdown"
+                  {{ label }}
+                </option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>ประเภทแบบฟอร์ม</label>
+              <select v-model="filterFormType" class="filter-select">
+                <option value="">ทั้งหมด</option>
+                <option
+                  v-for="opt in formTypeOptions"
+                  :key="opt.value"
+                  :value="opt.value"
                 >
-                  <div
-                    v-for="group in checklistGroups"
-                    :key="group.id"
-                    class="multi-group"
-                  >
-                    <!-- หัวข้อหลัก: Daily check / 1 Month / ... -->
-                    <div class="multi-group-header">
-                      <span class="group-label">
-                        {{ group.label }}
-                      </span>
-                    </div>
-
-                    <!-- รายการย่อย (เลือกได้แค่ 1 อัน) -->
-                    <div class="multi-items">
-                      <button
-                        v-for="item in group.items"
-                        :key="item.id"
-                        type="button"
-                        class="multi-item"
-                        @click="selectItem(item.id)"
-                      >
-                        <span
-                          class="radio-dot"
-                          :class="{ 'radio-dot-checked': checklistType === item.id }"
-                        ></span>
-                        <span class="item-label">
-                          {{ item.label }}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  {{ opt.label }}
+                </option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>จากวันที่</label>
+              <div class="filter-date-wrapper">
+                <input
+                  v-model="filterDateFrom"
+                  type="text"
+                  class="filter-input"
+                  placeholder="DD/MM/YYYY"
+                  maxlength="10"
+                  readonly
+                  @focus="openFilterCalendar('from')"
+                />
+                <button
+                  type="button"
+                  class="filter-date-icon"
+                  title="เลือกจากวันที่"
+                  @click.stop="openFilterCalendar('from')"
+                >
+                  <i class="fa-solid fa-calendar-days"></i>
+                </button>
               </div>
             </div>
-
-            <!-- Date -->
-            <div class="form-group">
-              <label for="date">Date</label>
-              <div class="input-shell">
-                <div class="date-wrapper">
-                  <!-- Daily check → แสดงแค่เดือน/ปี -->
-                  <input
-                    v-if="isDailyCheck"
-                    id="date"
-                    v-model="date"
-                    type="text"
-                    placeholder="MM/YYYY"
-                    maxlength="7"
-                    readonly
-                  />
-                  <!-- อื่นๆ → DD/MM/YYYY -->
-                  <input
-                    v-else
-                    id="date"
-                    v-model="date"
-                    type="text"
-                    placeholder="DD/MM/YYYY"
-                    maxlength="10"
-                    @input="formatDate"
-                    @keypress="onlyNumber"
-                  />
-                  <button
-                    type="button"
-                    class="date-icon"
-                    @click.stop="openCalendarFromInput"
-                  >
-                    📅
-                  </button>
-                </div>
+            <div class="filter-group">
+              <label>ถึงวันที่</label>
+              <div class="filter-date-wrapper">
+                <input
+                  v-model="filterDateTo"
+                  type="text"
+                  class="filter-input"
+                  placeholder="DD/MM/YYYY"
+                  maxlength="10"
+                  readonly
+                  @focus="openFilterCalendar('to')"
+                />
+                <button
+                  type="button"
+                  class="filter-date-icon"
+                  title="เลือกถึงวันที่"
+                  @click.stop="openFilterCalendar('to')"
+                >
+                  <i class="fa-solid fa-calendar-days"></i>
+                </button>
               </div>
             </div>
-          </form>
-
-          <!-- ปุ่มตัวอย่างไฟล์ -> ไปหน้า XrayF1Print -->
-          <div class="preview-wrapper">
-            <button class="btn-primary" @click="goToXrayPrint">
-              ตัวอย่างไฟล์
+            <button type="button" class="btn-clear-filter" @click="clearTableFilters">
+              <i class="fa-solid fa-xmark icon-btn icon-btn-close"></i>
             </button>
+          </div>
+
+          <!-- ตาราง -->
+          <div class="table-responsive">
+            <table class="records-table">
+              <thead>
+                <tr>
+                  <th>ลำดับ</th>
+                  <th>ประเภทแบบฟอร์ม</th>
+                  <th>เครื่อง</th>
+                  <th>ห้อง</th>
+                  <th>วันที่ตรวจ</th>
+                  <th>ผู้ตรวจ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="loadingRecords">
+                  <td colspan="7" class="text-center">กำลังโหลด...</td>
+                </tr>
+                <tr v-else-if="filteredRecords.length === 0">
+                  <td colspan="7" class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <span>ไม่มีรายการ</span>
+                  </td>
+                </tr>
+                <tr
+                  v-else
+                  v-for="(row, idx) in filteredRecords"
+                  :key="row.id"
+                >
+                  <td>{{ idx + 1 }}</td>
+                  <td>{{ getFormTypeLabel(row.formType) }}</td>
+                  <td>{{ row.machineName || '-' }}</td>
+                  <td>{{ row.room || '-' }}</td>
+                  <td>{{ row.checkDate || '-' }}</td>
+                  <td>{{ row.tester || '-' }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn-preview-row"
+                      @click="goToPrintFromRow(row)"
+                    >
+                      ตัวอย่างไฟล์
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- ป็อปอัพปฏิทิน -->
+      <!-- ปฏิทินสำหรับ filter วันที่ -->
       <div
-        v-if="isCalendarVisible && !isDailyMode"
+        v-if="isFilterCalendarVisible"
         class="calendar-popup-overlay"
-        @click="isCalendarVisible = false"
+        @click="isFilterCalendarVisible = false"
       >
         <div class="calendar-popup-box" @click.stop>
-          <!-- Daily check → เลือกเดือนเท่านั้น -->
-          <template v-if="isDailyCheck">
-            <div class="calendar-header">
-              <button class="nav-btn" @click.stop="currentYear--">&lt;</button>
-              <span class="month-title">{{ currentYear }}</span>
-              <button class="nav-btn" @click.stop="currentYear++">&gt;</button>
-            </div>
-
-            <div class="month-picker-grid">
-              <button
-                v-for="(name, idx) in monthPickerNames"
-                :key="idx"
-                type="button"
-                class="month-cell"
-                :class="{
-                  'is-selected': date === String(idx + 1).padStart(2, '0') + '/' + currentYear,
-                  'is-today': idx === today.getMonth() && currentYear === today.getFullYear()
-                }"
-                @click="selectMonth(idx)"
-              >
-                {{ name }}
-              </button>
-            </div>
-          </template>
-
-          <!-- อื่นๆ → เลือกวัน -->
-          <template v-else>
-            <div class="calendar-header">
-              <button class="nav-btn" @click.stop="changeMonth(-1)">&lt;</button>
-              <span class="month-title">{{ currentMonthYear }}</span>
-              <button class="nav-btn" @click.stop="changeMonth(1)">&gt;</button>
-            </div>
-
-            <div class="calendar-grid">
-              <div class="weekday" v-for="d in weekdays" :key="d">
-                {{ d }}
-              </div>
-
-              <div
-                v-for="cell in daysGrid"
-                :key="cell.key"
-                class="day-cell"
-                :class="{
-                  'is-empty': !cell.day,
-                  'is-today': cell.isToday,
-                  'is-selected': cell.isSelected
-                }"
-                @click="cell.day ? selectDate(cell.date) : null"
-              >
-                <div class="day-number">
-                  <span v-if="cell.day">{{ cell.day }}</span>
-                </div>
+          <div class="calendar-header">
+            <button class="nav-btn" type="button" @click.stop="changeFilterMonth(-1)">&lt;</button>
+            <span class="month-title">{{ filterCalMonthYear }}</span>
+            <button class="nav-btn" type="button" @click.stop="changeFilterMonth(1)">&gt;</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="weekday" v-for="d in weekdays" :key="d">{{ d }}</div>
+            <div
+              v-for="cell in filterDaysGrid"
+              :key="cell.key"
+              class="day-cell"
+              :class="{
+                'is-empty': !cell.day,
+                'is-today': cell.isToday,
+                'is-selected': cell.isSelected
+              }"
+              @click="cell.day ? selectFilterDate(cell.date) : null"
+            >
+              <div class="day-number">
+                <span v-if="cell.day">{{ cell.day }}</span>
               </div>
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </div>
@@ -273,6 +226,219 @@ const machineOptions = computed(() => {
   return opts
 })
 
+// ---------- ตารางรายการบันทึก Checklist ----------
+const checklistRecords = ref([])
+const loadingRecords = ref(false)
+const filterMachine = ref('')
+const filterFormType = ref('')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+const isFilterCalendarVisible = ref(false)
+const filterCalendarTarget = ref('from') // 'from' | 'to'
+const filterCalMonth = ref(today.getMonth())
+const filterCalYear = ref(today.getFullYear())
+
+const filterCalMonthYear = computed(() => {
+  return `${monthNames[filterCalMonth.value]} ${filterCalYear.value}`
+})
+
+const filterSelectedDate = computed(() => {
+  const val = filterCalendarTarget.value === 'from' ? filterDateFrom.value : filterDateTo.value
+  return parseDateString(val)
+})
+
+const filterDaysGrid = computed(() => {
+  const cells = []
+  const firstDayOfMonth = new Date(filterCalYear.value, filterCalMonth.value, 1).getDay()
+  const daysInMonth = new Date(filterCalYear.value, filterCalMonth.value + 1, 0).getDate()
+
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    cells.push({ key: `fe-${i}`, day: null, isToday: false, isSelected: false })
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(filterCalYear.value, filterCalMonth.value, d)
+    const isToday =
+      d === today.getDate() &&
+      filterCalMonth.value === today.getMonth() &&
+      filterCalYear.value === today.getFullYear()
+    let isSelected = false
+    if (filterSelectedDate.value) {
+      isSelected =
+        d === filterSelectedDate.value.getDate() &&
+        filterCalMonth.value === filterSelectedDate.value.getMonth() &&
+        filterCalYear.value === filterSelectedDate.value.getFullYear()
+    }
+    cells.push({ key: `fd-${d}`, day: d, date: dateObj, isToday, isSelected })
+  }
+  const totalCells = 42
+  const cellsToFill = totalCells - cells.length
+  for (let i = 0; i < cellsToFill; i++) {
+    cells.push({ key: `fp-${i}`, day: null, isToday: false, isSelected: false })
+  }
+  return cells.slice(0, 42)
+})
+
+function changeFilterMonth(delta) {
+  const newDate = new Date(filterCalYear.value, filterCalMonth.value + delta, 1)
+  filterCalMonth.value = newDate.getMonth()
+  filterCalYear.value = newDate.getFullYear()
+}
+
+function openFilterCalendar(target) {
+  filterCalendarTarget.value = target
+  const val = target === 'from' ? filterDateFrom.value : filterDateTo.value
+  const parsed = parseDateString(val)
+  if (parsed) {
+    filterCalMonth.value = parsed.getMonth()
+    filterCalYear.value = parsed.getFullYear()
+  } else {
+    filterCalMonth.value = today.getMonth()
+    filterCalYear.value = today.getFullYear()
+  }
+  isFilterCalendarVisible.value = true
+}
+
+function selectFilterDate(dateObj) {
+  const day = String(dateObj.getDate()).padStart(2, '0')
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+  const year = dateObj.getFullYear()
+  const str = `${day}/${month}/${year}`
+  if (filterCalendarTarget.value === 'from') {
+    filterDateFrom.value = str
+  } else {
+    filterDateTo.value = str
+  }
+  isFilterCalendarVisible.value = false
+}
+
+// formType จาก API (F1_F2, F10, ...) → label และ route พิมพ์
+const formTypeToLabel = {
+  F1_F2: 'F1/F2 : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
+  F10: 'F10 : แบบบันทึกการตรวจสอบความสว่างแสงไฟ',
+  F12: 'F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ',
+  F3_F6: 'F3-F6 : การควบคุมคุณภาพจอภาพ / บันทึกการตรวจสอบเครื่อง',
+  F7_F8: 'F7-F8 : Collimator / Dark noise CR/DR',
+  F9: 'F9 : การตรวจสอบคุณภาพเสื้อตะกั่ว',
+  F11: 'F11 : แบบบันทึกผลการวัดความหนาผู้ป่วย',
+  F13: 'F13 : แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์',
+}
+const formTypeToRoute = {
+  F1_F2: 'XrayF1Print',
+  F10: 'XrayF10Print',
+  F12: 'XrayF12Print',
+  F3_F6: 'XrayF3Print',
+  F7_F8: 'XrayF71Print',
+  F9: 'XrayF9Print',
+  F11: 'XrayF11Print',
+  F13: 'XrayF13Print',
+}
+
+const formTypeOptions = computed(() => {
+  const seen = new Set()
+  const list = []
+  checklistRecords.value.forEach(r => {
+    const ft = r.formType || ''
+    if (ft && !seen.has(ft)) {
+      seen.add(ft)
+      list.push({ value: ft, label: formTypeToLabel[ft] || ft })
+    }
+  })
+  list.sort((a, b) => (a.label || '').localeCompare(b.label || ''))
+  return list
+})
+
+const filteredRecords = computed(() => {
+  let list = checklistRecords.value
+  if (filterMachine.value) {
+    const m = machines.value.find(mach => `machine-${mach.id}` === filterMachine.value)
+    if (m) {
+      list = list.filter(r => (r.machineName || '').trim() === (m.machineName || '').trim() && (r.room || '').trim() === (m.room || '').trim())
+    }
+  }
+  if (filterFormType.value) {
+    list = list.filter(r => (r.formType || '') === filterFormType.value)
+  }
+  if (filterDateFrom.value && filterDateFrom.value.trim()) {
+    const fromDate = parseDateString(filterDateFrom.value.trim())
+    if (fromDate) {
+      const fromTime = fromDate.getTime()
+      list = list.filter(r => {
+        const cd = parseCheckDate(r.checkDate || '')
+        if (!cd) return false
+        return cd.getTime() >= fromTime
+      })
+    }
+  }
+  if (filterDateTo.value && filterDateTo.value.trim()) {
+    const toDate = parseDateString(filterDateTo.value.trim())
+    if (toDate) {
+      const toTime = toDate.getTime()
+      list = list.filter(r => {
+        const cd = parseCheckDate(r.checkDate || '')
+        if (!cd) return false
+        return cd.getTime() <= toTime
+      })
+    }
+  }
+  return list
+})
+
+function getFormTypeLabel(formType) {
+  return formTypeToLabel[formType] || formType || '-'
+}
+
+function clearTableFilters() {
+  filterMachine.value = ''
+  filterFormType.value = ''
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
+}
+
+async function loadChecklistRecords() {
+  loadingRecords.value = true
+  try {
+    const res = await fetch(`${API_BASE}/GetAllChecklistRecords`)
+    if (res.ok) {
+      const data = await res.json()
+      checklistRecords.value = Array.isArray(data) ? data : []
+    } else {
+      checklistRecords.value = []
+    }
+  } catch (e) {
+    console.error('Load checklist records error:', e)
+    checklistRecords.value = []
+  } finally {
+    loadingRecords.value = false
+  }
+}
+
+function getMachineQueryFromRow(row) {
+  if (!row.machineName && !row.room) return ''
+  const m = machines.value.find(mach =>
+    (mach.machineName || '').trim() === (row.machineName || '').trim() &&
+    (mach.room || '').trim() === (row.room || '').trim()
+  )
+  return m ? `machine-${m.id}` : (row.machineName || '')
+}
+
+function goToPrintFromRow(row) {
+  const routeName = formTypeToRoute[row.formType]
+  if (!routeName) {
+    alert('ไม่พบแบบฟอร์มสำหรับรายการนี้')
+    return
+  }
+  const machineQuery = getMachineQueryFromRow(row)
+  const dateQuery = row.checkDate || ''
+  router.push({
+    name: routeName,
+    query: {
+      id: row.id,
+      machine: machineQuery,
+      date: dateQuery,
+    },
+  })
+}
+
 onMounted(async () => {
   try {
     const res = await fetch(`${API_BASE}/GetAllMachines`)
@@ -283,6 +449,7 @@ onMounted(async () => {
   } catch (e) {
     console.error('Load machines error:', e)
   }
+  await loadChecklistRecords()
 })
 
 // ---------- Checklist groups & items ----------
@@ -410,7 +577,7 @@ const isDailyMode = computed(() => {
   const dailyGroup = checklistGroups.find((g) => g.id === 'daily')
   if (!dailyGroup) return false
   const dailyIds = dailyGroup.items.map((i) => i.id)
-  return checklistType.value.some((id) => dailyIds.includes(id))
+  return dailyIds.includes(checklistType.value)
 })
 
 // ✅ dropdown เดือนผูกกับ date (เก็บเป็น "MM/YYYY")
@@ -434,7 +601,9 @@ watch(isDailyMode, (val) => {
 
 // ---------- date helper ----------
 const parseDateString = (str) => {
-  const parts = str.split('/')
+  if (!str || typeof str !== 'string') return null
+  const trimmed = str.trim()
+  const parts = trimmed.split('/')
   if (parts.length !== 3) return null
   const [dd, mm, yyyy] = parts.map(Number)
   if (!dd || !mm || !yyyy) return null
@@ -447,6 +616,39 @@ const parseDateString = (str) => {
     return null
   }
   return d
+}
+
+/**
+ * รองรับ checkDate จาก API: DD/MM/YYYY, DD/MM/YYYY HH:mm:ss,
+ * DD/MM/พ.ศ. (ปี พ.ศ. >= 2400 แปลงเป็น ค.ศ.), YYYY-MM-DD
+ */
+const parseCheckDate = (str) => {
+  if (!str || typeof str !== 'string') return null
+  const trimmed = str.trim()
+  const datePart = trimmed.split(/\s+/)[0] || trimmed
+
+  const slashParts = datePart.split('/')
+  if (slashParts.length >= 3) {
+    const dd = parseInt(slashParts[0], 10)
+    const mm = parseInt(slashParts[1], 10)
+    let yyyy = parseInt(slashParts[2], 10)
+    if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) return null
+    if (yyyy >= 2400) yyyy -= 543
+    const d = new Date(yyyy, mm - 1, dd)
+    if (!isNaN(d.getTime()) && d.getDate() === dd && d.getMonth() === mm - 1 && d.getFullYear() === yyyy) return d
+  }
+
+  const iso = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (iso) {
+    let [, yyyy, mm, dd] = iso.map(Number)
+    if (yyyy >= 2400) yyyy -= 543
+    const d = new Date(yyyy, mm - 1, dd)
+    if (!isNaN(d.getTime())) return d
+  }
+
+  const parsed = parseDateString(trimmed)
+  if (parsed) return parsed
+  return null
 }
 
 const selectedDate = computed(() => parseDateString(date.value))
@@ -666,54 +868,11 @@ const goToXrayPrint = () => {
 </script>
 
 <style scoped>
-:root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
-}
-
 .page {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 12px 16px 32px;
-  background: #ffffff;
-}
-
-/* --------- Header bar --------- */
-.page-header {
-  max-width: 640px;
-  width: 100%;
-  margin: 15 auto;
-  padding: 12px 24px;
-  border-radius: 24px 24px 0 0;
-  background: #5b32d6;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 10px 18px rgba(91, 50, 214, 0.35);
-}
-
-.page-header-title {
-  font-size: 0.95rem;
-}
-
-.form-section-wrapper {
-  max-width: 640px;
-  width: 100%;
-}
-
-/* กล่องฟอร์มต่อเนื่องกับหัวข้อ */
-.form-panel {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 0 0 24px 24px;
-  padding: 32px 26px 26px;
-  margin: 0 auto;
-  box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.08),
-    0 0 0 1px rgba(148, 163, 184, 0.25);
-  backdrop-filter: blur(12px);
 }
 
 .form {
@@ -726,62 +885,57 @@ const goToXrayPrint = () => {
   display: block;
   font-size: 0.85rem;
   margin-bottom: 6px;
-  color: #4b5563;
+  color: var(--text-secondary, #475569);
   font-weight: 600;
 }
 
 .input-shell {
-  border-radius: 18px;
+  border-radius: var(--radius-md, 12px);
   padding: 3px 4px;
-  background: #f9fafb;
-  border: 1px solid transparent;
-  transition: all 0.18s ease;
+  background: #f8fafc;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
   position: relative;
 }
 
 .input-shell:focus-within {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.35);
-  background: #ffffff;
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  background: #fff;
 }
 
-/* select ปกติ */
 .select-wrapper {
   position: relative;
 }
 
 select {
   width: 100%;
-  border-radius: 14px;
+  border-radius: var(--radius-sm, 8px);
   border: none;
   padding: 10px 32px 10px 14px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   background: transparent;
   cursor: pointer;
   outline: none;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
-/* สีตัวเลือกใน dropdown */
 select option {
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
-/* placeholder (option ที่ disabled) ให้เป็นสีเทาอ่อน */
 select option[disabled] {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
 select:disabled {
   cursor: not-allowed;
 }
 
-/* ให้ select ของ X-ray machine เวลาเป็น placeholder เป็นสีเดียวกัน */
 select.select-placeholder {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
-/* ซ่อนลูกศรมาตรฐานของ browser */
 select {
   appearance: none;
   -webkit-appearance: none;
@@ -800,15 +954,10 @@ select::-ms-expand {
   transform: translateY(-50%);
   font-size: 0.95rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: var(--purple-soft, #8b5cf6);
   pointer-events: none;
-  background: #f3e8ff;
-  border-radius: 999px;
-  padding: 2px 6px;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.35);
 }
 
-/* ---------- custom multi-select ---------- */
 .multiselect-trigger {
   cursor: pointer;
   min-height: 40px;
@@ -818,45 +967,36 @@ select::-ms-expand {
 
 .multiselect-display {
   width: 100%;
-  padding: 6px 32px 6px 10px;
+  padding: 8px 32px 8px 14px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
 }
 
-/* placeholder ของ Checklist type (multiselect) */
 .placeholder-checklist {
-  font-size: 0.9rem;
-  color: #9ca3af;
-}
-
-.chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
 }
 
 .chip {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #eef2ff;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  background: #ede9fe;
   font-size: 0.78rem;
-  color: #4f46e5;
-  font-weight: 500;
-  border: 1px solid rgba(129, 140, 248, 0.65);
+  color: var(--purple-main, #6c3ce0);
+  font-weight: 600;
 }
 
-/* dropdown */
 .multiselect-dropdown {
   position: absolute;
   left: 0;
   right: 0;
   top: calc(100% + 4px);
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0,0,0,0.12));
   padding: 8px 10px 10px;
   max-height: 280px;
   overflow-y: auto;
@@ -864,7 +1004,7 @@ select::-ms-expand {
 }
 
 .multi-group + .multi-group {
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border-soft, #e2e8f0);
   margin-top: 6px;
   padding-top: 6px;
 }
@@ -882,7 +1022,7 @@ select::-ms-expand {
 .group-label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
 .multi-items {
@@ -898,59 +1038,32 @@ select::-ms-expand {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  padding: 3px 4px;
+  padding: 6px 8px;
   border: none;
   background: transparent;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.12s ease;
+  border-radius: var(--radius-sm, 8px);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .multi-item:hover {
-  background: #f3f4ff;
+  background: #f1f5f9;
 }
 
 .item-label {
   font-size: 0.8rem;
   text-align: left;
-  color: #374151;
+  color: var(--text-secondary, #475569);
 }
 
-/* checkbox style */
-.checkbox {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1px solid #cbd5e1;
-  margin-top: 2px;
-  box-sizing: border-box;
-  background: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  color: #ffffff;
-}
-
-.checkbox-checked {
-  background: #4f46e5;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
-}
-
-.checkbox-checked::after {
-  content: '✓';
-}
-
-/* radio dot style (single select) */
 .radio-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid var(--border-soft, #e2e8f0);
   margin-top: 2px;
   box-sizing: border-box;
-  background: #ffffff;
+  background: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -958,7 +1071,7 @@ select::-ms-expand {
 }
 
 .radio-dot-checked {
-  border-color: #4f46e5;
+  border-color: var(--purple-main, #6c3ce0);
 }
 
 .radio-dot-checked::after {
@@ -966,143 +1079,131 @@ select::-ms-expand {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #4f46e5;
+  background: var(--purple-main, #6c3ce0);
 }
 
-/* date input */
 .date-wrapper {
   display: flex;
   align-items: center;
-  border-radius: 14px;
+  border-radius: var(--radius-sm, 8px);
   padding-right: 2px;
 }
 
 .date-wrapper input {
   border: none;
   outline: none;
-  border-radius: 14px;
-  padding: 10px 12px 10px 14px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  font-size: 0.85rem;
   flex: 1;
   background: transparent;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
 .date-wrapper input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
 .date-icon {
   border: none;
-  background: #eef2ff;
-  border-radius: 999px;
-  width: 30px;
-  height: 30px;
+  background: #f1f5f9;
+  border-radius: var(--radius-sm, 8px);
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   margin-right: 4px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .date-icon:hover {
-  transform: translateY(-1px);
-  background: #e0e7ff;
-  box-shadow: 0 6px 14px rgba(129, 140, 248, 0.5);
+  background: #e2e8f0;
 }
 
-/* ปุ่ม primary */
 .btn-primary {
-  padding: 9px 26px;
-  border-radius: 999px;
   border: none;
-  background-image: linear-gradient(135deg, #4f46e5, #8b5cf6);
-  color: #f9fafb;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
   font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
-  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  filter: brightness(1.03);
-  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
 }
 
-.btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 8px 18px rgba(55, 48, 163, 0.4);
-}
-
-/* ปุ่มตัวอย่างไฟล์ */
 .preview-wrapper {
-  margin-top: 18px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
 }
 
-/* ป็อปอัพปฏิทิน */
 .calendar-popup-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.35);
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 900;
 }
 
 .calendar-popup-box {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 16px 18px 18px;
-  width: 320px;
-  box-shadow:
-    0 22px 50px rgba(15, 23, 42, 0.4),
-    0 0 0 1px rgba(148, 163, 184, 0.4);
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 20px;
+  width: 340px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .month-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
 .nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background-color: #eef2ff;
-  font-size: 0.85rem;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #fff;
+  font-size: 0.75rem;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .nav-btn:hover {
-  background-color: #e0e7ff;
-  transform: translateY(-1px);
+  background: #f1f5f9;
 }
 
-/* month picker grid (สำหรับ Daily check) */
 .month-picker-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1113,95 +1214,297 @@ select::-ms-expand {
 .month-cell {
   padding: 10px 4px;
   border: none;
-  border-radius: 12px;
-  background: #f3f4f6;
+  border-radius: var(--radius-sm, 8px);
+  background: #f8fafc;
   font-size: 0.82rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary, #475569);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .month-cell:hover {
-  background: #e5e7eb;
+  background: #f1f5f9;
 }
 
 .month-cell.is-today {
-  border: 1.5px solid #6366f1;
+  border: 2px solid var(--purple-main, #6c3ce0);
 }
 
 .month-cell.is-selected {
-  background: #4f46e5;
-  color: #ffffff;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
 }
 
-/* grid ปฏิทิน */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  row-gap: 6px;
-  column-gap: 4px;
+  gap: 4px;
   font-size: 0.8rem;
   text-align: center;
 }
 
 .weekday {
-  font-weight: 600;
-  color: #6b7280;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding-bottom: 8px;
 }
 
 .day-cell {
-  height: 32px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .day-cell.is-empty {
   pointer-events: none;
 }
 
+.day-cell:not(.is-empty):hover {
+  background: #f1f5f9;
+}
+
 .day-number span {
   display: inline-flex;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
-.day-number span:hover {
-  background-color: #e5e7eb;
-}
-
-/* วันนี้ */
 .day-cell.is-today .day-number span {
-  border: 1px solid #6366f1;
+  border: 2px solid var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #6c3ce0);
+  font-weight: 700;
 }
 
-/* วันที่เลือก */
 .day-cell.is-selected .day-number span {
-  background-color: #4f46e5;
-  color: #ffffff;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
 }
 
-/* --------- responsive --------- */
+/* ---------- ตารางรายการบันทึก Checklist ---------- */
+.table-section-wrapper {
+  max-width: 960px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.table-section-header {
+  padding: 12px 24px;
+  border-radius: var(--radius-xl, 20px) var(--radius-xl, 20px) 0 0;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.table-panel {
+  background: var(--bg-card, #fff);
+  border-radius: 0 0 var(--radius-xl, 20px) var(--radius-xl, 20px);
+  padding: 20px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+  border-top: none;
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.filter-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+}
+
+.filter-date-wrapper {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #f8fafc;
+  padding-right: 6px;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.filter-date-wrapper:focus-within {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background: #fff;
+}
+
+.filter-date-wrapper .filter-input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding-right: 8px;
+}
+
+.filter-date-wrapper .filter-input:focus {
+  box-shadow: none;
+}
+
+.filter-date-icon {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--purple-soft, #8b5cf6);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms;
+}
+
+.filter-date-icon:hover {
+  background: #ede9fe;
+}
+
+.filter-select,
+.filter-input {
+  min-width: 160px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  font-size: 0.85rem;
+  background: #f8fafc;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: none;
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  background: #fff;
+}
+
+.btn-clear-filter {
+  padding: 8px 16px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: var(--radius-sm, 8px);
+  background: #fff;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #475569);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.btn-clear-filter:hover {
+  background: #f1f5f9;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.records-table thead {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.records-table th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.records-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-secondary, #475569);
+}
+
+.records-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.records-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.empty-state {
+  padding: 32px 16px !important;
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+
+.empty-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.btn-preview-row {
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(108,60,224,0.3);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.btn-preview-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108,60,224,0.4);
+}
+
 @media (max-width: 640px) {
-  .form-panel {
-    padding: 24px 18px 20px;
-  }
-
-  /* ให้ select X-ray machine เป็นพื้นขาว */
-  .input-shell--plain {
-    background: #ffffff;
-  }
-
-  .input-shell--plain:focus-within {
-    background: #ffffff;
-  }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { font-size: 0.8rem; }
+  .input-shell input, .input-shell select, .select-wrapper select { font-size: 0.82rem; padding: 8px 10px; }
+  .btn-primary { padding: 10px 16px; font-size: 0.85rem; width: 100%; }
+  .table-section-wrapper { margin-top: 16px; }
+  .table-panel { padding: 14px; border-radius: 0 0 12px 12px; }
+  .filter-bar { grid-template-columns: 1fr; gap: 10px; }
+  .filter-select, .filter-input { min-width: 0; width: 100%; }
+  .records-table th, .records-table td { padding: 8px 10px; font-size: 0.78rem; }
+  .btn-preview-row { padding: 5px 10px; font-size: 0.72rem; }
 }
 </style>

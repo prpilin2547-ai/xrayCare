@@ -106,100 +106,132 @@ const submitForm = () => {
 
 <style scoped>
 .page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding-top: 8px;
 }
 
-.page-title {
-  margin: 0 0 12px;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
 .section-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 18px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--text-main, #0f172a);
 }
 
-/* ฟอร์ม */
 .form {
-  max-width: 640px;
+  width: 100%;
+  max-width: 820px;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 32px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
 .form-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 12px;
   align-items: flex-start;
-  gap: 16px;
 }
 
 .label {
-  width: 110px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
 }
 
 .field {
-  flex: 1;
+  min-width: 0;
 }
 
-/* ปุ่มเลือกอุปกรณ์ / เลือกไฟล์ */
 .pill-btn {
-  border-radius: 999px;
-  border: none;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
   padding: 10px 18px;
   min-width: 180px;
-  background: #d4d4d4;
-  color: #111827;
-  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text-secondary, #475569);
+  font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.pill-btn:hover {
+  background: #f8fafc;
 }
 
 .arrow {
   font-size: 0.75rem;
 }
 
-.camera {
-  font-size: 1rem;
-}
-
-/* ปุ่มแจ้งซ่อม ล่างขวา */
 .form-actions {
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 40px;
 }
 
 .btn-submit {
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm, 8px);
   padding: 10px 24px;
-  background: #86efac;
-  color: #111827;
-  font-size: 0.95rem;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  transition: all var(--transition-fast, 150ms);
 }
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+}
+
 .textarea-input {
   width: 100%;
   min-height: 140px;
-  background: #d4d4d4;
-  border-radius: 18px;
-  padding: 18px 16px;
-  font-size: 0.9rem;
-  color: #111827;
-  border: none;
+  background: #fff;
+  border-radius: var(--radius-sm, 8px);
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-soft, #e2e8f0);
   outline: none;
-  resize: vertical; /* สามารถยืดได้, ถ้าไม่ต้องการให้ลบออก */
+  resize: vertical;
+  transition: all 200ms;
+}
+
+.textarea-input:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
 }
 
 .textarea-input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
+.file-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #475569);
+}
 
+@media (max-width: 640px) {
+  .form { padding: 16px; border-radius: 12px; }
+  .section-title { font-size: 1.1rem; }
+  .form-row { grid-template-columns: 1fr; gap: 6px; }
+  .label { font-size: 0.8rem; width: 100%; }
+  .field { width: 100%; }
+  .textarea-input { min-height: 80px; }
+  .btn-submit { width: 100%; }
+}
 </style>

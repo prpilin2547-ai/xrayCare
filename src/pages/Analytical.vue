@@ -1062,134 +1062,230 @@ const prevPage = () => {
 }
 
 .placeholder-selected {
-  color: #6c757d;
+  color: var(--text-muted, #94a3b8);
 }
 
-/* PANEL BASE */
-.panel {
-  background: #ffffff;
-  border-radius: 16px;
+/* Chart & card containers */
+.card {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.3s ease;
+}
+
+.panel {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  overflow: hidden;
 }
 
 .panel-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   padding: 16px 20px;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main, #0f172a);
 }
 
 .panel-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  font-weight: 700;
 }
 
 .panel-body {
-  padding: 24px;
+  padding: 20px;
 }
 
-/* ========== HISTORY SECTION STYLES ========== */
 .history-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .history-filters {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.history-input,
+.history-btn {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
 }
 
 .history-input {
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 0.9rem;
+  background: var(--bg-card, #fff);
 }
 
 .history-btn {
-  background: var(--purple-main);
-  color: white;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
   border: none;
-  padding: 6px 16px;
-  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.history-btn:hover {
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
 }
 
 .tag-pass {
-  background: #10b981;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .tag-fail {
-  background: #ef4444;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .history-pagination {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
-  padding: 6px;
+  padding: 8px 0;
 }
 
 .page-btn {
-  background: #e5e7eb;
-  border: none;
-  padding: 4px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 6px 12px;
+  cursor: pointer;
+  background: var(--bg-card, #fff);
+  transition: all var(--transition-fast, 150ms);
 }
 
-/* Modal */
+.page-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.page-btn.active {
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  border-color: transparent;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.history-table {
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+}
+
+.history-table th {
+  background: #f8fafc;
+  color: var(--text-secondary, #475569);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
 }
 
 .modal-card {
-  background: white;
-  width: 480px;
-  max-width: 90vw;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 28px;
+  max-width: 600px;
+  width: 92%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .modal-title {
-  margin: 0 0 10px;
-  font-size: 1.1rem;
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.modal-section {
+  margin-top: 16px;
 }
 
 .modal-json {
-  background: #f3f4f6;
-  padding: 8px;
-  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: var(--radius-sm, 8px);
   max-height: 180px;
   overflow-y: auto;
   font-size: 0.8rem;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .modal-close {
-  margin-top: 14px;
-  padding: 8px 14px;
-  background: var(--purple-main);
-  color: white;
+  margin-top: 20px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 8px);
   width: 100%;
   cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.modal-close:hover {
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
+}
+
+/* Machine summary cards hover */
+.card.border-danger:hover,
+.card.border-warning:hover,
+.card.border-success:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Form select modern styling */
+.form-select {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1024px) {
+  .history-filters { flex-direction: column; }
+  .history-input { width: 100%; }
+}
+@media (max-width: 640px) {
+  .chart-container { padding: 12px; }
+  .panel { border-radius: 12px; }
+  .panel-header { padding: 12px 14px; font-size: 0.85rem; }
+  .panel-body { padding: 14px; }
+  .history-body { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .history-pagination { flex-wrap: wrap; gap: 4px; }
+  .page-btn { padding: 5px 10px; font-size: 0.78rem; }
+  .modal-card { width: calc(100vw - 24px); padding: 16px; }
 }
 </style>

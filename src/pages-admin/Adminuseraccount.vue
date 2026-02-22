@@ -373,103 +373,164 @@ const cancelEdit = (user) => {
 
 
 <style scoped>
-/* Page Title */
+/* Page title section */
 .page-title-section {
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
 .blue-dot {
-  width: 12px;
-  height: 12px;
-  background-color: #0d6efd;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  margin-right: 10px;
+  background: #3b82f6;
 }
 
-/* Controls */
+/* Search bar */
 .search-bar-container {
-  position: relative;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
   max-width: 400px;
 }
 
+.search-bar-container :deep(.form-control),
+.search-bar-container :deep(input) {
+  flex: 1;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  transition: all 200ms;
+}
+
+.search-bar-container :deep(.form-control:focus),
+.search-bar-container :deep(input:focus) {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+/* Purple button */
 .btn-purple {
-  background-color: #6200EA;
-  color: white;
   border: none;
-  transition: 0.2s;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  transition: all 150ms;
 }
 
 .btn-purple:hover {
-  background-color: #4a00b0;
-  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
+  color: #fff;
 }
 
-/* Table Styles */
+/* User table */
 .user-table {
-  background-color: white;
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
 }
 
-.user-table thead th {
-  background-color: #dcdcdc;
-  border-bottom: none;
-  padding: 15px;
-  font-weight: 600;
+.user-table thead {
+  background: #f8fafc;
 }
 
-.user-table tbody tr {
-  background-color: #e8e8e8;
-  border-bottom: 2px solid #fff;
+.user-table th {
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .user-table td {
-  padding: 15px;
-  vertical-align: middle;
+  padding: 12px 16px;
+  color: var(--text-secondary, #475569);
+  border-bottom: 1px solid #f1f5f9;
 }
 
+.user-table tbody tr {
+  transition: background 150ms;
+}
+
+.user-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Table input */
 .table-input {
-  background: white;
-  border: 1px solid #0d6efd;
-  border-radius: 4px;
-  padding: 4px 8px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 6px 10px;
+  font-size: 0.85rem;
   width: 140px;
+  transition: all 200ms;
 }
 
-/* ข้อ 1: style ของ Position badge */
+.table-input:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+/* Position badges */
 .position-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
-  color: #ffffff;
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .position-admin {
-  background-color: #6200EA;
-  /* ม่วง */
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .position-rt {
-  background-color: #0d6efd;
-  /* น้ำเงิน */
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .position-engineer {
-  background-color: #ff9800;
-  /* ส้ม */
+  background: #f0fdf4;
+  color: #15803d;
 }
 
-/* Icons */
+/* Action icons */
 .action-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: var(--bg-card, #fff);
   cursor: pointer;
-  font-size: 1.2rem;
-  transition: transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 150ms;
+  color: var(--text-muted, #94a3b8);
 }
 
 .action-icon:hover {
-  transform: scale(1.2);
+  background: #f1f5f9;
+  color: var(--text-main, #0f172a);
 }
 
 .bi-trash-fill:hover {
@@ -480,32 +541,31 @@ const cancelEdit = (user) => {
   cursor: pointer;
 }
 
-/* Modal Styles */
+/* Modal */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1050;
+  justify-content: center;
   overflow-y: auto;
   padding: 20px 0;
 }
 
 .modal-card {
-  background: white;
-  padding: 35px;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 28px;
+  max-width: 480px;
+  width: 92%;
   max-height: 90vh;
   overflow-y: auto;
-  border-radius: 15px;
-  width: 400px;
   position: relative;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  /* ข้อ 4: ขยายกล่อง Sign Up ลงล่าง (เพิ่มความสูงขั้นต่ำ) */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-soft, #e2e8f0);
   min-height: 430px;
 }
 
@@ -513,34 +573,93 @@ const cancelEdit = (user) => {
   position: absolute;
   top: 15px;
   right: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: transparent;
   cursor: pointer;
-  color: #dc3545;
-  font-size: 1.5rem;
-  transition: 0.2s;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms;
 }
 
 .close-modal-btn:hover {
-  transform: scale(1.1);
+  background: #f1f5f9;
+  color: var(--text-main, #0f172a);
 }
 
 .btn-create-account {
-  background-color: #4A148C;
-  color: white;
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: 600;
   border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 12px;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  transition: all 150ms;
 }
 
 .btn-create-account:hover {
-  background-color: #38006b;
-  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
 }
 
-/* ข้อ 3: ซ่อนปุ่ม reveal password ที่อยู่ในกล่องฟ้าของ browser (เช่น Edge) */
+/* Form inputs in modal */
+.modal-card :deep(input),
+.modal-card :deep(select),
+.modal-card :deep(.form-control),
+.modal-card :deep(.form-select) {
+  width: 100%;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  transition: all 200ms;
+}
+
+.modal-card :deep(input:focus),
+.modal-card :deep(select:focus),
+.modal-card :deep(.form-control:focus),
+.modal-card :deep(.form-select:focus) {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+.modal-card :deep(.input-group-text) {
+  border-radius: 0 var(--radius-sm, 8px) var(--radius-sm, 8px) 0;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #f8fafc;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.modal-card :deep(.input-group .form-control) {
+  border-radius: var(--radius-sm, 8px) 0 0 var(--radius-sm, 8px);
+}
+
+/* Hide browser password reveal (Edge) */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
+}
+
+@media (max-width: 1024px) {
+  .user-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+@media (max-width: 640px) {
+  .search-bar-container { flex-direction: column; }
+  .search-bar-container input { width: 100%; }
+  .btn-purple { width: 100%; text-align: center; }
+  .page-title-section h2 { font-size: 1.2rem; }
+  .page-title-section h3 { font-size: 1.2rem; }
+  .modal-card { width: calc(100vw - 24px); padding: 16px; }
 }
 </style>

@@ -920,12 +920,134 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.chart-container {
-  position: relative;
-  margin: auto;
+/* Page container */
+.container-fluid {
+  background: var(--bg-body, #f0f2f5);
+}
+
+/* Form selects */
+.form-select {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  transition: all 200ms;
+}
+
+.form-select:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
 }
 
 .placeholder-selected {
-  color: #6c757d;
+  background: #ede9fe !important;
+  color: #7c3aed !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Search button */
+.btn-primary {
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  border: none;
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  transition: all 150ms;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  margin: auto;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Card layouts */
+.card {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  transition: all var(--transition-base, 250ms cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
+}
+
+.card-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Monthly chart container */
+.monthly-chart-container {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-md, 12px);
+  padding: 16px;
+}
+
+/* Year selector */
+.year-selector :deep(.form-select) {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.year-selector :deep(.form-select:focus) {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+/* Empty state placeholder */
+.card-body.bg-light,
+.card-body[style*="background-color: #f8f9fa"] {
+  background: var(--bg-body, #f0f2f5) !important;
+  border-radius: var(--radius-md, 12px);
+}
+
+/* Machine summary cards */
+.col-md-6 .card,
+.col-xl-3 .card {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+}
+
+/* Summary cards (ภาพรวม, เครื่องที่ต้องโฟกัส, ช่วงเวลาที่ต้องเฝ้าระวัง) */
+.col-md-4 .card {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  transition: all var(--transition-base, 250ms cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.col-md-4 .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
+}
+
+@media (max-width: 640px) {
+  .chart-container { padding: 12px; border-radius: 12px; }
 }
 </style>

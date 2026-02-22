@@ -1,45 +1,59 @@
 .content-panel {
   background: #ffffff;
-  padding: 18px 22px 22px;
-  box-shadow: 0 0 0 1px #e5e5e5;
+  padding: 24px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
 }
 
 .table-wrapper {
-  border: 1px solid #d4d4d4;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .check-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .check-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
   vertical-align: top;
 }
 
 .row-header-main td {
   font-weight: 700;
-  background: #55b4ff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
 }
 
 .row-header-columns td {
   font-weight: 600;
-  background: #f3f4f6;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
 }
 
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
-  background: #f9fafb;
+  background: #ffffff;
 }
 .check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
-  background: #e5e7eb;
+  background: #f8fafc;
+}
+
+.check-table tbody tr:not(.row-header-main):not(.row-header-columns):hover {
+  background: #f1f5f9;
 }
 
 .cell-label {
   width: 60%;
+  color: var(--text-secondary, #475569);
 }
 
 .small {
@@ -52,15 +66,22 @@
 
 .input-cell {
   width: 100%;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-  padding: 4px 6px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 6px 10px;
   font-size: 0.85rem;
   box-sizing: border-box;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.input-cell:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
 }
 
 .remark-actions {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -72,20 +93,27 @@
 }
 
 .field-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #4b5563;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
 }
 
 .input-textarea {
   width: 100%;
-  min-height: 100px;
+  min-height: 80px;
   resize: vertical;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  padding: 8px 10px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 12px;
+  font-size: 0.85rem;
   margin-top: 4px;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.input-textarea:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  outline: none;
 }
 
 .mt-8 {
@@ -93,34 +121,53 @@
 }
 
 .file-name {
-  font-size: 0.8rem;
-  color: #6b7280;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
   margin-top: 4px;
 }
 
 .btn-next {
   border: none;
-  border-radius: 6px;
-  padding: 10px 26px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 28px;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  background: #f7c948;
-  color: #111827;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  transition: all 150ms ease;
 }
 
 .btn-next:hover {
-  background: #e0b63f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
 }
 
 .footnote {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted, #94a3b8);
   margin-top: 8px;
 }
 
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .check-table {
+    min-width: 500px;
+  }
+}
+
 @media (max-width: 768px) {
+  .content-panel {
+    padding: 16px;
+  }
+
   .remark-actions {
     flex-direction: column;
     align-items: stretch;
@@ -129,5 +176,30 @@
   .btn-next,
   .btn-save-final {
     align-self: flex-end;
+  }
+
+  .check-table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .row-header-main td {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-panel {
+    padding: 12px;
+    border-radius: var(--radius-md, 12px);
+  }
+
+  .check-table {
+    font-size: 0.78rem;
+  }
+
+  .input-textarea {
+    min-height: 60px;
+    font-size: 0.8rem;
   }
 }
