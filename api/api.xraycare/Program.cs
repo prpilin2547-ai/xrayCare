@@ -63,5 +63,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.ApplyMigration();
+app.SeedDefaultAdmin();
 
 app.Run();
