@@ -2,6 +2,62 @@
   <MainLayout>
     <div class="page">
 
+      <!-- ==================== NOTIFICATION BANNER ==================== -->
+      <div v-if="notifications.length > 0" class="notification-container">
+        <div v-for="notif in notifications" :key="notif.id"
+          class="notification-banner"
+          :class="{
+            'notif-today': notif.status === 'today',
+            'notif-urgent': notif.status !== 'today' && notif.daysRemaining <= 3,
+            'notif-warning': notif.status !== 'today' && notif.daysRemaining > 3 && notif.daysRemaining <= 7,
+            'notif-info': notif.daysRemaining > 7
+          }">
+
+          <!-- Pulse ring for today -->
+          <div v-if="notif.status === 'today'" class="notif-pulse-ring"></div>
+
+          <div class="notif-icon">
+            <span v-if="notif.status === 'today'">🔔</span>
+            <span v-else-if="notif.daysRemaining <= 3">⚠️</span>
+            <span v-else-if="notif.daysRemaining <= 7">📋</span>
+            <span v-else>✅</span>
+          </div>
+
+          <div class="notif-body">
+            <div class="notif-title">
+              <template v-if="notif.status === 'today'">
+                ถึงกำหนดแล้ว! — ทำการ Check วันนี้
+              </template>
+              <template v-else-if="notif.daysRemaining <= 7">
+                เหลืออีก <span class="notif-countdown">{{ notif.daysRemaining }}</span> วัน
+              </template>
+              <template v-else>
+                ถึงรอบ Check วันที่ {{ notif.nextCheckDate }}
+              </template>
+            </div>
+            <div class="notif-detail">
+              Monthly Check ({{ notif.frequencyLabel }})
+              <template v-if="notif.description"> — {{ notif.description }}</template>
+              <template v-if="notif.daysRemaining > 7">
+                &nbsp;·&nbsp; อีก {{ notif.daysRemaining }} วัน
+              </template>
+              <template v-else>
+                &nbsp;·&nbsp; กำหนดวันที่ {{ notif.nextCheckDate }}
+              </template>
+            </div>
+          </div>
+
+          <div class="notif-badge">
+            <span v-if="notif.status === 'today'" class="badge-today">TODAY</span>
+            <span v-else class="badge-days">{{ notif.daysRemaining }} Days</span>
+          </div>
+
+          <button class="notif-close" @click="dismissNotification(notif.id)" title="ปิดการแจ้งเตือน">
+            ✕
+          </button>
+        </div>
+      </div>
+
       <!-- HEADER -->
       <div class="dashboard-header-row">
         <h2 class="page-title">Dashboard</h2>
@@ -263,6 +319,84 @@ const sampleRows = computed(() =>
     caretaker: m.caretaker || '-'
   }))
 );
+
+/* ---------- Notifications ---------- */
+const notifications = ref([]);
+
+async function loadNotifications() {
+  const allNotifs = [];
+
+  // 1) โหลดจาก API (database)
+  try {
+    const res = await fetch(`${API_BASE}/GetNotifications`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) allNotifs.push(...data);
+    }
+  } catch (e) {
+    console.error('loadNotifications API error:', e);
+  }
+
+  // 2) คำนวณจาก localStorage (pmMonthlyRules) ที่ตั้งค่าจากหน้า PM Schedule
+  try {
+    const savedRules = JSON.parse(localStorage.getItem('pmMonthlyRules') || '{}');
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    const freqLabels = { '1m': 'ทุก 1 เดือน', '3m': 'ทุก 3 เดือน', '6m': 'ทุก 6 เดือน' };
+    const intervalMap = { '1m': 1, '3m': 3, '6m': 6 };
+    const existingDates = new Set(allNotifs.map(n => n.nextCheckDate));
+
+    let localId = 9000;
+    for (const [startKey, type] of Object.entries(savedRules)) {
+      const interval = intervalMap[type];
+      if (!interval) continue;
+
+      const [y, m, d] = startKey.split('-').map(Number);
+      if (!y || !m || !d) continue;
+
+      let startDate;
+      try { startDate = new Date(y, m - 1, d); } catch { continue; }
+
+      let nextCheck = new Date(startDate);
+      while (nextCheck < todayDate) {
+        nextCheck = new Date(nextCheck.getFullYear(), nextCheck.getMonth() + interval, nextCheck.getDate());
+      }
+
+      const daysRemaining = Math.round((nextCheck - todayDate) / (1000 * 60 * 60 * 24));
+
+      const dd = String(nextCheck.getDate()).padStart(2, '0');
+      const mm = String(nextCheck.getMonth() + 1).padStart(2, '0');
+      const yyyy = nextCheck.getFullYear();
+      const checkDateStr = `${dd}/${mm}/${yyyy}`;
+
+      if (existingDates.has(checkDateStr)) continue;
+
+      let status = 'upcoming';
+      if (daysRemaining === 0) status = 'today';
+      else if (daysRemaining > 7) status = 'info';
+
+      allNotifs.push({
+        id: `local-${localId++}`,
+        status,
+        daysRemaining,
+        nextCheckDate: checkDateStr,
+        frequencyType: type,
+        frequencyLabel: freqLabels[type] || type,
+        description: ''
+      });
+    }
+  } catch (e) {
+    console.error('loadNotifications localStorage error:', e);
+  }
+
+  allNotifs.sort((a, b) => a.daysRemaining - b.daysRemaining);
+  notifications.value = allNotifs;
+}
+
+function dismissNotification(id) {
+  notifications.value = notifications.value.filter(n => n.id !== id);
+}
 
 /* ---------- โหลดข้อมูลจาก API ---------- */
 async function loadMachines() {
@@ -568,12 +702,7 @@ onMounted(async () => {
   /* โหลด daily check data */
   loadDailyChecked();
 
-  /* โหลดข้อมูลจาก API */
-  loading.value = true;
-  await Promise.all([loadMachines(), loadRepairRequests()]);
-  loading.value = false;
-
-  /* โหลด calendar data จาก localStorage (เหมือนหน้า PM) */
+  /* โหลด calendar data จาก localStorage ก่อน (เหมือนหน้า PM) */
   try {
     const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY);
     if (savedEvents) {
@@ -609,10 +738,209 @@ onMounted(async () => {
   } catch (e) {
     console.error("Cannot load disabled daily dates from storage", e);
   }
+
+  /* โหลดข้อมูลจาก API + คำนวณ notifications (รวม localStorage) */
+  loading.value = true;
+  await Promise.all([loadMachines(), loadRepairRequests(), loadNotifications()]);
+  loading.value = false;
 });
 </script>
 
 <style scoped>
+/* ==================== NOTIFICATION STYLES ==================== */
+.notification-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.notification-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: notifSlideIn 0.5s ease-out;
+}
+
+@keyframes notifSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* TODAY — pulsing red gradient */
+.notif-today {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: notifSlideIn 0.5s ease-out, notifGlow 2s ease-in-out infinite;
+}
+
+@keyframes notifGlow {
+  0%, 100% { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 8px 36px rgba(220, 38, 38, 0.6); }
+}
+
+.notif-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  animation: pulseRing 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseRing {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* URGENT (1-3 days) — orange gradient */
+.notif-urgent {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* WARNING (4-7 days) — blue gradient */
+.notif-warning {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* INFO (>7 days) — green gradient */
+.notif-info {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.notif-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
+.notif-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0 6px;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+.notif-detail {
+  font-size: 0.82rem;
+  margin-top: 2px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
+.notif-badge {
+  flex-shrink: 0;
+}
+
+.badge-today {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #fff;
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  animation: badgePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.badge-days {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.notif-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  margin-left: 4px;
+}
+
+.notif-close:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.15);
+}
+
+@media (max-width: 600px) {
+  .notification-banner {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .notif-badge {
+    width: 100%;
+    text-align: right;
+  }
+}
+
 /* ====== DASHBOARD + TABLE (เดิม) ====== */
 .page {
   display: flex;

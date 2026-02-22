@@ -468,6 +468,162 @@ namespace api.xraycare.Controllers
                 return StatusCode(500, message);
             }
         }
+
+        // ===================== Schedule Config Endpoints =====================
+
+        // GET: api/xraycare/GetAllScheduleConfigs
+        [HttpGet("GetAllScheduleConfigs")]
+        public async Task<IActionResult> GetAllScheduleConfigs()
+        {
+            var list = await _db.ScheduleConfigs
+                .OrderBy(s => s.RID)
+                .Select(s => new
+                {
+                    id = s.RID,
+                    startDate = s.StartDate,
+                    frequencyType = s.FrequencyType,
+                    description = s.Description
+                })
+                .ToListAsync();
+            return Ok(list);
+        }
+
+        // POST: api/xraycare/AddScheduleConfig
+        [HttpPost("AddScheduleConfig")]
+        public async Task<IActionResult> AddScheduleConfig([FromBody] AddScheduleConfigRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.startDate))
+                return BadRequest("startDate is required.");
+            if (string.IsNullOrWhiteSpace(request.frequencyType))
+                return BadRequest("frequencyType is required.");
+
+            try
+            {
+                var entity = new ScheduleConfig
+                {
+                    StartDate = request.startDate,
+                    FrequencyType = request.frequencyType,
+                    Description = request.description ?? ""
+                };
+                _db.ScheduleConfigs.Add(entity);
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    id = entity.RID,
+                    startDate = entity.StartDate,
+                    frequencyType = entity.FrequencyType,
+                    description = entity.Description
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AddScheduleConfig failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
+
+        // DELETE: api/xraycare/DeleteScheduleConfig/5
+        [HttpDelete("DeleteScheduleConfig/{id}")]
+        public async Task<IActionResult> DeleteScheduleConfig(int id)
+        {
+            try
+            {
+                var entity = await _db.ScheduleConfigs.FindAsync(id);
+                if (entity == null)
+                    return NotFound($"ไม่พบ Schedule Config ที่มี ID = {id}");
+
+                _db.ScheduleConfigs.Remove(entity);
+                await _db.SaveChangesAsync();
+
+                return Ok(new { message = "ลบ Schedule Config สำเร็จ", id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DeleteScheduleConfig failed for ID {Id}", id);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
+
+        // GET: api/xraycare/GetNotifications
+        [HttpGet("GetNotifications")]
+        public async Task<IActionResult> GetNotifications()
+        {
+            try
+            {
+                var configs = await _db.ScheduleConfigs.ToListAsync();
+                var todayDate = DateTime.Today;
+                var notifications = new List<object>();
+
+                foreach (var cfg in configs)
+                {
+                    if (string.IsNullOrWhiteSpace(cfg.StartDate) || string.IsNullOrWhiteSpace(cfg.FrequencyType))
+                        continue;
+
+                    var parts = cfg.StartDate.Split('/');
+                    if (parts.Length != 3) continue;
+
+                    if (!int.TryParse(parts[0], out int day) ||
+                        !int.TryParse(parts[1], out int month) ||
+                        !int.TryParse(parts[2], out int year))
+                        continue;
+
+                    DateTime startDate;
+                    try { startDate = new DateTime(year, month, day); }
+                    catch { continue; }
+
+                    int intervalMonths = cfg.FrequencyType switch
+                    {
+                        "1m" => 1,
+                        "3m" => 3,
+                        "6m" => 6,
+                        _ => 0
+                    };
+                    if (intervalMonths == 0) continue;
+
+                    var nextCheck = startDate;
+                    while (nextCheck < todayDate)
+                    {
+                        nextCheck = nextCheck.AddMonths(intervalMonths);
+                    }
+
+                    int daysRemaining = (nextCheck - todayDate).Days;
+
+                    string status = daysRemaining == 0 ? "today"
+                                  : daysRemaining <= 7 ? "upcoming"
+                                  : "info";
+
+                    string frequencyLabel = cfg.FrequencyType switch
+                    {
+                        "1m" => "ทุก 1 เดือน",
+                        "3m" => "ทุก 3 เดือน",
+                        "6m" => "ทุก 6 เดือน",
+                        _ => cfg.FrequencyType ?? ""
+                    };
+
+                    notifications.Add(new
+                    {
+                        id = cfg.RID,
+                        status,
+                        daysRemaining,
+                        nextCheckDate = nextCheck.ToString("dd/MM/yyyy"),
+                        frequencyType = cfg.FrequencyType,
+                        frequencyLabel,
+                        description = cfg.Description
+                    });
+                }
+
+                return Ok(notifications.OrderBy(n => ((dynamic)n).daysRemaining));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetNotifications failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, message);
+            }
+        }
     }
 
     // ===================== Request DTOs =====================
@@ -522,5 +678,12 @@ namespace api.xraycare.Controllers
         public string? checkDate { get; set; }
         public string? tester { get; set; }
         public string? jsonData { get; set; }
+    }
+
+    public class AddScheduleConfigRequest
+    {
+        public string startDate { get; set; } = "";
+        public string frequencyType { get; set; } = "";
+        public string? description { get; set; }
     }
 }
