@@ -106,9 +106,11 @@
               <tr v-if="loading">
                 <td colspan="6" class="text-center">กำลังโหลด...</td>
               </tr>
-              <!-- ตอนยังไม่มีข้อมูล แสดงแถวเปล่า -->
               <tr v-else-if="machines.length === 0">
-                <td v-for="n in 6" :key="n">&nbsp;</td>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+                  <span>ยังไม่มีเครื่องที่ลงทะเบียน</span>
+                </td>
               </tr>
               <!-- ข้อมูลจากการกด Save -->
               <tr v-for="(m, index) in machines" :key="m.id">
@@ -428,45 +430,31 @@ async function handleSave() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* ให้เลื่อนขึ้นลงได้ + แถบเลื่อนสีเทา */
-  max-height: 100vh;
-  overflow-y: auto;
-}
-
-/* scrollbar สีเทา */
-.page::-webkit-scrollbar {
-  width: 8px;
-}
-
-.page::-webkit-scrollbar-track {
-  background: #f3f4f6;
-}
-
-.page::-webkit-scrollbar-thumb {
-  background: #9ca3af;
-  border-radius: 4px;
 }
 
 .page-note {
   font-size: 0.9rem;
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
   align-self: flex-start;
   margin: 0 0 12px;
 }
 
 .form-card {
   width: 100%;
-  max-width: 820px;
-  background: white;
-  border-radius: 18px;
-  padding: 26px 28px 28px;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  max-width: 960px;
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 32px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
 }
 
 .form-title {
-  margin: 0 0 18px;
+  margin: 0 0 24px;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
 }
 
 .form-grid {
@@ -483,55 +471,54 @@ async function handleSave() {
 }
 
 .form-label label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
 }
 
 .form-input input {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  transition: all 200ms;
 }
 
 .form-input input:focus {
-  border-color: var(--purple-main);
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
   outline: none;
-  box-shadow: 0 0 0 1px rgba(91, 60, 196, 0.18);
 }
 
-/* ผู้ดูแลเครื่อง สีเทา */
 .caretaker-input {
-  color: #6b7280;
+  color: var(--text-secondary, #475569);
 }
 
 .caretaker-input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
 .form-example {
-  font-size: 0.8rem;
-  color: #9ca3af;
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
   margin: 4px 0 0;
 }
 
-/* date input + icon */
 .date-wrapper {
   display: flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
   padding-right: 6px;
-  background: white;
+  background: var(--bg-card, #fff);
 }
 
 .date-wrapper input {
   border: none;
-  border-radius: 999px;
-  padding: 8px 10px 8px 12px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  font-size: 0.85rem;
   flex: 1;
 }
 
@@ -541,7 +528,7 @@ async function handleSave() {
 }
 
 .date-wrapper input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
 }
 
 .date-icon {
@@ -552,9 +539,8 @@ async function handleSave() {
   cursor: pointer;
 }
 
-/* ปุ่ม */
 .form-actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -562,37 +548,45 @@ async function handleSave() {
 
 .btn {
   min-width: 96px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  padding: 10px 24px;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .btn.back {
-  border: 1px solid #111827;
-  background: white;
-  color: #111827;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #fff;
+  color: var(--text-secondary, #475569);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.btn.back:hover {
+  background: #f8fafc;
 }
 
 .btn.save {
   border: none;
-  background: var(--purple-main);
-  color: white;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
 }
 
 .btn.save:hover {
-  background: #4c2faf;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
 }
 
-/* ===== วงกลมสีฟ้า + หัวข้อ (เหมือน Admin Dashboard) ===== */
 .section-header-blue {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 820px;
-  margin-top: 16px;
+  max-width: 960px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 }
 
 .left {
@@ -602,27 +596,26 @@ async function handleSave() {
 }
 
 .dot-blue {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: var(--info, #3b82f6);
 }
 
 .header-text-blue {
   font-weight: 600;
-  font-size: 1.1rem;
-  color: #000;
+  font-size: 1rem;
+  color: var(--text-main, #0f172a);
 }
 
-/* ===== ตารางเครื่องที่ลงทะเบียน (สไตล์เหมือน Dashboard CHECKLIST) ===== */
 .registered-panel {
   width: 100%;
-  max-width: 820px;
-  margin-top: 8px;
-  background: white;
-  border-radius: 14px;
-  padding: 12px 14px 16px;
-  border: 1px solid #e5e7eb;
+  max-width: 960px;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+  background: var(--bg-card, #fff);
 }
 
 .table-responsive {
@@ -633,40 +626,74 @@ async function handleSave() {
 .registered-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.registered-table th,
-.registered-table td {
+.registered-table thead {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.registered-table th {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.03em;
   text-align: center;
-  padding: 6px 4px;
+  white-space: nowrap;
 }
 
-/* หัวตารางมีเส้นขีดล่าง */
-.registered-table thead tr {
-  border-bottom: 1px solid #e5e7eb;
+.registered-table td {
+  padding: 12px 16px;
+  color: var(--text-secondary, #475569);
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
 }
 
-/* แถวข้อมูลสลับสีพื้นหลัง */
 .registered-table tbody tr:nth-child(even) {
-  background: #f9fafb;
+  background: #f8fafc;
 }
 
-/* ปุ่มลบ */
+.registered-table tbody tr {
+  transition: background 150ms;
+}
+
+.registered-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.empty-state {
+  padding: 40px 16px !important;
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+
+.text-center {
+  text-align: center;
+}
+
 .btn-delete {
-  padding: 4px 14px;
-  border-radius: 999px;
-  border: 1px solid #ef4444;
-  background: white;
-  color: #ef4444;
-  font-size: 0.8rem;
+  padding: 5px 14px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-delete:hover {
-  background: #ef4444;
-  color: white;
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
 .btn-delete:disabled {
@@ -674,80 +701,87 @@ async function handleSave() {
   cursor: not-allowed;
 }
 
-/* ===============  เพิ่มส่วนนี้เข้าไป =============== */
-/* ป็อปอัพปฏิทิน (ยกมาจากหน้า Export PDF) */
 .calendar-popup-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.35);
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
-  /* ให้ซ้อนทับทุกอย่าง */
 }
 
 .calendar-popup-box {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 16px 18px 18px;
-  width: 320px;
-  box-shadow:
-    0 22px 50px rgba(15, 23, 42, 0.4),
-    0 0 0 1px rgba(148, 163, 184, 0.4);
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 20px;
+  width: 340px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .month-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
 .nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background-color: #eef2ff;
-  font-size: 0.85rem;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #fff;
+  font-size: 0.75rem;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .nav-btn:hover {
-  background-color: #e0e7ff;
-  transform: translateY(-1px);
+  background: #f1f5f9;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  row-gap: 6px;
-  column-gap: 4px;
+  gap: 4px;
   font-size: 0.8rem;
   text-align: center;
 }
 
 .weekday {
-  font-weight: 600;
-  color: #6b7280;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding-bottom: 8px;
 }
 
 .day-cell {
-  height: 32px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.day-cell:not(.is-empty):hover {
+  background: #f1f5f9;
 }
 
 .day-cell.is-empty {
@@ -756,30 +790,43 @@ async function handleSave() {
 
 .day-number span {
   display: inline-flex;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
-.day-number span:hover {
-  background-color: #e5e7eb;
-}
-
-/* วันนี้ */
 .day-cell.is-today .day-number span {
-  border: 1px solid #6366f1;
+  border: 2px solid var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #6c3ce0);
+  font-weight: 700;
 }
 
-/* วันที่เลือก */
 .day-cell.is-selected .day-number span {
-  background-color: #4f46e5;
-  color: #ffffff;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
 }
 
-/* ============= จบส่วนที่เพิ่ม ============= */
+@media (max-width: 1024px) {
+  .form-card { padding: 20px; }
+  .form-row { grid-template-columns: 1fr; gap: 6px; }
+  .registered-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .registered-table { min-width: 500px; }
+}
+@media (max-width: 640px) {
+  .page { padding: 0; }
+  .page-note { font-size: 0.82rem; }
+  .form-card { padding: 16px; border-radius: 12px; }
+  .form-title { font-size: 1.1rem; }
+  .form-input input { padding: 8px 10px; font-size: 0.82rem; }
+  .form-actions { flex-direction: column; }
+  .btn { width: 100%; text-align: center; }
+  .section-header-blue { margin-top: 12px; }
+  .header-text-blue { font-size: 0.95rem; }
+  .registered-panel { padding: 10px; border-radius: 12px; }
+}
 </style>

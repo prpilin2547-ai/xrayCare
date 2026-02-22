@@ -21,8 +21,33 @@
         </div>
       </div>
 
+      <!-- รายการที่ต้องทำวันนี้ตาม Schedule (จาก Dashboard) -->
+      <div v-if="formTypesDueToday.length > 0" class="schedule-today-panel">
+        <p class="section-label">รายการที่ต้องทำวันนี้ (ตาม Schedule)</p>
+        <div class="schedule-form-list">
+          <span
+            v-for="(ft, idx) in formTypesDueToday"
+            :key="ft"
+            class="schedule-form-item"
+          >
+            <template v-if="ft === 'F1_F2'">
+              <span class="schedule-form-current">F1/F2 (กำลังทำ)</span>
+            </template>
+            <router-link
+              v-else-if="formTypeRoute(ft)"
+              :to="formTypeRoute(ft)"
+              class="schedule-form-link"
+            >
+              {{ formTypeLabel(ft) }}
+            </router-link>
+            <span v-else class="schedule-form-label">{{ ft }}</span>
+            <span v-if="idx < formTypesDueToday.length - 1" class="schedule-sep"> → </span>
+          </span>
+        </div>
+      </div>
+
       <div class="content-panel">
-        <p class="section-label">Dairy check</p>
+        <p class="section-label">Daily check</p>
 
         <!-- ตารางหลัก -->
         <div class="table-wrapper">
@@ -120,8 +145,16 @@
             ผ่านทั้งหมด
           </button>
 
-          <!-- ⭐ ปุ่มถัดไปทำงานเฉพาะวันที่ครบ 3 เดือน ⭐ -->
-          <button v-if="isExactly3Months" class="btn btn-warning" @click="goNext">
+          <!-- ถัดไป: มีฟอร์มที่ต้องทำในวันเดียวกัน (ตาม Schedule) -->
+          <button
+            v-if="!isExactly3Months && nextFormsAfterCurrent.length > 0"
+            class="btn btn-next"
+            @click="goToNextForm"
+          >
+            ถัดไป ({{ firstNextFormLabel }})
+          </button>
+          <!-- ถัดไป: วันที่ครบ 3 เดือน -->
+          <button v-else-if="isExactly3Months" class="btn btn-warning" @click="goNext">
             ถัดไป
           </button>
 
@@ -144,19 +177,18 @@ const API_BASE = '/api/Xraycare'
 const props = defineProps({
   selectedDevice: {
     type: Object,
-    default: () => ({
-      name: '',
-      model: '',
-      room: ''
-    })
+    default () {
+      return { name: '', model: '', room: '' };
+    }
   },
   currentUserName: {
     type: String,
     default: ''
   }
-})
+});
 
-const router = useRouter()
+const router = useRouter();
+const route = useRoute();
 
 /* ---------- ข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
 const deviceInfo = ref({ name: '', model: '', room: '' })
@@ -170,39 +202,35 @@ const currentUserName = computed(() =>
 )
 
 onMounted(async () => {
-  // โหลดผู้ใช้จาก localStorage
   try {
-    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
-    if (stored.username) userName.value = stored.username
-  } catch (e) { /* ignore */ }
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}');
+    if (stored.username) userName.value = stored.username;
+  } catch (e) {}
 
-  // โหลดเครื่องจาก API แล้ว match กับ equipmentName ใน route params
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
-    if (res.ok) {
-      const machines = await res.json()
-      const equipmentName = route.params.equipmentName || ''
-      const found = machines.find(m => m.machineName === equipmentName)
-      if (found) {
-        const parts = found.machineName.split(' ')
-        deviceInfo.value = {
-          name: found.machineName,
-          model: parts.length > 2 ? parts.slice(2).join(' ') : found.machineName,
-          room: found.room || ''
-        }
-      } else if (machines.length > 0) {
-        const m = machines[0]
-        deviceInfo.value = {
-          name: m.machineName,
-          model: m.machineName,
-          room: m.room || ''
-        }
-      }
+    const res = await fetch(`${API_BASE}/GetAllMachines`);
+    if (!res.ok) return;
+    const machines = await res.json();
+    const equipmentName = route.params.equipmentName || '';
+    const found = machines.find(m => m.machineName === equipmentName);
+    if (found) {
+      deviceInfo.value = {
+        name: found.machineName,
+        model: found.machineName,
+        room: found.room || ''
+      };
+    } else if (machines.length > 0) {
+      const m = machines[0];
+      deviceInfo.value = {
+        name: m.machineName,
+        model: m.machineName,
+        room: m.room || ''
+      };
     }
   } catch (e) {
-    console.error('Failed to load machines', e)
+    console.error('Failed to load machines', e);
   }
-})
+});
 
 // วันเริ่มต้นที่กำหนด
 const startDate = ref(new Date("2025-08-21"))
@@ -211,8 +239,18 @@ const startDate = ref(new Date("2025-08-21"))
 const today = ref(new Date())
 
 // แสดงวันที่บน UI
+// แสดงวันเวลาไทย (Asia/Bangkok)
 const todayText = computed(() =>
-  today.value.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  today.value.toLocaleString('th-TH', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  })
 )
 
 // วันครบ 3 เดือน
@@ -307,9 +345,42 @@ function getTodayKey() {
   return `${y}-${m}-${dd}`
 }
 
-const route = useRoute()
+/* รายการ form ตาม Schedule ที่ส่งมาจาก Dashboard (query.formTypes) */
+const formTypesDueToday = computed(() => {
+  const q = route.query.formTypes
+  if (!q || typeof q !== 'string') return []
+  return q.split(',').map(s => s.trim()).filter(Boolean)
+})
 
-const saveChecklist = async () => {
+const FORM_TYPE_ROUTES = {
+  F10: { path: '/monthly-check-light', label: 'F10 ความสว่างแสงไฟ' },
+  F12: { path: '/f12', label: 'F12 อัตราการถ่ายภาพซ้ำ' },
+  F3_F6: { path: '/monthly-check', label: 'F3-F6 จอภาพ/บันทึกเครื่อง' },
+  F7_F8: { path: '/monthly-check-all', label: 'F7-F8 Collimator/Dark noise' },
+  F9: { path: '/f9', label: 'F9 เสื้อตะกั่ว' },
+  F11: { path: '/f11', label: 'F11 ความหนาผู้ป่วย' },
+  F13: { path: '/f13', label: 'F13 อัลตราซาวด์' }
+}
+
+function formTypeRoute(formType) {
+  return FORM_TYPE_ROUTES[formType]?.path || null
+}
+
+function formTypeLabel(formType) {
+  return FORM_TYPE_ROUTES[formType]?.label || formType
+}
+
+/* ฟอร์มที่ต้องทำต่อจาก F1/F2 ในวันเดียวกัน (ตาม Schedule) */
+const nextFormsAfterCurrent = computed(() =>
+  formTypesDueToday.value.filter(ft => ft !== 'F1_F2')
+)
+const firstNextFormLabel = computed(() => {
+  const first = nextFormsAfterCurrent.value[0]
+  return first ? formTypeLabel(first) : ''
+})
+
+/** บันทึก F1/F2 ลง API + localStorage (ใช้ร่วมกับ saveChecklist และ goToNextForm) */
+async function performSaveChecklist() {
   const payload = {
     formType: 'F1_F2',
     machineName: selectedDevice.value.name,
@@ -324,9 +395,8 @@ const saveChecklist = async () => {
         fileName: plateEraseFileName.value
       }
     })
-  }
+  };
 
-  // ส่งข้อมูลไปยัง API
   try {
     const res = await fetch(`${API_BASE}/SaveChecklist`, {
       method: 'POST',
@@ -338,7 +408,6 @@ const saveChecklist = async () => {
     console.error('SaveChecklist error:', e)
   }
 
-  /* บันทึกว่าเครื่องนี้ถูก check แล้ววันนี้ */
   try {
     const todayKey = getTodayKey()
     const stored = JSON.parse(localStorage.getItem(DAILY_CHECK_KEY) || '{}')
@@ -351,102 +420,175 @@ const saveChecklist = async () => {
   } catch (e) {
     console.error('Cannot save daily check to localStorage', e)
   }
+}
 
+/** บันทึกแล้วไปหน้าถัดไป (เมื่อมีฟอร์มที่ต้องทำในวันเดียวกัน) */
+async function goToNextForm() {
+  await performSaveChecklist()
+  const next = nextFormsAfterCurrent.value
+  if (next.length === 0) {
+    router.push('/dashboard')
+    return
+  }
+  const path = formTypeRoute(next[0])
+  if (!path) {
+    router.push('/dashboard')
+    return
+  }
+  const remainingFormTypes = next.join(',')
+  router.push({ path, query: { formTypes: remainingFormTypes } })
+}
+
+const saveChecklist = async () => {
+  await performSaveChecklist()
   router.push('/dashboard')
 }
 </script>
 
 <style scoped>
 .checklist-page {
-  background: #ffffff;
+  padding: 0;
   min-height: calc(100vh - 56px);
-  padding: 24px 32px 32px;
 }
 
 .page-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
 }
 
 .pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
-.pill {
-  background: #ffb480;
-  color: #111827;
-  padding: 8px 18px;
-  border-radius: 999px;
+.schedule-today-panel {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--bg-card, #f8fafc);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.schedule-today-panel .section-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 8px;
+}
+
+.schedule-form-list {
   font-size: 0.9rem;
+}
+
+.schedule-form-item {
+  display: inline;
+}
+
+.schedule-form-current {
+  font-weight: 600;
+  color: var(--purple-main, #6c3ce0);
+}
+
+.schedule-form-link {
+  color: var(--link-color, #2563eb);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.schedule-form-link:hover {
+  text-decoration: underline;
+}
+
+.schedule-form-label {
+  color: var(--text-secondary, #475569);
+}
+
+.schedule-sep {
+  color: var(--text-muted, #94a3b8);
+  margin: 0 2px;
+}
+
+.pill {
+  background: #f1f5f9;
+  color: var(--text-secondary, #475569);
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.82rem;
   font-weight: 500;
   white-space: nowrap;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .pill-main {
-  background: #ffb480;
-  color: #047857;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #6d28d9;
   font-weight: 700;
+  border-color: #c4b5fd;
 }
 
 .content-panel {
-  background: #ffffff;
-  padding: 20px 24px 28px;
-  box-shadow: 0 0 0 1px #e5e5e5;
+  background: var(--bg-card, #ffffff);
+  padding: 24px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
 }
 
 .section-label {
   font-size: 1rem;
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 16px;
 }
 
 .table-wrapper {
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-md, 12px);
   overflow: hidden;
-  border: 1px solid #d4d4d4;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .check-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .check-table td {
-  padding: 10px 12px;
+  padding: 10px 14px;
   vertical-align: top;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .row-header-main td {
   font-weight: 700;
-  background: #55b4ff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
 }
 
 .row-header-columns td {
   font-weight: 600;
-  background: #f3f4f6;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
 }
 
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns) {
-  background: #f9fafb;
+  background: #ffffff;
 }
 
 .check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns) {
-  background: #e5e7eb;
+  background: #f8fafc;
 }
 
 .cell-label {
   width: 70%;
+  color: var(--text-secondary, #475569);
 }
 
 .text-center {
@@ -454,44 +596,74 @@ const saveChecklist = async () => {
 }
 
 .actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-remark,
-.btn-save {
+.btn-save,
+.btn-warning,
+.btn-next {
   border: none;
-  border-radius: 4px;
-  padding: 8px 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border-radius: var(--radius-sm, 8px);
+  padding: 9px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .btn-remark {
-  background: #ff6b81;
-  color: #ffffff;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(244,63,94,0.3);
 }
 
 .btn-remark:hover {
-  background: #e0556a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(244,63,94,0.4);
 }
 
 .btn-save {
-  background: #65d46e;
-  color: #ffffff;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.3);
 }
 
 .btn-save:hover {
-  background: #4fb759;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f7c948, #e0b63f);
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(247,201,72,0.35);
+}
+
+.btn-warning:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(247,201,72,0.45);
+}
+
+.btn-next {
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
+}
+
+.btn-next:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.45);
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -499,12 +671,13 @@ const saveChecklist = async () => {
 }
 
 .modal-box {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 16px 18px 14px;
+  background: #fff;
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px;
   width: 430px;
   max-width: 92%;
-  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .modal-header {
@@ -517,7 +690,7 @@ const saveChecklist = async () => {
 .modal-header h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-main, #0f172a);
 }
 
 .close-btn {
@@ -525,6 +698,11 @@ const saveChecklist = async () => {
   background: none;
   font-size: 1.3rem;
   cursor: pointer;
+  transition: opacity var(--transition-fast, 150ms);
+}
+
+.close-btn:hover {
+  opacity: 0.7;
 }
 
 .modal-body {
@@ -537,17 +715,44 @@ const saveChecklist = async () => {
 .field-label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--text-secondary, #475569);
 }
 
 .input-textarea {
   width: 100%;
-  min-height: 100px;
+  min-height: 80px;
   resize: vertical;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  padding: 8px 10px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.input-textarea:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
+}
+
+.form-control {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.form-control:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary, #475569);
 }
 
 .mt-12 {
@@ -560,7 +765,7 @@ const saveChecklist = async () => {
 
 .file-name {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #94a3b8);
   margin-top: 4px;
 }
 
@@ -572,34 +777,46 @@ const saveChecklist = async () => {
 
 .btn-cancel,
 .btn-save-popup {
-  border-radius: 4px;
+  border-radius: var(--radius-sm, 8px);
   border: none;
-  padding: 6px 16px;
+  padding: 8px 18px;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-cancel {
-  background: #e5e7eb;
-  color: #111827;
+  background: #f1f5f9;
+  color: var(--text-main, #0f172a);
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
 }
 
 .btn-save-popup {
-  background: #65d46e;
-  color: #ffffff;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.3);
 }
 
-@media (max-width: 768px) {
-  .checklist-page {
-    padding: 16px;
-  }
+.btn-save-popup:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+}
 
-  .pill-row {
-    gap: 8px;
-  }
-
-  .pill {
-    font-size: 0.8rem;
-  }
+@media (max-width: 1024px) {
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .check-table { min-width: 500px; }
+}
+@media (max-width: 640px) {
+  .checklist-page { padding: 0; }
+  .page-title { font-size: 1.2rem; margin-bottom: 12px; }
+  .pill-row { gap: 6px; }
+  .pill { font-size: 0.75rem; padding: 5px 12px; }
+  .content-panel { padding: 12px; border-radius: 12px; }
+  .actions { flex-wrap: wrap; }
+  .btn-remark, .btn-save, .btn-next { padding: 8px 16px; font-size: 0.8rem; flex: 1; min-width: 120px; text-align: center; }
 }
 </style>

@@ -1,28 +1,37 @@
 <template>
   <div class="login-page">
+    <div class="bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+
     <div class="login-card">
       <div class="login-avatar">
-  <i class="fa-solid fa-circle-user"></i>
-</div>
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
 
-
-      <h1 class="login-title">Login</h1>
-      <p class="login-subtitle">Welcome To X-ray care</p>
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Sign in to X-RayCare QC System</p>
 
       <form class="login-form" @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="username">Username</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="Enter your username"
-          />
+          <div class="input-wrapper">
+            <i class="fa-solid fa-user input-icon"></i>
+            <input
+              id="username"
+              v-model="username"
+              type="text"
+              placeholder="Enter your username"
+            />
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <div class="password-wrapper">
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
             <input
               id="password"
               :type="showPassword ? 'text' : 'password'"
@@ -35,12 +44,20 @@
           </div>
         </div>
 
-        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+        <p v-if="errorMsg" class="error-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          {{ errorMsg }}
+        </p>
 
         <button type="submit" class="btn-login" :disabled="isLoading">
-          {{ isLoading ? 'กำลังเข้าสู่ระบบ...' : 'Login' }}
+          <span v-if="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
         </button>
       </form>
+
+      <div class="login-footer">
+        <span>X-RayCare QC Management System</span>
+      </div>
     </div>
   </div>
 </template>
@@ -94,21 +111,18 @@ const handleLogin = async () => {
 
     const user = await res.json()
 
-    // เก็บข้อมูลผู้ใช้ใน localStorage
     localStorage.setItem('xraycare-user', JSON.stringify({
       id: user.id,
       username: user.username,
       position: user.position
     }))
 
-    // redirect ตาม position/role
     const position = (user.position || '').toLowerCase()
     if (position === 'admin') {
       router.push('/admindashboard')
     } else if (position === 'engineer') {
       router.push('/engineerdashboard')
     } else {
-      // Tech / นักรังสี / default
       router.push('/dashboard')
     }
   } catch (e) {
@@ -123,52 +137,107 @@ const handleLogin = async () => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #6b46c1, #2b2345 55%);
+  background: #0f0a1e;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #111827;
   position: relative;
+  overflow: hidden;
 }
 
-.login-header-note {
+.bg-shapes {
   position: absolute;
-  top: 18px;
-  left: 24px;
-  color: #d1d5db;
-  font-size: 0.9rem;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+}
+
+.shape-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #6c3ce0 0%, transparent 70%);
+  top: -15%;
+  left: -10%;
+  animation: floatShape 8s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+  bottom: -10%;
+  right: -5%;
+  animation: floatShape 10s ease-in-out infinite reverse;
+}
+
+.shape-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  top: 50%;
+  left: 60%;
+  animation: floatShape 12s ease-in-out infinite;
+}
+
+@keyframes floatShape {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
 }
 
 .login-card {
+  position: relative;
   width: 100%;
-  max-width: 380px;
-  background: white;
-  border-radius: 18px;
-  padding: 28px 26px 32px;
-  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.35);
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 40px 36px 32px;
   text-align: center;
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #ffffff;
 }
 
 .login-avatar {
   width: 72px;
   height: 72px;
-  border-radius: 999px;
-  margin: 0 auto 12px;
-  background: #e5e7eb;
-  border: 2px solid #f3f4f6;
+  border-radius: 20px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(108, 60, 224, 0.4);
+}
+
+.login-avatar i {
+  font-size: 28px;
+  color: #ffffff;
 }
 
 .login-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
 }
 
 .login-subtitle {
-  margin: 4px 0 18px;
-  font-size: 0.95rem;
-  color: #6b7280;
+  margin: 6px 0 28px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
 }
 
 .login-form {
@@ -176,98 +245,141 @@ const handleLogin = async () => {
 }
 
 .form-group {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 label {
   display: block;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
 }
 
-input {
-  width: 100%;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 8px 12px;
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0 14px;
+  transition: all 200ms ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.input-icon {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.input-wrapper:focus-within .input-icon {
+  color: #a78bfa;
+}
+
+.input-wrapper input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
   font-size: 0.9rem;
+  color: #ffffff;
   outline: none;
 }
 
-input:focus {
-  border-color: #5b3cc4;
-  box-shadow: 0 0 0 1px rgba(91, 60, 196, 0.25);
-}
-
-.password-wrapper {
-  display: flex;
-  align-items: center;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding-right: 4px;
-  background: white;
-}
-
-.password-wrapper input {
-  border: none;
-  border-radius: 999px;
-  padding-right: 0;
-}
-
-.password-wrapper input:focus {
-  box-shadow: none;
+.input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .eye-btn {
   border: none;
   background: transparent;
-  padding: 0 8px;
+  padding: 4px 2px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 150ms ease;
+}
+
+.eye-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .btn-login {
   width: 100%;
-  margin-top: 12px;
-  border-radius: 999px;
+  margin-top: 8px;
+  border-radius: 12px;
   border: none;
-  background: #5b3cc4;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
   color: white;
-  font-weight: 600;
-  padding: 10px 0;
+  font-weight: 700;
+  padding: 13px 0;
   font-size: 0.95rem;
   cursor: pointer;
-}
-
-.btn-login:hover:not(:disabled) {
-  background: #4c2faf;
-}
-
-.btn-login:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.error-msg {
-  color: #dc2626;
-  font-size: 0.85rem;
-  margin: 8px 0 0;
-  text-align: center;
-}
-.login-avatar {
-  width: 80px;     /* ขนาดเดิมของ avatar */
-  height: 80px;
-  border-radius: 999px;
-  background: none; /* เอาพื้นหลังเดิมออกถ้ามี */
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  transition: all 200ms ease;
+  box-shadow: 0 4px 16px rgba(108, 60, 224, 0.4);
+  letter-spacing: 0.01em;
 }
 
-.login-avatar i {
-  font-size: 80px;  /* ไอคอนใหญ่เท่า avatar */
-  color: #4b5563;   /* เทาเข้ม ดูเหมือน user icon */
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(108, 60, 224, 0.5);
 }
 
+.btn-login:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  color: #fca5a5;
+  font-size: 0.82rem;
+  margin: 0 0 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+}
+
+.login-footer {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.03em;
+}
 </style>

@@ -2,46 +2,125 @@
   <MainLayout>
     <div class="page">
 
+      <!-- ==================== NOTIFICATION BANNER ==================== -->
+      <div v-if="notifications.length > 0" class="notification-container">
+        <div v-for="notif in notifications" :key="notif.id"
+          class="notification-banner"
+          :class="{
+            'notif-today': notif.status === 'today',
+            'notif-urgent': notif.status !== 'today' && notif.daysRemaining <= 3,
+            'notif-warning': notif.status !== 'today' && notif.daysRemaining > 3 && notif.daysRemaining <= 7,
+            'notif-info': notif.daysRemaining > 7
+          }">
+
+          <div v-if="notif.status === 'today'" class="notif-pulse-ring"></div>
+
+          <div class="notif-icon">
+            <i v-if="notif.status === 'today'" class="fa-solid fa-bell"></i>
+            <i v-else-if="notif.daysRemaining <= 3" class="fa-solid fa-triangle-exclamation"></i>
+            <i v-else-if="notif.daysRemaining <= 7" class="fa-solid fa-clipboard-check"></i>
+            <i v-else class="fa-solid fa-circle-check"></i>
+          </div>
+
+          <div class="notif-body">
+            <div class="notif-title">
+              <template v-if="notif.status === 'today'">
+                ถึงกำหนดแล้ว! — ทำการ Check วันนี้
+              </template>
+              <template v-else-if="notif.daysRemaining <= 7">
+                เหลืออีก <span class="notif-countdown">{{ notif.daysRemaining }}</span> วัน
+              </template>
+              <template v-else>
+                ถึงรอบ Check วันที่ {{ notif.nextCheckDate }}
+              </template>
+            </div>
+            <div class="notif-detail">
+              Monthly Check ({{ notif.frequencyLabel }})
+              <template v-if="notif.description"> — {{ notif.description }}</template>
+              <template v-if="notif.daysRemaining > 7">
+                &nbsp;·&nbsp; อีก {{ notif.daysRemaining }} วัน
+              </template>
+              <template v-else>
+                &nbsp;·&nbsp; กำหนดวันที่ {{ notif.nextCheckDate }}
+              </template>
+            </div>
+          </div>
+
+          <div class="notif-badge">
+            <span v-if="notif.status === 'today'" class="badge-today">TODAY</span>
+            <span v-else class="badge-days">{{ notif.daysRemaining }} Days</span>
+          </div>
+
+          <button class="notif-close" @click="dismissNotification(notif.id)" title="ปิดการแจ้งเตือน">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
       <!-- HEADER -->
       <div class="dashboard-header-row">
-        <h2 class="page-title">Dashboard</h2>
+        <div>
+          <h2 class="page-title">Dashboard</h2>
+          <p class="page-subtitle">Overview of your equipment and schedule</p>
+        </div>
       </div>
 
       <!-- SUMMARY CARDS -->
       <div class="cards-row">
-        <div class="card summary-card">
-          <p class="card-label date">DATE</p>
-          <p class="card-value">{{ displayDate }}</p>
+        <div class="card summary-card card-date">
+          <div class="card-icon-wrap icon-pink">
+            <i class="fa-solid fa-calendar-day"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">DATE</p>
+            <p class="card-value">{{ displayDate }}</p>
+          </div>
         </div>
-        <div class="card summary-card">
-          <p class="card-label purple">EQUIPMENT</p>
-          <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
+        <div class="card summary-card card-equipment">
+          <div class="card-icon-wrap icon-purple">
+            <i class="fa-solid fa-laptop-medical"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">EQUIPMENT</p>
+            <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
+          </div>
         </div>
-        <div class="card summary-card">
-          <p class="card-label orange">PENDING</p>
-          <p class="card-value">{{ hasMachines ? pendingCount : '-' }}</p>
+        <div class="card summary-card card-pending">
+          <div class="card-icon-wrap icon-orange">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">PENDING</p>
+            <p class="card-value">{{ hasMachines ? pendingCount : '-' }}</p>
+          </div>
         </div>
-        <div class="card summary-card">
-          <p class="card-label blue">REPAIR REQUESTS</p>
-          <p class="card-value">{{ repairRequestCount || '-' }}</p>
+        <div class="card summary-card card-repair">
+          <div class="card-icon-wrap icon-blue">
+            <i class="fa-solid fa-wrench"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label">REPAIR REQUESTS</p>
+            <p class="card-value">{{ repairRequestCount || '-' }}</p>
+          </div>
         </div>
       </div>
 
       <!-- CHECKLIST TITLE -->
-      <div class="checklist-header">
-        <div class="left">
-          <span class="dot-blue"></span>
-          <span class="checklist-text">CHECKLIST</span>
+      <div class="section-header">
+        <div class="section-left">
+          <div class="section-dot"></div>
+          <span class="section-text">Checklist</span>
+          <span class="section-badge" v-if="hasMachines">{{ pendingCount }} pending</span>
         </div>
-
         <button class="btn-add" @click="goToMachinesCreate">
-          <span class="btn-add-icon">＋</span>
+          <i class="fa-solid fa-plus"></i>
+          <span>Add Equipment</span>
         </button>
       </div>
 
       <!-- TABLE -->
       <div class="table-card">
-        <table class="table">
+        <table class="modern-table">
           <thead>
             <tr>
               <th>No.</th>
@@ -49,27 +128,33 @@
               <th>Room</th>
               <th>Caretaker</th>
               <th>Status</th>
-              <th>CHECK</th>
+              <th>Action</th>
             </tr>
           </thead>
 
           <tbody v-if="hasMachines">
             <tr v-for="row in sampleRows" :key="row.no">
-              <td>{{ row.rid }}</td>
-              <td>{{ row.machine_name }}</td>
+              <td><span class="row-num">{{ row.rid }}</span></td>
+              <td class="fw-500">{{ row.machine_name }}</td>
               <td>{{ row.room }}</td>
               <td>{{ row.caretaker }}</td>
-              <td class="status pending">PENDING</td>
+              <td>
+                <span class="status-badge status-pending">
+                  <span class="status-dot"></span>
+                  Pending
+                </span>
+              </td>
               <td>
                 <button @click="goToDairyCheck(row.equipment)" class="check-btn">
-                  CHECK
+                  <i class="fa-solid fa-clipboard-check"></i>
+                  Check
                 </button>
               </td>
             </tr>
           </tbody>
 
           <tbody v-else>
-            <tr v-for="n in 4" :key="n">
+            <tr v-for="n in 4" :key="n" class="empty-row">
               <td>-</td>
               <td>-</td>
               <td>-</td>
@@ -81,61 +166,58 @@
         </table>
       </div>
 
-      <!-- ---------------------- CALENDAR (ใช้ logic เดียวกับ PM Schedule) ---------------------- -->
+      <!-- ---------------------- CALENDAR ---------------------- -->
       <div class="calendar-wrapper">
 
         <!-- DATE CARD -->
-        <div class="card date-card mb-3">
+        <div class="card date-card">
           <div class="date-inner">
-            <div class="calendar-icon">📅</div>
+            <div class="calendar-icon-wrap">
+              <i class="fa-solid fa-calendar"></i>
+            </div>
             <div class="date-text">
-              <p class="mb-0 fw-semibold">{{ headerDateText }}</p>
-              <p class="mb-0 text-muted">{{ headerWeekdayText }}</p>
+              <p class="date-main">{{ headerDateText }}</p>
+              <p class="date-sub">{{ headerWeekdayText }}</p>
             </div>
           </div>
         </div>
 
         <!-- CALENDAR BODY -->
         <div class="card calendar-card">
-          <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
-            <button class="nav-btn" @click="goPrevMonth">&lt;</button>
-            <span class="fw-semibold">
+          <div class="calendar-header">
+            <button class="cal-nav-btn" @click="goPrevMonth">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="cal-month-label">
               {{ monthNames[currentMonth] }} {{ currentYear }}
             </span>
-            <button class="nav-btn" @click="goNextMonth">&gt;</button>
+            <button class="cal-nav-btn" @click="goNextMonth">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
 
           <div class="calendar-grid">
-
-            <!-- WEEKDAY -->
-            <div v-for="d in weekdays" :key="d" class="weekday fw-semibold text-muted">
+            <div v-for="d in weekdays" :key="d" class="weekday">
               {{ d }}
             </div>
 
-            <!-- DAYS -->
             <div v-for="cell in calendarCells" :key="cell.key" class="day-cell"
               :class="{ empty: !cell.day, today: isToday(cell.day) }" @click="cell.day && openDayPopup(cell)">
               <div v-if="cell.day" class="day-number">
                 <span>{{ cell.day }}</span>
               </div>
 
-              <!-- tag-stack เหมือนหน้า PM (ฟ้า/แดง/เขียว) -->
               <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)">
-                <!-- Monthly Check -->
                 <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
-                  <span class="star">★</span>
-                  <span>Monthly Check</span>
+                  <span class="tag-dot"></span>
+                  <span>Monthly</span>
                 </div>
-
-                <!-- Daily Check -->
                 <div v-if="isDailySpecialCell(cell)" class="tag-pill monthly-tag-red">
-                  <span class="star">★</span>
-                  <span>Daily Check</span>
+                  <span class="tag-dot"></span>
+                  <span>Daily</span>
                 </div>
-
-                <!-- Custom event -->
                 <div v-if="getCustomTagLabel(cell)" class="tag-pill custom-tag">
-                  <span class="star">★</span>
+                  <span class="tag-dot"></span>
                   <span>{{ getCustomTagLabel(cell) }}</span>
                 </div>
               </div>
@@ -145,40 +227,51 @@
       </div>
 
       <!-- ---------------------- READ-ONLY POPUP ---------------------- -->
+      <Transition name="fade">
+        <div v-if="showPopup" class="popup-overlay" @click="closePopup"></div>
+      </Transition>
 
-      <div v-if="showPopup" class="popup-overlay" @click="closePopup"></div>
+      <Transition name="pop">
+        <div v-if="showPopup" class="popup-row" @click="closePopup">
+          <div class="popup-box" @click.stop>
 
-      <div v-if="showPopup" class="popup-row" @click="closePopup">
-        <div class="popup-box popup-day text-start" @click.stop>
+            <div class="popup-header">
+              <h5 class="popup-title">{{ popupTitle }}</h5>
+              <button class="popup-close-btn" @click="closePopup">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
 
-          <div class="popup-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">{{ popupTitle }}</h5>
+            <div class="popup-content">
+              <div v-if="popupFrequency" class="popup-freq-badge">
+                <i class="fa-solid fa-repeat"></i>
+                {{ popupFrequency }}
+              </div>
+
+              <p class="popup-date-text">
+                <i class="fa-regular fa-calendar"></i>
+                {{ popupFullDate }}
+              </p>
+
+              <div v-if="popupTasks.length" class="popup-tasks">
+                <p class="popup-section-title">{{ popupSectionTitle }}</p>
+                <ul class="popup-list">
+                  <li v-for="(task, i) in popupTasks" :key="i">
+                    <span class="task-bullet"></span>
+                    <span class="task-text">{{ task }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div v-else class="popup-empty">
+                <i class="fa-regular fa-circle-check"></i>
+                <span>ไม่มีรายการ</span>
+              </div>
+            </div>
+
           </div>
-
-          <hr class="popup-divider" />
-
-          <div class="popup-content">
-            <p class="text-danger fw-bold" v-if="popupFrequency">
-              {{ popupFrequency }}
-            </p>
-
-            <p class="mb-2">{{ popupFullDate }}</p>
-
-            <p v-if="popupTasks.length" class="fw-bold mb-1">
-              {{ popupSectionTitle }}
-            </p>
-
-            <ul class="popup-list" v-if="popupTasks.length">
-              <li v-for="(task, i) in popupTasks" :key="i">
-                <span class="task-text">{{ task }}</span>
-              </li>
-            </ul>
-
-            <p v-if="popupTasks.length === 0">ไม่มีรายการ</p>
-          </div>
-
         </div>
-      </div>
+      </Transition>
 
     </div>
   </MainLayout>
@@ -199,13 +292,11 @@ const loading = ref(false);
 
 const hasMachines = computed(() => pendingMachines.value.length > 0);
 
-// Abbreviated month names for displayDate
 const monthNamesShort = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
-// Display current date in format: "18 Dec 2025"
 const displayDate = computed(() => {
   const now = new Date();
   const day = now.getDate();
@@ -214,7 +305,7 @@ const displayDate = computed(() => {
   return `${day} ${month} ${year}`;
 });
 
-/* ---------- Daily Check: อ่านเครื่องที่ check แล้ววันนี้ ---------- */
+/* ---------- Daily Check ---------- */
 const DAILY_CHECK_KEY = 'xraycare-dailyChecked';
 
 function getTodayKey() {
@@ -236,15 +327,12 @@ function loadDailyChecked() {
   }
 }
 
-/* เครื่องที่ยังไม่ได้ check วันนี้ */
 const pendingMachines = computed(() =>
   machines.value.filter(m => !todayCheckedMachines.value.includes(m.machineName))
 );
 
-/* Summary card counts */
 const equipmentCount = computed(() => machines.value.length);
 const pendingCount = computed(() => pendingMachines.value.length);
-/* นับเฉพาะรายการที่ยังไม่เสร็จ (ไม่นับ ดำเนินการแล้ว / ซ่อมเสร็จ / COMPLETED) */
 const completedStatuses = ['ดำเนินการแล้ว', 'ซ่อมเสร็จ', 'completed'];
 const repairRequestCount = computed(() =>
   repairRequests.value.filter(r => {
@@ -253,7 +341,6 @@ const repairRequestCount = computed(() =>
   }).length
 );
 
-/* สร้าง rows สำหรับตาราง CHECKLIST - แสดงเฉพาะเครื่องที่ยังไม่ได้ check วันนี้ */
 const sampleRows = computed(() =>
   pendingMachines.value.map((m, index) => ({
     rid: String(index + 1).padStart(3, '0'),
@@ -264,7 +351,152 @@ const sampleRows = computed(() =>
   }))
 );
 
-/* ---------- โหลดข้อมูลจาก API ---------- */
+/* ---------- Schedule Config (สำหรับเช็คว่าวันนี้ต้องทำ form อะไรบ้าง) ---------- */
+const scheduleConfigs = ref([]);
+
+async function loadScheduleConfigs() {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllScheduleConfigs`);
+    if (!res.ok) return;
+    const data = await res.json();
+    scheduleConfigs.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadScheduleConfigs error:', e);
+    scheduleConfigs.value = [];
+  }
+}
+
+/** คืนค่ารายการ form types ที่ต้องทำวันนี้: เริ่ม F1_F2 แล้วตาม config ที่ครบกำหนด */
+function getFormTypesDueToday() {
+  const todayDate = new Date();
+  const todayYear = todayDate.getFullYear();
+  const todayMonth = todayDate.getMonth();
+  const todayDay = todayDate.getDate();
+  const result = ['F1_F2'];
+
+  function parseFormTypes(jsonStr) {
+    if (!jsonStr || typeof jsonStr !== 'string') return [];
+    try {
+      const arr = JSON.parse(jsonStr);
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  for (const cfg of scheduleConfigs.value) {
+    const startDateStr = cfg.startDate || '';
+    const freq = cfg.frequencyType || '';
+    if (!startDateStr || !freq) continue;
+
+    let startYear, startMonth, startDay;
+    if (startDateStr.includes('-')) {
+      const parts = startDateStr.split('-').map(Number);
+      if (parts.length !== 3) continue;
+      [startYear, startMonth, startDay] = parts;
+      startMonth -= 1;
+    } else {
+      const parts = startDateStr.split('/').map(Number);
+      if (parts.length !== 3) continue;
+      [startDay, startMonth, startYear] = parts;
+      startMonth -= 1;
+    }
+
+    if (todayDay !== startDay) continue;
+
+    const diffMonths = (todayYear - startYear) * 12 + (todayMonth - startMonth);
+    if (diffMonths < 0) continue;
+
+    const interval = { '1m': 1, '3m': 3, '6m': 6 }[freq];
+    if (!interval) continue;
+    if (diffMonths % interval !== 0) continue;
+
+    const types = parseFormTypes(cfg.formTypes);
+    for (const t of types) {
+      if (t && !result.includes(t)) result.push(t);
+    }
+  }
+
+  return result;
+}
+
+/* ---------- Notifications ---------- */
+const notifications = ref([]);
+
+async function loadNotifications() {
+  const allNotifs = [];
+
+  try {
+    const res = await fetch(`${API_BASE}/GetNotifications`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) allNotifs.push(...data);
+    }
+  } catch (e) {
+    console.error('loadNotifications API error:', e);
+  }
+
+  try {
+    const savedRules = JSON.parse(localStorage.getItem('pmMonthlyRules') || '{}');
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    const freqLabels = { '1m': 'ทุก 1 เดือน', '3m': 'ทุก 3 เดือน', '6m': 'ทุก 6 เดือน' };
+    const intervalMap = { '1m': 1, '3m': 3, '6m': 6 };
+    const existingDates = new Set(allNotifs.map(n => n.nextCheckDate));
+
+    let localId = 9000;
+    for (const [startKey, type] of Object.entries(savedRules)) {
+      const interval = intervalMap[type];
+      if (!interval) continue;
+
+      const [y, m, d] = startKey.split('-').map(Number);
+      if (!y || !m || !d) continue;
+
+      let startDate;
+      try { startDate = new Date(y, m - 1, d); } catch { continue; }
+
+      let nextCheck = new Date(startDate);
+      while (nextCheck < todayDate) {
+        nextCheck = new Date(nextCheck.getFullYear(), nextCheck.getMonth() + interval, nextCheck.getDate());
+      }
+
+      const daysRemaining = Math.round((nextCheck - todayDate) / (1000 * 60 * 60 * 24));
+
+      const dd = String(nextCheck.getDate()).padStart(2, '0');
+      const mm = String(nextCheck.getMonth() + 1).padStart(2, '0');
+      const yyyy = nextCheck.getFullYear();
+      const checkDateStr = `${dd}/${mm}/${yyyy}`;
+
+      if (existingDates.has(checkDateStr)) continue;
+
+      let status = 'upcoming';
+      if (daysRemaining === 0) status = 'today';
+      else if (daysRemaining > 7) status = 'info';
+
+      allNotifs.push({
+        id: `local-${localId++}`,
+        status,
+        daysRemaining,
+        nextCheckDate: checkDateStr,
+        frequencyType: type,
+        frequencyLabel: freqLabels[type] || type,
+        description: ''
+      });
+    }
+  } catch (e) {
+    console.error('loadNotifications localStorage error:', e);
+  }
+
+  allNotifs.sort((a, b) => a.daysRemaining - b.daysRemaining);
+  notifications.value = allNotifs;
+}
+
+function dismissNotification(id) {
+  notifications.value = notifications.value.filter(n => n.id !== id);
+}
+
+/* ---------- API ---------- */
 async function loadMachines() {
   try {
     const res = await fetch(`${API_BASE}/GetAllMachines`);
@@ -290,13 +522,15 @@ async function loadRepairRequests() {
 }
 
 function goToDairyCheck(equipmentName) {
-  router.push({ name: "DairyCheckPage", params: { equipmentName } });
+  const formTypes = getFormTypesDueToday();
+  const query = formTypes.length > 0 ? { formTypes: formTypes.join(',') } : {};
+  router.push({ name: "DairyCheckPage", params: { equipmentName }, query });
 }
 function goToMachinesCreate() {
   router.push("/machines/create");
 }
 
-/* ---------------- Calendar Core (เหมือนหน้า PM) ---------------- */
+/* ---------------- Calendar Core ---------------- */
 const today = new Date();
 const currentYear = ref(today.getFullYear());
 const currentMonth = ref(today.getMonth());
@@ -359,7 +593,7 @@ const isToday = (day) => {
   );
 };
 
-/* ---------- ใช้ localStorage ร่วมกับ PM Schedule ---------- */
+/* ---------- localStorage shared with PM Schedule ---------- */
 const STORAGE_EVENTS_KEY = "pmEventsByDate";
 const STORAGE_RULES_KEY = "pmMonthlyRules";
 const STORAGE_HIDDEN_MONTHLY_KEY = "pmHiddenMonthlyTasks";
@@ -370,12 +604,10 @@ const monthlyTypeByStartDate = ref({});
 const hiddenMonthlyTasksByDate = ref({});
 const disabledDailyDates = ref({});
 
-/* วัน Daily Check พิเศษ: 28 Nov 2025 */
 const DAILY_SPECIAL_DATES = [
-  { year: 2025, month: 10, day: 28 } // month index 0-based
+  { year: 2025, month: 10, day: 28 }
 ];
 
-/* Tasks รายเดือน (เหมือน PM Schedule) */
 const MONTHLY_TASKS_MAP = {
   "1m": [
     "-การตรวจสอบความสว่างแสงไฟ",
@@ -396,7 +628,6 @@ const MONTHLY_TASKS_MAP = {
   ]
 };
 
-/* รายการที่ไม่ได้ทำของ Daily Check */
 const dailySpecialTasks = [
   '- X-ray shimazu รุ่น AAA ห้อง 1'
 ];
@@ -414,7 +645,6 @@ const getCellDate = (cell) => {
   return new Date(currentYear.value, currentMonth.value, cell.day);
 };
 
-/* daily special? */
 const isDailySpecialDate = (date) => {
   if (!date) return false;
 
@@ -431,7 +661,6 @@ const isDailySpecialDate = (date) => {
   return !disabledDailyDates.value[key];
 };
 
-/* หารอบ Monthly ที่ตรงกับวันนั้น */
 const getMonthlyTypeForDate = (date) => {
   if (!date) return null;
   const dateDay = date.getDate();
@@ -461,7 +690,6 @@ const getMonthlyTypeForDate = (date) => {
   return null;
 };
 
-/* tag helpers */
 const hasMonthlyTag = (cell) => {
   const date = getCellDate(cell);
   if (!date) return false;
@@ -473,7 +701,6 @@ const isDailySpecialCell = (cell) => {
   return isDailySpecialDate(date);
 };
 
-/* custom green tag: text 7 ตัวแรก + ... */
 const getCustomTagLabel = (cell) => {
   const date = getCellDate(cell);
   if (!date) return "";
@@ -488,7 +715,7 @@ const getCustomTagLabel = (cell) => {
   return firstText.slice(0, 7) + "...";
 };
 
-/* ---------- Popup (read-only) ---------- */
+/* ---------- Popup ---------- */
 const showPopup = ref(false);
 const popupDate = ref(null);
 
@@ -563,17 +790,10 @@ const popupFullDate = computed(() => {
   return `${w} ${d} ${m} ${y}`;
 });
 
-/* ---------- โหลดข้อมูลจาก localStorage + API ---------- */
+/* ---------- onMounted ---------- */
 onMounted(async () => {
-  /* โหลด daily check data */
   loadDailyChecked();
 
-  /* โหลดข้อมูลจาก API */
-  loading.value = true;
-  await Promise.all([loadMachines(), loadRepairRequests()]);
-  loading.value = false;
-
-  /* โหลด calendar data จาก localStorage (เหมือนหน้า PM) */
   try {
     const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY);
     if (savedEvents) {
@@ -609,283 +829,585 @@ onMounted(async () => {
   } catch (e) {
     console.error("Cannot load disabled daily dates from storage", e);
   }
+
+  loading.value = true;
+  await Promise.all([loadMachines(), loadRepairRequests(), loadNotifications(), loadScheduleConfigs()]);
+  loading.value = false;
 });
 </script>
 
 <style scoped>
-/* ====== DASHBOARD + TABLE (เดิม) ====== */
+/* ==================== NOTIFICATION STYLES ==================== */
+.notification-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.notification-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-radius: var(--radius-lg, 16px);
+  color: #fff;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.12));
+  animation: notifSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notif-today {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  animation: notifSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), notifGlow 2s ease-in-out infinite;
+}
+
+@keyframes notifGlow {
+  0%, 100% { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 8px 36px rgba(220, 38, 38, 0.55); }
+}
+
+.notif-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  animation: pulseRing 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseRing {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+.notif-urgent {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+}
+
+.notif-warning {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.notif-info {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.notif-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md, 12px);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+.notif-body { flex: 1; min-width: 0; }
+
+.notif-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.notif-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  min-width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0 6px;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+.notif-detail {
+  font-size: 0.78rem;
+  margin-top: 2px;
+  opacity: 0.85;
+  line-height: 1.3;
+}
+
+.notif-badge { flex-shrink: 0; }
+
+.badge-today {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: var(--radius-full, 9999px);
+  background: #fff;
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  animation: badgePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.badge-days {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.78rem;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.notif-close {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast, 150ms);
+  margin-left: 4px;
+}
+
+.notif-close:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1);
+}
+
+/* ====== PAGE LAYOUT ====== */
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .dashboard-header-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .page-title {
   margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main, #0f172a);
 }
 
-.toggle-wrapper {
-  font-size: 0.82rem;
-  color: #6b7280;
+.page-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
 }
 
-.toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
+/* ====== SUMMARY CARDS ====== */
 .cards-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .card {
-  background: white;
-  border-radius: 14px;
-  padding: 12px 14px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  transition: all var(--transition-base, 250ms);
 }
 
-.summary-card .card-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  margin: 0 0 4px;
+.summary-card {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: default;
 }
 
-.summary-card .card-label.date {
-  color: #db2777;
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
 }
 
-.summary-card .card-label.purple {
-  color: var(--purple-main);
+.card-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md, 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
-.summary-card .card-label.orange {
-  color: #f97316;
+.icon-pink {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  color: #c2185b;
 }
 
-.summary-card .card-label.blue {
-  color: #2563eb;
+.icon-purple {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #7c3aed;
 }
 
-.summary-card .card-value {
+.icon-orange {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  color: #e65100;
+}
+
+.icon-blue {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1565c0;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card-value {
   margin: 0;
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.01em;
 }
 
-.checklist-header {
-  margin-top: 4px;
+/* ====== SECTION HEADER ====== */
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.left {
+.section-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.dot-blue {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #3b82f6;
+.section-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--info, #3b82f6);
 }
 
-.checklist-text {
+.section-text {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-main, #0f172a);
+}
+
+.section-badge {
+  font-size: 0.72rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .btn-add {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: none;
-  background: #ef4444;
-  color: white;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm, 8px);
+  border: none;
+  background: var(--purple-main, #6c3ce0);
+  color: white;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all var(--transition-fast, 150ms);
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
 }
 
-.btn-add-icon {
-  font-size: 1.2rem;
+.btn-add:hover {
+  background: var(--purple-soft, #8b5cf6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
 }
 
+.btn-add i {
+  font-size: 0.75rem;
+}
+
+/* ====== TABLE ====== */
 .table-card {
-  background: white;
-  border-radius: 14px;
-  padding: 12px 14px 16px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
-.table {
+.modern-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-th,
-td {
+.modern-table thead {
+  background: #f8fafc;
+}
+
+.modern-table th {
   text-align: left;
-  padding: 6px 4px;
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
 }
 
-thead tr {
-  border-bottom: 1px solid #e5e7eb;
+.modern-table td {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-secondary, #475569);
+  border-bottom: 1px solid #f1f5f9;
 }
 
-tbody tr:nth-child(even) {
-  background: #f9fafb;
+.modern-table tbody tr {
+  transition: background var(--transition-fast, 150ms);
 }
 
-.status.pending {
-  color: #f97316;
+.modern-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.modern-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row-num {
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.8rem;
+}
+
+.fw-500 {
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+}
+
+.empty-row td {
+  color: var(--text-muted, #94a3b8);
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .check-btn {
-  background: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 4px 12px;
-  font-size: 0.8rem;
+  border-radius: var(--radius-sm, 8px);
+  padding: 6px 14px;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all var(--transition-fast, 150ms);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
-@media (max-width: 960px) {
-  .cards-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.check-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
-/* ====== CALENDAR + POPUP ====== */
+.check-btn i {
+  font-size: 0.72rem;
+}
+
+/* ====== CALENDAR ====== */
+.calendar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 460px;
+}
+
+.date-card {
+  padding: 16px 20px;
+}
 
 .date-inner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-.calendar-icon {
-  font-size: 22px;
+.calendar-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 12px);
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #7c3aed;
 }
 
-.calendar-wrapper {
-  margin-top: 20px;
+.date-text {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
 }
 
-.date-card,
-.calendar-card {
-  width: 420px;
-  max-width: 100%;
-  background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-}
-
-.date-card {
-  padding: 12px 18px;
-}
-
-.date-text p {
+.date-main {
   margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main, #0f172a);
+}
+
+.date-sub {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
 }
 
 .calendar-card {
-  padding: 14px 18px 18px;
+  padding: 18px 20px 22px;
 }
 
 .calendar-header {
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
+  margin-bottom: 14px;
 }
 
-.calendar-header span {
-  font-size: 0.92rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+.cal-month-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-main, #0f172a);
 }
 
-.nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+.cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: var(--bg-card, #ffffff);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary, #475569);
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  transition: all var(--transition-fast, 150ms);
 }
 
-.nav-btn:hover {
-  background: #eff6ff;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.18);
-  transform: translateY(-1px);
+.cal-nav-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: var(--text-main, #0f172a);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 4px;
   justify-items: center;
-  margin-top: 10px;
   font-size: 0.78rem;
 }
 
 .weekday {
   text-transform: uppercase;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
-  color: #9ca3af !important;
+  color: var(--text-muted, #94a3b8);
+  padding-bottom: 8px;
 }
 
 .day-cell {
   position: relative;
-  min-height: 40px;
+  min-height: 42px;
   width: 100%;
-  max-width: 44px;
+  max-width: 50px;
   cursor: pointer;
-  border-radius: 12px;
-  padding-top: 4px;
-  padding-bottom: 18px;
-  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  border-radius: var(--radius-sm, 8px);
+  padding-top: 6px;
+  padding-bottom: 20px;
+  transition: all var(--transition-fast, 150ms);
 }
 
 .day-cell.empty {
   cursor: default;
   background: transparent;
-  box-shadow: none;
 }
 
 .day-cell:not(.empty):hover {
-  background: #eff6ff;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.14);
-  transform: translateY(-2px);
+  background: #f1f5f9;
 }
 
 .day-number {
@@ -895,7 +1417,8 @@ tbody tr:nth-child(even) {
 
 .day-number span {
   font-size: 0.8rem;
-  color: #111827;
+  color: var(--text-secondary, #475569);
+  font-weight: 500;
 }
 
 .day-cell.today .day-number span {
@@ -904,129 +1427,391 @@ tbody tr:nth-child(even) {
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 999px;
-  border: 2px solid #2563eb;
-  background-color: #ffffff;
-  color: #1d4ed8;
-  font-weight: 600;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
 }
 
 /* tag stack */
 .tag-stack {
   position: absolute;
-  bottom: 3px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   align-items: center;
 }
 
 .tag-pill {
-  padding: 1px 6px;
-  border-radius: 999px;
+  padding: 1px 5px;
+  border-radius: var(--radius-full, 9999px);
   color: white;
-  font-size: 0.58rem;
+  font-size: 0.52rem;
   white-space: nowrap;
-  line-height: 1.3;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  line-height: 1.4;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
-.tag-stack .star {
-  margin-right: 4px;
-  font-size: 0.6rem;
+.tag-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
 }
 
 .monthly-tag-blue {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .monthly-tag-red {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .custom-tag {
-  background-color: #16a34a;
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 
-/* Popup overlay */
+/* ====== POPUP ====== */
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(2px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   z-index: 900;
 }
 
 .popup-row {
   position: fixed;
   left: 50%;
-  top: 52%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
   z-index: 1000;
 }
 
 .popup-box {
-  background: #ffffff;
-  width: 380px;
+  background: var(--bg-card, #ffffff);
+  width: 400px;
   max-width: 92vw;
-  border-radius: 18px;
-  padding: 16px 18px 18px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-xl, 20px);
+  padding: 24px;
+  box-shadow: var(--shadow-xl, 0 20px 50px rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
-.popup-divider {
-  margin: 8px 0 10px;
-  border-color: #e5e7eb;
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.popup-content p {
-  margin-bottom: 4px;
+.popup-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+}
+
+.popup-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast, 150ms);
+}
+
+.popup-close-btn:hover {
+  background: #f1f5f9;
+  color: var(--text-main, #0f172a);
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popup-freq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 8px);
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.popup-date-text {
+  margin: 0;
   font-size: 0.85rem;
+  color: var(--text-secondary, #475569);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.popup-content .text-danger {
+.popup-date-text i {
+  color: var(--text-muted, #94a3b8);
+}
+
+.popup-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.popup-section-title {
+  margin: 0;
   font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
 }
 
 .popup-list {
   list-style: none;
-  padding-left: 0;
-  margin: 4px 0 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.popup-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.task-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--purple-main, #6c3ce0);
+  margin-top: 7px;
+  flex-shrink: 0;
 }
 
 .task-text {
-  font-size: 0.84rem;
-  color: #111827;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.5;
 }
 
-.popup-list li+li {
-  margin-top: 2px;
+.popup-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--radius-sm, 8px);
+  background: #f8fafc;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
 }
 
-@media (max-width: 600px) {
-  .calendar-wrapper {
-    align-items: stretch;
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 200ms ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.pop-enter-active {
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pop-leave-active {
+  transition: all 150ms ease-in;
+}
+.pop-enter-from {
+  opacity: 0;
+  transform: translate(-50%, -48%) scale(0.95);
+}
+.pop-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -52%) scale(0.95);
+}
+
+/* ====== RESPONSIVE ====== */
+
+/* Table horizontal scroll */
+.table-card {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modern-table {
+  min-width: 600px;
+}
+
+@media (max-width: 1024px) {
+  .page {
+    gap: 16px;
   }
 
-  .date-card,
-  .calendar-card {
+  .cards-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
+
+  .section-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 14px 16px;
+  }
+
+  .card-value {
+    font-size: 1.2rem;
+  }
+
+  .card-icon-wrap {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .notification-banner {
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .notif-badge {
     width: 100%;
+    text-align: right;
   }
 
-  .calendar-grid {
-    gap: 6px;
+  .notif-title {
+    font-size: 0.85rem;
   }
 
-  .day-cell {
+  .calendar-wrapper {
     max-width: 100%;
   }
 
+  .calendar-card {
+    padding: 14px 12px 16px;
+  }
+
+  .cal-month-label {
+    font-size: 0.82rem;
+  }
+
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  .day-cell {
+    min-height: 36px;
+    padding-bottom: 16px;
+  }
+
+  .tag-pill {
+    font-size: 0.45rem;
+    padding: 0px 3px;
+  }
+
+  .btn-add span {
+    display: none;
+  }
+
+  .btn-add {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section-text {
+    font-size: 0.9rem;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.78rem;
+  }
+
   .popup-box {
-    width: 340px;
+    width: calc(100vw - 32px);
+    max-width: 380px;
+  }
+
+  .popup-row {
+    width: 100%;
+    padding: 0 16px;
+    left: 0;
+    transform: translate(0, -50%);
+    display: flex;
+    justify-content: center;
+  }
+
+  .pop-enter-from {
+    opacity: 0;
+    transform: translate(0, -48%) scale(0.95);
+  }
+  .pop-leave-to {
+    opacity: 0;
+    transform: translate(0, -52%) scale(0.95);
+  }
+
+  .modern-table th,
+  .modern-table td {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+  }
+
+  .modern-table th {
+    font-size: 0.65rem;
+  }
+
+  .check-btn {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+
+  .status-badge {
+    font-size: 0.68rem;
+    padding: 3px 8px;
   }
 }
 </style>

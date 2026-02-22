@@ -341,113 +341,126 @@ const saveChecklist = async () => {
 </script>
 
 <style scoped>
-/* พื้นที่ทำงานหลักของหน้า (content ใน MainLayout) */
+/* Page wrapper */
 .checklist-page {
-  background: #ffffff;
-  min-height: calc(100vh - 56px);
-  padding: 24px 32px 32px;
+  padding: 0;
 }
 
-/* หัวข้อหน้า */
+/* Page title */
 .page-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
 }
 
-/* แถวแคปซูลด้านบน */
+/* Info pills */
 .pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
 .pill {
-  background: #ffb480;
-  color: #111827;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 0.9rem;
+  background: #f1f5f9;
+  color: var(--text-secondary, #475569);
+  padding: 6px 16px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.82rem;
   font-weight: 500;
   white-space: nowrap;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .pill-main {
-  background: #ffb480;
-  color: #047857;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #6d28d9;
   font-weight: 700;
+  border-color: #c4b5fd;
 }
 
-/* กล่องเนื้อหากลาง (พื้นขาวเหมือนกระดาษ) */
+/* Content panel */
 .content-panel {
-  background: #ffffff;
-  padding: 20px 24px 28px;
-  box-shadow: 0 0 0 1px #e5e5e5;
+  background: var(--bg-card, #ffffff);
+  padding: 24px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
 }
 
-/* ตาราง */
+/* Section label */
+.section-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  margin-bottom: 16px;
+}
+
+/* Table wrapper */
 .table-wrapper {
-  border-radius: 0;
-  box-shadow: none;
+  border-radius: var(--radius-md, 12px);
   overflow: hidden;
-  border: 1px solid #d4d4d4;
+  border: 1px solid var(--border-soft, #e2e8f0);
 }
 
+/* Check table */
 .check-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.check-table td {
-  padding: 10px 12px;
+.check-table td,
+.check-table th {
+  padding: 10px 14px;
   vertical-align: top;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-/* แถวหัวบนสุดสีฟ้า */
 .row-header-main td {
   font-weight: 700;
-  background: #55b4ff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #ffffff;
+  font-size: 0.85rem;
 }
 
-/* หัวคอลัมน์ */
 .row-header-columns td {
   font-weight: 600;
-  background: #f3f4f6;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
 }
 
-/* สีพื้นสลับแถว ให้ดูลอย */
 .check-table tr:nth-child(odd):not(.row-header-main):not(.row-header-columns):not(.row-section) {
-  background: #f9fafb;
+  background: #ffffff;
 }
 .check-table tr:nth-child(even):not(.row-header-main):not(.row-header-columns):not(.row-section) {
-  background: #e5e7eb;
+  background: #f8fafc;
 }
 
 .cell-label {
   width: 28%;
+  color: var(--text-secondary, #475569);
 }
 
-/* แถวหัวแต่ละส่วน */
+/* Section header rows */
 .row-section td {
-  background: #e0f2fe;
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
   font-weight: 600;
-  border-bottom: 1px solid #bfdbfe;
+  border-bottom: 1px solid #7dd3fc;
 }
 
-/* ข้อความอธิบายใต้หัวข้อ */
+/* Field caption under labels */
 .field-caption {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted, #94a3b8);
   margin-top: 4px;
 }
 
-/* หัวคอลัมน์ของแต่ละอุปกรณ์ */
+/* Device column headers */
 .header-device-cell {
   min-width: 160px;
 }
@@ -456,24 +469,30 @@ const saveChecklist = async () => {
   margin-top: 4px;
 }
 
-/* input / select */
+/* Text inputs */
 .input-text,
 .input-select {
   width: 100%;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  padding: 6px 8px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-  background: #ffffff;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  transition: border-color 200ms, box-shadow 200ms;
 }
 
-/* ปุ่มด้านล่าง */
+.input-text:focus,
+.input-select:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
+}
+
+/* Action buttons */
 .actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
 .actions-with-add {
@@ -483,76 +502,75 @@ const saveChecklist = async () => {
 .actions-right {
   margin-left: auto;
   display: flex;
-  gap: 10px;
-}
-
-/* ปุ่มต่าง ๆ */
-.btn-save,
-.btn-add {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
+  gap: 12px;
 }
 
 .btn-save {
-  background: #65d46e;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 28px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-save:hover {
-  background: #4fb759;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16,185,129,0.4);
 }
 
 .btn-add {
-  background: #ffb480;
-  color: #111827;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 8px 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  transition: all var(--transition-fast, 150ms);
 }
 
 .btn-add:hover {
-  background: #f59e63;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
 }
 
-/* ปุ่มลบอุปกรณ์ในหัวคอลัมน์ */
 .btn-remove-device {
-  border: none;
-  border-radius: 999px;
-  padding: 2px 10px;
-  font-size: 0.75rem;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: var(--radius-sm, 8px);
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
-  background: #f87171;
-  color: #ffffff;
+  transition: all 150ms;
 }
 
 .btn-remove-device:hover {
-  background: #ef4444;
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
-/* Popup / field-label จากสไตล์เดิม (เผื่อใช้ต่อ) */
-.field-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #4b5563;
+@media (max-width: 1024px) {
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .check-table { min-width: 500px; }
 }
-
-/* responsive เล็กน้อย */
-@media (max-width: 768px) {
-  .checklist-page {
-    padding: 16px;
-  }
-
-  .pill-row {
-    gap: 8px;
-  }
-
-  .pill {
-    font-size: 0.8rem;
-  }
-
-  .header-device-cell {
-    min-width: 120px;
-  }
+@media (max-width: 640px) {
+  .checklist-page { padding: 0; }
+  .pill-row { gap: 6px; }
+  .pill { font-size: 0.75rem; padding: 5px 12px; }
+  .content-panel { padding: 12px; border-radius: 12px; }
+  .actions { flex-wrap: wrap; }
+  .btn-save { padding: 8px 16px; font-size: 0.8rem; width: 100%; }
+  .btn-remark { padding: 8px 16px; font-size: 0.8rem; }
+  .btn-add { padding: 7px 14px; font-size: 0.78rem; }
+  .input-text, .input-select { font-size: 0.8rem; padding: 6px 8px; }
 }
 </style>

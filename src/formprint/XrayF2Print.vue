@@ -20,9 +20,7 @@
       </button>
     </div>
 
-    <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <!-- บรรทัดแรก -->
@@ -133,7 +131,6 @@
           </table>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -142,6 +139,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+
+const API_BASE = '/api/Xraycare'
 
 const record = ref({
   fiscalYear: '',      // ปีงบประมาณ พ.ศ.
@@ -162,11 +161,32 @@ function handlePrint () {
 }
 
 onMounted(async () => {
-  const id = route.params.id
-  // โหลดจาก backend ถ้ามี
+  const id = route.query.id || route.params.id
+  if (!id) return
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    record.value.machineName = data.machineName || ''
+    record.value.checkDate = data.checkDate || ''
+    record.value.tester = data.tester || ''
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData)
+        if (parsed.fiscalYear !== undefined) record.value.fiscalYear = parsed.fiscalYear
+        if (parsed.frequency !== undefined) record.value.frequency = parsed.frequency
+        if (parsed.ipNumber !== undefined) record.value.ipNumber = parsed.ipNumber
+        if (parsed.inspector !== undefined) record.value.inspector = parsed.inspector
+        if (Array.isArray(parsed.monthSections)) monthSections.value = parsed.monthSections
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.error('Load checklist record error:', e)
+  }
 })
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -174,50 +194,6 @@ onMounted(async () => {
 * {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 16pt !important;
-}
-
-/* พื้นหลังหน้า */
-.print-root {
-  background: #e5e7eb;
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ปุ่ม Print */
-.print-toolbar {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.btn-print {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 24px;
-  background: #f9fafb;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  cursor: pointer;
-}
-
-/* A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 172mm;              /* แคบลงให้ขยับเข้าเหมือนต้นฉบับ */
-  padding: 18mm 0 14mm;
 }
 
 .title-main {
@@ -388,26 +364,10 @@ onMounted(async () => {
 }
 
 
-/* Print mode */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
+  .f2-table th,
+  .f2-table td {
+    border: 1px solid #000 !important;
   }
 }
 </style>

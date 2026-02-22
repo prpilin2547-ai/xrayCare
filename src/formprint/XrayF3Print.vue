@@ -1,197 +1,241 @@
 <template>
   <div class="print-root">
-    <!-- ปุ่ม Print (จะไม่แสดงตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          style="margin-right:6px;"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
           <path d="M6 9V2h12v7h2.5A1.5 1.5 0 0 1 22 10.5v6A1.5 1.5 0 0 1 20.5 18H18v4H6v-4H3.5A1.5 1.5 0 0 1 2 16.5v-6A1.5 1.5 0 0 1 3.5 9H6zm2-5v5h8V4H8zm8 14H8v2h8v-2z"/>
         </svg>
         Print
       </button>
     </div>
 
-    <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
-        <!-- หัวฟอร์ม -->
+    <div class="sheet-inner combined-sheet">
+      <!-- ========== F3 : การควบคุมคุณภาพจอภาพ ========== -->
+      <div class="print-section">
         <div class="header-main">
-          <div class="title-main">
-            แบบบันทึก F3 : การควบคุมคุณภาพจอภาพ (Display monitor)
-          </div>
-          <div class="title-sub">
-          <span class="bold-text">ความถี่ :</span>
-            ทุก 3 เดือน (หรือ 1 เดือน)
-          </div>
-
+          <div class="title-main">แบบบันทึก F3 : การควบคุมคุณภาพจอภาพ (Display monitor)</div>
+          <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน (หรือ 1 เดือน)</div>
         </div>
-
-        <!-- ตารางหลัก -->
         <table class="f3-table">
-          <tbody>
+          <tbody class="section-block">
             <tr>
-              <td class="label-col right-label">
-                <span class="bold-text">วันที่</span>
-              </td>
-
-              <td colspan="4" class="value-cell">
-                {{ record.date }}
-              </td>
+              <td class="label-col right-label"><span class="bold-text">วันที่</span></td>
+              <td colspan="4" class="value-cell">{{ f3Record.date }}</td>
             </tr>
-
-            <!-- ผู้ทดสอบ -->
             <tr>
-              <td class="label-col right-label">
-                <span class="bold-text">ผู้ทดสอบ</span>
-              </td>
-  
-              <td colspan="4" class="value-cell">
-                {{ record.tester }}
-              </td>
+              <td class="label-col right-label"><span class="bold-text">ผู้ทดสอบ</span></td>
+              <td colspan="4" class="value-cell">{{ f3Record.tester }}</td>
             </tr>
-
-
-            <!-- Pass / Fail (ตัวหนา) -->
-            <tr>
-              <td colspan="5" class="center-cell bold-text">
-                Pass (P) / Fail (F)
-              </td>
+            <tr><td colspan="5" class="center-cell bold-text">Pass (P) / Fail (F)</td></tr>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="section-title">คุณภาพของภาพพิมพ์โดยทั่วไป</td></tr>
+            <tr v-for="(item, idx) in (f3Record.qualityItems || [])" :key="'pq-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-            <!-- กลุ่ม : คุณภาพของภาพพิมพ์โดยทั่วไป -->
-            <tr>
-              <td colspan="5" class="section-title">
-                คุณภาพของภาพพิมพ์โดยทั่วไป
-              </td>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="section-title">ความบิดเบือนทั่วไป</td></tr>
+            <tr v-for="(item, idx) in (f3Record.sharpnessItems || [])" :key="'cl-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-            <tr v-for="(item, idx) in printQualityRows" :key="'pq-' + idx">
-              <td class="label-col">{{ item }}</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="section-title">ความส่องสว่าง (Luminance)</td></tr>
+            <tr v-for="(item, idx) in (f3Record.luminanceItems || [])" :key="'lum-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-            <!-- ความบิดเบือนทั่วไป -->
-            <tr>
-              <td colspan="5" class="section-title">
-                ความบิดเบือนทั่วไป
-              </td>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="section-title">กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้ (ในมุมทั้ง 4 และตรงกลางของภาพ)</td></tr>
+            <tr v-for="(item, idx) in (f3Record.objectGroupItems || [])" :key="'sg-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-            <tr v-for="(item, idx) in clarityRows" :key="'cl-' + idx">
-              <td class="label-col">{{ item }}</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="section-title">จำนวนตัวอักษรที่มองเห็น (อย่างน้อย 11 ตัว หรืออ่านได้ถึง "QUALITY CONT")</td></tr>
+            <tr v-for="(item, idx) in (f3Record.whiteObjectItems || [])" :key="'tx-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-            <!-- ความส่องสว่าง (Luminance) -->
-            <tr>
-              <td colspan="5" class="section-title">
-                ความส่องสว่าง (Luminance)
-              </td>
+          </tbody>
+          <tbody class="section-block">
+            <tr><td colspan="5" class="merged-left">ลูกกลิ้งของเครื่องพิมพ์</td></tr>
+            <tr v-for="(item, idx) in (f3Record.rollerItems || [])" :key="'roll-' + (item.id || idx)">
+              <td class="label-col">{{ item.label }}</td>
+              <td class="check-cell" :class="{ 'result-p': item.result === 'P', 'result-f': item.result === 'F' }">{{ item.result === 'P' ? 'P' : item.result === 'F' ? 'F' : '' }}</td>
+              <td class="check-cell"></td><td class="check-cell"></td><td class="check-cell"></td>
             </tr>
-
-<!-- แถว 1: กรอบที่มีระดับสีเทาวางซ้อนกัน -->
-<tr>
-  <td class="label-col">กรอบที่มีระดับสีเทาวางซ้อนกัน</td>
-  <td class="check-cell"></td>
-  <td class="check-cell"></td>
-  <td class="check-cell"></td>
-  <td class="check-cell"></td>
-</tr>
-
-<!-- แถว 2–3: กรอบสีเทา 5% + 0% (ผสานช่องว่างด้านขวาทั้ง 4 ช่อง) -->
-<tr>
-  <td class="label-col">กรอบสีเทา 5% มองเห็นในพื้น</td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-</tr>
-<tr>
-  <td class="label-col">กรอบสีเทา 0%</td>
-</tr>
-
-<!-- แถว 4–5: กรอบสีเทา 95% + 100% (ผสานช่องว่างด้านขวาทั้ง 4 ช่อง) -->
-<tr>
-  <td class="label-col">กรอบสีเทา 95% มองเห็นในพื้น</td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-  <td class="check-cell" rowspan="2"></td>
-</tr>
-<tr>
-  <td class="label-col">กรอบสีเทา 100%</td>
-</tr>
-
-            <!-- กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้ -->
-            <tr>
-              <td colspan="5" class="section-title">
-                กลุ่มวัตถุคอนทราสสูงขนาดเล็กสุดมองเห็นได้ (ในมุมทั้ง 4 และตรงกลางของภาพ)
-              </td>
-            </tr>
-
-            <tr v-for="(item, idx) in smallGroupRows" :key="'sg-' + idx">
-              <td class="label-col">{{ item }}</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-            </tr>
-
-            <!-- จำนวนตัวอักษรที่มองเห็น -->
-            <tr>
-              <td colspan="5" class="section-title">
-                จำนวนตัวอักษรที่มองเห็น (อย่างน้อย 11 ตัว หรืออ่านได้ถึง “QUALITY CONT”)
-              </td>
-            </tr>
-
-            <tr v-for="(item, idx) in textRows" :key="'tx-' + idx">
-              <td class="label-col">{{ item }}</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-            </tr>
-
-            <!-- ลูกกลิ้งของเครื่องพิมพ์ (ผสานเซลล์ + ชิดซ้าย + ตัวหนา) -->
-            <tr>
-              <td colspan="5" class="merged-left">
-                ลูกกลิ้งของเครื่องพิมพ์
-              </td>
-            </tr>
-
-            <!-- ทำความสะอาด (ถ้าจำเป็น) -->
-            <tr>
-              <td class="label-col">ทำความสะอาด (ถ้าจำเป็น)</td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-              <td class="check-cell"></td>
-            </tr>
-
-            <!-- ข้อคิดเห็น (ผสานเซลล์ + ชิดซ้าย + ตัวหนาแค่ label) -->
-            <tr>
-              <td colspan="5" rowspan="2" class="merged-left">
-                ข้อคิดเห็น
-              </td>
-          </tr>
-
-          <tr>
-            <!-- ไม่ต้องมี <td> ใด ๆ -->
-          </tr>
+            <tr><td colspan="5" class="merged-left">ข้อคิดเห็น</td></tr>
+            <tr><td colspan="5" class="value-cell align-left">{{ f3Record.remark }}</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- ========== F4 : แบบบันทึกการตรวจสอบเครื่องเอกซเรย์ ========== -->
+      <div class="print-section section-f4">
+        <div class="header-main">
+          <div class="title-main">แบบบันทึก F4 : แบบบันทึกการตรวจสอบเครื่องเอกซเรย์</div>
+          <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน</div>
+          <div class="title-sub header-row-inline">
+            ห้อง <span class="underline short">{{ f4Record.room }}</span> รุ่น <span class="underline long">{{ f4Record.model }}</span>
+          </div>
+          <div class="title-sub header-row-inline">
+            วันที่ <span class="underline short">{{ f4Record.date }}</span> ผู้ทดสอบ <span class="underline short">{{ f4Record.tester }}</span>
+          </div>
+        </div>
+        <table class="f4-table">
+          <thead>
+            <tr>
+              <th class="col-no"><span class="bold-text">ลำดับที่</span></th>
+              <th class="col-desc"><span class="bold-text">รายการตรวจสอบ</span></th>
+              <th class="col-result"><span class="bold-text">ผ่าน (✓)<br> ไม่ผ่าน (✗)</span></th>
+              <th class="col-remark"><span class="bold-text">หมายเหตุ</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in f4Rows" :key="row.id || row.order">
+              <td class="col-no">{{ row.order ?? row.no }}</td>
+              <td class="col-desc align-left">{{ row.label ?? row.description }}</td>
+              <td class="col-result">
+                <span v-if="row.pass === true || row.result === 'P'">✓</span>
+                <span v-else-if="row.pass === false || row.result === 'F'">✗</span>
+              </td>
+              <td class="col-remark align-left">{{ row.remark ?? '' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="note-block">
+          <div class="note-line">*ในระบบ DR ให้ทวนสอบค่าทางเทคนิคว่าถูกต้องเป็นปัจจุบัน</div>
+          <div class="note-line">**ไม่ต้องทดสอบสำหรับเครื่องเอกซเรย์เคลื่อนที่</div>
+        </div>
+        <div class="footer-note" v-if="f4Record.remark">{{ f4Record.remark }}</div>
+      </div>
+
+      <!-- ========== F5 : ความสม่ำเสมอของภาพ ========== -->
+      <div class="print-section section-f5">
+        <div class="header-main">
+          <div class="title-main">แบบบันทึก F5 : ความสม่ำเสมอของภาพ (Measured Uniformity)</div>
+          <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน</div>
+          <div class="title-sub"><span class="bold-text">หมายเลขของแผ่นรับภาพ</span> <span class="underline long">{{ f5Record.cassetteNumber }}</span></div>
+        </div>
+        <table class="summary-box">
+          <tr>
+            <td class="align-left">
+              <span class="bold-text">ค่าขอบเขต</span><br />
+              <template v-for="(c, i) in (f5Record.criteria || [])" :key="'crit-' + (c.id || i)">
+                <span class="bold-text">{{ c.label }}</span> <span v-if="c.result">({{ c.result }})</span><br />
+              </template>
+            </td>
+          </tr>
+        </table>
+        <table class="f5-table">
+          <tbody>
+            <tr>
+              <td class="col-label"><span class="bold-text">วันที่</span></td>
+              <td class="col-right-4" colspan="4">{{ f5Record.date }}</td>
+            </tr>
+            <tr>
+              <td class="col-label"><span class="bold-text">ผู้ทดสอบ</span></td>
+              <td class="col-right-4" colspan="4">{{ f5Record.tester }}</td>
+            </tr>
+            <tr v-for="(item, idx) in (f5Record.imageChecks || [])" :key="'img-' + (item.id || idx)">
+              <td class="col-label"><span class="bold-text">{{ item.label }}</span></td>
+              <td class="small-box" colspan="4">{{ item.result }}</td>
+            </tr>
+            <tr>
+              <td class="col-label"><span class="bold-text">ข้อคิดเห็น–ความดำภาพ (heel effect etc?)</span></td>
+              <td class="small-box" colspan="4">{{ f5Record.comment }}</td>
+            </tr>
+            <tr>
+              <td class="col-label"><span class="bold-text">การแก้ไข (ถ้าเป็นไปได้)</span></td>
+              <td class="small-box" colspan="4">{{ f5Record.correction }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ========== F6 : ความคงที่ของค่าดัชนีปริมาณรังสี ========== -->
+      <div class="print-section section-f6">
+        <div class="header-main">
+          <div class="title-main">แบบบันทึก F6 : ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)</div>
+          <div class="title-sub"><span class="freq-label">ความถี่ :</span> <span class="freq-value">ทุก 3 เดือน</span></div>
+        </div>
+        <table class="f6-table">
+          <tbody>
+            <tr>
+              <td colspan="4" class="align-left multi-line-cell">
+                <div>ข้อมูลสำหรับระบบ CR / DR</div>
+                <div>หมายเลขคาสเซท CR / DR : <span class="full-underline">{{ f6Record.cassetteNumber }}</span></div>
+                <div>หมายเลขเครื่องอ่าน CR / DR : <span class="full-underline">{{ f6Record.readerNumber }}</span></div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="align-left multi-line-cell">
+                <div>ข้อมูลเครื่องเอกซเรย์</div>
+                <div>ยี่ห้อ : <span class="full-underline">{{ f6Record.xrayBrand }}</span> รุ่น : <span class="short-line full-underline">{{ f6Record.xrayModel }}</span> หมายเลขเครื่อง : <span class="short-line full-underline">{{ f6Record.xraySerial }}</span></div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="align-left multi-line-cell">
+                <div>ขอบเขต</div>
+                <div>ค่าแตกต่างจากค่าอ้างอิงพื้นฐาน (Baseline) น้อยกว่า ± 10%</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" class="align-left">ข้อมูลเบื้องต้น : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.eiUnitInfo }}</span></td>
+            </tr>
+            <tr>
+              <td colspan="4" class="align-left">เทคนิคประมวลผลภาพ : <span class="underline long">{{ f6Record.processingTechnique }}</span></td>
+            </tr>
+            <tr class="ei-header">
+              <th>วันที่ทำการทดสอบ</th><th>อ้างอิง</th><th>ขอบเขตล่าง</th><th>ขอบเขตบน</th>
+            </tr>
+            <tr v-for="row in (f6Record.eiRows || []).slice(0, 3)" :key="'ei-' + row.id">
+              <td class="align-left">{{ row.technique }}</td>
+              <td>{{ row.eiRef }}</td>
+              <td>{{ row.eiMeasured }}</td>
+              <td>{{ row.passFail }}</td>
+            </tr>
+            <tr v-if="!(f6Record.eiRows && f6Record.eiRows.length)">
+              <td class="align-left">EI</td><td></td><td></td><td></td></tr>
+            <tr v-if="!(f6Record.eiRows && f6Record.eiRows.length)"><td class="align-left">EI จากเครื่อง</td><td></td><td></td><td></td></tr>
+            <tr><td class="align-left" colspan="2">EI อยู่ในเกณฑ์ (P/F)</td><td></td><td></td></tr>
+            <tr><td class="align-left" colspan="2">ข้อคิดเห็น</td><td colspan="2">{{ f6Record.comment }}</td></tr>
+            <tr class="section-header">
+              <td colspan="4" class="align-left">ปริมาณรังสีที่ใช้สำหรับการทดสอบ (กรณีศูนย์วิทยาศาสตร์การแพทย์ ดำเนินการวัดให้พร้อมตรวจมาตรฐานเครื่องเอกซเรย์ประจำปี)</td>
+            </tr>
+            <template v-if="f6Record.doseRows && f6Record.doseRows.length">
+              <tr v-for="(row, idx) in f6Record.doseRows" :key="'dose-' + (row.id ?? idx)">
+                <td class="align-center">เทคนิคการถ่ายภาพ<br />{{ row.technique }}</td>
+                <td class="align-center">kV<br />{{ row.kv }}</td>
+                <td class="align-center">mAs<br />{{ row.mas }}</td>
+                <td class="align-center">Dose (mGy)<br />{{ row.dose }}</td>
+              </tr>
+            </template>
+            <tr v-else>
+              <td class="align-center">เทคนิคการถ่ายภาพ<br /></td>
+              <td class="align-center">kV<br /></td>
+              <td class="align-center">mAs<br /></td>
+              <td class="align-center">Dose (mGy)<br /></td>
+            </tr>
+            <tr class="empty-row"><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="signature-block">
+          <div class="sig-line sig-row">ลงชื่อ .................................................. ผู้ทดสอบ</div>
+          <div class="sig-line sig-row">( ................................................................. )</div>
+          <div class="sig-line sig-row">ตำแหน่ง ..........................................................</div>
+        </div>
       </div>
     </div>
   </div>
@@ -202,210 +246,219 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const API_BASE = '/api/Xraycare'
 
-// ข้อมูลที่ดึงมาจากการบันทึกจริง
-const record = ref({
-  date: '',
-  tester: '',
-  result: '',
-  comment: ''
+// F3 – โครงสร้างตรงกับ jsonData.F3
+const f3Record = ref({
+  date: '', tester: '', remark: '',
+  qualityItems: [], sharpnessItems: [], luminanceItems: [], objectGroupItems: [], whiteObjectItems: [], rollerItems: []
 })
 
-// แถวข้อความในแต่ละกลุ่ม (ตามฟอร์ม)
-const printQualityRows = [
-  'ภาพไม่มีลายเปื้อน (Smear)',
-  'ไม่มีสิ่งแปลกปลอม',
-  'ภาพลดหลั่น (ramp) แบบต่อเนื่อง'
-]
+// F4
+const f4Record = ref({ room: '', model: '', date: '', tester: '', remark: '' })
+const f4Rows = ref([
+  { no: 1, description: 'สภาพสายไฟไม่มีรอยแตก บิดงอหรือเป็นปมสาย และไม่ถูกอุปกรณ์ที่มีน้ำหนักกดทับสาย', result: '', remark: '' },
+  { no: 2, description: 'ระบบอินเตอร์ล็อคและเบรคทำงานอย่างถูกต้อง', result: '', remark: '' },
+  { no: 3, description: 'การเคลื่อนที่ของเตียง หัวหลอดเอกซเรย์ และบัคกี้ เป็นไปอย่างราบรื่น', result: '', remark: '' },
+  { no: 4, description: 'สวิตซ์แผงควบคุม ไฟแสดงสถานะต่างๆ และมิเตอร์แสดงค่าทางเทคนิคทำงานและมองเห็นอย่างชัดเจน', result: '', remark: '' },
+  { no: 5, description: 'แสงไฟจากคอลลิเมเตอร์มีความเข้มแสงเพียงพอต่อการปฏิบัติงานในขณะที่เปิดไฟห้องปฏิบัติการ และคอลลิเมเตอร์ปราศจากฝุ่น', result: '', remark: '' },
+  { no: '6*', description: 'มีแผนภูมิค่าทางเทคนิคที่ใช้ปัจจุบันแสดงอยู่ใกล้แผงควบคุม', result: '', remark: '' },
+  { no: 7, description: 'ไม่มีน้ำมันระบายความร้อนรั่วรอบหลอดเอกซเรย์ ถังเครื่องกำเนิดไฟฟ้าแรงสูง และปราศจากฝุ่น', result: '', remark: '' },
+  { no: 8, description: 'แผ่นรับภาพสะอาดและปราศจากสิ่งแปลกปลอม', result: '', remark: '' },
+  { no: 9, description: 'บนเวิร์กสเตชัน ให้แสดงภาพทางคลินิกล่าสุด ในภาพตรวจสอบเวลาและวันที่ รวมถึงการระบุสถานที่ และคำอธิบายประกอบอื่นๆถูกต้อง', result: '', remark: '' },
+  { no: 10, description: 'ที่หลอดเอกซเรย์ และเครื่องกำเนิดไฟฟ้า มีป้ายบอกรุ่น หมายเลขซีเรียลอ่านได้ชัดเจน หรือมีการจดบันทึกไว้ที่แฟ้มเอกสารคุณภาพ', result: '', remark: '' },
+  { no: 11, description: 'อุปกรณ์ป้องกันรังสี เช่น เสื้อตะกั่ว ไทรอยด์ชิวด์ อุปกรณ์กำบังรังสีบริเวณอวัยวะสืบพันธุ์ ไม่ชำรุดหรือฉีกขาด สะอาดและมีการจัดเก็บอย่างเหมาะสม', result: '', remark: '' },
+  { no: '12**', description: 'สามารถมองเห็นผู้ป่วยจากห้องควบคุมโดยไม่มีสิ่งกีดขวางบดบังผ่านจากช่องมองกระจก หรือมีระบบกล้องวงจรปิด', result: '', remark: '' },
+  { no: '13**', description: 'ป้ายและสัญลักษณ์เตือนภัยทางรังสีติดหน้าประตูและไฟเตือนขณะฉายรังสีหน้าห้องปฏิบัติการ', result: '', remark: '' },
+  { no: '14**', description: 'ช่องหรือบักกี้ใส่คาสเซทและตัวล็อคทำงานปกติ', result: '', remark: '' },
+  { no: '15**', description: 'ศูนย์กลางลำรังสีกับเตียง ตัวเลขบอกระยะ SID หรือขนาดแสงไฟ ถูกต้อง', result: '', remark: '' }
+])
 
-const clarityRows = [
-  'เส้นตรงต่อเนื่อง',
-  'กรอบหรือช่องเป็นสี่เหลี่ยม'
-]
+// F5 – โครงสร้างตรงกับ jsonData.F5
+const f5Record = ref({
+  cassetteNumber: '', date: '', tester: '', comment: '', correction: '',
+  criteria: [], imageChecks: []
+})
 
-const smallGroupRows = [
-  'กลุ่มเส้นคู่แนวนอน',
-  'กลุ่มเส้นคู่แนวตั้ง'
-]
+// F6 – โครงสร้างตรงกับ jsonData.F6
+const f6Record = ref({
+  cassetteNumber: '', readerNumber: '', xrayBrand: '', xrayModel: '', xraySerial: '', eiUnitInfo: '', processingTechnique: '', comment: '',
+  eiRows: [], testRows: [], doseRows: []
+})
 
-const textRows = [
-  'ในพื้นที่มืด (Dark)',
-  'ในพื้นที่สีเทาระดับกลาง (Mid-grey)',
-  'ในพื้นที่สว่าง (Light)'
-]
-
-// โหลดข้อมูลจาก backend ตาม id
 onMounted(async () => {
-  const id = route.params.id
-  // const res = await fetch(`/api/f3/${id}`)
-  // const data = await res.json()
-  // record.value = { ... }
+  const id = route.query.id || route.params.id
+  if (!id) return
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    const checkDate = data.checkDate || ''
+    const tester = data.tester || ''
+    let parsed = {}
+    if (data.jsonData) {
+      try {
+        parsed = JSON.parse(data.jsonData)
+      } catch (_) {}
+    }
+    // F3
+    if (parsed.F3 && typeof parsed.F3 === 'object') {
+      Object.assign(f3Record.value, parsed.F3)
+    }
+    f3Record.value.date = f3Record.value.date || checkDate
+    f3Record.value.tester = f3Record.value.tester || tester
+    // F4 – ใช้ items[] จาก jsonData
+    if (parsed.F4 && typeof parsed.F4 === 'object') {
+      Object.assign(f4Record.value, {
+        room: parsed.F4.room ?? '',
+        model: parsed.F4.model ?? '',
+        date: parsed.F4.date ?? checkDate,
+        tester: parsed.F4.tester ?? tester,
+        remark: parsed.F4.remark ?? ''
+      })
+      f4Rows.value = Array.isArray(parsed.F4.items) ? parsed.F4.items : []
+    }
+    // F5
+    if (parsed.F5 && typeof parsed.F5 === 'object') {
+      Object.assign(f5Record.value, parsed.F5)
+    }
+    f5Record.value.date = f5Record.value.date || checkDate
+    f5Record.value.tester = f5Record.value.tester || tester
+    // F6
+    if (parsed.F6 && typeof parsed.F6 === 'object') {
+      Object.assign(f6Record.value, parsed.F6)
+    }
+  } catch (e) {
+    console.error('Load checklist record error:', e)
+  }
 })
 
-function handlePrint () {
+function handlePrint() {
   window.print()
 }
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-* {
-  font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
-  font-size: 16pt !important;
-  font-weight: 400;
+* { font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important; font-size: 16pt !important; font-weight: 400; }
+
+/* หน้ารวม F3–F6: ยกเลิกความสูงคงที่ ให้ scroll ดูทุกฟอร์มได้ และพิมพ์แยกหน้าตาม section */
+.print-root > .sheet-inner.combined-sheet {
+  height: auto !important;
+  min-height: 277mm;
+  max-height: none !important;
+  aspect-ratio: auto;
+  overflow: visible !important;
 }
-
-
-.print-root {
-  background: #e5e7eb;   
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
+.print-root:has(.combined-sheet) {
+  overflow-x: hidden;
+  overflow-y: auto;
   align-items: center;
+  justify-content: flex-start;
 }
-
-/* ปุ่ม print */
-.print-toolbar {
-  margin-bottom: 18px;
+.sheet-inner.combined-sheet {
+  width: 190mm;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
-
-.btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-  font-size: 16pt !important;
+/* แบ่งหน้าตามหัวข้อ: แต่ละบล็อกไม่ขาดกลางหน้า */
+.section-block {
+  display: table-row-group;
+  page-break-inside: avoid;
 }
-
-/* A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 185mm;
-  padding: 15mm 0 15mm;
-}
-
-/* Header */
-.header-main {
-  margin-bottom: 6mm;
-}
-
-.title-main {
-  font-weight: 700;
-  font-size: 18pt !important;   /* ← เฉพาะ F3 */
-  margin-bottom: 2mm;
-}
-
-
-/* บรรทัดรอง → 11pt */
-.title-sub {
-  font-size: 16pt !important;
-}
-
-/* ตาราง */
-.f3-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 16pt !important;
-}
-
-.f3-table td {
-  border: 0.4pt solid #000;
-  padding: 1.5mm 2mm;
-  vertical-align: middle;
-  font-size: 16pt !important;
-}
-
-.label-col {
-  width: 65mm;
-}
-
-.check-cell {
-  width: 25mm; /* ให้ 4 คอลัมน์ว่างมีขนาดใกล้เคียงกัน */
-}
-
-.center-cell {
-  text-align: center;
-}
-
-/* หัวกลุ่มทุกอัน: ตัวหนา + ชิดซ้าย + ชิดขอบตาราง */
 .section-title {
-  font-weight: 700;
-  text-align: left;
-  padding-left: 2mm;
+  border-top: 1pt solid #000;
+  padding-top: 3mm !important;
+  margin-top: 2mm;
+}
+.section-block:first-child .section-title,
+.section-block .section-title:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+.section-block + .section-block .section-title { border-top-color: #333; }
+.print-section { margin-bottom: 8mm; }
+.print-section.section-f4,
+.print-section.section-f5,
+.print-section.section-f6 { page-break-before: always; }
+@media print {
+  .print-root > .sheet-inner.combined-sheet {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    page-break-after: auto;
+    width: 190mm !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .print-section.section-f4,
+  .print-section.section-f5,
+  .print-section.section-f6 { page-break-before: always; }
+  .section-block { page-break-inside: avoid; }
 }
 
-/* ตัวหนา */
-.bold-text {
-  font-weight: 700;
-}
+/* F3 */
+.header-main { margin-bottom: 6mm; }
+.title-main { font-weight: 700; font-size: 18pt !important; margin-bottom: 2mm; }
+.title-sub { font-size: 16pt !important; }
+.f3-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 16pt !important; }
+.f3-table td { border: 0.4pt solid #000; padding: 1.5mm 2mm; vertical-align: middle; font-size: 16pt !important; }
+.label-col { width: 65mm; }
+.check-cell { width: 25mm; }
+.center-cell { text-align: center; }
+.section-title { font-weight: 700; text-align: left; padding-left: 2mm; }
+.bold-text { font-weight: 700; }
+.value-cell { text-align: left; }
+.merged-left { font-weight: 700; text-align: left !important; padding-left: 2mm !important; border: 0.4pt solid #000; }
+.underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 50mm; min-height: 6mm; }
+.f3-table td, .f3-table th { padding-top: 0.2mm !important; padding-bottom: 0.2mm !important; }
+.right-label { text-align: right !important; padding-right: 3mm !important; }
+.check-cell.result-p { font-weight: 700; text-align: center; }
+.check-cell.result-f { font-weight: 700; text-align: center; }
+.align-left { text-align: left !important; }
 
-/* ช่องกรอกข้อมูล */
-.value-cell {
-  text-align: left;
-}
+/* F4 */
+.header-row-inline { display: flex; align-items: center; gap: 4mm; width: 100%; }
+.underline.long { flex: 1; min-width: 40mm; border-bottom: 0.4pt solid #000; min-height: 6mm; display: inline-block; }
+.underline.short { flex: 0 0 40mm; border-bottom: 0.4pt solid #000; min-height: 6mm; display: inline-block; }
+.f4-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt !important; }
+.f4-table th, .f4-table td { border: 0.4pt solid #000; padding: 1.5mm 1mm; vertical-align: middle; font-size: 14pt !important; }
+.f4-table th { text-align: center; font-weight: 700 !important; }
+.f4-table td { text-align: left !important; }
+.f4-table td.col-no { text-align: center !important; vertical-align: top !important; padding-top: 1mm; }
+.f4-table td.col-result { text-align: center !important; font-weight: 700; }
+.col-no { width: 14mm; } .col-desc { width: 75mm; } .col-result { width: 30mm; } .col-remark { width: auto; }
+.note-block { margin-top: 4mm; font-size: 16pt !important; }
+.note-line { line-height: 1.4 !important; }
+.footer-note { margin-top: 3mm; font-size: 16pt !important; }
+.freq-label { font-weight: 700; } .freq-value { font-weight: 400; }
+.align-left { text-align: left !important; }
 
-/* ผสานเซลล์และชิดซ้าย (ลูกกลิ้ง/ข้อคิดเห็น) */
-.merged-left {
-  font-weight: 700;
-  text-align: left !important;
-  padding-left: 2mm !important;
-  border: 0.4pt solid #000;
-}
+/* F5 */
+.summary-box { width: 100%; border-collapse: collapse; border: 0.4pt solid #000; margin-bottom: 8mm; }
+.summary-box td { padding: 4mm; text-align: left; line-height: 2.5; }
+.f5-table { width: 100%; border-collapse: collapse; }
+.f5-table td { border: 0.4pt solid #000; padding: 3mm 2mm; vertical-align: middle; }
+.col-label { width: 90mm; } .col-right-4 { width: auto; } .small-box { width: auto; border: 0.4pt solid #000; }
+.merged-text { line-height: 2.5 !important; }
 
-.underline {
-  display: inline-block;
-  border-bottom: 0.4pt solid #000;
-  min-width: 50mm;
-  min-height: 6mm;
-}
-/* ลดความกว้างด้านบน–ล่างของทุกช่องในตาราง */
-.f3-table td,
-.f3-table th {
-  padding-top: 0.2mm !important;
-  padding-bottom: 0.2mm !important;
-}
-
-/* คอลัมน์ label แถว วันที่ / ผู้ทดสอบ ให้ชิดขวา */
-.right-label {
-  text-align: right !important;
-  padding-right: 3mm !important;
-}
-
-/* Print */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
+/* F6 */
+.f6-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.f6-table td, .f6-table th { border: 1px solid #000; padding: 2mm; width: 25%; vertical-align: middle; font-weight: 400 !important; }
+.f6-table th { font-weight: 700; text-align: center; font-size: 16pt !important; }
+.align-center { text-align: center !important; }
+.multi-line-cell { padding: 3mm 2mm; line-height: 1.4; }
+.multi-line-cell div { margin-bottom: 1mm; }
+.full-underline { display: inline-block; border-bottom: 0.4pt solid #000; width: 40mm; height: 4mm; vertical-align: middle; }
+.short-line { width: 25mm; }
+.section-header td { font-weight: 700; }
+.ei-header th { font-weight: 700; }
+.empty-row td { height: 10mm; }
+.signature-block { margin-top: 20mm; text-align: right; font-size: 16pt !important; }
+.sig-line { margin-bottom: 3mm; font-size: 16pt !important; }
 
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
-  .right-label {
-  text-align: right !important;
-  padding-right: 3mm !important; /* เล็กน้อยให้สวยงาม */
+  .f3-table td, .f4-table th, .f4-table td, .f5-table td, .summary-box td, .f6-table td, .f6-table th { border: 1px solid #000 !important; }
 }
-}
-
 </style>

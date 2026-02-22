@@ -70,69 +70,86 @@ const handleEdit = () => {
 .header-note {
   align-self: flex-start;
   font-size: 0.9rem;
-  color: #9ca3af;
+  color: var(--text-muted, #94a3b8);
   margin: 0 0 10px;
 }
 
 .profile-card {
+  max-width: 460px;
+  margin: 0 auto;
   width: 100%;
-  max-width: 420px;
-  background: white;
-  border-radius: 18px;
-  padding: 24px 26px 28px;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  padding: 32px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+  border: 1px solid var(--border-card, rgba(0,0,0,0.06));
   text-align: center;
 }
 
 .title {
-  margin: 0 0 12px;
-  font-size: 1.4rem;
+  margin: 0 0 24px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
 }
 
 .avatar {
-  width: 84px;
-  height: 84px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  border: 2px solid #f3f4f6;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto 16px;
+  color: #7c3aed;
+  font-size: 2rem;
 }
 
 .form {
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.9rem;
-  margin-bottom: 4px;
-  color: #374151;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: var(--text-secondary, #475569);
+  font-weight: 600;
 }
 
 .form-group input {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  transition: all 200ms;
+}
+
+.form-group input:focus {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  outline: none;
 }
 
 .password-wrapper {
   display: flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
   padding-right: 4px;
-  background: white;
+  background: var(--bg-card, #fff);
 }
 
 .password-wrapper input {
   border: none;
-  border-radius: 999px;
-  padding-right: 0;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  flex: 1;
 }
 
 .eye-btn {
@@ -144,12 +161,30 @@ const handleEdit = () => {
 }
 
 .btn-edit {
-  margin-top: 12px;
-  border-radius: 999px;
-  border: 1px solid #111827;
-  background: white;
-  padding: 8px 0;
-  font-size: 0.95rem;
+  margin-top: 16px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.btn-edit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+}
+
+@media (max-width: 640px) {
+  .profile-card { padding: 20px; border-radius: 12px; margin: 0 -4px; }
+  .avatar { width: 64px; height: 64px; font-size: 1.5rem; }
+  .title { font-size: 1.1rem; }
+  .form-group label { font-size: 0.8rem; }
+  .form-group input { padding: 8px 10px; }
+  .btn-edit { width: 100%; }
 }
 </style>

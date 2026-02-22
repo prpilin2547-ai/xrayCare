@@ -21,8 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- ส่วนหัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -208,7 +207,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -247,13 +245,33 @@ function handlePrint () {
   window.print()
 }
 
+const API_BASE = '/api/Xraycare'
+
 onMounted(async () => {
-  const id = route.params.id
+  const id = route.query.id || route.params.id
   if (!id) return
-  // โหลดข้อมูลจริงค่อยใส่ภายหลัง
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    record.value.date = data.checkDate || ''
+    record.value.testerName = data.tester || ''
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData)
+        Object.keys(parsed).forEach(k => {
+          if (record.value[k] !== undefined) record.value[k] = parsed[k]
+        })
+        if (parsed.runs && Array.isArray(parsed.runs)) record.value.runs = parsed.runs
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.error('Load checklist record error:', e)
+  }
 })
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -265,43 +283,6 @@ onMounted(async () => {
 }
 
 /* ===== พื้นหลัง & ปุ่ม ===== */
-.print-root {
-  background: #e5e7eb;
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.print-toolbar {
-  margin-bottom: 16px;
-}
-
-.btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-  font-size: 16pt;
-}
-
-/* ===== แผ่น A4 ===== */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 180mm;
-  padding: 18mm 0 14mm;
-}
-
 /* ===== HEADER & META ให้เว้นบรรทัดเท่ากัน ===== */
 .header-main {
   text-align: left;
@@ -470,26 +451,7 @@ onMounted(async () => {
 
 
 /* ===== PRINT ===== */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
-  .print-toolbar {
-    display: none;
-  }
-
-  .print-root {
-    background: #ffffff;
-    padding: 0;
-  }
-
-  .sheet-a4 {
-    box-shadow: none;
-    width: auto;
-    min-height: auto;
-  }
 .col-iav-group,
 .col-bg-group {
   text-align: center;

@@ -21,8 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-a4">
-      <div class="sheet-inner">
+    <div class="sheet-inner">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -193,7 +192,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -218,47 +216,36 @@ function handlePrint () {
   window.print()
 }
 
+const API_BASE = '/api/Xraycare'
+
 onMounted(async () => {
-  const id = route.params.id
-
-  // mock data ตัวอย่าง (เปลี่ยนเป็นเรียก backend จริงได้)
-  externalChecks.value = [
-    {
-      equipmentNo: 'xxxx',
-      equipmentType: 'เสื้อตะกั่ว',
-      usageAge: '> 3 ปี',
-      checkDate: '4/3/65',
-      damageType: 'รอยหัก',
-      position: 'บ่าขวาหน้า',
-      size: '-',
-      storageMethod: 'ไม้แขวน',
-      recorder: 'ประวิตร'
+  const id = route.query.id || route.params.id
+  if (!id) return
+  try {
+    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.jsonData) {
+      try {
+        const parsed = JSON.parse(data.jsonData)
+        if (parsed.frequency !== undefined) record.value.frequency = parsed.frequency
+        if (Array.isArray(parsed.externalChecks)) externalChecks.value = parsed.externalChecks
+        if (Array.isArray(parsed.internalChecks)) internalChecks.value = parsed.internalChecks
+      } catch (_) {}
     }
-  ]
-
-  internalChecks.value = [
-    {
-      equipmentNo: 'xxxx',
-      equipmentType: 'เสื้อตะกั่ว',
-      usageAge: '> 5 ปี',
-      checkDate: '4/3/65',
-      internalFinding: 'รูทะลุ',
-      position: 'อกหน้า',
-      size: '3x10 cm',
-      storageMethod: 'วางราบ',
-      recorder: 'ประวิตร'
-    }
-  ]
-
-  // ถ้าเชื่อมจริงก็ใช้แบบนี้แทน
-  // const res = await fetch(`/api/f9/${id}`)
-  // const data = await res.json()
-  // record.value.frequency = data.frequency || 'ทุก 6 เดือน'
-  // externalChecks.value = data.externalChecks || []
-  // internalChecks.value = data.internalChecks || []
+  } catch (e) {
+    console.error('Load checklist record error:', e)
+  }
+  if (externalChecks.value.length === 0) {
+    externalChecks.value = [{ equipmentNo: '', equipmentType: 'เสื้อตะกั่ว', usageAge: '', checkDate: '', damageType: '', position: '', size: '', storageMethod: '', recorder: '' }]
+  }
+  if (internalChecks.value.length === 0) {
+    internalChecks.value = [{ equipmentNo: '', equipmentType: 'เสื้อตะกั่ว', usageAge: '', checkDate: '', internalFinding: '', position: '', size: '', storageMethod: '', recorder: '' }]
+  }
 })
 </script>
 
+<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -267,45 +254,6 @@ onMounted(async () => {
   font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important;
   font-size: 16pt;
   font-weight: 400;
-}
-
-/* พื้นหลัง print */
-.print-root {
-  background: #e5e7eb;
-  min-height: 100vh;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ปุ่ม print */
-.print-toolbar {
-  margin-bottom: 18px;
-}
-
-.btn-print {
-  padding: 6px 18px;
-  background: #ffffff;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  cursor: pointer;
-  font-size: 16pt;
-}
-
-/* แผ่น A4 */
-.sheet-a4 {
-  width: 210mm;
-  min-height: 297mm;
-  background: #ffffff;
-  box-shadow: 0 0 4mm rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-}
-
-.sheet-inner {
-  width: 185mm;
-  padding: 18mm 0 14mm;
 }
 
 /* HEADER */
@@ -394,12 +342,6 @@ onMounted(async () => {
 }
 
 
-/* PRINT */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
 @media print {
   .print-toolbar {
     display: none;
@@ -416,15 +358,7 @@ onMounted(async () => {
     min-height: auto;
   }
 
-  .section-title {
-    text-align: left !important;
-    padding-left: 3mm;
-  }
-  /* ทำให้ตัวหนังสือในแถวลำดับที่ชิดด้านบน */
-.f9-table td.row-top {
-  vertical-align: top !important;
-  padding-top: 1mm !important;
-}
-
+  .section-title { text-align: left !important; padding-left: 3mm; }
+  .f9-table td.row-top { vertical-align: top !important; padding-top: 1mm !important; }
 }
 </style>

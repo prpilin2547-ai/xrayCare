@@ -65,7 +65,6 @@
                     <span>{{ cell.day }}</span>
                   </div>
 
-                  <!-- stack แท็กต่าง ๆ ใต้ตัวเลขวัน -->
                   <div
                     v-if="
                       hasMonthlyTag(cell) ||
@@ -74,48 +73,16 @@
                     "
                     class="tag-stack"
                   >
-                    <!-- Monthly check (ฟ้า) -->
-                    <div
-                      v-if="hasMonthlyTag(cell)"
-                      class="tag-pill monthly-tag-blue"
-                    >
-                      <span class="star">★</span>
-                      <span>Monthly Check</span>
-                    </div>
-
-                    <!-- Daily check (แดง) -->
-                    <div
-                      v-if="isDailySpecialCell(cell)"
-                      class="tag-pill monthly-tag-red"
-                    >
-                      <span class="star">★</span>
-                      <span>Daily Check</span>
-                    </div>
-
-                    <!-- custom event (เขียว) 7 ตัวอักษรแรก + ... -->
-                    <div
-                      v-if="getCustomTagLabel(cell)"
-                      class="tag-pill custom-tag"
-                    >
-                      <span class="star">★</span>
-                      <span>{{ getCustomTagLabel(cell) }}</span>
-                    </div>
+                    <span class="tag-star">★</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- overlay ทั้งหมด -->
-            <div
-              v-if="showAnyPopup"
-              class="popup-overlay"
-              @click="closeAllPopups"
-            ></div>
-
-            <!-- Popup วัน (สีชมพู) + Add -->
+            <!-- Popup วัน — fixed center modal -->
             <div
               v-if="showDayPopup"
-              class="popup-row"
+              class="day-modal-overlay"
               @click="closeAllPopups"
             >
               <div class="popup-box popup-day text-start" @click.stop>
@@ -126,34 +93,25 @@
                     {{ dayPopupTitle }}
                   </h5>
                   <div class="d-flex align-items-center gap-2">
-                    <!-- settings -->
                     <button
-                      class="icon-btn rounded-circle"
+                      class="icon-btn"
                       @click.stop="openSettingsPopup"
+                      title="ตั้งค่ารอบ"
                     >
-                      ⚙️
+                      <i class="fa-solid fa-gear"></i>
                     </button>
 
-                    <!-- ปุ่มลบทั้ง Daily / Monthly + events ของวันนั้น -->
                     <button
-                      class="icon-btn icon-btn-red rounded-circle"
-                      @click.stop="clearDayData"
-                      title="ลบข้อมูลของวันนี้"
+                      class="icon-btn icon-btn-close"
+                      @click.stop="closeAllPopups"
+                      title="ปิด"
                     >
-                      🗑
-                    </button>
-
-                    <!-- plus -->
-                    <button
-                      class="icon-btn icon-btn-red rounded-circle"
-                      @click.stop="toggleAddPopup"
-                    >
-                      +
+                      <i class="fa-solid fa-xmark"></i>
                     </button>
                   </div>
                 </div>
 
-                <hr class="popup-divider" />
+                <hr class="popup-divider">
 
                 <div class="popup-content">
                   <!-- บรรทัดความถี่ -->
@@ -181,13 +139,38 @@
 
                   <!-- กรณีอื่น ๆ (Monthly / Event ทั่วไป) -->
                   <template v-else>
-                    <p v-if="dayTasks.length" class="fw-bold mb-1">
-                      รายละเอียด
-                    </p>
+                    <div v-if="dayTasks.length" class="detail-header">
+                      <p class="fw-bold mb-0">รายละเอียด</p>
+                      <div class="detail-actions">
+                        <button
+                          class="icon-btn-sm icon-btn-sm-primary"
+                          @click.stop="toggleAddPopup"
+                          title="เพิ่มรายการ"
+                        >
+                          <i class="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                          class="icon-btn-sm icon-btn-sm-danger"
+                          @click.stop="confirmClearAll"
+                          title="ลบรายการทั้งหมด"
+                        >
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </div>
 
-                    <p v-else-if="!dayPopupMonthlyType" class="mb-0">
-                      ไม่มีรายการ
-                    </p>
+                    <div v-else-if="!dayPopupMonthlyType" class="detail-header">
+                      <p class="mb-0">ไม่มีรายการ</p>
+                      <div class="detail-actions">
+                        <button
+                          class="icon-btn-sm icon-btn-sm-primary"
+                          @click.stop="toggleAddPopup"
+                          title="เพิ่มรายการ"
+                        >
+                          <i class="fa-solid fa-plus"></i>
+                        </button>
+                      </div>
+                    </div>
 
                     <ul v-if="dayTasks.length" class="mb-0 popup-list">
                       <li v-for="(task, idx) in dayTasks" :key="idx">
@@ -216,12 +199,18 @@
                         ยกเลิก
                       </span>
                       <span
-                        class="add-action text-secondary"
+                        class="add-action text-success"
                         @click="handleAddEvent"
                       >
                         เพิ่ม
                       </span>
                     </div>
+                  </div>
+
+                  <div class="popup-footer">
+                    <button class="btn-popup-save" @click.stop="closeAllPopups">
+                      <i class="fa-solid fa-check"></i> Save
+                    </button>
                   </div>
                 </div>
               </div>
@@ -234,8 +223,17 @@
               @click="closeAllPopups"
             >
               <div class="popup-box popup-settings text-start" @click.stop>
-                <h5 class="fw-bold mb-2">รอบการทำ Monthly Check</h5>
-                <hr class="popup-divider" />
+                <div class="popup-header d-flex justify-content-between align-items-start">
+                  <h5 class="fw-bold mb-0">รอบการทำ Monthly Check</h5>
+                  <button
+                    class="icon-btn icon-btn-close"
+                    @click.stop="showSettingsPopup = false"
+                    title="ปิด"
+                  >
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <hr class="popup-divider">
                 <div class="mb-3">
                   <label class="form-label mb-1">Type</label>
                   <select
@@ -247,13 +245,18 @@
                     <option value="6m">6 months</option>
                   </select>
                 </div>
+                <div v-if="saveConfigError" class="mb-2 text-danger small">
+                  {{ saveConfigError }}
+                </div>
                 <div class="text-end">
                   <span
-                    class="text-danger fw-semibold save-text"
+                    v-if="!saveConfigLoading"
+                    class="text-success fw-semibold save-text"
                     @click="handleSaveSettings"
                   >
                     Save
                   </span>
+                  <span v-else class="text-muted small">กำลังบันทึก...</span>
                 </div>
               </div>
             </div>
@@ -268,6 +271,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
+
+const API_BASE = '/api/Xraycare'
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -392,7 +397,23 @@ const disabledDailyDates = ref({})
 
 /* รอบ monthly: ใช้เป็น "กฎ" โดย key = วันที่เริ่มทำรอบนั้น */
 const monthlyTypeByStartDate = ref({}) // key: YYYY-MM-DD -> '1m' | '3m' | '6m'
+const configIdByStartDate = ref({}) // key: YYYY-MM-DD -> config RID (จาก API)
+const formTypesByStartDate = ref({}) // key: YYYY-MM-DD -> string[] (จาก API)
 const settingsType = ref('1m')
+const saveConfigLoading = ref(false)
+const saveConfigError = ref('')
+
+/* label ของ form type (สำหรับแสดงใน popup) */
+const FORM_TYPE_LABELS = {
+  F1_F2: 'F1/F2',
+  F10: 'F10',
+  F12: 'F12',
+  F3_F6: 'F3-F6',
+  F7_F8: 'F7-F8',
+  F9: 'F9',
+  F11: 'F11',
+  F13: 'F13'
+}
 
 /* วัน Daily Check พิเศษ: 28 November 2025 */
 const DAILY_SPECIAL_DATES = [
@@ -402,8 +423,7 @@ const DAILY_SPECIAL_DATES = [
 /* รายการที่ต้องทำสำหรับ Monthly ในแต่ละรอบ */
 const MONTHLY_TASKS_MAP = {
   '1m': [
-    '-การตรวจสอบความสว่างแสงไฟ',
-    '-แบบบันทึกอัตราการถ่ายภาพซ้ำ'
+    '-การตรวจสอบความสว่างแสงไฟ'
   ],
   '3m': [
     '-การควบคุมคุณภาพจอภาพ',
@@ -419,6 +439,18 @@ const MONTHLY_TASKS_MAP = {
     '-การตรวจสอบคุณภาพเสื้อตะกั่วและหารอยแตกของเสื้อตะกั่วด้วยรังสีเอกซ์'
   ]
 }
+
+/* Form types ตาม Type (mockup): บันทึกอัตโนมัติเมื่อเลือก Type */
+const FORM_TYPES_BY_SCHEDULE_TYPE = {
+  '1m': ['F10'],
+  '3m': ['F3_F6'],
+  '6m': ['F7_F8', 'F9']
+}
+
+const formTypesLabelByType = computed(() => {
+  const codes = FORM_TYPES_BY_SCHEDULE_TYPE[settingsType.value] || []
+  return codes.map(c => FORM_TYPE_LABELS[c] || c).join(', ')
+})
 
 /* ---------- helpers ---------- */
 const isDailySpecialDate = (date) => {
@@ -624,7 +656,12 @@ const removeTask = (idx) => {
 }
 
 /* ลบข้อมูลทั้งวัน (รองรับ Daily + Monthly) */
-const clearDayData = () => {
+const confirmClearAll = async () => {
+  if (!confirm('คุณต้องการลบรายการทั้งหมดหรือไม่?')) return
+  await clearDayData()
+}
+
+async function clearDayData () {
   if (!dayPopupDate.value) return
   const date = dayPopupDate.value
   const key = dateKey(date)
@@ -644,6 +681,19 @@ const clearDayData = () => {
     return
   }
 
+  const configId = configIdByStartDate.value[key]
+  if (configId != null) {
+    try {
+      await fetch(`${API_BASE}/DeleteScheduleConfig/${configId}`, { method: 'DELETE' })
+    } catch (e) {
+      console.error('Delete schedule config failed', e)
+    }
+    const { [key]: _removedId, ...restIds } = configIdByStartDate.value
+    configIdByStartDate.value = restIds
+    const { [key]: _removedFt, ...restFt } = formTypesByStartDate.value
+    formTypesByStartDate.value = restFt
+  }
+
   const { [key]: removedType, ...restTypes } = monthlyTypeByStartDate.value
   monthlyTypeByStartDate.value = restTypes
 
@@ -656,17 +706,104 @@ const openSettingsPopup = () => {
   if (!dayPopupDate.value) return
   const currentType = getMonthlyTypeForDate(dayPopupDate.value)
   settingsType.value = currentType || '1m'
+  saveConfigError.value = ''
   showSettingsPopup.value = true
 }
 
-const handleSaveSettings = () => {
+function parseFormTypesFromApi (formTypesJson) {
+  if (!formTypesJson || typeof formTypesJson !== 'string') return []
+  try {
+    const arr = JSON.parse(formTypesJson)
+    return Array.isArray(arr) ? arr.filter(Boolean) : []
+  } catch {
+    return []
+  }
+}
+
+async function loadScheduleConfigs () {
+  try {
+    const res = await fetch(`${API_BASE}/GetAllScheduleConfigs`)
+    if (!res.ok) return
+    const list = await res.json()
+    if (!Array.isArray(list)) return
+
+    const types = {}
+    const ids = {}
+    const formTypes = {}
+    for (const c of list) {
+      const startDate = c.startDate || ''
+      if (!startDate) continue
+      types[startDate] = c.frequencyType || '1m'
+      ids[startDate] = c.id
+      formTypes[startDate] = parseFormTypesFromApi(c.formTypes)
+    }
+    monthlyTypeByStartDate.value = { ...monthlyTypeByStartDate.value, ...types }
+    configIdByStartDate.value = { ...configIdByStartDate.value, ...ids }
+    formTypesByStartDate.value = { ...formTypesByStartDate.value, ...formTypes }
+  } catch (e) {
+    console.error('Load schedule configs failed', e)
+  }
+}
+
+async function handleSaveSettings () {
   if (!dayPopupDate.value) return
   const startKey = dateKey(dayPopupDate.value)
-  monthlyTypeByStartDate.value = {
-    ...monthlyTypeByStartDate.value,
-    [startKey]: settingsType.value
+  saveConfigError.value = ''
+  saveConfigLoading.value = true
+
+  try {
+    const body = {
+      startDate: startKey,
+      frequencyType: settingsType.value,
+      description: '',
+      formTypes: FORM_TYPES_BY_SCHEDULE_TYPE[settingsType.value] ?? []
+    }
+    const configId = configIdByStartDate.value[startKey]
+
+    if (configId != null) {
+      const res = await fetch(`${API_BASE}/UpdateScheduleConfig/${configId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        saveConfigError.value = text || 'อัปเดตไม่สำเร็จ'
+        return
+      }
+    } else {
+      const res = await fetch(`${API_BASE}/AddScheduleConfig`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        saveConfigError.value = text || 'บันทึกไม่สำเร็จ'
+        return
+      }
+      const data = await res.json()
+      configIdByStartDate.value = {
+        ...configIdByStartDate.value,
+        [startKey]: data.id
+      }
+    }
+
+    monthlyTypeByStartDate.value = {
+      ...monthlyTypeByStartDate.value,
+      [startKey]: settingsType.value
+    }
+    formTypesByStartDate.value = {
+      ...formTypesByStartDate.value,
+      [startKey]: FORM_TYPES_BY_SCHEDULE_TYPE[settingsType.value] ?? []
+    }
+    showSettingsPopup.value = false
+  } catch (e) {
+    console.error('Save schedule config failed', e)
+    saveConfigError.value = e.message || 'เกิดข้อผิดพลาด'
+  } finally {
+    saveConfigLoading.value = false
   }
-  showSettingsPopup.value = false
 }
 
 const closeAllPopups = () => {
@@ -675,8 +812,10 @@ const closeAllPopups = () => {
   showSettingsPopup.value = false
 }
 
-/* ---------- localStorage ---------- */
-onMounted(() => {
+/* ---------- API + localStorage ---------- */
+onMounted(async () => {
+  await loadScheduleConfigs()
+
   try {
     const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY)
     if (savedEvents) {
@@ -689,7 +828,8 @@ onMounted(() => {
   try {
     const savedRules = localStorage.getItem(STORAGE_RULES_KEY)
     if (savedRules) {
-      monthlyTypeByStartDate.value = JSON.parse(savedRules)
+      const parsed = JSON.parse(savedRules)
+      monthlyTypeByStartDate.value = { ...parsed, ...monthlyTypeByStartDate.value }
     }
   } catch (e) {
     console.error('Cannot load monthly rules from storage', e)
@@ -771,27 +911,27 @@ watch(
 
 <style scoped>
 .pm-card {
-  background-color: transparent;
-  border: none !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .date-card,
 .calendar-card {
-  background-color: #ffffff;
-  border-radius: 20px;
-  border: 1px solid #d4d4d4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  max-width: 420px;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-xl, 20px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  max-width: 460px;
   width: 100%;
 }
 
 .date-card {
-  padding: 12px 24px;
+  padding: 16px 20px;
 }
 
 .calendar-card {
-  padding: 16px 24px 20px;
+  padding: 18px 20px 22px;
 }
 
 .date-inner {
@@ -800,51 +940,83 @@ watch(
 }
 
 .calendar-icon {
-  font-size: 1.6rem;
-  margin-right: 12px;
+  font-size: 1rem;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 12px);
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  margin-right: 14px;
 }
 
 .date-text p {
   text-align: left;
+  color: var(--text-main, #0f172a);
+}
+
+.date-text p:last-child {
+  color: var(--text-muted, #94a3b8);
 }
 
 .nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1px solid #d4d4d4;
-  background-color: #ffffff;
-  line-height: 1;
-  font-size: 0.9rem;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: var(--bg-card, #fff);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.nav-btn:hover {
+  background: #f1f5f9;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  column-gap: 16px;
-  row-gap: 12px;
-  font-size: 0.82rem;
+  gap: 4px;
+  font-size: 0.78rem;
   justify-items: center;
 }
 
 .weekday {
-  padding: 4px 0;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  padding-bottom: 8px;
 }
 
 .day-cell {
-  min-height: 40px;
-  border-radius: 12px;
-  padding: 2px 0;
+  position: relative;
+  min-height: 42px;
+  width: 100%;
+  max-width: 50px;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 8px);
+  padding-top: 6px;
+  padding-bottom: 20px;
+  transition: all var(--transition-fast, 150ms);
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  cursor: pointer;
 }
 
 .day-cell.empty {
-  background-color: transparent;
+  background: transparent;
   cursor: default;
+}
+
+.day-cell:not(.empty):hover {
+  background: #f8fafc;
 }
 
 .day-number span {
@@ -852,92 +1024,70 @@ watch(
 }
 
 .day-cell.today .day-number span {
-  display: inline-flex;
+  display: flex;
   width: 28px;
   height: 28px;
-  border-radius: 999px;
-  border: 2px solid #111827;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  color: #fff;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
+}
+
+.tag-stack {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* stack แท็กทั้งหมดให้ไม่ทับกัน */
-.tag-stack {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+.tag-star {
+  font-size: 0.65rem;
+  color: #3b82f6;
+  line-height: 1;
 }
 
-/* pill base ทั้งฟ้า แดง เขียว */
-.tag-pill {
-  padding: 1px 6px;
-  border-radius: 999px;
-  color: #ffffff;
-  font-size: 0.6rem;
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.tag-stack .star {
-  margin-right: 4px;
-  font-size: 0.6rem;
-}
-
-.monthly-tag-blue {
-  background-color: #1d4ed8;
-}
-
-.monthly-tag-red {
-  background-color: #dc2626;
-}
-
-.custom-tag {
-  background-color: #16a34a;
-}
-
-/* overlay */
-.popup-overlay {
+.day-modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.05);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   z-index: 900;
-}
-
-/* popup base */
-.popup-box {
-  border-radius: 18px;
-  padding: 14px 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  z-index: 1000;
-  position: relative;
-}
-
-.popup-row {
-  position: absolute;
-  left: 50%;
-  top: 62%;
-  transform: translateX(-50%);
   display: flex;
-  gap: 12px;
-  z-index: 1000;
+  align-items: center;
+  justify-content: center;
 }
 
-/* popup วันสีชมพู */
+.popup-box {
+  border-radius: var(--radius-xl, 20px);
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  position: relative;
+  border: 1px solid var(--border-soft, #e2e8f0);
+}
+
 .popup-day {
-  background-color: #f7c4d2;
-  width: 360px;
+  background: var(--bg-card, #fff);
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.popup-settings {
+  background: var(--bg-card, #fff);
+  width: 380px;
+  max-width: calc(100vw - 32px);
 }
 
 .popup-divider {
-  border-color: rgba(255, 255, 255, 0.9);
-  opacity: 0.9;
-  margin: 8px 0 10px;
+  border-color: var(--border-soft, #e2e8f0);
+  margin: 12px 0 14px;
 }
 
 .popup-content p {
@@ -964,31 +1114,108 @@ watch(
   content: '';
 }
 
-/* ข้อความรายการ */
 .task-text {
   flex: 1;
   margin-right: 8px;
 }
 
-/* ปุ่มไอคอน */
 .icon-btn {
-  width: 26px;
-  height: 26px;
-  border: none;
-  background-color: #ffffff;
-  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  background: #f8fafc;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #475569);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.icon-btn:hover {
+  background: #e2e8f0;
+}
+
+.icon-btn-danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.icon-btn-danger:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.icon-btn-primary {
+  border-color: #c4b5fd;
+  background: #ede9fe;
+  color: var(--purple-main, #6c3ce0);
+}
+
+.icon-btn-primary:hover {
+  background: #ddd6fe;
+  border-color: #a78bfa;
+}
+
+.icon-btn-close {
+  border-color: var(--border-soft, #e2e8f0);
+  background: #f1f5f9;
+  color: var(--text-muted, #94a3b8);
   font-size: 0.9rem;
+}
+
+.icon-btn-close:hover {
+  background: #e2e8f0;
+  color: var(--text-main, #0f172a);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn-sm {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  transition: all var(--transition-fast, 150ms);
 }
 
-.icon-btn-red {
-  background-color: #dc2626;
-  color: #ffffff;
+.icon-btn-sm-danger {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
-/* ปุ่มลบใน list */
+.icon-btn-sm-danger:hover {
+  background: #fee2e2;
+}
+
+.icon-btn-sm-primary {
+  background: #ede9fe;
+  color: var(--purple-main, #6c3ce0);
+}
+
+.icon-btn-sm-primary:hover {
+  background: #ddd6fe;
+}
+
 .item-delete-btn {
   border: none;
   background: transparent;
@@ -997,11 +1224,18 @@ watch(
   cursor: pointer;
 }
 
-/* กล่อง Add */
 .add-box {
-  background-color: #ffffff;
-  border-radius: 12px;
+  background: #f8fafc;
+  border-radius: var(--radius-md, 12px);
+  padding: 12px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.add-box textarea {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
   padding: 8px 10px;
+  font-size: 0.85rem;
 }
 
 .add-action {
@@ -1009,17 +1243,39 @@ watch(
   cursor: pointer;
 }
 
-/* popup settings */
-.popup-settings {
-  background-color: #f7eeee;
-  width: 260px;
+.popup-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft, #e2e8f0);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-popup-save {
+  padding: 8px 24px;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.btn-popup-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
 }
 
 .save-text {
   cursor: pointer;
 }
 
-/* กล่อง settings กลางจอ */
 .settings-modal {
   position: fixed;
   inset: 0;
@@ -1027,6 +1283,33 @@ watch(
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.settings-modal .form-label,
+.settings-modal .form-select {
+  font-size: 0.85rem;
+}
+
+.settings-modal .form-select {
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.form-types-mockup {
+  font-size: 0.85rem;
+}
+
+.form-types-mockup .form-label-mockup {
+  display: block;
+  color: var(--text-muted, #64748b);
+  margin-bottom: 4px;
+}
+
+.form-types-mockup .form-types-list {
+  color: var(--text-main, #0f172a);
+  font-weight: 500;
 }
 
 .page-top {
@@ -1035,7 +1318,22 @@ watch(
 
 .page-top h2 {
   margin-top: 0;
-  margin-bottom: 0px;
+  margin-bottom: 0;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
 }
 
+@media (max-width: 1024px) {
+  .date-card, .calendar-card { max-width: 100%; }
+}
+@media (max-width: 640px) {
+  .page-top h2 { font-size: 1.2rem; }
+  .date-card { padding: 12px 14px; }
+  .calendar-card { padding: 12px 14px 16px; }
+  .calendar-grid { column-gap: 4px; row-gap: 6px; font-size: 0.75rem; }
+  .day-cell { min-height: 36px; }
+  .tag-pill { font-size: 0.45rem; padding: 0 3px; }
+  .popup-day { width: calc(100vw - 32px); }
+  .popup-settings { width: calc(100vw - 32px); max-width: 280px; }
+}
 </style>

@@ -1210,12 +1210,77 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Chart containers - modern card styling */
 .chart-container {
   position: relative;
   margin: auto;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
+.monthly-chart-container {
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-md, 12px);
+}
+
+/* Placeholder select styling */
 .placeholder-selected {
-  color: #6c757d;
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+/* Summary cards - enhance Bootstrap cards with design system */
+.card {
+  background: var(--bg-card, #ffffff) !important;
+  border-radius: var(--radius-lg, 16px) !important;
+  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06)) !important;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06)) !important;
+  transition: all var(--transition-base, 250ms cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
+}
+
+.card-header {
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0 !important;
+  border-bottom: 1px solid var(--border-soft, #e2e8f0) !important;
+}
+
+.card-body {
+  color: var(--text-secondary, #475569);
+}
+
+/* Machine summary cards */
+.border-danger {
+  border-color: #dc2626 !important;
+}
+
+.border-warning {
+  border-color: #f59e0b !important;
+}
+
+.border-success {
+  border-color: #059669 !important;
+}
+
+.badge {
+  border-radius: var(--radius-full, 9999px) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 4px 12px !important;
+}
+
+@media (max-width: 640px) {
+  .chart-container { padding: 12px; border-radius: 12px; }
 }
 </style>

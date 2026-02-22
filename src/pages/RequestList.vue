@@ -670,142 +670,155 @@ const deleteItem = async (id) => {
     margin: 0 0 12px;
     font-size: 1rem;
     font-weight: 500;
+    color: var(--text-main, #0f172a);
 }
 
 .section-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
 }
 
 .section-title {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--text-main, #0f172a);
 }
 
 .repair-detail-page {
     position: relative;
 }
 
-/* ปุ่มกากบาทมุมขวาบน */
 .close-modal-btn {
     margin-left: auto;
-    /* ดันไปชิดขวาในแถวเดียวกับหัวข้อ */
     cursor: pointer;
-    color: #dc3545;
+    color: #dc2626;
     font-size: 1.5rem;
-    transition: 0.2s;
+    transition: all var(--transition-fast, 150ms);
 }
-
 
 .close-modal-btn:hover {
     transform: scale(1.1);
 }
 
-
-/* ตาราง */
 .table-wrapper {
-    max-width: 100%;
-    background: white;
-    border-radius: 14px;
-    padding: 12px 14px 16px;
-    border: 1px solid #e5e7eb;
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    border: 1px solid var(--border-card, rgba(0,0,0,0.06));
+    box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+    background: var(--bg-card, #fff);
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
-th,
-td {
+.table thead {
+    background: #f8fafc;
+}
+
+.table th {
+    padding: 12px 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted, #94a3b8);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.table td {
+    padding: 12px 16px;
+    color: var(--text-secondary, #475569);
+    border-bottom: 1px solid #f1f5f9;
     text-align: center;
-    padding: 6px 4px;
 }
 
-thead tr {
-    border-bottom: 1px solid #e5e7eb;
+.table tbody tr {
+    transition: background 150ms;
 }
 
-tbody tr:nth-child(even) {
-    background: #f9fafb;
+.table tbody tr:hover {
+    background: #f8fafc;
 }
 
-.status.pending {
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.clickable-row {
-    /* ไม่ต้องให้ทั้งแถวเป็น pointer แล้ว */
-}
-
-/* ✅ ลิงก์ "ดูรายละเอียด" */
 .detail-link {
-    color: #2563eb;
-    /* น้ำเงิน */
+    color: var(--purple-soft, #8b5cf6);
     text-decoration: underline;
-    /* ขีดเส้นใต้ */
     cursor: pointer;
-    /* เมาส์เป็นรูปมือ */
+    font-weight: 500;
 }
 
-/* ✅ ลิงก์ "ลบ" */
+.detail-link:hover {
+    color: var(--purple-main, #6c3ce0);
+}
+
 .delete-link {
+    padding: 5px 14px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid #fecaca;
+    background: #fef2f2;
     color: #dc2626;
-    /* แดง */
-    text-decoration: underline;
+    font-size: 0.78rem;
+    font-weight: 600;
     cursor: pointer;
-    /* เมาส์เป็นรูปมือ */
+    transition: all var(--transition-fast, 150ms);
 }
 
-/* ---------- style หน้ารายละเอียด ---------- */
+.delete-link:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
 .page-header {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
 }
 
+.dot-blue,
 .blue-dot {
-    width: 12px;
-    height: 12px;
-    background-color: #007bff;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    background: var(--info, #3b82f6);
     margin-right: 10px;
 }
 
 .repair-detail-page .page-title {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.2rem;
     margin: 0;
 }
 
-/* Main Box */
 .main-box {
-    border: 1px solid #000;
-    background-color: #d9d9d9;
-    border-radius: 4px;
+    border: 1px solid var(--border-soft, #e2e8f0);
+    background: var(--bg-card, #fff);
+    border-radius: var(--radius-md, 12px);
     overflow: hidden;
+    box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
 }
 
-/* Box Header */
 .box-header {
-    background-color: rgb(229, 229, 229);
-    border-bottom: 1px solid #000;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border-soft, #e2e8f0);
     display: flex;
     min-height: 60px;
 }
 
 .header-label {
     width: 120px;
-    border-right: 1px solid #000;
+    border-right: 1px solid var(--border-soft, #e2e8f0);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
+    font-weight: 600;
     padding: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #475569);
 }
 
 .header-value {
@@ -814,17 +827,16 @@ tbody tr:nth-child(even) {
     align-items: center;
     padding: 10px 20px;
     font-weight: 400;
+    color: var(--text-main, #0f172a);
 }
 
-/* Box Body */
 .box-body {
-    background-color: white;
+    background: var(--bg-card, #fff);
     padding: 30px;
     position: relative;
     min-height: 300px;
 }
 
-/* Lists */
 ul.content-list {
     list-style-type: none;
     padding-left: 10px;
@@ -832,14 +844,13 @@ ul.content-list {
 
 ul.content-list li::before {
     content: '•';
-    color: black;
+    color: var(--purple-main, #6c3ce0);
     font-weight: bold;
     display: inline-block;
     width: 1em;
     margin-left: -1em;
 }
 
-/* Status แสดงอย่างเดียวด้านล่างขวา */
 .inner-actions {
     position: absolute;
     bottom: 30px;
@@ -850,65 +861,79 @@ ul.content-list li::before {
 }
 
 .btn-status-base {
-    border: 1px solid #333;
-    border-radius: 6px;
-    color: black;
-    height: 50px;
+    border-radius: var(--radius-full, 9999px);
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
+    font-weight: 600;
     min-width: 180px;
     padding: 0 25px;
     white-space: nowrap;
     pointer-events: none;
+    font-size: 0.85rem;
 }
 
-/* สีสถานะใช้ร่วมกับ RequestEN */
 .status-waiting {
-    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 0.75rem;
     font-weight: 600;
-    background-color: white;
+    background: #fff7ed;
+    color: #c2410c;
 }
 
 .status-progress {
-    color: #f59e0b;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 0.75rem;
     font-weight: 600;
-    background-color: white;
+    background: #eff6ff;
+    color: #1d4ed8;
 }
 
 .status-completed {
-    background-color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #f0fdf4;
+    color: #15803d;
 }
 
-/* ปุ่ศไฟล์ภาพ */
 .btn-file {
-    background-color: white;
-    border: 1px solid #00d42a;
-    color: #00d42a;
+    background: #fff;
+    border: 1px solid var(--purple-soft, #8b5cf6);
+    color: var(--purple-main, #6c3ce0);
     width: 140px;
-    height: 50px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: 0.2s;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 8px);
+    transition: all var(--transition-fast, 150ms);
     cursor: pointer;
 }
 
 .btn-file i {
-    color: #00d42a;
+    color: var(--purple-main, #6c3ce0);
 }
 
 .btn-file:hover {
-    color: #00d42a;
-    background-color: white;
-    border-color: #00d42a;
-    transform: scale(1.1);
+    background: #ede9fe;
+    transform: translateY(-1px);
 }
 
-/* กล่องชื่อไฟล์ + ปุ่มกากบาท */
 .file-name {
     margin-top: 6px;
     display: inline-flex;
@@ -919,161 +944,162 @@ ul.content-list li::before {
 .file-link {
     text-decoration: underline;
     cursor: pointer;
+    color: var(--purple-soft, #8b5cf6);
 }
 
 .file-remove {
     border: none;
     background: none;
-    color: #6b7280;
+    color: var(--text-muted, #94a3b8);
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
 }
 
-/* modal แสดงรูปภาพ – ให้อยู่ตรงกลางหน้าจอ */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 2000;
+    justify-content: center;
 }
 
 .image-modal-card {
-    width: 90%;
+    background: var(--bg-card, #fff);
+    border-radius: var(--radius-xl, 20px);
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     max-width: 600px;
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 92%;
 }
 
-/* ================= CALENDAR STYLES (Scoped for this Page) ================= */
 .calendar-popup-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(15, 23, 42, 0.35);
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2060;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2060;
-    /* Higher than Bootstrap Model (1055) */
 }
 
 .calendar-popup-box {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 16px 18px 18px;
-    width: 320px;
-    box-shadow:
-        0 22px 50px rgba(15, 23, 42, 0.4),
-        0 0 0 1px rgba(148, 163, 184, 0.4);
+    background: var(--bg-card, #fff);
+    border-radius: var(--radius-xl, 20px);
+    padding: 20px;
+    width: 340px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    border: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-soft, #e2e8f0);
 }
 
 .month-title {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.9rem;
-    color: #111827;
+    color: var(--text-main, #0f172a);
 }
 
 .nav-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    border: none;
-    background-color: #eef2ff;
-    font-size: 0.85rem;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border-soft, #e2e8f0);
+    background: #fff;
+    font-size: 0.75rem;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, transform 0.15s ease;
+    transition: all var(--transition-fast, 150ms);
 }
 
 .nav-btn:hover {
-    background-color: #e0e7ff;
-    transform: translateY(-1px);
+    background: #f1f5f9;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    row-gap: 6px;
-    column-gap: 4px;
+    gap: 4px;
     font-size: 0.8rem;
     text-align: center;
 }
 
 .weekday {
-    font-weight: 600;
-    color: #6b7280;
+    font-weight: 700;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding-bottom: 8px;
 }
 
 .day-cell {
-    height: 32px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: var(--radius-sm, 8px);
+    cursor: pointer;
+    transition: all var(--transition-fast, 150ms);
 }
 
 .day-cell.is-empty {
     pointer-events: none;
 }
 
+.day-cell:not(.is-empty):hover {
+    background: #f1f5f9;
+}
+
 .day-number span {
     display: inline-flex;
-    width: 26px;
-    height: 26px;
-    border-radius: 999px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
-.day-number span:hover {
-    background-color: #e5e7eb;
-}
-
-/* วันนี้ */
 .day-cell.is-today .day-number span {
-    border: 1px solid #6366f1;
+    border: 2px solid var(--purple-main, #6c3ce0);
+    color: var(--purple-main, #6c3ce0);
+    font-weight: 700;
 }
 
-/* วันที่เลือก */
 .day-cell.is-selected .day-number span {
-    background-color: #4f46e5;
-    color: #ffffff;
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(108,60,224,0.35);
 }
 
-
-/* date input + icon (เหมือน MachinesCreate) */
 .date-wrapper {
     display: flex;
     align-items: center;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border-soft, #e2e8f0);
     padding-right: 6px;
-    background: white;
+    background: var(--bg-card, #fff);
 }
 
 .date-wrapper input {
     border: none;
     flex: 1;
-    padding: 6px 10px;
-    font-size: 0.9rem;
+    padding: 10px 14px;
+    font-size: 0.85rem;
     background: transparent;
 }
 
@@ -1087,7 +1113,7 @@ ul.content-list li::before {
     background: transparent;
     cursor: pointer;
     font-size: 1.1rem;
-    color: #6b7280;
+    color: var(--text-muted, #94a3b8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1095,7 +1121,7 @@ ul.content-list li::before {
 }
 
 .date-icon:hover {
-    color: #111827;
+    color: var(--text-main, #0f172a);
 }
 
 .cursor-pointer {
@@ -1103,11 +1129,10 @@ ul.content-list li::before {
 }
 
 .section-header button {
-    padding: 6px 14px;
-    font-size: 0.9rem;
+    padding: 8px 16px;
+    font-size: 0.85rem;
 }
 
-/* Image Preview Styling */
 .image-preview-container {
     margin-top: 10px;
     display: flex;
@@ -1115,12 +1140,28 @@ ul.content-list li::before {
 }
 
 .image-preview {
-    max-width: 300px;
-    max-height: 300px;
-    width: auto;
-    height: auto;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border-soft, #e2e8f0);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+}
+
+@media (max-width: 1024px) {
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table { min-width: 600px; }
+}
+@media (max-width: 640px) {
+  .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .main-box { border-radius: 12px; }
+  .box-body { padding: 14px; }
+  .content-list .item { flex-direction: column; gap: 4px; }
+  .inner-actions { flex-direction: column; gap: 8px; }
+  .btn-file, .btn-status-base { width: 100%; text-align: center; }
+  .modal-overlay .modal-card { width: calc(100vw - 24px); padding: 16px; }
+  .form-group label { font-size: 0.8rem; }
+  .form-group input, .form-group textarea, .form-group select { font-size: 0.82rem; }
 }
 </style>
