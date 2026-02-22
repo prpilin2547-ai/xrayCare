@@ -38,6 +38,35 @@ public static class Extension
         }
         return app;
     }
+
+    public static WebApplication SeedDefaultAdmin(this WebApplication app)
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            if (!db.Users.Any(u => u.Username == "Superadmin"))
+            {
+                db.Users.Add(new db.xraycare.UserAccount
+                {
+                    Username = "Superadmin",
+                    Password = "Superadmin1234",
+                    Position = "Admin"
+                });
+                db.SaveChanges();
+
+                var log = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("Seed");
+                log?.LogInformation("Default admin user created (username: admin)");
+            }
+        }
+        catch (Exception e)
+        {
+            using var scope = app.Services.CreateScope();
+            var log = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("Seed") ?? NullLogger.Instance;
+            log.LogError(e, "Failed to seed default admin user");
+        }
+        return app;
+    }
 }
 
 
