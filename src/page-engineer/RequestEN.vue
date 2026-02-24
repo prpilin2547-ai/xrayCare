@@ -549,8 +549,8 @@ watch(items, () => {
 }
 
 .section-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--text-main, #0f172a);
 }
 
@@ -592,11 +592,15 @@ watch(items, () => {
   border-radius: var(--radius-lg, 16px);
   border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 12px 14px 16px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
+  min-width: 880px;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
@@ -614,6 +618,11 @@ watch(items, () => {
   text-transform: uppercase;
   border-bottom: 1px solid var(--border-soft, #e2e8f0);
   text-align: center;
+}
+
+/* ลบเอฟเฟกต์ hover สีเทาที่หัวคอลัมน์ (สถานะ เป็นต้น) */
+.table thead th:hover {
+  background: #f8fafc;
 }
 
 .table td {
@@ -675,11 +684,12 @@ td:nth-child(7) {
 
 th:nth-child(8),
 td:nth-child(8) {
-  width: 80px;
-  min-width: 80px;
+  width: 90px;
+  min-width: 90px;
+  white-space: nowrap;
 }
 
-/* Status badges */
+/* Status badges: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
 .status {
   display: inline-flex;
   align-items: center;
@@ -692,20 +702,20 @@ td:nth-child(8) {
 
 .status.status-waiting,
 .status.pending {
-  background: #fff7ed;
-  color: #c2410c;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .status.status-progress,
 .status.in-progress {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: #fff7ed;
+  color: #ea580c;
 }
 
 .status.status-completed,
 .status.completed {
   background: #f0fdf4;
-  color: #15803d;
+  color: #16a34a;
 }
 
 /* Links */
@@ -843,20 +853,20 @@ ul.content-list li::before {
 }
 
 .btn-status-base.status-waiting {
-  background: #fff7ed;
-  color: #c2410c;
-  border: 1px solid #fed7aa;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
 .btn-status-base.status-progress {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #93c5fd;
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
 }
 
 .btn-status-base.status-completed {
   background: #f0fdf4;
-  color: #15803d;
+  color: #16a34a;
   border: 1px solid #86efac;
 }
 
@@ -1041,7 +1051,7 @@ ul.content-list li::before {
 
 @media (max-width: 1024px) {
   .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .table { min-width: 600px; }
+  .table { min-width: 880px; }
 }
 @media (max-width: 640px) {
   .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }

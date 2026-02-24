@@ -20,9 +20,8 @@
       </button>
     </div>
 
-    <!-- แผ่น A4 -->
+    <!-- แผ่น A4 หน้า 1: F7-1 -->
     <div class="sheet-inner">
-        <!-- ===== หัวฟอร์ม ===== -->
         <div class="header-main">
           <div class="title-main">
             แบบบันทึก F7-1 : การทดสอบ Collimator and Beam Alignment
@@ -37,14 +36,13 @@
           <!-- เครื่องเอกซเรย์ยี่ห้อ / รุ่น อยู่นอกตาราง -->
           <div class="title-sub machine-row">
             <span class="bold-label">เครื่องเอกซเรย์ยี่ห้อ :</span>
-            <span class="underline brand-line">{{ header.machineBrand }}</span>
+            <span class="underline brand-line">{{ f71.machineName || header.machineBrand }}</span>
               รุ่น
-            <span class="underline model-line">{{ header.machineModel }}</span>
+            <span class="underline model-line">{{ f71.machineModel || header.machineModel }}</span>
           </div>
         </div>
 
        <table class="main-table">
-  <!-- ปรับเป็น 5 คอลัมน์: ข้อความ / cm / Pass / Fail / Note -->
   <colgroup>
     <col class="col-text" />
     <col class="col-cm" />
@@ -53,37 +51,28 @@
     <col class="col-note" />
   </colgroup>
 
-  <!-- แถว 1: วัน/เดือน/ปี ที่ทดสอบ -->
   <tr>
     <td class="label-cell text-left" colspan="5">
-      วัน/เดือน/ปี ที่ทดสอบ :
+      วัน/เดือน/ปี ที่ทดสอบ : <span class="underline short">{{ f71.testDate || header.testDate }}</span>
     </td>
   </tr>
-
-  <!-- แถว 2: ผู้ทดสอบ -->
   <tr>
     <td class="label-cell text-left" colspan="5">
-      ผู้ทดสอบ :
+      ผู้ทดสอบ : <span class="underline medium">{{ f71.tester || header.tester }}</span>
     </td>
   </tr>
-
-  <!-- แถว 3: ○ หลอดไส้เล็ก ○ หลอดไส้ใหญ่ -->
   <tr>
     <td colspan="5" class="value-cell text-left">
-      ○ หลอดไส้เล็ก<br />
-      ○ หลอดไส้ใหญ่
+      <span :class="{ 'option-checked': f71.tubeSize === 'small' }">{{ f71.tubeSize === 'small' ? '●' : '○' }}</span> หลอดไส้เล็ก<br />
+      <span :class="{ 'option-checked': f71.tubeSize === 'large' }">{{ f71.tubeSize === 'large' ? '●' : '○' }}</span> หลอดไส้ใหญ่
     </td>
   </tr>
-
-  <!-- แถว 4: ○ Collimator ... / ○ Coins ... -->
   <tr>
     <td class="align-left" colspan="5">
-      ○ ทดสอบโดย Collimator / Beam alignment test tool<br />
-      ○ ทดสอบโดย Coins for x-ray to light-beam alignment test
+      <span :class="{ 'option-checked': f71.testMethod === 'tool' }">{{ f71.testMethod === 'tool' ? '●' : '○' }}</span> ทดสอบโดย Collimator / Beam alignment test tool<br />
+      <span :class="{ 'option-checked': f71.testMethod === 'coins' }">{{ f71.testMethod === 'coins' ? '●' : '○' }}</span> ทดสอบโดย Coins for x-ray to light-beam alignment test
     </td>
   </tr>
-
-  <!-- แถว 5: ข้อความคำอธิบาย + / - -->
   <tr>
     <td class="align-left note-row" colspan="5">
       <strong class="note-title">
@@ -95,95 +84,234 @@
       </span>
     </td>
   </tr>
-
-  <!-- แถว 6: หัวข้อ ความเหลื่อมล้ำ... + Pass / Fail / Note -->
   <tr class="sub-header">
-    <!-- ผสานช่องข้อความ + cm -->
-    <td class="center-item nowrap-header" colspan="2">
-      ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ
-    </td>
+    <td class="center-item nowrap-header" colspan="2">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ</td>
     <td>Pass</td>
     <td>Fail</td>
     <td>Note</td>
   </tr>
-
-  <!-- แถว 7–10: ด้านแอโนด / ด้านแคโทด / ด้านบน / ด้านล่าง + cm -->
-  <tr>
-    <td class="center-item">ด้านแอโนด</td>
-    <td class="cm-cell">cm</td>
-    <td></td>
-    <td></td>
-    <td></td>
+  <tr v-for="row in f71.lightMismatch" :key="'f71-lm-' + row.id">
+    <td class="center-item">{{ row.label }}</td>
+    <td class="cm-cell">{{ row.value1 ? row.value1 + ' cm' : 'cm' }}</td>
+    <td class="pass-fail-cell">{{ row.pass ? '✓' : '' }}</td>
+    <td class="pass-fail-cell">{{ row.fail ? '✓' : '' }}</td>
+    <td class="note-cell">{{ row.note || '' }}</td>
   </tr>
-  <tr>
-    <td class="center-item">ด้านแคโทด</td>
-    <td class="cm-cell">cm</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td class="center-item">ด้านบน</td>
-    <td class="cm-cell">cm</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td class="center-item">ด้านล่าง</td>
-    <td class="cm-cell">cm</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-
-  <!-- แถว 11: ช่องว่าง -->
   <tr>
     <td colspan="5">&nbsp;</td>
   </tr>
-
-  <!-- Beam Alignment section -->
   <tr class="section-row">
     <td class="section-title" colspan="5">
       Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา
     </td>
   </tr>
-
-  <!-- หัว Beam Alignment + Pass / Fail / Note -->
   <tr class="sub-header">
-    <!-- ใช้ 2 คอลัมน์แรกเป็น Beam Alignment -->
     <td class="col-beam-header" colspan="2">Beam Alignment</td>
     <td>Pass</td>
     <td>Fail</td>
     <td>Note</td>
   </tr>
-
-  <!-- ผสานเซลล์ Pass / Fail / Note ในแนวตั้ง -->
-  <tr>
-    <td class="align-left" colspan="2">○ &lt; 1.5°</td>
-    <td rowspan="3"></td>
-    <td rowspan="3"></td>
-    <td rowspan="3"></td>
-  </tr>
-  <tr>
-    <td class="align-left" colspan="2">○ 1.5° &lt; X &lt; 3°</td>
-  </tr>
-  <tr>
-    <td class="align-left" colspan="2">○ ≥ 3°</td>
+  <tr v-for="(row, idx) in f71.beamAlignment" :key="'f71-ba-' + row.id">
+    <td class="align-left" colspan="2">○ {{ row.label }}</td>
+    <td class="pass-fail-cell">{{ row.pass ? '✓' : '' }}</td>
+    <td class="pass-fail-cell">{{ row.fail ? '✓' : '' }}</td>
+    <td class="note-cell">{{ row.note || '' }}</td>
   </tr>
 </table>
+    </div>
 
-      </div>
+    <!-- แผ่น A4 หน้า 2: F7-2 (ถ้าเนื้อหาเกินหน้าก็ต่อหน้าใหม่ได้) -->
+    <div class="sheet-inner sheet-inner--flow">
+          <div class="header-main">
+            <div class="title-main">
+              แบบบันทึก F7-2 : การทดสอบ Collimator and Beam Alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)
+            </div>
+            <div class="title-sub">
+              <span class="bold-label">ความถี่ :</span>
+              <span class="normal-text">{{ header.frequency }}</span>
+            </div>
+            <div class="title-sub machine-row">
+              <span class="bold-label">เครื่องเอกซเรย์ยี่ห้อ :</span>
+              <span class="underline brand-line">{{ f72.machineName || header.machineBrand }}</span>
+              รุ่น
+              <span class="underline model-line">{{ f72.machineModel || header.machineModel }}</span>
+            </div>
+          </div>
+          <table class="main-table">
+            <colgroup>
+              <col class="col-text" />
+              <col class="col-cm" />
+              <col class="col-pass" />
+              <col class="col-fail" />
+              <col class="col-note" />
+            </colgroup>
+            <tr>
+              <td class="label-cell text-left" colspan="5">วัน/เดือน/ปี ที่ทดสอบ : <span class="underline short">{{ f72.testDate || header.testDate }}</span></td>
+            </tr>
+            <tr>
+              <td class="label-cell text-left" colspan="5">ผู้ทดสอบ : <span class="underline medium">{{ f72.tester || header.tester }}</span></td>
+            </tr>
+            <tr>
+              <td colspan="5" class="value-cell text-left">
+                <span :class="{ 'option-checked': f72.tubeSize === 'small' }">{{ f72.tubeSize === 'small' ? '●' : '○' }}</span> หลอดไส้เล็ก<br />
+                <span :class="{ 'option-checked': f72.tubeSize === 'large' }">{{ f72.tubeSize === 'large' ? '●' : '○' }}</span> หลอดไส้ใหญ่
+              </td>
+            </tr>
+            <tr>
+              <td class="align-left" colspan="5">
+                <span :class="{ 'option-checked': f72.testMethod === 'tool' }">{{ f72.testMethod === 'tool' ? '●' : '○' }}</span> ทดสอบโดย Collimator / Beam alignment test tool<br />
+                <span :class="{ 'option-checked': f72.testMethod === 'coins' }">{{ f72.testMethod === 'coins' ? '●' : '○' }}</span> ทดสอบโดย Coins for x-ray to light-beam alignment test
+              </td>
+            </tr>
+            <tr>
+              <td class="align-left note-row" colspan="5">
+                <strong class="note-title">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ (ไม่เกิน ± 2 cm หรือ 2% ที่ SID 100 cm)</strong><br />
+                <span class="note-desc">+ หมายถึงลำรังสีมีขนาดใหญ่กว่าขอบเขตจริง - หมายถึงลำรังสีมีขนาดเล็กกว่าขอบเขตจริง</span>
+              </td>
+            </tr>
+            <tr class="sub-header">
+              <td class="center-item nowrap-header" colspan="2">ความเหลื่อมล้ำระหว่างลำรังสีกับลำแสงไฟ</td>
+              <td>Pass</td>
+              <td>Fail</td>
+              <td>Note</td>
+            </tr>
+            <tr v-for="row in f72.lightMismatch" :key="'f72-lm-' + row.id">
+              <td class="center-item">{{ row.label }}</td>
+              <td class="cm-cell">{{ row.value1 ? row.value1 + ' cm' : 'cm' }}</td>
+              <td class="pass-fail-cell">{{ row.pass ? '✓' : '' }}</td>
+              <td class="pass-fail-cell">{{ row.fail ? '✓' : '' }}</td>
+              <td class="note-cell">{{ row.note || '' }}</td>
+            </tr>
+            <tr><td colspan="5">&nbsp;</td></tr>
+            <tr class="section-row">
+              <td class="section-title" colspan="5">Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา</td>
+            </tr>
+            <tr class="sub-header">
+              <td class="col-beam-header" colspan="2">Beam Alignment</td>
+              <td>Pass</td>
+              <td>Fail</td>
+              <td>Note</td>
+            </tr>
+            <tr v-for="row in f72.beamAlignment" :key="'f72-ba-' + row.id">
+              <td class="align-left" colspan="2">○ {{ row.label }}</td>
+              <td class="pass-fail-cell">{{ row.pass ? '✓' : '' }}</td>
+              <td class="pass-fail-cell">{{ row.fail ? '✓' : '' }}</td>
+              <td class="note-cell">{{ row.note || '' }}</td>
+            </tr>
+          </table>
+    </div>
+
+    <!-- แผ่น A4 หน้า 3: F8-1 -->
+    <div class="sheet-inner">
+          <div class="header-main">
+            <div class="title-main">แบบบันทึก F8-1 : การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR</div>
+            <div class="title-sub">
+              <span class="bold-label">ความถี่ :</span>
+              <span class="normal-text">{{ header.frequency }}</span>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="f81-table">
+              <thead>
+                <tr>
+                  <th rowspan="3" class="col-ip">IP no.</th>
+                  <th rowspan="3" class="col-ip">IP size</th>
+                  <th rowspan="3" class="col-ip">ID</th>
+                  <th rowspan="3" class="col-ip">Type</th>
+                  <th rowspan="3" class="col-ip">EI / S</th>
+                  <th colspan="8" class="col-roi">ROI 80%</th>
+                  <th colspan="2" class="col-result-head">การแปรผล (P/F)</th>
+                </tr>
+                <tr>
+                  <th colspan="4" class="col-roi-sub">PV</th>
+                  <th colspan="4" class="col-roi-sub">PVSD</th>
+                  <th class="col-result">PV</th>
+                  <th class="col-result">PVSD</th>
+                </tr>
+                <tr>
+                  <th>1</th><th>2</th><th>3</th><th>mean</th>
+                  <th>4</th><th>5</th><th>6</th><th>mean</th>
+                  <th>............</th>
+                  <th>............</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, index) in f81Rows" :key="'f81-' + index">
+                  <td>{{ row.ipNo }}</td>
+                  <td>{{ row.ipSize }}</td>
+                  <td>{{ row.readerId }}</td>
+                  <td>{{ row.type }}</td>
+                  <td>{{ row.eiOrS }}</td>
+                  <td>{{ row.pv[0] || '' }}</td>
+                  <td>{{ row.pv[1] || '' }}</td>
+                  <td>{{ row.pv[2] || '' }}</td>
+                  <td>{{ row.pvMean || '' }}</td>
+                  <td>{{ row.pvsd[0] || '' }}</td>
+                  <td>{{ row.pvsd[1] || '' }}</td>
+                  <td>{{ row.pvsd[2] || '' }}</td>
+                  <td>{{ row.pvsdMean || '' }}</td>
+                  <td>{{ row.pvResult || '' }}</td>
+                  <td>{{ row.pvsdResult || '' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="signature-block">
+            <div class="sig-row">ลงชื่อ.............................................................ผู้ทดสอบ</div>
+            <div class="sig-row">(..............................................................................)</div>
+            <div class="sig-row">ตำแหน่ง.......................................................................</div>
+          </div>
+    </div>
+
+    <!-- แผ่น A4 หน้า 4: F8-2 -->
+    <div class="sheet-inner">
+          <div class="header-main">
+            <div class="title-main">{{ f82FormTitle }}</div>
+            <div class="title-sub">
+              <span class="bold-label">ความถี่ :</span>
+              <span class="normal-text">{{ header.frequency }}</span>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="f82-table">
+              <thead>
+                <tr>
+                  <th class="col-fpd-no">FPD no.</th>
+                  <th class="col-fpd-size">FPD size</th>
+                  <th class="col-id">ID</th>
+                  <th class="col-ei">EI</th>
+                  <th class="col-ddi">DDI</th>
+                  <th class="col-pixel">Pixel<br />mean</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, index) in f82RowsForPrint" :key="'f82-' + index">
+                  <td>{{ row.fpdNo }}</td>
+                  <td>{{ row.fpdSize }}</td>
+                  <td>{{ row.id }}</td>
+                  <td>{{ row.ei }}</td>
+                  <td>{{ row.ddi }}</td>
+                  <td>{{ row.pixelMean }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="signature-block">
+            <div class="sig-line">ลงชื่อ............................................................ผู้ทดสอบ</div>
+            <div class="sig-line">(..............................................................................)</div>
+            <div class="sig-line">ตำแหน่ง.....................................................................</div>
+          </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// Header + ข้อมูลทั่วไป
+// Header + ข้อมูลทั่วไป (ใช้ร่วม F7-1, F7-2)
 const header = ref({
   frequency: 'ทุก 6 เดือน',
   machineBrand: '',
@@ -193,11 +321,108 @@ const header = ref({
   tester: ''
 })
 
+// โครง F7 เริ่มต้น (lightMismatch: anode, cathode, top, bottom | beamAlignment: <1.5°, 1.5-3°, ≥3°)
+const defaultLightMismatch = () => [
+  { id: 'anode', label: 'ด้านแอโนด', value1: '', pass: false, fail: false, note: '' },
+  { id: 'cathode', label: 'ด้านแคโทด', value1: '', pass: false, fail: false, note: '' },
+  { id: 'top', label: 'ด้านบน', value1: '', pass: false, fail: false, note: '' },
+  { id: 'bottom', label: 'ด้านล่าง', value1: '', pass: false, fail: false, note: '' }
+]
+const defaultBeamAlignment = () => [
+  { id: 'lt1_5', label: '< 1.5°', pass: false, fail: false, note: '' },
+  { id: 'btw', label: '1.5° < X < 3°', pass: false, fail: false, note: '' },
+  { id: 'ge3', label: '≥ 3°', pass: false, fail: false, note: '' }
+]
+const defaultF7 = () => ({
+  machineName: '',
+  machineModel: '',
+  testDate: '',
+  tester: '',
+  tubeSize: 'small',
+  testMethod: 'tool',
+  lightMismatch: defaultLightMismatch(),
+  beamAlignment: defaultBeamAlignment(),
+  remark: ''
+})
+const f71 = ref(defaultF7())
+const f72 = ref(defaultF7())
+
+// F8-1: แถวตาราง CR (Dark Noise) — แมปจากฟอร์ม F8CRDarkNoiseForm (imageId, eis, pv1–pv3, pvsd4–6, resultPv/resultPvsd)
+function mapF81Row (r) {
+  if (!r || typeof r !== 'object') return defaultF81Row()
+  return {
+    ipNo: r.ipNo ?? '',
+    ipSize: r.ipSize ?? '',
+    readerId: r.readerId ?? r.imageId ?? r.id ?? '',
+    type: r.type ?? '',
+    eiOrS: r.eiOrS ?? r.eis ?? r.ei ?? '',
+    pv: Array.isArray(r.pv) ? r.pv : [r.pv1 ?? '', r.pv2 ?? '', r.pv3 ?? ''],
+    pvMean: r.pvMean ?? '',
+    pvsd: Array.isArray(r.pvsd) ? r.pvsd : [r.pvsd4 ?? '', r.pvsd5 ?? '', r.pvsd6 ?? ''],
+    pvsdMean: r.pvsdMean ?? '',
+    pvResult: r.pvResult ?? r.resultPv ?? '',
+    pvsdResult: r.pvsdResult ?? r.resultPvsd ?? ''
+  }
+}
+const defaultF81Row = () => ({
+  ipNo: '', ipSize: '', readerId: '', type: '', eiOrS: '',
+  pv: ['', '', ''], pvMean: '', pvsd: ['', '', ''], pvsdMean: '', pvResult: '', pvsdResult: ''
+})
+const f81Rows = ref([
+  defaultF81Row(), defaultF81Row(), defaultF81Row(), defaultF81Row(), defaultF81Row()
+])
+
+// F8-2: หัวข้อฟอร์ม + แถวตาราง DR (Dark Noise)
+const f82FormTitle = ref('แบบบันทึก F8-2 : การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ DR')
+const f82Rows = ref([])
+
+const f82RowsForPrint = computed(() => {
+  const base = f82Rows.value || []
+  const total = 5
+  const out = base.map(r => ({
+    fpdNo: r.fpdNo || '',
+    fpdSize: r.fpdSize || '',
+    id: r.id || '',
+    ei: r.ei || '',
+    ddi: r.ddi || '',
+    pixelMean: r.pixelMean || ''
+  }))
+  while (out.length < total) {
+    out.push({ fpdNo: '', fpdSize: '', id: '', ei: '', ddi: '', pixelMean: '' })
+  }
+  return out
+})
+
 function handlePrint () {
   window.print()
 }
 
 const API_BASE = '/api/Xraycare'
+
+function mapJsonToF7 (obj) {
+  if (!obj || typeof obj !== 'object') return defaultF7()
+  const lm = Array.isArray(obj.lightMismatch) && obj.lightMismatch.length
+    ? obj.lightMismatch
+    : defaultLightMismatch()
+  const orderLm = ['anode', 'cathode', 'top', 'bottom']
+  const sortedLm = orderLm.map(id => lm.find(m => m.id === id) || { id, label: '', value1: '', pass: false, fail: false, note: '' })
+  const ba = Array.isArray(obj.beamAlignment) && obj.beamAlignment.length
+    ? obj.beamAlignment
+    : defaultBeamAlignment()
+  const orderBa = ['lt1_5', 'btw', 'ge3']
+  const sortedBa = orderBa.map(id => ba.find(b => b.id === id) || { id, label: '', pass: false, fail: false, note: '' })
+  return {
+    machineName: obj.machineName ?? '',
+    machineModel: obj.machineModel ?? '',
+    testDate: obj.testDate ?? '',
+    tester: obj.tester ?? '',
+    tubeSize: obj.tubeSize === 'large' ? 'large' : 'small',
+    testMethod: obj.testMethod === 'coins' ? 'coins' : 'tool',
+    lightMismatch: sortedLm,
+    beamAlignment: sortedBa,
+    remark: obj.remark ?? ''
+  }
+}
 
 onMounted(async () => {
   const id = route.query.id || route.params.id
@@ -208,6 +433,7 @@ onMounted(async () => {
     const data = await res.json()
     header.value.testDate = data.checkDate || ''
     header.value.tester = data.tester || ''
+    header.value.machineBrand = data.machineName || ''
     if (data.jsonData) {
       try {
         const parsed = JSON.parse(data.jsonData)
@@ -217,6 +443,49 @@ onMounted(async () => {
         if (parsed.roomNo !== undefined) header.value.roomNo = parsed.roomNo
         if (parsed.testDate !== undefined) header.value.testDate = parsed.testDate
         if (parsed.tester !== undefined) header.value.tester = parsed.tester
+        // F7_1 / F7_2
+        if (parsed.F7_1) f71.value = mapJsonToF7(parsed.F7_1)
+        if (parsed.F7_2) f72.value = mapJsonToF7(parsed.F7_2)
+        // Header จาก F7_1 ถ้ายังไม่มี
+        if (f71.value.machineName) header.value.machineBrand = f71.value.machineName
+        if (f71.value.machineModel) header.value.machineModel = f71.value.machineModel
+        if (f71.value.testDate) header.value.testDate = f71.value.testDate
+        if (f71.value.tester) header.value.tester = f71.value.tester
+        // F8-1 (รองรับ F8_1.rows, F8_1 เป็น array, F8_1 เป็น object เดี่ยว จากฟอร์ม F8CRDarkNoiseForm)
+        let rawF81 = []
+        if (parsed.F8_1 != null) {
+          if (Array.isArray(parsed.F8_1.rows)) rawF81 = parsed.F8_1.rows
+          else if (Array.isArray(parsed.F8_1)) rawF81 = parsed.F8_1
+          else if (typeof parsed.F8_1 === 'object' && (parsed.F8_1.ipNo != null || parsed.F8_1.imageId != null || parsed.F8_1.ipNo === '')) rawF81 = [parsed.F8_1]
+        }
+        if (rawF81.length) {
+          f81Rows.value = rawF81.map(mapF81Row)
+          while (f81Rows.value.length < 5) f81Rows.value.push(defaultF81Row())
+        } else if (Array.isArray(parsed.f81Rows)) {
+          f81Rows.value = parsed.f81Rows.map(mapF81Row)
+          while (f81Rows.value.length < 5) f81Rows.value.push(defaultF81Row())
+        } else if (Array.isArray(parsed.rows) && parsed.rows.length && ('ipNo' in (parsed.rows[0] || {}) || 'imageId' in (parsed.rows[0] || {}))) {
+          f81Rows.value = parsed.rows.map(mapF81Row)
+          while (f81Rows.value.length < 5) f81Rows.value.push(defaultF81Row())
+        }
+        // F8-2
+        if (parsed.F8_2) {
+          if (parsed.F8_2.basicInfo?.testerName) header.value.tester = parsed.F8_2.basicInfo.testerName
+          if (parsed.F8_2.basicInfo?.testDate) header.value.testDate = parsed.F8_2.basicInfo.testDate
+          if (Array.isArray(parsed.F8_2.rows)) {
+            f82Rows.value = parsed.F8_2.rows.map(r => ({
+              fpdNo: r.fpdNo ?? '',
+              fpdSize: r.fpdSize ?? (r.fpdSizeOther && r.fpdSizeOther !== '' ? r.fpdSizeOther : ''),
+              id: r.imageId ?? r.id ?? '',
+              ei: r.ei != null ? String(r.ei) : '',
+              ddi: r.ddi != null ? String(r.ddi) : '',
+              pixelMean: r.pixelMean != null ? String(r.pixelMean) : ''
+            }))
+          }
+        }
+        if (parsed.formTitle !== undefined) f82FormTitle.value = parsed.formTitle
+        if (Array.isArray(parsed.f82Rows)) f82Rows.value = parsed.f82Rows
+        else if (Array.isArray(parsed.rows) && parsed.rows.length && 'fpdNo' in (parsed.rows[0] || {})) f82Rows.value = parsed.rows
       } catch (_) {}
     }
   } catch (e) {
@@ -384,9 +653,19 @@ onMounted(async () => {
 
 /* 2) ทำให้คำว่า cm อยู่ขวาและเป็นตัวบาง */
 .cm-cell {
-  text-align: right !important;   /* ชิดขวาของช่อง */
-  font-weight: 400 !important;    /* ตัวบาง */
-  padding-right: 2mm !important;  /* เว้นขอบเล็กน้อยให้สวย */
+  text-align: right !important;
+  font-weight: 400 !important;
+  padding-right: 2mm !important;
+}
+
+.pass-fail-cell {
+  text-align: center !important;
+  font-weight: 400 !important;
+}
+
+.note-cell {
+  text-align: left !important;
+  font-weight: 400 !important;
 }
 
 .brand-line {
@@ -405,5 +684,111 @@ onMounted(async () => {
 
 @media print {
   .main-table th, .main-table td { border: 1px solid #000 !important; }
+}
+
+/* F7-2: อนุญาตให้เนื้อหาเกิน 1 หน้าแล้วต่อหน้าใหม่ได้ มีขนาดเหมาะสม */
+.sheet-inner--flow {
+  height: auto !important;
+  min-height: 277mm;
+  max-height: none !important;
+  overflow: visible !important;
+  aspect-ratio: auto;
+}
+/* ตารางใน F7-2 ให้แบ่งหน้าพิมพ์ได้ และไม่ตัดแถว */
+.sheet-inner--flow .main-table {
+  page-break-inside: auto;
+}
+.sheet-inner--flow .main-table tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+@media print {
+  .sheet-inner--flow {
+    height: auto !important;
+    min-height: 277mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-after: always;
+    page-break-inside: auto;
+  }
+  .sheet-inner--flow .main-table tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* F8-1 ตาราง CR */
+.table-wrapper {
+  width: 100%;
+  margin-bottom: 6mm;
+}
+.f81-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.f81-table thead th {
+  border: 0.4pt solid #000;
+  padding: 1.2mm 0.8mm;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.f81-table tbody td {
+  border: 0.4pt solid #000;
+  padding: 3mm 2mm;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.col-ip { padding-left: 0.8mm; padding-right: 0.8mm; }
+.col-roi { text-align: center; }
+.col-roi-sub { text-align: center; font-weight: 400; }
+.col-result-head { text-align: center; }
+.col-result { padding-left: 0.9mm; padding-right: 0.9mm; }
+
+/* F8-2 ตาราง DR */
+.f82-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.f82-table th,
+.f82-table td {
+  border: 0.4pt solid #000;
+  padding: 3mm 2mm;
+  text-align: center;
+  vertical-align: middle;
+}
+.f82-table thead th {
+  padding-top: 1.5mm !important;
+  padding-bottom: 1.5mm !important;
+}
+.col-fpd-no { width: 22mm; }
+.col-fpd-size { width: 35mm; }
+.col-id { width: 28mm; }
+.col-ei { width: 25mm; }
+.col-ddi { width: 25mm; }
+.col-pixel { width: 30mm; }
+
+/* ลายเซ็น F8-1 / F8-2 */
+.signature-block {
+  width: 100%;
+  margin-top: 14mm;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+.sig-row,
+.sig-line {
+  margin-bottom: 3mm;
+  white-space: nowrap;
+}
+
+@media print {
+  .f81-table th, .f81-table td { border: 1px solid #000 !important; }
+  .f82-table th, .f82-table td { border: 1px solid #000 !important; }
 }
 </style>

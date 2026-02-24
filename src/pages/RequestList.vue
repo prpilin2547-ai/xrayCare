@@ -728,6 +728,12 @@ const deleteItem = async (id) => {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border-soft, #e2e8f0);
+    text-align: center;
+}
+
+/* ลบเอฟเฟกต์ hover สีเทาที่หัวคอลัมน์ (ลำดับ อุปกรณ์ ห้องตรวจ สถานะ เป็นต้น) */
+.table thead th:hover {
+    background: #f8fafc;
 }
 
 .table td {
@@ -874,40 +880,52 @@ ul.content-list li::before {
     font-size: 0.85rem;
 }
 
-.status-waiting {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: var(--radius-full, 9999px);
-    font-size: 0.75rem;
-    font-weight: 600;
+/* สีปุ่มสถานะในหน้ารายละเอียด (ให้ตรงกับ RequestEN) */
+.btn-status-base.status-waiting {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-status-base.status-progress {
     background: #fff7ed;
-    color: #c2410c;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
 }
 
-.status-progress {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: var(--radius-full, 9999px);
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.status-completed {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: var(--radius-full, 9999px);
-    font-size: 0.75rem;
-    font-weight: 600;
+.btn-status-base.status-completed {
     background: #f0fdf4;
-    color: #15803d;
+    color: #16a34a;
+    border: 1px solid #86efac;
+}
+
+/* สีสถานะให้ตรงกับ RequestEN: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status.status-waiting,
+.status.pending {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.status.status-progress,
+.status.in-progress {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.status.status-completed,
+.status.completed {
+    background: #f0fdf4;
+    color: #16a34a;
 }
 
 .btn-file {

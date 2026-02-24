@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
     initial: Object,
@@ -133,7 +133,7 @@ const props = defineProps({
 
 const formarr = ref([]);
 const emit = defineEmits(['next'])
-const form = ({
+const form = ref({
     ipNo: '',
     ipSize: '',
     imageId: '',
@@ -154,41 +154,41 @@ const form = ({
 const addform = () => {
     formarr.value.push({
         id: formarr.value.length + 1,
-        ipNo: form.ipNo,
-        ipSize: form.ipSize,
-        imageId: form.imageId,
-        type: form.type,
-        eis: form.eis,
-        pv1: form.pv1,
-        pv2: form.pv2,
-        pv3: form.pv3,
-        pvMean: form.pvMean,
-        pvsd4: form.pvsd4,
-        pvsd5: form.pvsd5,
-        pvsd6: form.pvsd6,
-        pvsdMean: form.pvsdMean,
-        resultPv: form.resultPv,
-        resultPvsd: form.resultPvsd
+        ipNo: form.value.ipNo,
+        ipSize: form.value.ipSize,
+        imageId: form.value.imageId,
+        type: form.value.type,
+        eis: form.value.eis,
+        pv1: form.value.pv1,
+        pv2: form.value.pv2,
+        pv3: form.value.pv3,
+        pvMean: form.value.pvMean,
+        pvsd4: form.value.pvsd4,
+        pvsd5: form.value.pvsd5,
+        pvsd6: form.value.pvsd6,
+        pvsdMean: form.value.pvsdMean,
+        resultPv: form.value.resultPv,
+        resultPvsd: form.value.resultPvsd
     });
     resetform();
 };
 
 const resetform = () => {
-    form.ipNo = '';
-    form.ipSize = '';
-    form.imageId = '';
-    form.type = '';
-    form.eis = '';
-    form.pv1 = '';
-    form.pv2 = '';
-    form.pv3 = '';
-    form.pvMean = '';
-    form.pvsd4 = '';
-    form.pvsd5 = '';
-    form.pvsd6 = '';
-    form.pvsdMean = '';
-    form.resultPv = '';
-    form.resultPvsd = '';
+    form.value.ipNo = '';
+    form.value.ipSize = '';
+    form.value.imageId = '';
+    form.value.type = '';
+    form.value.eis = '';
+    form.value.pv1 = '';
+    form.value.pv2 = '';
+    form.value.pv3 = '';
+    form.value.pvMean = '';
+    form.value.pvsd4 = '';
+    form.value.pvsd5 = '';
+    form.value.pvsd6 = '';
+    form.value.pvsdMean = '';
+    form.value.resultPv = '';
+    form.value.resultPvsd = '';
 }
 
 const remark = ref('')
@@ -197,8 +197,41 @@ const delrow = (id) => {
     formarr.value = formarr.value.filter(row => row.id !== id);
 };
 
-// ส่งข้อมูลไป MonthlyCheckAll เพื่อไป F8-2
+// โหลดข้อมูลจาก initial (เมื่อกลับมาแก้ไขหรือเปิด record ที่บันทึกแล้ว)
+function loadInitial () {
+  const data = props.initial
+  if (!data) return
+  if (Array.isArray(data.rows) && data.rows.length) {
+    formarr.value = data.rows.map((r, i) => ({
+      id: i + 1,
+      ipNo: r.ipNo ?? '',
+      ipSize: r.ipSize ?? '',
+      imageId: r.imageId ?? '',
+      type: r.type ?? '',
+      eis: r.eis ?? '',
+      pv1: r.pv1 ?? '',
+      pv2: r.pv2 ?? '',
+      pv3: r.pv3 ?? '',
+      pvMean: r.pvMean ?? '',
+      pvsd4: r.pvsd4 ?? '',
+      pvsd5: r.pvsd5 ?? '',
+      pvsd6: r.pvsd6 ?? '',
+      pvsdMean: r.pvsdMean ?? '',
+      resultPv: r.resultPv ?? '',
+      resultPvsd: r.resultPvsd ?? ''
+    }))
+  }
+}
+onMounted(loadInitial)
+watch(() => props.initial, loadInitial, { deep: true })
+
+// ส่งข้อมูลไป MonthlyCheckAll เพื่อไป F8-2 (ส่งทุกแถว: แถวที่เพิ่มแล้ว + แถวปัจจุบัน)
 const submitNext = () => {
-    emit('next', form.value)
+    const allRows = [...formarr.value]
+    const current = { ...form.value }
+    if (current.ipNo || current.imageId || current.pv1 || current.pv2 || current.pv3 || current.pvsd4 || current.pvsd5 || current.pvsd6) {
+        allRows.push(current)
+    }
+    emit('next', { rows: allRows })
 }
 </script>

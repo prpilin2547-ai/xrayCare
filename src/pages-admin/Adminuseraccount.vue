@@ -92,7 +92,9 @@
       <!-- Sign Up Modal -->
       <div v-if="showModal" class="modal-overlay">
         <div class="modal-card">
-          <i class="bi bi-x-circle close-modal-btn" @click="closeModal"></i>
+          <button type="button" class="close-modal-btn" aria-label="ปิด" @click="closeModal">
+            <i class="bi bi-x-lg"></i>
+          </button>
 
           <h3 class="text-center fw-bold mb-4">Sign Up</h3>
 
@@ -121,13 +123,13 @@
 
           <div class="mb-3">
             <label class="form-label">Password</label>
-            <div class="input-group">
-              <!-- ข้อ 3: ยังใช้ input-group เหมือนเดิม แต่เราจะซ่อนไอคอน reveal ของ browser ด้วย CSS ด้านล่าง -->
-              <input :type="newUser.showPass ? 'text' : 'password'" class="form-control" v-model="newUser.password">
-              <!-- ไอคอนตาข้างนอก (คงไว้) -->
-              <span class="input-group-text cursor-pointer" @click="newUser.showPass = !newUser.showPass">
+            <div class="password-input-wrap">
+              <input :type="newUser.showPass ? 'text' : 'password'" class="form-control password-input"
+                v-model="newUser.password" placeholder="กรอกรหัสผ่าน">
+              <button type="button" class="password-toggle" aria-label="แสดง/ซ่อนรหัสผ่าน"
+                @click="newUser.showPass = !newUser.showPass">
                 <i class="bi" :class="newUser.showPass ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
-              </span>
+              </button>
             </div>
             <div v-if="errors.password" class="alert alert-danger mt-2 py-2" role="alert">
               <i class="bi bi-exclamation-circle-fill me-2"></i>กรุณากรอกข้อมูลให้ครบ
@@ -136,13 +138,13 @@
 
           <div class="mb-4">
             <label class="form-label">Confirm Password</label>
-            <div class="input-group">
-              <input :type="newUser.showConfirm ? 'text' : 'password'" class="form-control"
-                v-model="newUser.confirmPassword">
-              <!-- ไอคอนตาข้างนอก (คงไว้) -->
-              <span class="input-group-text cursor-pointer" @click="newUser.showConfirm = !newUser.showConfirm">
+            <div class="password-input-wrap">
+              <input :type="newUser.showConfirm ? 'text' : 'password'" class="form-control password-input"
+                v-model="newUser.confirmPassword" placeholder="กรอกรหัสผ่านอีกครั้ง">
+              <button type="button" class="password-toggle" aria-label="แสดง/ซ่อนรหัสผ่าน"
+                @click="newUser.showConfirm = !newUser.showConfirm">
                 <i class="bi" :class="newUser.showConfirm ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
-              </span>
+              </button>
             </div>
             <div v-if="errors.confirmPassword" class="alert alert-danger mt-2 py-2" role="alert">
               <i class="bi bi-exclamation-circle-fill me-2"></i>กรุณากรอกข้อมูลให้ครบ
@@ -571,25 +573,28 @@ const cancelEdit = (user) => {
 
 .close-modal-btn {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm, 8px);
-  border: 1px solid var(--border-soft, #e2e8f0);
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #dc2626;
+  border-radius: 50%;
   background: transparent;
   cursor: pointer;
-  font-size: 0.8rem;
-  color: var(--text-muted, #94a3b8);
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #dc2626;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 150ms;
+  transition: color 150ms, border-color 150ms, transform 150ms;
 }
 
 .close-modal-btn:hover {
-  background: #f1f5f9;
-  color: var(--text-main, #0f172a);
+  color: #b91c1c;
+  border-color: #b91c1c;
+  transform: scale(1.05);
 }
 
 .btn-create-account {
@@ -632,17 +637,58 @@ const cancelEdit = (user) => {
   outline: none;
 }
 
-.modal-card :deep(.input-group-text) {
-  border-radius: 0 var(--radius-sm, 8px) var(--radius-sm, 8px) 0;
+/* ช่องรหัสผ่าน: ไอคอนตาอยู่แนวเดียวกับช่องกรอก (inline) */
+.password-input-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 44px;
+  border-radius: var(--radius-sm, 8px);
   border: 1px solid var(--border-soft, #e2e8f0);
-  background: #f8fafc;
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: all 150ms;
+  background: var(--bg-card, #fff);
+  transition: border-color 200ms, box-shadow 200ms;
 }
 
-.modal-card :deep(.input-group .form-control) {
+.password-input-wrap:focus-within {
+  border-color: var(--purple-soft, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.password-input-wrap .password-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
   border-radius: var(--radius-sm, 8px) 0 0 var(--radius-sm, 8px);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  background: transparent;
+}
+
+.password-input-wrap .password-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.password-input-wrap .password-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  min-height: 44px;
+  border: none;
+  border-left: 1px solid var(--border-soft, #e2e8f0);
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: color 150ms, background 150ms;
+  border-radius: 0 var(--radius-sm, 8px) var(--radius-sm, 8px) 0;
+}
+
+.password-input-wrap .password-toggle:hover {
+  color: var(--text-main, #0f172a);
+  background: #f8fafc;
 }
 
 /* Hide browser password reveal (Edge) */

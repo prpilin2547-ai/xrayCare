@@ -206,15 +206,15 @@ onMounted(async () => {
 }
 
 .card-label.red {
-  color: #f97316;
+  color: #dc2626;
 }
 
 .card-label.orange {
-  color: #f97316;
+  color: #ea580c;
 }
 
 .card-label.green {
-  color: #059669;
+  color: #16a34a;
 }
 
 .card-value {
@@ -235,9 +235,10 @@ onMounted(async () => {
   .card-value { font-size: 1.2rem; }
 }
 
-/* REQUEST SECTION HEADER */
+/* REQUEST SECTION HEADER - เว้นระยะบนล่างเท่ากัน */
 .request-section {
-  margin-top: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -292,6 +293,11 @@ onMounted(async () => {
   text-align: left;
 }
 
+/* ลบเอฟเฟกต์ hover สีเทาที่หัวคอลัมน์ (Repair Status เป็นต้น) */
+.table thead th:hover {
+  background: #f8fafc;
+}
+
 .table td {
   padding: 12px 16px;
   color: var(--text-secondary, #475569);
@@ -307,7 +313,7 @@ onMounted(async () => {
   background: #f8fafc;
 }
 
-/* Status badges */
+/* Status badges: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
 .status {
   display: inline-flex;
   align-items: center;
@@ -320,19 +326,19 @@ onMounted(async () => {
 
 .status.pending,
 .status[class*="pending"] {
-  background: #fff7ed;
-  color: #c2410c;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .status.in-progress,
 .status[class*="progress"] {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: #fff7ed;
+  color: #ea580c;
 }
 
 .status.completed,
 .status[class*="completed"] {
   background: #f0fdf4;
-  color: #15803d;
+  color: #16a34a;
 }
 </style>

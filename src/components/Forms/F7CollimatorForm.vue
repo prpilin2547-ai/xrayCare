@@ -136,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
   initial: Object,
@@ -154,6 +154,18 @@ const testMethodOptions = [
   { value: 'coins', label: 'ทดสอบโดย Coins for x-ray to light-beam alignment test' }
 ]
 
+const defaultLightMismatch = () => [
+  { id: 'anode', label: 'ด้านแอโนด', value1: '', pass: false, fail: false, note: '' },
+  { id: 'cathode', label: 'ด้านแคโทด', value1: '', pass: false, fail: false, note: '' },
+  { id: 'top', label: 'ด้านบน', value1: '', pass: false, fail: false, note: '' },
+  { id: 'bottom', label: 'ด้านล่าง', value1: '', pass: false, fail: false, note: '' }
+]
+const defaultBeamAlignment = () => [
+  { id: 'lt1_5', label: '< 1.5°', pass: false, fail: false, note: '' },
+  { id: 'btw', label: '1.5° < X < 3°', pass: false, fail: false, note: '' },
+  { id: 'ge3', label: '≥ 3°', pass: false, fail: false, note: '' }
+]
+
 const form = ref({
   machineName: '',
   machineModel: '',
@@ -161,19 +173,51 @@ const form = ref({
   tester: props.currentUserName || '',
   tubeSize: '',
   testMethod: '',
-  lightMismatch: [
-    { id: 'anode', label: 'ด้านแอโนด', value1: '', pass: false, fail: false, note: '' },
-    { id: 'cathode', label: 'ด้านแคโทด', value1: '', pass: false, fail: false, note: '' },
-    { id: 'top', label: 'ด้านบน', value1: '', pass: false, fail: false, note: '' },
-    { id: 'bottom', label: 'ด้านล่าง', value1: '', pass: false, fail: false, note: '' }
-  ],
-  beamAlignment: [
-    { id: 'lt1_5', label: '< 1.5°', pass: false, fail: false, note: '' },
-    { id: 'btw', label: '1.5° < X < 3°', pass: false, fail: false, note: '' },
-    { id: 'ge3', label: '≥ 3°', pass: false, fail: false, note: '' }
-  ],
+  lightMismatch: defaultLightMismatch(),
+  beamAlignment: defaultBeamAlignment(),
   remark: ''
 })
+
+function loadInitial () {
+  const d = props.initial
+  if (!d || typeof d !== 'object') return
+  form.value.machineName = d.machineName ?? ''
+  form.value.machineModel = d.machineModel ?? ''
+  form.value.testDate = d.testDate ?? ''
+  form.value.tester = d.tester ?? props.currentUserName ?? ''
+  form.value.tubeSize = d.tubeSize === 'large' ? 'large' : (d.tubeSize || 'small')
+  form.value.testMethod = d.testMethod === 'coins' ? 'coins' : (d.testMethod || 'tool')
+  form.value.remark = d.remark ?? ''
+  const orderLm = ['anode', 'cathode', 'top', 'bottom']
+  if (Array.isArray(d.lightMismatch) && d.lightMismatch.length) {
+    form.value.lightMismatch = orderLm.map(id => {
+      const row = d.lightMismatch.find(r => r.id === id) || {}
+      return {
+        id,
+        label: row.label ?? '',
+        value1: row.value1 ?? '',
+        pass: !!row.pass,
+        fail: !!row.fail,
+        note: row.note ?? ''
+      }
+    })
+  }
+  const orderBa = ['lt1_5', 'btw', 'ge3']
+  if (Array.isArray(d.beamAlignment) && d.beamAlignment.length) {
+    form.value.beamAlignment = orderBa.map(id => {
+      const row = d.beamAlignment.find(r => r.id === id) || {}
+      return {
+        id,
+        label: row.label ?? '',
+        pass: !!row.pass,
+        fail: !!row.fail,
+        note: row.note ?? ''
+      }
+    })
+  }
+}
+onMounted(loadInitial)
+watch(() => props.initial, loadInitial, { deep: true })
 
 const attachmentFileName = ref('')
 const onFileChange = (e) => {
