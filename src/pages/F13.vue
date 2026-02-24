@@ -205,13 +205,13 @@
                   <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.vertical1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.vertical2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.vertical3" placeholder="" />
                 </td>
                 <td rowspan="3" class="action-cell">
                   ≥ 4 dB or any change<br/>from baseline
@@ -227,13 +227,13 @@
                   <input type="text" class="input-text" v-model="testData.imageUniformity.horizontalBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.horizontal1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.horizontal2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.horizontal3" placeholder="" />
                 </td>
               </tr>
               
@@ -243,13 +243,13 @@
                   <input type="text" class="input-text" v-model="testData.imageUniformity.artifactsBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.artifacts1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.artifacts2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageUniformity.artifacts3" placeholder="" />
                 </td>
               </tr>
               
@@ -257,16 +257,16 @@
               <tr class="category-row">
                 <td class="category-title">Depth of Penetration (cm)</td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.depthPenetration.baseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.depthPenetration.col1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.depthPenetration.col2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.depthPenetration.col3" placeholder="" />
                 </td>
                 <td class="action-cell">± 6 mm</td>
                 <td class="defect-cell">± 10 mm</td>
@@ -300,13 +300,13 @@
                   <input type="text" class="input-text" v-model="testData.verticalDistance.pin13Baseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin131" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin132" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin133" placeholder="" />
                 </td>
                 <td rowspan="3" class="action-cell">± 1.5 mm or 1.5%</td>
                 <td rowspan="3" class="defect-cell">± 2.0 mm or 2%</td>
@@ -318,13 +318,13 @@
                   <input type="text" class="input-text" v-model="testData.verticalDistance.pin35Baseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin351" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin352" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin353" placeholder="" />
                 </td>
               </tr>
               
@@ -334,13 +334,13 @@
                   <input type="text" class="input-text" v-model="testData.verticalDistance.pin68Baseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin681" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin682" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.verticalDistance.pin683" placeholder="" />
                 </td>
               </tr>
               
@@ -360,13 +360,13 @@
                   <input type="text" class="input-text" v-model="testData.horizontalDistance.nearBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.near1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.near2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.near3" placeholder="" />
                 </td>
                 <td rowspan="2" class="action-cell">± 2.0 mm or 2%</td>
                 <td rowspan="2" class="defect-cell">± 3.0 mm or 3%</td>
@@ -378,13 +378,13 @@
                   <input type="text" class="input-text" v-model="testData.horizontalDistance.farBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.far1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.far2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.horizontalDistance.far3" placeholder="" />
                 </td>
               </tr>
               
@@ -406,13 +406,13 @@
                   <input type="text" class="input-text" v-model="testData.lateralResolution.nearBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.near1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.near2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.near3" placeholder="" />
                 </td>
                 <td rowspan="3" colspan="2" class="criteria-cell">
                   width &lt;1.5 mm, freq ≥ 5 MHz<br/>
@@ -427,13 +427,13 @@
                   <input type="text" class="input-text" v-model="testData.lateralResolution.midBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.mid1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.mid2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.mid3" placeholder="" />
                 </td>
               </tr>
               
@@ -443,13 +443,13 @@
                   <input type="text" class="input-text" v-model="testData.lateralResolution.farBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.far1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.far2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.lateralResolution.far3" placeholder="" />
                 </td>
               </tr>
               
@@ -464,13 +464,13 @@
                   <input type="text" class="input-text" v-model="testData.axialResolution.nearBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.near1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.near2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.near3" placeholder="" />
                 </td>
                 <td rowspan="3" colspan="2" class="criteria-cell">
                   Action level: 1 mm<br/>
@@ -485,13 +485,13 @@
                   <input type="text" class="input-text" v-model="testData.axialResolution.midBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.mid1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.mid2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.mid3" placeholder="" />
                 </td>
               </tr>
               
@@ -501,13 +501,13 @@
                   <input type="text" class="input-text" v-model="testData.axialResolution.farBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.far1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.far2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.axialResolution.far3" placeholder="" />
                 </td>
               </tr>
               
@@ -526,13 +526,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.nearCystBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.nearCyst1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.nearCyst2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.nearCyst3" placeholder="" />
                 </td>
                 <td rowspan="3" colspan="2" class="criteria-cell">
                   Major distortion or any change from baseline<br/>
@@ -546,13 +546,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.imageQualityBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.imageQuality1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.imageQuality2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.imageQuality3" placeholder="" />
                 </td>
               </tr>
               
@@ -562,13 +562,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.midCystBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midCyst1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midCyst2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midCyst3" placeholder="" />
                 </td>
               </tr>
               
@@ -578,13 +578,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.midImageQuality" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midImageQuality1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midImageQuality2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.midImageQuality3" placeholder="" />
                 </td>
                 <td></td>
                 <td></td>
@@ -596,13 +596,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.farCystBaseline" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farCyst1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farCyst2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farCyst3" placeholder="" />
                 </td>
                 <td></td>
                 <td></td>
@@ -614,13 +614,13 @@
                   <input type="text" class="input-text" v-model="testData.imageGeometry.farImageQuality" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farImageQuality1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farImageQuality2" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.imageGeometry.farImageQuality3" placeholder="" />
                 </td>
                 <td></td>
                 <td></td>
@@ -637,13 +637,13 @@
                   <input type="text" class="input-text" v-model="testData.grayScale.deadZone" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.grayScale.deadZone1" placeholder="" />
                 </td>
                 <td>
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.grayScale.deadZone2" placeholder="" />
                 </td>
                 <td rowspan="1" class="image-cell">
-                  <input type="text" class="input-text" v-model="testData.imageUniformity.verticalBaseline" placeholder="" />
+                  <input type="text" class="input-text" v-model="testData.grayScale.deadZone3" placeholder="" />
                 </td>
                 <td colspan="2" class="criteria-cell">
                   7 mm, freq 3 MHz<br/>
@@ -785,48 +785,46 @@ const testData = ref({
     date3: ''
   },
   imageUniformity: {
-    verticalBaseline: '',
-    horizontalBaseline: '',
-    artifactsBaseline: ''
+    verticalBaseline: '', vertical1: '', vertical2: '', vertical3: '',
+    horizontalBaseline: '', horizontal1: '', horizontal2: '', horizontal3: '',
+    artifactsBaseline: '', artifacts1: '', artifacts2: '', artifacts3: ''
   },
   depthPenetration: {
-    baseline: ''
+    baseline: '', col1: '', col2: '', col3: ''
   },
   verticalDistance: {
     actualDistance: '',
-    pin13Baseline: '',
-    pin35Baseline: '',
-    pin68Baseline: ''
+    pin13Baseline: '', pin131: '', pin132: '', pin133: '',
+    pin35Baseline: '', pin351: '', pin352: '', pin353: '',
+    pin68Baseline: '', pin681: '', pin682: '', pin683: ''
   },
   horizontalDistance: {
     actualDistance: '',
-    nearBaseline: '',
-    farBaseline: ''
+    nearBaseline: '', near1: '', near2: '', near3: '',
+    farBaseline: '', far1: '', far2: '', far3: ''
   },
   lateralResolution: {
-    pinDepthNear: '',
-    pinDepthMid: '',
-    pinDepthFar: '',
-    nearBaseline: '',
-    midBaseline: '',
-    farBaseline: ''
+    pinDepthNear: '', pinDepthMid: '', pinDepthFar: '',
+    nearBaseline: '', near1: '', near2: '', near3: '',
+    midBaseline: '', mid1: '', mid2: '', mid3: '',
+    farBaseline: '', far1: '', far2: '', far3: ''
   },
   axialResolution: {
-    nearBaseline: '',
-    midBaseline: '',
-    farBaseline: ''
+    nearBaseline: '', near1: '', near2: '', near3: '',
+    midBaseline: '', mid1: '', mid2: '', mid3: '',
+    farBaseline: '', far1: '', far2: '', far3: ''
   },
   imageGeometry: {
     actualDiameter: '',
-    nearCystBaseline: '',
-    imageQualityBaseline: '',
-    midCystBaseline: '',
-    midImageQuality: '',
-    farCystBaseline: '',
-    farImageQuality: ''
+    nearCystBaseline: '', nearCyst1: '', nearCyst2: '', nearCyst3: '',
+    imageQualityBaseline: '', imageQuality1: '', imageQuality2: '', imageQuality3: '',
+    midCystBaseline: '', midCyst1: '', midCyst2: '', midCyst3: '',
+    midImageQuality: '', midImageQuality1: '', midImageQuality2: '', midImageQuality3: '',
+    farCystBaseline: '', farCyst1: '', farCyst2: '', farCyst3: '',
+    farImageQuality: '', farImageQuality1: '', farImageQuality2: '', farImageQuality3: ''
   },
   grayScale: {
-    deadZone: ''
+    deadZone: '', deadZone1: '', deadZone2: '', deadZone3: ''
   }
 })
 
@@ -858,49 +856,45 @@ const resetForm = () => {
   }
 
   testData.value = {
-    testDates: {
-      date1: '',
-      date2: '',
-      date3: ''
-    },
+    testDates: { date1: '', date2: '', date3: '' },
     imageUniformity: {
-      verticalBaseline: '',
-      horizontalBaseline: '',
-      artifactsBaseline: ''
+      verticalBaseline: '', vertical1: '', vertical2: '', vertical3: '',
+      horizontalBaseline: '', horizontal1: '', horizontal2: '', horizontal3: '',
+      artifactsBaseline: '', artifacts1: '', artifacts2: '', artifacts3: ''
     },
-    depthPenetration: {
-      baseline: ''
-    },
+    depthPenetration: { baseline: '', col1: '', col2: '', col3: '' },
     verticalDistance: {
-      pin13Baseline: '',
-      pin35Baseline: '',
-      pin68Baseline: ''
+      actualDistance: '',
+      pin13Baseline: '', pin131: '', pin132: '', pin133: '',
+      pin35Baseline: '', pin351: '', pin352: '', pin353: '',
+      pin68Baseline: '', pin681: '', pin682: '', pin683: ''
     },
     horizontalDistance: {
-      nearBaseline: '',
-      farBaseline: ''
+      actualDistance: '',
+      nearBaseline: '', near1: '', near2: '', near3: '',
+      farBaseline: '', far1: '', far2: '', far3: ''
     },
     lateralResolution: {
-      nearBaseline: '',
-      midBaseline: '',
-      farBaseline: ''
+      pinDepthNear: '', pinDepthMid: '', pinDepthFar: '',
+      nearBaseline: '', near1: '', near2: '', near3: '',
+      midBaseline: '', mid1: '', mid2: '', mid3: '',
+      farBaseline: '', far1: '', far2: '', far3: ''
     },
     axialResolution: {
-      nearBaseline: '',
-      midBaseline: '',
-      farBaseline: ''
+      nearBaseline: '', near1: '', near2: '', near3: '',
+      midBaseline: '', mid1: '', mid2: '', mid3: '',
+      farBaseline: '', far1: '', far2: '', far3: ''
     },
     imageGeometry: {
-      nearCystBaseline: '',
-      imageQualityBaseline: '',
-      midCystBaseline: '',
-      midImageQuality: '',
-      farCystBaseline: '',
-      farImageQuality: ''
+      actualDiameter: '',
+      nearCystBaseline: '', nearCyst1: '', nearCyst2: '', nearCyst3: '',
+      imageQualityBaseline: '', imageQuality1: '', imageQuality2: '', imageQuality3: '',
+      midCystBaseline: '', midCyst1: '', midCyst2: '', midCyst3: '',
+      midImageQuality: '', midImageQuality1: '', midImageQuality2: '', midImageQuality3: '',
+      farCystBaseline: '', farCyst1: '', farCyst2: '', farCyst3: '',
+      farImageQuality: '', farImageQuality1: '', farImageQuality2: '', farImageQuality3: ''
     },
-    grayScale: {
-      deadZone: ''
-    }
+    grayScale: { deadZone: '', deadZone1: '', deadZone2: '', deadZone3: '' }
   }
 
   summary.value = {

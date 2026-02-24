@@ -53,6 +53,15 @@
   font-family: "TH Sarabun New", Tahoma, sans-serif;
 }
 
+/* F7-2: อนุญาตให้เนื้อหาเกิน 1 หน้าแล้วต่อหน้าใหม่ (height auto, overflow visible) */
+.print-root > .sheet-inner.sheet-inner--flow {
+  height: auto;
+  min-height: 277mm;
+  max-height: none;
+  overflow: visible;
+  aspect-ratio: auto;
+}
+
 @page {
   size: A4 portrait;
   margin: 10mm;
@@ -75,6 +84,14 @@
     max-width: 190mm !important;
     padding: 10mm;
     page-break-after: always;
+  }
+
+  .print-root > .sheet-inner.sheet-inner--flow {
+    height: auto !important;
+    min-height: 277mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-inside: auto;
   }
 
   .print-root > .sheet-inner:last-child,

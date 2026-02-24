@@ -34,8 +34,8 @@
               <span class="schedule-form-current">F1/F2 (กำลังทำ)</span>
             </template>
             <router-link
-              v-else-if="formTypeRoute(ft)"
-              :to="formTypeRoute(ft)"
+              v-else-if="formTypeTo(ft)"
+              :to="formTypeTo(ft)"
               class="schedule-form-link"
             >
               {{ formTypeLabel(ft) }}
@@ -366,6 +366,17 @@ function formTypeRoute(formType) {
   return FORM_TYPE_ROUTES[formType]?.path || null
 }
 
+/** สร้าง route ไปหน้าฟอร์ม (ส่งชื่อเครื่อง/ห้องไปด้วยเมื่อไป F7-F8 เพื่อให้แสดงเครื่องเดิม) */
+function formTypeTo(formType) {
+  const path = formTypeRoute(formType)
+  if (!path) return null
+  const q = { equipmentName: selectedDevice.value?.name || '', room: selectedDevice.value?.room || '' }
+  if (path === '/monthly-check-all' && q.equipmentName) {
+    return { path, query: q }
+  }
+  return path
+}
+
 function formTypeLabel(formType) {
   return FORM_TYPE_ROUTES[formType]?.label || formType
 }
@@ -435,8 +446,12 @@ async function goToNextForm() {
     router.push('/dashboard')
     return
   }
-  const remainingFormTypes = next.join(',')
-  router.push({ path, query: { formTypes: remainingFormTypes } })
+  const query = { formTypes: next.join(',') }
+  if (path === '/monthly-check-all' && selectedDevice.value?.name) {
+    query.equipmentName = selectedDevice.value.name
+    query.room = selectedDevice.value.room || ''
+  }
+  router.push({ path, query })
 }
 
 const saveChecklist = async () => {

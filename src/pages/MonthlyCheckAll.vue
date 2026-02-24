@@ -75,7 +75,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 import F7CollimatorForm from '../components/forms/F7CollimatorForm.vue'
@@ -97,6 +97,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const route = useRoute()
 
 /* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
 const deviceInfo = ref({ name: '', model: '', room: '' })
@@ -120,11 +121,29 @@ onMounted(async () => {
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
-        const m = machines[0]
-        deviceInfo.value = {
-          name: m.machineName,
-          model: m.machineName,
-          room: m.room || ''
+        const fromQuery = route.query.equipmentName || props.selectedDevice?.name
+        const m = fromQuery
+          ? machines.find(mx => (mx.machineName || '').trim() === String(fromQuery).trim())
+          : null
+        if (m) {
+          deviceInfo.value = {
+            name: m.machineName,
+            model: m.model || m.machineName,
+            room: m.room || route.query.room || props.selectedDevice?.room || ''
+          }
+        } else if (fromQuery) {
+          deviceInfo.value = {
+            name: String(fromQuery).trim(),
+            model: props.selectedDevice?.model || String(fromQuery).trim(),
+            room: route.query.room || props.selectedDevice?.room || ''
+          }
+        } else {
+          const first = machines[0]
+          deviceInfo.value = {
+            name: first.machineName,
+            model: first.machineName,
+            room: first.room || ''
+          }
         }
       }
     }
