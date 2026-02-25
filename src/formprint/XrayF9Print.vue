@@ -58,23 +58,9 @@
           </thead>
 
           <tbody>
-            <!-- แถวตัวอย่าง ต.ย. ภายนอก -->
+            <!-- แถวตัวอย่าง ต.ย. ภายนอก (ไม่แสดงข้อมูล เว้นว่าง) -->
             <tr>
               <td class="col-no">ต.ย.</td>
-              <td>{{ exampleExternal.equipmentNo || '' }}</td>
-              <td>{{ exampleExternal.equipmentType || '' }}</td>
-              <td>{{ exampleExternal.usageAge || '' }}</td>
-              <td>{{ exampleExternal.checkDate || '' }}</td>
-              <td>{{ exampleExternal.damageType || '' }}</td>
-              <td>{{ exampleExternal.position || '' }}</td>
-              <td>{{ exampleExternal.size || '' }}</td>
-              <td>{{ exampleExternal.storageMethod || '' }}</td>
-              <td>{{ exampleExternal.recorder || '' }}</td>
-            </tr>
-
-            <!-- ลำดับที่ 1 ภายนอก -->
-            <tr>
-              <td class="col-no row-top">1</td>
               <td></td>
               <td></td>
               <td></td>
@@ -86,21 +72,21 @@
               <td></td>
             </tr>
 
-            <!-- ลำดับที่ 2 ภายนอก -->
-            <tr>
-              <td class="col-no row-top">2</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+            <!-- แถวข้อมูลจาก jsonData.items (inspectType = visual) เริ่มข้อ 1 -->
+            <tr v-for="(row, idx) in externalRows" :key="'ext-' + idx">
+              <td class="col-no row-top">{{ idx + 1 }}</td>
+              <td>{{ row.deviceNumber || '' }}</td>
+              <td>{{ labelDeviceType(row.deviceType) }}</td>
+              <td>{{ row.yearsUsed ?? '' }}</td>
+              <td>{{ formatDate(row.inspectDate) || '' }}</td>
+              <td>{{ labelDamageType(row.damageType) }}</td>
+              <td>{{ row.damagePosition || '' }}</td>
+              <td>{{ row.damageSize || '' }}</td>
+              <td>{{ labelStorageMethod(row.storageMethod) }}</td>
+              <td>{{ row.inspectorName || '' }}</td>
             </tr>
 
-            <!-- แถวสุดท้ายว่าง ภายนอก -->
+            <!-- แถวว่าง ภายนอก -->
             <tr>
               <td class="col-no row-top">&nbsp;</td>
               <td></td>
@@ -121,23 +107,9 @@
               </td>
             </tr>
 
-            <!-- แถวตัวอย่าง ต.ย. ภายใน -->
+            <!-- แถวตัวอย่าง ต.ย. ภายใน (ไม่แสดงข้อมูล เว้นว่าง) -->
             <tr>
               <td class="col-no">ต.ย.</td>
-              <td>{{ exampleInternal.equipmentNo || '' }}</td>
-              <td>{{ exampleInternal.equipmentType || '' }}</td>
-              <td>{{ exampleInternal.usageAge || '' }}</td>
-              <td>{{ exampleInternal.checkDate || '' }}</td>
-              <td>{{ exampleInternal.internalFinding || '' }}</td>
-              <td>{{ exampleInternal.position || '' }}</td>
-              <td>{{ exampleInternal.size || '' }}</td>
-              <td>{{ exampleInternal.storageMethod || '' }}</td>
-              <td>{{ exampleInternal.recorder || '' }}</td>
-            </tr>
-
-            <!-- ลำดับที่ 1 ภายใน -->
-            <tr>
-              <td class="col-no row-top">1</td>
               <td></td>
               <td></td>
               <td></td>
@@ -149,21 +121,21 @@
               <td></td>
             </tr>
 
-            <!-- ลำดับที่ 2 ภายใน -->
-            <tr>
-              <td class="col-no row-top">2</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+            <!-- แถวข้อมูลจาก jsonData.items (inspectType = xray หรืออื่นๆ) เริ่มข้อ 1 -->
+            <tr v-for="(row, idx) in internalRows" :key="'int-' + idx">
+              <td class="col-no row-top">{{ idx + 1 }}</td>
+              <td>{{ row.deviceNumber || '' }}</td>
+              <td>{{ labelDeviceType(row.deviceType) }}</td>
+              <td>{{ row.yearsUsed ?? '' }}</td>
+              <td>{{ formatDate(row.inspectDate) || '' }}</td>
+              <td>{{ labelDamageType(row.damageType) }}</td>
+              <td>{{ row.damagePosition || '' }}</td>
+              <td>{{ row.damageSize || '' }}</td>
+              <td>{{ labelStorageMethod(row.storageMethod) }}</td>
+              <td>{{ row.inspectorName || '' }}</td>
             </tr>
 
-            <!-- แถวสุดท้ายว่าง ภายใน -->
+            <!-- แถวว่าง ภายใน -->
             <tr>
               <td class="col-no row-top">&nbsp;</td>
               <td></td>
@@ -179,10 +151,10 @@
           </tbody>
         </table>
 
-        <!-- ลายเซ็นด้านล่าง -->
+        <!-- ลายเซ็นด้านล่าง (เว้นช่องลงชื่อไว้ ไม่ใส่ชื่อ) -->
         <div class="signature-block">
           <div class="sig-row">
-            ลงชื่อ........................................................ผู้ทดสอบ
+            ลงชื่อ ........................................................ ผู้ทดสอบ
           </div>
           <div class="sig-row">
             (...........................................................................)
@@ -202,15 +174,62 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const record = ref({
-  frequency: 'ทุก 6 เดือน'
+  frequency: 'ทุก 6 เดือน',
+  checkDate: '',
+  tester: '',
+  machineName: '',
+  room: ''
 })
 
 const externalChecks = ref([])
 const internalChecks = ref([])
 
-/* ดึงแถวตัวอย่าง (ถ้ามี) สำหรับ ต.ย. */
-const exampleExternal = computed(() => externalChecks.value[0] || {})
-const exampleInternal = computed(() => internalChecks.value[0] || {})
+/* แถวที่แสดงในตาราง (ข้อมูลเริ่มจากข้อ 1 เป็นต้นไป ไม่รวมแถว ต.ย.) */
+const externalRows = computed(() => externalChecks.value)
+const internalRows = computed(() => internalChecks.value)
+
+/** ชนิดของอุปกรณ์ (ตามฟอร์ม F9) */
+function labelDeviceType (code) {
+  if (!code) return ''
+  const map = {
+    leadApron: 'เสื้อตะกั่ว'
+  }
+  return map[String(code).trim()] || code
+}
+
+/** ชนิดของความชำรุดเสียหาย (ตามฟอร์ม F9) */
+function labelDamageType (code) {
+  if (!code) return ''
+  const map = {
+    hole: 'รูทะลุ',
+    crack: 'รอยหัก'
+  }
+  return map[String(code).trim()] || code
+}
+
+/** วิธีการจัดเก็บ (ตามฟอร์ม F9) */
+function labelStorageMethod (code) {
+  if (!code) return ''
+  const map = {
+    hang: 'ไม้แขวน',
+    flat: 'วางราบ',
+    layFlat: 'วางราบ'
+  }
+  return map[String(code).trim()] || code
+}
+
+/** วันที่ ISO (YYYY-MM-DD) → DD/MM/YYYY (พ.ศ.) */
+function formatDate (val) {
+  if (val === undefined || val === null) return ''
+  const s = String(val).trim()
+  if (!s) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split('-')
+    const thaiYear = Number.parseInt(y, 10) + 543
+    return `${d}/${m}/${thaiYear}`
+  }
+  return s
+}
 
 function handlePrint () {
   window.print()
@@ -218,29 +237,69 @@ function handlePrint () {
 
 const API_BASE = '/api/Xraycare'
 
+/** แปลง items จาก jsonData ให้ตรงกับช่องในฟอร์ม (ลำดับที่, หมายเลขอุปกรณ์, ชนิดของอุปกรณ์, อายุการใช้งาน, วันที่ตรวจสอบ, ชนิดของความชำรุดเสียหาย, ตำแหน่ง, ขนาด, วิธีการจัดเก็บ, ผู้บันทึก) */
+function normalizeItems (items) {
+  if (!Array.isArray(items)) return []
+  return items.map(it => ({
+    id: it.id,
+    inspectType: it.inspectType,
+    deviceNumber: it.deviceNumber ?? it.equipmentNo ?? '',
+    deviceType: it.deviceType ?? it.equipmentType ?? '',
+    yearsUsed: it.yearsUsed ?? it.usageAge ?? '',
+    inspectDate: it.inspectDate ?? it.checkDate ?? '',
+    damageType: it.damageType ?? '',
+    damagePosition: it.damagePosition ?? it.position ?? '',
+    damageSize: it.damageSize ?? it.size ?? '',
+    storageMethod: it.storageMethod ?? '',
+    inspectorName: it.inspectorName ?? it.recorder ?? ''
+  }))
+}
+
+function applyRecordData (data) {
+  if (!data) return
+  if (data.checkDate) record.value.checkDate = data.checkDate
+  if (data.tester) record.value.tester = data.tester
+  if (data.machineName !== undefined) record.value.machineName = data.machineName
+  if (data.room !== undefined) record.value.room = data.room
+
+  let raw = data.jsonData
+  if (raw === undefined || raw === null) return
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (parsed.frequency !== undefined) record.value.frequency = parsed.frequency
+
+    if (Array.isArray(parsed.items)) {
+      const normalized = normalizeItems(parsed.items)
+      const external = normalized.filter(it => String(it.inspectType || '').toLowerCase() === 'visual')
+      const internal = normalized.filter(it => String(it.inspectType || '').toLowerCase() !== 'visual')
+      externalChecks.value = external.length ? external : [{ deviceNumber: '', deviceType: '', yearsUsed: '', inspectDate: '', damageType: '', damagePosition: '', damageSize: '', storageMethod: '', inspectorName: '' }]
+      internalChecks.value = internal.length ? internal : [{ deviceNumber: '', deviceType: '', yearsUsed: '', inspectDate: '', damageType: '', damagePosition: '', damageSize: '', storageMethod: '', inspectorName: '' }]
+    } else {
+      if (Array.isArray(parsed.externalChecks)) externalChecks.value = normalizeItems(parsed.externalChecks)
+      if (Array.isArray(parsed.internalChecks)) internalChecks.value = normalizeItems(parsed.internalChecks)
+      if (externalChecks.value.length === 0) externalChecks.value = [{ deviceNumber: '', deviceType: '', yearsUsed: '', inspectDate: '', damageType: '', damagePosition: '', damageSize: '', storageMethod: '', inspectorName: '' }]
+      if (internalChecks.value.length === 0) internalChecks.value = [{ deviceNumber: '', deviceType: '', yearsUsed: '', inspectDate: '', damageType: '', damagePosition: '', damageSize: '', storageMethod: '', inspectorName: '' }]
+    }
+  } catch (_) {}
+}
+
 onMounted(async () => {
   const id = route.query.id || route.params.id
+  const stateRecord = history.state?.record
+
+  if (stateRecord && (stateRecord.formType === 'F9' || stateRecord.jsonData)) {
+    applyRecordData(stateRecord)
+    return
+  }
+
   if (!id) return
   try {
     const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
-    if (data.jsonData) {
-      try {
-        const parsed = JSON.parse(data.jsonData)
-        if (parsed.frequency !== undefined) record.value.frequency = parsed.frequency
-        if (Array.isArray(parsed.externalChecks)) externalChecks.value = parsed.externalChecks
-        if (Array.isArray(parsed.internalChecks)) internalChecks.value = parsed.internalChecks
-      } catch (_) {}
-    }
+    applyRecordData(data)
   } catch (e) {
     console.error('Load checklist record error:', e)
-  }
-  if (externalChecks.value.length === 0) {
-    externalChecks.value = [{ equipmentNo: '', equipmentType: 'เสื้อตะกั่ว', usageAge: '', checkDate: '', damageType: '', position: '', size: '', storageMethod: '', recorder: '' }]
-  }
-  if (internalChecks.value.length === 0) {
-    internalChecks.value = [{ equipmentNo: '', equipmentType: 'เสื้อตะกั่ว', usageAge: '', checkDate: '', internalFinding: '', position: '', size: '', storageMethod: '', recorder: '' }]
   }
 })
 </script>
@@ -288,6 +347,14 @@ onMounted(async () => {
   padding: 1.5mm 1mm;
   vertical-align: middle;
   text-align: center;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ข้อความยาวในช่องข้อมูลให้ขึ้นบรรทัดใหม่ (รวมข้อความไทยที่ไม่มีช่องว่าง) */
+.f9-table td {
+  word-break: break-all;
 }
 
 .section-title {

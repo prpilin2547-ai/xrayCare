@@ -152,24 +152,20 @@
           </button>
         </div>
 
-        <!-- Image Modal -->
-        <div v-if="showImageModal" class="modal-overlay">
+        <!-- Image Modal (รูปแบบเดียวกับ RequestList.vue) -->
+        <div v-if="showImageModal" class="modal-overlay" @click.self="closeImageModal">
           <div class="modal-card image-modal-card">
-            <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
-              <h5 class="m-0">รูปภาพ</h5>
-              <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
+            <div class="image-modal-header">
+              <h5 class="image-modal-title">ไฟล์รูปภาพ</h5>
+              <button type="button" class="image-modal-close" aria-label="ปิด" @click="closeImageModal">
+                <i class="bi bi-x-lg"></i>
+              </button>
             </div>
-            <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
-              style="min-height: 300px">
-              <div class="text-center">
-                <img v-if="currentImageSrc" :src="currentImageSrc" alt="Request Image"
-                  class="img-fluid shadow-sm mb-3" />
-                <p class="text-muted" v-if="currentImageSrc">
-                  รูปภาพที่แนบโดยนักรังสีการแพทย์
-                </p>
-                <p class="text-muted" v-else>
-                  ยังไม่มีรูปภาพจากนักรังสี
-                </p>
+            <div class="image-modal-body">
+              <div class="image-modal-content">
+                <img v-if="currentImageSrc" :src="currentImageSrc" alt="Request Image" class="image-modal-img" />
+                <p class="image-modal-caption" v-if="currentImageSrc">รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม</p>
+                <p class="image-modal-caption image-modal-empty" v-else>ยังไม่มีรูปภาพจากนักรังสี</p>
               </div>
             </div>
           </div>
@@ -532,12 +528,12 @@ watch(items, () => {
 </script>
 
 <style scoped>
-/* PAGE + SECTION HEADER */
+/* PAGE + SECTION HEADER (ให้ตรงกับ RequestList.vue) */
 .page {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-top: 8px;
+  padding: 12px 0 24px;
 }
 
 .section-header,
@@ -545,31 +541,31 @@ watch(items, () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .section-title {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-main, #0f172a);
+  letter-spacing: -0.02em;
 }
 
-/* Page Header (detail view) */
 .page-header {
   margin-bottom: 20px;
 }
 
 .blue-dot {
-  width: 12px;
-  height: 12px;
-  background-color: #2563eb;
+  width: 8px;
+  height: 8px;
+  background-color: #3b82f6;
   border-radius: var(--radius-full, 9999px);
   margin-right: 10px;
 }
 
 .page-title {
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   margin: 0;
   color: var(--text-main, #0f172a);
 }
@@ -577,16 +573,17 @@ watch(items, () => {
 .close-modal-btn {
   margin-left: auto;
   cursor: pointer;
-  color: #dc3545;
-  font-size: 1.5rem;
-  transition: transform var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+  color: #dc2626;
+  font-size: 1.4rem;
+  transition: color 150ms, transform 150ms;
 }
 
 .close-modal-btn:hover {
-  transform: scale(1.1);
+  color: #b91c1c;
+  transform: scale(1.08);
 }
 
-/* TABLE */
+/* TABLE (ให้ตรงกับ RequestList.vue) */
 .table-wrapper {
   background: var(--bg-card, #ffffff);
   border-radius: var(--radius-lg, 16px);
@@ -594,7 +591,7 @@ watch(items, () => {
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
   overflow-x: auto;
   overflow-y: visible;
-  padding: 12px 14px 16px;
+  padding: 14px 16px 18px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -750,6 +747,7 @@ td:nth-child(8) {
   border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
   overflow: hidden;
+  transition: box-shadow 200ms;
 }
 
 .box-header {
@@ -955,26 +953,96 @@ ul.content-list li::before {
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
 }
 
-/* Image modal */
+/* Image modal (รูปแบบเดียวกับ RequestList.vue) */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
   z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.image-modal-card {
+  background: var(--bg-card, #fff);
+  border-radius: var(--radius-xl, 20px);
+  overflow: hidden;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.18);
+  max-width: 620px;
+  width: 100%;
+  border: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.image-modal-header {
+  background: #198754;
+  color: #fff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.image-modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.image-modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: background 150ms, transform 150ms;
+}
+
+.image-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.image-modal-body {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.image-modal-card {
-  background: var(--bg-card, #ffffff);
-  border-radius: var(--radius-xl, 20px);
-  padding: 20px;
-  max-width: 600px;
-  width: 92%;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+.image-modal-content {
+  text-align: center;
+  width: 100%;
+}
+
+.image-modal-img {
+  max-width: 100%;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.image-modal-caption {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.image-modal-caption.image-modal-empty {
+  color: var(--text-muted, #94a3b8);
 }
 
 .cursor-pointer {

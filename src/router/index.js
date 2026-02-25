@@ -27,6 +27,8 @@ import QCFormsHub from '../pages/QCFormsHub.vue'
 import AdminAnalytical from '../pages-admin/AdminAnalytical.vue'
 import XrayF1Print from '../formprint/XrayF1Print.vue'
 import XrayF2Print from '../formprint/XrayF2Print.vue'
+import XrayF1PrintMonthly from '../formprint/XrayF1PrintMonthly.vue'
+import XrayF2PrintMonthly from '../formprint/XrayF2PrintMonthly.vue'
 import XrayF3Print from '../formprint/XrayF3Print.vue'
 import XrayF4Print from '../formprint/XrayF4Print.vue'
 import XrayF5Print from '../formprint/XrayF5Print.vue'
@@ -132,6 +134,18 @@ const routes = [
     path: '/formprint/xray-f2',
     name: 'XrayF2Print',
     component: XrayF2Print,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f1-monthly',
+    name: 'XrayF1PrintMonthly',
+    component: XrayF1PrintMonthly,
+    props: true
+  },
+  {
+    path: '/formprint/xray-f2-monthly',
+    name: 'XrayF2PrintMonthly',
+    component: XrayF2PrintMonthly,
     props: true
   },
   {

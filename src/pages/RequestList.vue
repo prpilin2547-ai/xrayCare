@@ -120,21 +120,19 @@
             </div>
         </div>
 
-        <!-- Image Modal (เพิ่มใหม่) -->
-        <div v-if="showImageModal" class="modal-overlay">
+        <!-- Image Modal -->
+        <div v-if="showImageModal" class="modal-overlay" @click.self="closeImageModal">
             <div class="modal-card image-modal-card">
-                <div class="modal-header bg-success text-white p-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">ไฟล์รูปภาพ</h5>
-                    <i class="bi bi-x-circle cursor-pointer fs-4" @click="closeImageModal"></i>
+                <div class="image-modal-header">
+                    <h5 class="image-modal-title">ไฟล์รูปภาพ</h5>
+                    <button type="button" class="image-modal-close" aria-label="ปิด" @click="closeImageModal">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-                <div class="modal-body p-5 bg-light d-flex justify-content-center align-items-center"
-                    style="min-height: 300px">
-                    <div class="text-center">
-                        <img v-if="previewImageSrc" :src="previewImageSrc" alt="Request Image"
-                            class="img-fluid shadow-sm mb-3" />
-                        <p class="text-muted">
-                            รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม
-                        </p>
+                <div class="image-modal-body">
+                    <div class="image-modal-content">
+                        <img v-if="previewImageSrc" :src="previewImageSrc" alt="Request Image" class="image-modal-img" />
+                        <p class="image-modal-caption">รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม</p>
                     </div>
                 </div>
             </div>
@@ -663,13 +661,13 @@ const deleteItem = async (id) => {
 
 <style scoped>
 .page {
-    padding-top: 8px;
+    padding: 12px 0 24px;
 }
 
 .page-title {
     margin: 0 0 12px;
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.05rem;
+    font-weight: 600;
     color: var(--text-main, #0f172a);
 }
 
@@ -677,13 +675,14 @@ const deleteItem = async (id) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .section-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-main, #0f172a);
+    letter-spacing: -0.02em;
 }
 
 .repair-detail-page {
@@ -694,20 +693,24 @@ const deleteItem = async (id) => {
     margin-left: auto;
     cursor: pointer;
     color: #dc2626;
-    font-size: 1.5rem;
-    transition: all var(--transition-fast, 150ms);
+    font-size: 1.4rem;
+    transition: color 150ms, transform 150ms;
 }
 
 .close-modal-btn:hover {
-    transform: scale(1.1);
+    color: #b91c1c;
+    transform: scale(1.08);
 }
 
 .table-wrapper {
     border-radius: var(--radius-lg, 16px);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
     border: 1px solid var(--border-card, rgba(0,0,0,0.06));
     box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
     background: var(--bg-card, #fff);
+    padding: 14px 16px 18px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -803,9 +806,10 @@ const deleteItem = async (id) => {
 .main-box {
     border: 1px solid var(--border-soft, #e2e8f0);
     background: var(--bg-card, #fff);
-    border-radius: var(--radius-md, 12px);
+    border-radius: var(--radius-lg, 16px);
     overflow: hidden;
     box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
+    transition: box-shadow 200ms;
 }
 
 .box-header {
@@ -977,21 +981,89 @@ ul.content-list li::before {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15,23,42,0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(6px);
     z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .image-modal-card {
     background: var(--bg-card, #fff);
     border-radius: var(--radius-xl, 20px);
-    padding: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    max-width: 600px;
-    width: 92%;
+    overflow: hidden;
+    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.18);
+    max-width: 620px;
+    width: 100%;
+    border: 1px solid var(--border-soft, #e2e8f0);
+}
+
+/* หัว modal รูปภาพ - สีเขียวแบบเดิม */
+.image-modal-header {
+    background: #198754;
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.image-modal-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.image-modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: background 150ms, transform 150ms;
+}
+
+.image-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.image-modal-body {
+    padding: 24px;
+    background: #f8fafc;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-modal-content {
+    text-align: center;
+    width: 100%;
+}
+
+.image-modal-img {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-md, 12px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
+}
+
+.image-modal-caption {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #64748b);
 }
 
 .calendar-popup-overlay {

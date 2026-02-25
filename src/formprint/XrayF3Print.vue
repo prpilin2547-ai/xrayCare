@@ -175,8 +175,8 @@
             <tr>
               <td colspan="4" class="align-left multi-line-cell">
                 <div>ข้อมูลสำหรับระบบ CR / DR</div>
-                <div>หมายเลขคาสเซท CR / DR : <span class="full-underline">{{ f6Record.cassetteNumber }}</span></div>
-                <div>หมายเลขเครื่องอ่าน CR / DR : <span class="full-underline">{{ f6Record.readerNumber }}</span></div>
+                <div>หมายเลขคาสเซท CR / DR : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.cassetteNumber }}</span></div>
+                <div>หมายเลขเครื่องอ่าน CR / DR : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.readerNumber }}</span></div>
               </td>
             </tr>
             <tr>
@@ -450,6 +450,8 @@ function handlePrint() {
 .align-center { text-align: center !important; }
 .multi-line-cell { padding: 3mm 2mm; line-height: 1.4; }
 .multi-line-cell div { margin-bottom: 1mm; }
+/* ช่องค่า CR/DR (คาสเซท + เครื่องอ่าน) ไม่ให้มีเส้นขีด แสดงเหมือนข้อมูลเบื้องต้น */
+.multi-line-cell .underline.short { text-decoration: none !important; }
 .full-underline { display: inline-block; border-bottom: 0.4pt solid #000; width: 40mm; height: 4mm; vertical-align: middle; }
 .short-line { width: 25mm; }
 .section-header td { font-weight: 700; }

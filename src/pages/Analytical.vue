@@ -265,98 +265,135 @@
         </div>
       </div>
 
-      <!-- ========== HISTORY SECTION ========== -->
-      <div class="panel mt-4">
+      <!-- ========== ประวัติการทำรายการ (ดึงข้อมูลจริงจากระบบ) ========== -->
+      <div class="panel history-panel mt-4">
         <div class="panel-header">
-          <h3>ประวัติการทำรายการ</h3>
+          <h3 class="d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history"></i>
+            ประวัติการทำรายการ
+          </h3>
+          <p class="panel-sub">รวมการบันทึกแบบฟอร์ม ระบบแจ้งซ่อม และรายการที่ส่งออก PDF</p>
         </div>
 
         <div class="panel-body history-body">
-          <!-- Search Filters -->
+          <!-- Filters -->
           <div class="history-filters">
-            <input v-model="filters.device" class="history-input" placeholder="ค้นหาตามชื่อเครื่อง..." />
-
-            <!-- <select v-model="filters.form" class="history-input">
-              <option value="">เลือกแบบบันทึก</option>
-              <option>dairy check</option>
-              <option>monthly check(1 month)</option>
-              <option>monthly check(3 month)</option>
-              <option>monthly check(6 month)</option>
-            </select> -->
-
-            <input type="date" v-model="filters.date" class="history-input" />
-
-            <button class="history-btn" @click="searchHistory">
-              ค้นหา
+            <select v-model="historyFilters.type" class="history-input history-select">
+              <option value="">ประเภทรายการ: ทั้งหมด</option>
+              <option value="checklist">บันทึกแบบฟอร์ม / QC</option>
+              <option value="repair">แจ้งซ่อม</option>
+            </select>
+            <select v-model="historyFilters.machine" class="history-input history-select">
+              <option value="">เครื่อง: ทั้งหมด</option>
+              <option v-for="m in historyMachines" :key="'m-' + m.id" :value="'machine-' + m.id">
+                {{ m.machineName }} ({{ m.room || '-' }})
+              </option>
+            </select>
+            <input
+              v-model="historyFilters.dateFrom"
+              type="date"
+              class="history-input"
+              placeholder="จากวันที่"
+            />
+            <input
+              v-model="historyFilters.dateTo"
+              type="date"
+              class="history-input"
+              placeholder="ถึงวันที่"
+            />
+            <input
+              v-model="historyFilters.search"
+              class="history-input"
+              placeholder="ค้นหา ผู้ทำ, เครื่อง, รายละเอียด..."
+            />
+            <button type="button" class="history-btn" @click="applyHistoryFilters">
+              <i class="bi bi-search me-1"></i>ค้นหา
+            </button>
+            <button type="button" class="history-btn history-btn-outline" @click="clearHistoryFilters">
+              ล้างตัวกรอง
             </button>
           </div>
 
-          <!-- Table -->
-          <div class="table-responsive mt-2">
-            <table class="table table-bordered small history-table">
-              <thead class="table-light text-center">
-                <tr>
-                  <th>วันที่</th>
-                  <th>ผู้ทำ</th>
-                  <th>เครื่อง</th>
-                  <th>แบบบันทึก</th>
-                  <th>ผล</th>
-                  <th>รายละเอียด</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in history" :key="item.id">
-                  <td>{{ item.timestamp }}</td>
-                  <td>{{ item.user }}</td>
-                  <td>{{ item.device }}</td>
-                  <td class="fw-bold">{{ item.form }}</td>
-                  <td>
-                    <span :class="item.status === 'Pass' ? 'tag-pass' : 'tag-fail'">
-                      {{ item.status }}
-                    </span>
-                  </td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary" @click="openDetail(item)">
-                      ดูเพิ่มเติม
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div v-if="historyLoading" class="history-loading">
+            <div class="spinner-border text-primary" role="status"></div>
+            <span>กำลังโหลดประวัติ...</span>
           </div>
 
-          <!-- Pagination -->
-          <div class="history-pagination">
-            <button class="page-btn" @click="prevPage" :disabled="page === 1">
-              ‹
-            </button>
-            <span>หน้า {{ page }}</span>
-            <button class="page-btn" @click="nextPage">
-              ›
-            </button>
-          </div>
+          <template v-else>
+            <div class="history-content">
+            <!-- Table -->
+            <div class="table-responsive mt-2">
+              <table class="table history-table">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ผู้ทำ</th>
+                    <th>เครื่อง / ห้อง</th>
+                    <th>ประเภทรายการ</th>
+                    <th>การจัดการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="paginatedHistory.length === 0">
+                    <td colspan="5" class="text-center text-muted py-5">
+                      <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                      ไม่พบรายการตามเงื่อนไข
+                    </td>
+                  </tr>
+                  <tr v-else v-for="(item, idx) in paginatedHistory" :key="item.uid">
+                    <td class="history-date">{{ item.displayDate }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>{{ item.machine }}</td>
+                    <td>
+                      <span class="history-type-badge" :class="item.type === 'repair' ? 'badge-repair' : 'badge-form'">
+                        {{ item.typeLabel }}
+                      </span>
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-link p-0" @click="openHistoryDetail(item)">
+                        ดูรายละเอียด
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="historyFiltered.length > 0" class="history-pagination">
+              <span class="history-pagination-summary">{{ historyPaginationSummary }}</span>
+              <div class="history-pagination-btns">
+                <button type="button" class="page-btn" :disabled="historyPage <= 1" @click="historyPage = Math.max(1, historyPage - 1)">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+                <span class="page-info">หน้า {{ historyPage }} / {{ historyTotalPages }}</span>
+                <button type="button" class="page-btn" :disabled="historyPage >= historyTotalPages" @click="historyPage = Math.min(historyTotalPages, historyPage + 1)">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+            </div>
+          </template>
         </div>
       </div>
 
       <!-- Detail Modal -->
-      <div v-if="modal.open" class="modal-backdrop">
-        <div class="modal-card">
-          <h3 class="modal-title">รายละเอียดการทำรายการ</h3>
-
-          <p><strong>วันที่:</strong> {{ modal.data.timestamp }}</p>
-          <p><strong>ผู้ทำ:</strong> {{ modal.data.user }}</p>
-          <p><strong>เครื่อง:</strong> {{ modal.data.device }}</p>
-          <p><strong>แบบบันทึก:</strong> {{ modal.data.form }}</p>
-          <p><strong>ผล:</strong> {{ modal.data.status }}</p>
-
-          <div class="modal-section">
-            <strong>ข้อมูลที่บันทึก</strong>
-            <pre class="modal-json">{{ modal.data.values }}</pre>
+      <div v-if="historyModal.open && historyModal.data" class="modal-backdrop" @click.self="historyModal.open = false">
+        <div class="modal-card modal-card-wide">
+          <h3 class="modal-title">
+            {{ historyModal.data.type === 'repair' ? 'รายละเอียดแจ้งซ่อม' : 'รายละเอียดการบันทึกแบบฟอร์ม' }}
+          </h3>
+          <div class="modal-body-inner">
+            <p><strong>วันที่:</strong> {{ historyModal.data.displayDate }}</p>
+            <p><strong>ผู้ทำ:</strong> {{ historyModal.data.user }}</p>
+            <p><strong>เครื่อง / ห้อง:</strong> {{ historyModal.data.machine }}</p>
+            <p><strong>ประเภทรายการ:</strong> {{ historyModal.data.typeLabel }}</p>
+            <template v-if="historyModal.data.type === 'repair'">
+              <p><strong>รายละเอียด:</strong> {{ historyModal.data.detail }}</p>
+              <p v-if="historyModal.data.remarks"><strong>หมายเหตุ:</strong> {{ historyModal.data.remarks }}</p>
+            </template>
           </div>
-
-          <button class="modal-close" @click="modal.open = false">
-            ปิด
-          </button>
+          <button type="button" class="modal-close" @click="historyModal.open = false">ปิด</button>
         </div>
       </div>
       <!-- ========== END HISTORY SECTION ========== -->
@@ -366,8 +403,12 @@
 
 <script setup>
 import { ref, nextTick, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import MainLayout from '../components/Layout/MainLayout.vue';
 import Chart from 'chart.js/auto';
+
+const API_BASE = '/api/Xraycare';
+const router = useRouter();
 
 // Constants
 const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -983,8 +1024,8 @@ watch(showGraph, (newVal) => {
 // โหลดข้อมูลเมื่อ component mount
 onMounted(() => {
   loadRepairItems()
+  loadHistoryData()
 
-  // Listen for storage changes
   window.addEventListener('storage', (event) => {
     if (event.key === STORAGE_KEY) {
       loadRepairItems()
@@ -1002,57 +1043,264 @@ onMounted(() => {
   })
 })
 
-// History section data
-const filters = ref({
-  device: '',
-  form: '',
-  date: ''
+// ---------- ประวัติการทำรายการ (ดึงข้อมูลจริง) ----------
+const formTypeToLabel = {
+  F1_F2: 'F1/F2 : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์',
+  F10: 'F10 : แบบบันทึกการตรวจสอบความสว่างแสงไฟ',
+  F12: 'F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ',
+  F3_F6: 'F3-F6 : การควบคุมคุณภาพจอภาพ / บันทึกการตรวจสอบเครื่อง',
+  F7_F8: 'F7-F8 : Collimator / Dark noise CR/DR',
+  F9: 'F9 : การตรวจสอบคุณภาพเสื้อตะกั่ว',
+  F11: 'F11 : แบบบันทึกผลการวัดความหนาผู้ป่วย',
+  F13: 'F13 : แบบบันทึกการตรวจสอบคุณภาพเครื่องอัลตราซาวด์',
+}
+const formTypeToRoute = {
+  F1_F2: 'XrayF1Print',
+  F10: 'XrayF10Print',
+  F12: 'XrayF12Print',
+  F3_F6: 'XrayF3Print',
+  F7_F8: 'XrayF71Print',
+  F9: 'XrayF9Print',
+  F11: 'XrayF11Print',
+  F13: 'XrayF13Print',
+}
+
+const historyChecklistRecords = ref([])
+const historyRepairRequests = ref([])
+const historyMachines = ref([])
+const historyLoading = ref(false)
+const historyFilters = ref({
+  type: '',
+  machine: '',
+  dateFrom: '',
+  dateTo: '',
+  search: '',
 })
+const historyPage = ref(1)
+const HISTORY_PAGE_SIZE = 20
 
-const page = ref(1)
-
-const history = ref([
-  {
-    id: 1,
-    timestamp: '2025-02-01 10:20',
-    user: 'John Doe',
-    device: 'X-Ray Model A / Room 101',
-    form: 'F3',
-    status: 'Pass',
-    values: '{ "brightness": 220, "contrast": 180 }'
-  },
-  {
-    id: 2,
-    timestamp: '2025-02-03 09:10',
-    user: 'Jane Smith',
-    device: 'X-Ray Model B / Room 102',
-    form: 'F7-1',
-    status: 'Fail',
-    values: '{ "alignment": "3.5°", "limit": "3°" }'
+function parseCheckDateForSort(str) {
+  if (!str || typeof str !== 'string') return 0
+  const trimmed = str.trim()
+  const datePart = (trimmed.split(/\s+/)[0] || trimmed).trim()
+  const parts = datePart.split('/')
+  if (parts.length >= 3) {
+    const d = parseInt(parts[0], 10)
+    const m = parseInt(parts[1], 10) - 1
+    const y = parseInt(parts[2], 10)
+    const yAd = y > 2400 ? y - 543 : y
+    const t = new Date(yAd, m, d).getTime()
+    return isNaN(t) ? 0 : t
   }
-])
+  return 0
+}
 
-const modal = ref({
-  open: false,
-  data: {}
+function parseRequestDateForSort(str) {
+  if (!str || typeof str !== 'string') return 0
+  const thaiMonths = { 'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5, 'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11 }
+  const thaiMatch = str.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+  if (thaiMatch) {
+    const d = parseInt(thaiMatch[1], 10)
+    const m = thaiMonths[thaiMatch[2]]
+    const y = parseInt(thaiMatch[3], 10) - 543
+    if (m !== undefined) {
+      const t = new Date(y, m, d).getTime()
+      return isNaN(t) ? 0 : t
+    }
+  }
+  const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
+  if (slashMatch) {
+    const d = parseInt(slashMatch[1], 10)
+    const m = parseInt(slashMatch[2], 10) - 1
+    const y = parseInt(slashMatch[3], 10)
+    const yAd = y > 2400 ? y - 543 : y
+    const t = new Date(yAd, m, d).getTime()
+    return isNaN(t) ? 0 : t
+  }
+  return 0
+}
+
+const historyUnified = computed(() => {
+  const list = []
+  historyChecklistRecords.value.forEach((r) => {
+    const sortTime = parseCheckDateForSort(r.checkDate)
+    list.push({
+      uid: 'c-' + r.id,
+      type: 'checklist',
+      sortTime,
+      displayDate: r.checkDate || '-',
+      user: r.tester || '-',
+      machine: [r.machineName, r.room].filter(Boolean).join(' ') || '-',
+      typeLabel: formTypeToLabel[r.formType] || r.formType || 'แบบฟอร์ม',
+      status: getChecklistStatus(r),
+      statusClass: null,
+      detail: '',
+      remarks: '',
+      jsonPreview: (r.jsonData && typeof r.jsonData === 'string') ? r.jsonData.substring(0, 500) : (r.jsonData ? JSON.stringify(r.jsonData).substring(0, 500) : '-'),
+      raw: r,
+      canPrint: !!formTypeToRoute[r.formType],
+      machineId: null,
+    })
+  })
+  historyRepairRequests.value.forEach((r) => {
+    const sortTime = parseRequestDateForSort(r.requestDate) || 0
+    list.push({
+      uid: 'r-' + r.id,
+      type: 'repair',
+      sortTime,
+      displayDate: r.requestDate || '-',
+      user: r.reporterName || r.tester || '-',
+      machine: [r.equipment, r.room].filter(Boolean).join(' ') || '-',
+      typeLabel: 'แจ้งซ่อม',
+      status: r.statusText || '-',
+      statusClass: (r.statusText === 'ดำเนินการแล้ว') ? 'success' : 'warning',
+      detail: r.detail || '',
+      remarks: r.remarks || '',
+      jsonPreview: '',
+      raw: r,
+      canPrint: false,
+      machineId: null,
+    })
+  })
+  list.sort((a, b) => b.sortTime - a.sortTime)
+  return list
 })
 
-const openDetail = (item) => {
-  modal.value.data = item
-  modal.value.open = true
+function getChecklistStatus(r) {
+  try {
+    const parsed = r.jsonData ? JSON.parse(r.jsonData) : {}
+    if (parsed.summaryResult) return parsed.summaryResult
+    if (Array.isArray(parsed.checklist)) {
+      const hasFail = parsed.checklist.some((x) => (x.result || '').toLowerCase() === 'fail')
+      return hasFail ? 'Fail' : 'Pass'
+    }
+  } catch (_) {}
+  return '-'
 }
 
-const searchHistory = () => {
-  console.log('ค้นหาด้วย filter:', filters.value)
+const historyFiltered = computed(() => {
+  let list = historyUnified.value
+  if (historyFilters.value.type === 'checklist') list = list.filter((x) => x.type === 'checklist')
+  if (historyFilters.value.type === 'repair') list = list.filter((x) => x.type === 'repair')
+  if (historyFilters.value.machine) {
+    const mid = historyFilters.value.machine.replace('machine-', '')
+    const m = historyMachines.value.find((x) => String(x.id) === mid)
+    if (m) {
+      const name = (m.machineName || '').trim()
+      const room = (m.room || '').trim()
+      list = list.filter((x) => {
+        const raw = x.raw
+        if (x.type === 'checklist') return (raw.machineName || '').trim() === name && (raw.room || '').trim() === room
+        return (raw.equipment || '').trim() === name && (raw.room || '').trim() === room
+      })
+    }
+  }
+  if (historyFilters.value.dateFrom) {
+    const tFrom = new Date(historyFilters.value.dateFrom).getTime()
+    list = list.filter((x) => x.sortTime >= tFrom)
+  }
+  if (historyFilters.value.dateTo) {
+    const tTo = new Date(historyFilters.value.dateTo).getTime() + 86400000
+    list = list.filter((x) => x.sortTime <= tTo)
+  }
+  if (historyFilters.value.search && historyFilters.value.search.trim()) {
+    const q = historyFilters.value.search.trim().toLowerCase()
+    list = list.filter((x) =>
+      (x.user || '').toLowerCase().includes(q) ||
+      (x.machine || '').toLowerCase().includes(q) ||
+      (x.typeLabel || '').toLowerCase().includes(q) ||
+      (x.detail || '').toLowerCase().includes(q) ||
+      (x.status || '').toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+const historyTotalPages = computed(() => Math.max(1, Math.ceil(historyFiltered.value.length / HISTORY_PAGE_SIZE)))
+const paginatedHistory = computed(() => {
+  const list = historyFiltered.value
+  const start = (historyPage.value - 1) * HISTORY_PAGE_SIZE
+  return list.slice(start, start + HISTORY_PAGE_SIZE)
+})
+const historyPaginationSummary = computed(() => {
+  const total = historyFiltered.value.length
+  if (total === 0) return 'ไม่มีรายการ'
+  const start = (historyPage.value - 1) * HISTORY_PAGE_SIZE + 1
+  const end = Math.min(historyPage.value * HISTORY_PAGE_SIZE, total)
+  return `แสดง ${start}–${end} จาก ${total} รายการ`
+})
+
+const historyModal = ref({ open: false, data: null })
+
+function openHistoryDetail(item) {
+  historyModal.value.data = item
+  historyModal.value.open = true
 }
 
-const nextPage = () => {
-  page.value++
+function applyHistoryFilters() {
+  historyPage.value = 1
 }
 
-const prevPage = () => {
-  if (page.value > 1) page.value--
+function clearHistoryFilters() {
+  historyFilters.value = { type: '', machine: '', dateFrom: '', dateTo: '', search: '' }
+  historyPage.value = 1
 }
+
+function getMachineQueryFromRow(row) {
+  if (!row.machineName && !row.room) return ''
+  const m = historyMachines.value.find(
+    (mach) =>
+      (mach.machineName || '').trim() === (row.machineName || '').trim() &&
+      (mach.room || '').trim() === (row.room || '').trim()
+  )
+  return m ? 'machine-' + m.id : (row.machineName || '')
+}
+
+function goToHistoryPrint(item) {
+  if (item.type !== 'checklist' || !item.raw) return
+  const row = item.raw
+  const routeName = formTypeToRoute[row.formType]
+  if (!routeName) {
+    alert('ไม่พบแบบฟอร์มสำหรับรายการนี้')
+    return
+  }
+  const machineQuery = getMachineQueryFromRow(row)
+  router.push({
+    name: routeName,
+    query: { id: row.id, machine: machineQuery, date: row.checkDate || '' },
+  })
+}
+
+function closeModalAndPrint() {
+  const data = historyModal.value.data
+  if (data) goToHistoryPrint(data)
+  historyModal.value.open = false
+}
+
+async function loadHistoryData() {
+  historyLoading.value = true
+  try {
+    const [resMachines, resChecklist, resRepair] = await Promise.all([
+      fetch(API_BASE + '/GetAllMachines'),
+      fetch(API_BASE + '/GetAllChecklistRecords'),
+      fetch(API_BASE + '/GetAllRepairRequests'),
+    ])
+    historyMachines.value = resMachines.ok ? (await resMachines.json()) || [] : []
+    const checklistData = resChecklist.ok ? await resChecklist.json() : []
+    historyChecklistRecords.value = Array.isArray(checklistData) ? checklistData : []
+    const repairData = resRepair.ok ? await resRepair.json() : []
+    historyRepairRequests.value = Array.isArray(repairData) ? repairData : []
+  } catch (e) {
+    console.error('Load history error:', e)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+watch(
+  () => [historyFilters.value.type, historyFilters.value.machine, historyFilters.value.dateFrom, historyFilters.value.dateTo, historyFilters.value.search],
+  () => { historyPage.value = 1 }
+)
 </script>
 
 <style scoped>
@@ -1094,6 +1342,109 @@ const prevPage = () => {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+.panel-sub {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  font-weight: 400;
+}
+
+.history-type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-form {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.badge-repair {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tag-status {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tag-status.tag-success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.tag-status.tag-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tag-status.tag-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.history-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--text-secondary, #64748b);
+}
+
+.history-pagination-summary {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.history-pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-info {
+  font-size: 0.85rem;
+  color: var(--text-main, #0f172a);
+}
+
+.history-btn-outline {
+  background: transparent !important;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.history-btn-outline:hover {
+  background: #f8fafc !important;
+  color: #0f172a;
+}
+
+.history-select {
+  min-width: 180px;
+}
+
+.modal-card-wide {
+  max-width: 560px;
+}
+
+.modal-body-inner {
+  margin-bottom: 16px;
+}
+
+.modal-body-inner p {
+  margin-bottom: 8px;
+}
+
+.history-date {
+  white-space: nowrap;
 }
 
 .panel-body {

@@ -101,9 +101,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="reason in reasons" :key="reason.code">
+            <tr v-for="(reason, idx) in reasons" :key="reason.code">
               <td class="align-left">
-                {{ reason.code }} {{ reason.text }}
+                {{ reason.code }} {{ reason.text }}{{ reason.code === '9.' && formData.otherText ? ' (' + formData.otherText + ')' : '' }}
               </td>
               <td class="align-center">
                 {{ reason.count }}
@@ -132,13 +132,13 @@
           </tbody>
         </table>
 
-        <!-- ข้อเสนอแนะ: เส้นจุด 3 บรรทัด -->
+        <!-- ข้อเสนอแนะ: แสดง remark จาก jsonData -->
         <div class="comment-block">
           <div class="comment-title">
             ข้อเสนอแนะ....................................................................................................................................
           </div>
           <div class="comment-dot-line">
-            ........................................................................................................................................................
+            {{ formData.remark || '........................................................................................' }}
           </div>
           <div class="comment-dot-line">
             ........................................................................................................................................................
@@ -184,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -202,18 +202,49 @@ const header = ref({
   previousRepeatRate: ""
 });
 
-// ตารางสาเหตุ (1–9) + จำนวนครั้ง (ตามข้อความใหม่)
-const reasons = ref([
-  { code: "1.", text: "การจัดท่าผู้ป่วย (Positioning)", count: "" },
-  { code: "2.", text: "ปริมาณรังสีที่ไม่เหมาะสม (Exposure error)", count: "" },
-  { code: "3.", text: "ความผิดพลาดของกริด (Grid error)", count: "" },
-  { code: "4.", text: "ความผิดพลาดของระบบ (System error)", count: "" },
-  { code: "5.", text: "สิ่งแปลกปลอมในภาพ* (Artifact)", count: "" },
-  { code: "6.", text: "การเคลื่อนไหวของผู้ป่วย (Patient motion)", count: "" },
-  { code: "7.", text: "การทดสอบภาพ (Test image)", count: "" },
-  { code: "8.", text: "ยกเลิกเคส (Study canceled)", count: "" },
-  { code: "9.", text: "อื่นๆ", count: "" }
-]);
+// โครงสร้าง jsonData ตัวอย่าง: { reason, otherText, remark }
+const formData = ref({
+  reason: "",
+  otherText: "",
+  remark: ""
+});
+
+// รหัส reason จาก jsonData → ดัชนีแถว (0–8)
+const REASON_CODE_TO_INDEX = {
+  positioning: 0,
+  exposureError: 1,
+  gridError: 2,
+  systemError: 3,
+  artifact: 4,
+  patientMotion: 5,
+  testImage: 6,
+  studyCanceled: 7,
+  other: 8
+};
+
+// ตารางสาเหตุ (1–9) + จำนวนครั้ง
+const reasonRows = [
+  { code: "1.", text: "การจัดท่าผู้ป่วย (Positioning)", key: "positioning" },
+  { code: "2.", text: "ปริมาณรังสีที่ไม่เหมาะสม (Exposure error)", key: "exposureError" },
+  { code: "3.", text: "ความผิดพลาดของกริด (Grid error)", key: "gridError" },
+  { code: "4.", text: "ความผิดพลาดของระบบ (System error)", key: "systemError" },
+  { code: "5.", text: "สิ่งแปลกปลอมในภาพ* (Artifact)", key: "artifact" },
+  { code: "6.", text: "การเคลื่อนไหวของผู้ป่วย (Patient motion)", key: "patientMotion" },
+  { code: "7.", text: "การทดสอบภาพ (Test image)", key: "testImage" },
+  { code: "8.", text: "ยกเลิกเคส (Study canceled)", key: "studyCanceled" },
+  { code: "9.", text: "อื่นๆ", key: "other" }
+];
+
+// แถวสาเหตุ + จำนวนครั้ง (ตาม formData.reason จาก jsonData)
+const reasons = computed(() => {
+  const selected = String(formData.value.reason || "").trim();
+  const idx = REASON_CODE_TO_INDEX[selected];
+  return reasonRows.map((r, i) => ({
+    code: r.code,
+    text: r.text,
+    count: idx === i ? 1 : ""
+  }));
+});
 
 // ส่วนสรุป (ใช้ในแถวท้ายตาราง)
 const summary = ref({
@@ -234,25 +265,47 @@ function handlePrint() {
 
 const API_BASE = '/api/Xraycare';
 
-// โหลดข้อมูลจริงจาก backend
+/** อ่าน jsonData ตัวอย่าง: { reason, otherText, remark } และรองรับ header/reasons/summary แบบเก่า */
+function applyRecordData(data) {
+  if (!data) return;
+  if (data.checkDate) header.value.fromDate = data.checkDate;
+  if (data.tester) header.value.recorder = data.tester;
+  if (data.room) header.value.room = data.room;
+
+  const raw = data.jsonData;
+  if (raw === undefined || raw === null) return;
+  try {
+    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (parsed.reason !== undefined) formData.value.reason = parsed.reason;
+    if (parsed.otherText !== undefined) formData.value.otherText = parsed.otherText;
+    if (parsed.remark !== undefined) formData.value.remark = parsed.remark;
+    if (parsed.header && typeof parsed.header === "object") Object.assign(header.value, parsed.header);
+    if (Array.isArray(parsed.reasons)) {
+      const withCountIndex = parsed.reasons.findIndex((x) => x.count != null && x.count !== "");
+      if (withCountIndex >= 0 && reasonRows[withCountIndex]) formData.value.reason = reasonRows[withCountIndex].key;
+    }
+    if (parsed.summary && typeof parsed.summary === "object") Object.assign(summary.value, parsed.summary);
+    if (parsed.footer && typeof parsed.footer === "object") Object.assign(footer.value, parsed.footer);
+  } catch (_) {}
+}
+
 onMounted(async () => {
   const id = route.query.id || route.params.id;
+  const stateRecord = history.state?.record;
+
+  if (stateRecord && (stateRecord.formType === "F12" || stateRecord.jsonData)) {
+    applyRecordData(stateRecord);
+    return;
+  }
+
   if (!id) return;
   try {
     const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`);
     if (!res.ok) return;
     const data = await res.json();
-    if (data.jsonData) {
-      try {
-        const parsed = JSON.parse(data.jsonData);
-        if (parsed.header && typeof parsed.header === 'object') Object.assign(header.value, parsed.header);
-        if (Array.isArray(parsed.reasons)) reasons.value = parsed.reasons;
-        if (parsed.summary && typeof parsed.summary === 'object') Object.assign(summary.value, parsed.summary);
-        if (parsed.footer && typeof parsed.footer === 'object') Object.assign(footer.value, parsed.footer);
-      } catch (_) {}
-    }
+    applyRecordData(data);
   } catch (e) {
-    console.error('Load checklist record error:', e);
+    console.error("Load checklist record error:", e);
   }
 });
 </script>
