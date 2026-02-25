@@ -110,10 +110,10 @@
                 </tr>
                 <tr
                   v-else
-                  v-for="(row, idx) in filteredRecords"
+                  v-for="(row, idx) in paginatedRecords"
                   :key="row.id"
                 >
-                  <td>{{ idx + 1 }}</td>
+                  <td>{{ getSeqOnPage(idx) }}</td>
                   <td>{{ getFormTypeLabel(row.formType) }}</td>
                   <td>{{ row.machineName || '-' }}</td>
                   <td>{{ row.room || '-' }}</td>
@@ -131,6 +131,93 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div v-if="!loadingRecords && filteredRecords.length > 0" class="pagination-wrap">
+            <div class="pagination-summary">{{ paginationSummary }}</div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn pagination-prev"
+                :disabled="currentPage <= 1"
+                aria-label="หน้าก่อน"
+                @click="goToPage(currentPage - 1)"
+              >
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <div class="pagination-pages">
+                <template v-for="p in visiblePageNumbers" :key="p">
+                  <span v-if="p === '...'" class="pagination-ellipsis">…</span>
+                  <button
+                    v-else
+                    type="button"
+                    class="pagination-btn pagination-num"
+                    :class="{ active: p === currentPage }"
+                    @click="goToPage(p)"
+                  >
+                    {{ p }}
+                  </button>
+                </template>
+              </div>
+              <button
+                type="button"
+                class="pagination-btn pagination-next"
+                :disabled="currentPage >= totalPages"
+                aria-label="หน้าถัดไป"
+                @click="goToPage(currentPage + 1)"
+              >
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export รายเดือน (F1 / F2) -->
+      <div class="table-section-wrapper monthly-export-section">
+        <div class="table-section-header">
+          <span class="table-section-title">Export PDF รายเดือน (F1 / F2)</span>
+        </div>
+        <div class="table-panel monthly-export-panel">
+          <div class="filter-bar monthly-export-bar">
+            <div class="filter-group">
+              <label>แบบฟอร์ม</label>
+              <select v-model="monthlyFormType" class="filter-select">
+                <option value="">-- เลือกแบบฟอร์ม --</option>
+                <option value="F1_MONTHLY">F1 : การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ (รายเดือน)</option>
+                <option value="F2_MONTHLY">F2 : การลบแผ่นเพลท (รายเดือน)</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>เดือน / ปี</label>
+              <input
+                v-model="monthlyMonth"
+                type="month"
+                class="filter-input monthly-month-input"
+              />
+            </div>
+            <div class="filter-group">
+              <label>เครื่อง X-ray</label>
+              <select v-model="monthlyMachine" class="filter-select">
+                <option value="">ทั้งหมด</option>
+                <option
+                  v-for="(label, value) in machineOptions"
+                  :key="value"
+                  :value="value"
+                >
+                  {{ label }}
+                </option>
+              </select>
+            </div>
+            <button
+              type="button"
+              class="btn-export-monthly"
+              :disabled="!monthlyFormType || !monthlyMonth"
+              @click="goToMonthlyPrint"
+            >
+              ส่งออก PDF รายเดือน
+            </button>
           </div>
         </div>
       </div>
@@ -216,6 +303,12 @@ const currentMonthYear = computed(() => {
 
 // ---------- X-ray machine options (โหลดจาก API) ----------
 const machines = ref([])
+// Export รายเดือน (F1/F2)
+const monthlyFormType = ref('')
+const monthlyMachine = ref('')
+const _dm = new Date()
+const monthlyMonth = ref(`${_dm.getFullYear()}-${String(_dm.getMonth() + 1).padStart(2, '0')}`)
+
 const machineOptions = computed(() => {
   const opts = {}
   machines.value.forEach(m => {
@@ -227,6 +320,8 @@ const machineOptions = computed(() => {
 })
 
 // ---------- ตารางรายการบันทึก Checklist ----------
+const PAGE_SIZE = 20
+const currentPage = ref(1)
 const checklistRecords = ref([])
 const loadingRecords = ref(false)
 const filterMachine = ref('')
@@ -383,6 +478,47 @@ const filteredRecords = computed(() => {
   return list
 })
 
+const totalRecords = computed(() => filteredRecords.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalRecords.value / PAGE_SIZE)))
+const paginatedRecords = computed(() => {
+  const list = filteredRecords.value
+  const start = (currentPage.value - 1) * PAGE_SIZE
+  return list.slice(start, start + PAGE_SIZE)
+})
+const paginationSummary = computed(() => {
+  const total = totalRecords.value
+  if (total === 0) return 'ไม่มีรายการ'
+  const start = (currentPage.value - 1) * PAGE_SIZE + 1
+  const end = Math.min(currentPage.value * PAGE_SIZE, total)
+  return `แสดง ${start}–${end} จาก ${total} รายการ`
+})
+
+const visiblePageNumbers = computed(() => {
+  const total = totalPages.value
+  const cur = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = []
+  if (cur <= 4) {
+    for (let i = 1; i <= Math.min(5, total); i++) pages.push(i)
+    if (total > 5) pages.push('...', total)
+  } else if (cur >= total - 3) {
+    pages.push(1, '...')
+    for (let i = total - 4; i <= total; i++) if (i > 1) pages.push(i)
+  } else {
+    pages.push(1, '...', cur - 1, cur, cur + 1, '...', total)
+  }
+  return pages
+})
+
+function getSeqOnPage(idx) {
+  return (currentPage.value - 1) * PAGE_SIZE + idx + 1
+}
+
+function goToPage(page) {
+  const p = Math.max(1, Math.min(page, totalPages.value))
+  currentPage.value = p
+}
+
 function getFormTypeLabel(formType) {
   return formTypeToLabel[formType] || formType || '-'
 }
@@ -392,7 +528,12 @@ function clearTableFilters() {
   filterFormType.value = ''
   filterDateFrom.value = ''
   filterDateTo.value = ''
+  currentPage.value = 1
 }
+
+watch([filterMachine, filterFormType, filterDateFrom, filterDateTo], () => {
+  currentPage.value = 1
+})
 
 async function loadChecklistRecords() {
   loadingRecords.value = true
@@ -865,6 +1006,22 @@ const goToXrayPrint = () => {
     },
   })
 }
+
+// ส่งออก PDF รายเดือน (F1 หรือ F2) — เปิดหน้า print ตามเดือนที่เลือก
+function goToMonthlyPrint() {
+  if (!monthlyFormType.value || !monthlyMonth.value) {
+    alert('กรุณาเลือกแบบฟอร์มและเดือน/ปี')
+    return
+  }
+  const routeName = monthlyFormType.value === 'F1_MONTHLY' ? 'XrayF1PrintMonthly' : 'XrayF2PrintMonthly'
+  router.push({
+    name: routeName,
+    query: {
+      month: monthlyMonth.value,
+      machine: monthlyMachine.value || undefined,
+    },
+  })
+}
 </script>
 
 <style scoped>
@@ -1293,6 +1450,41 @@ select::-ms-expand {
   box-shadow: 0 2px 8px rgba(108,60,224,0.35);
 }
 
+/* ---------- Export รายเดือน ---------- */
+.monthly-export-section .filter-bar.monthly-export-bar {
+  grid-template-columns: 1fr 1fr 1fr auto;
+  align-items: end;
+}
+
+.monthly-month-input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.9rem;
+  min-width: 140px;
+}
+
+.btn-export-monthly {
+  padding: 10px 20px;
+  border-radius: var(--radius-md, 12px);
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-export-monthly:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.btn-export-monthly:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---------- ตารางรายการบันทึก Checklist ---------- */
 .table-section-wrapper {
   max-width: 960px;
@@ -1424,6 +1616,95 @@ select::-ms-expand {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Pagination ---------- */
+.pagination-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft, #e2e8f0);
+}
+
+.pagination-summary {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #475569);
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: var(--radius-md, 10px);
+  background: #fff;
+  color: var(--text-main, #0f172a);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagination-btn.pagination-num.active {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.pagination-btn.pagination-num.active:hover {
+  filter: brightness(1.05);
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #64748b);
+}
+
+@media (max-width: 560px) {
+  .pagination-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .pagination-controls {
+    justify-content: center;
+  }
 }
 
 .records-table {

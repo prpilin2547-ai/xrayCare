@@ -18,8 +18,8 @@
     </button>
     </div>
 
-    <!-- แผ่น A4 -->
-    <div class="sheet-inner">
+    <!-- แผ่น A4 (เนื้อหายาวให้ต่อหลายหน้า) -->
+    <div class="sheet-inner sheet-inner--flow">
         <!-- ===== หัวฟอร์ม ===== -->
         <div class="header-main align-with-table">
         <div class="title-main">
@@ -28,41 +28,41 @@
         </div>
 
 
-        <!-- ข้อมูลเครื่อง / ผู้ตรวจ -->
+        <!-- ข้อมูลเครื่อง / ผู้ตรวจ (จาก jsonData.deviceForm) -->
         <div class="machine-block">
           <div class="machine-row">
-            ยี่ห้อ <span class="underline long"></span>
-            รุ่น <span class="underline long"></span>
-            ผู้ตรวจสอบ <span class="underline long"></span>
+            ยี่ห้อ <span class="underline long">{{ formData.deviceForm.machineName || '' }}</span>
+            รุ่น <span class="underline long">{{ formData.deviceForm.model || '' }}</span>
+            ผู้ตรวจสอบ <span class="underline long">{{ formData.deviceForm.tester || '' }}</span>
           <br>
           </div>
           <div class="machine-row">
-            แผนก/กลุ่มงาน <span class="underline long"></span>
+            แผนก/กลุ่มงาน <span class="underline long">{{ formData.deviceForm.department || '' }}</span>
             อุณหภูมิห้อง <span class="underline long"></span>
             ความชื้นห้อง <span class="underline long"></span>
           <br>
-          </div> 
+          </div>
           <div class="machine-row">
-            Probe ชนิด <span class="underline long"></span>
-            ความถี่ <span class="underline long"></span>
-            Phantom <span class="underline long"></span>
+            Probe ชนิด <span class="underline long">{{ formData.deviceForm.probeType || formData.deviceForm.probeOther || '' }}</span>
+            ความถี่ <span class="underline long">{{ formData.deviceForm.frequencyMHz != null ? formData.deviceForm.frequencyMHz + ' MHz' : '' }}</span>
+            Phantom <span class="underline long">{{ formData.deviceForm.phantom || '' }}</span>
           <br>
           </div>
           <div class="machine-row">
-            Power <span class="underline long"></span>
-            TGC <span class="underline long"></span>
-            Gain <span class="underline long"></span>
+            Power <span class="underline long">{{ formData.deviceForm.power || '' }}</span>
+            TGC <span class="underline long">{{ formData.deviceForm.tgc || '' }}</span>
+            Gain <span class="underline long">{{ formData.deviceForm.gain || '' }}</span>
           </div>
         </div>
 
         <table class="qc-table">
   <thead>
   <tr class="force-left">
-    <th>Test Date</th>
+    <th>{{ formatDate(formData.deviceForm.testDate) || 'Test Date' }}</th>
     <th>baseline</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>{{ formData.testData.testDates?.date1 ?? '' }}</th>
+    <th>{{ formData.testData.testDates?.date2 ?? '' }}</th>
+    <th>{{ formData.testData.testDates?.date3 ?? '' }}</th>
     <th>Action level</th>
     <th>Defect level</th>
   </tr>
@@ -78,10 +78,10 @@
 
 <tr>
   <td>Vertical band (y/n)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.imageUniformity?.verticalBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.vertical1 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.vertical2 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.vertical3 ?? '' }}</td>
 
   <!-- คอลัมน์ 6 : Action level (ผสานแถว 3–4) -->
   <td rowspan="2">
@@ -99,24 +99,28 @@
 
 <tr>
   <td>Horizontal band (y/n)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.imageUniformity?.horizontalBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.horizontal1 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.horizontal2 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.horizontal3 ?? '' }}</td>
   <!-- ❌ ไม่ต้องมี td คอลัมน์ 6 และ 7 -->
 </tr>
 
 <tr>
   <td>Artifacts (y/n)</td>
-  <td></td><td></td><td></td><td></td><td></td><td></td>
+  <td>{{ formData.testData.imageUniformity?.artifactsBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.artifacts1 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.artifacts2 ?? '' }}</td>
+  <td>{{ formData.testData.imageUniformity?.artifacts3 ?? '' }}</td>
+  <td></td><td></td>
 </tr>
 
 <tr>
   <td><strong>Depth of Penetration (cm)</strong></td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.depthPenetration?.baseline ?? '' }}</td>
+  <td>{{ formData.testData.depthPenetration?.col1 ?? '' }}</td>
+  <td>{{ formData.testData.depthPenetration?.col2 ?? '' }}</td>
+  <td>{{ formData.testData.depthPenetration?.col3 ?? '' }}</td>
 
   <!-- คอลัมน์ที่ 6 : Action level -->
   <td>± 6 mm</td>
@@ -129,17 +133,17 @@
 <tr>
   <td colspan="7" style="text-align:left;">
   <strong>Vertical Distance Accuracy</strong>
-  Actual distance………………………….mm
+  Actual distance {{ formData.testData.verticalDistance?.actualDistance ?? '………………………….' }} mm
 </td>
 </tr>
 
 
 <tr>
   <td>(Pin 1-3) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.verticalDistance?.pin13Baseline ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin131 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin132 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin133 ?? '' }}</td>
 
   <!-- คอลัมน์ที่ 6 : Action level (rowspan 3) -->
   <td rowspan="3">± 1.5 mm or 1.5%</td>
@@ -151,20 +155,20 @@
 
 <tr>
   <td>(Pin 3-5) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.verticalDistance?.pin35Baseline ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin351 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin352 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin353 ?? '' }}</td>
   <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
 </tr>
 
 
 <tr>
   <td>(Pin 6-8) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.verticalDistance?.pin68Baseline ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin681 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin682 ?? '' }}</td>
+  <td>{{ formData.testData.verticalDistance?.pin683 ?? '' }}</td>
   <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
 </tr>
 
@@ -172,17 +176,17 @@
 <tr>
   <td colspan="7" style="text-align:left;">
     <strong>Horizontal Distance Accuracy</strong>
-    Actual distance………………………….mm
+    Actual distance {{ formData.testData.horizontalDistance?.actualDistance ?? '………………………….' }} mm
   </td>
 </tr>
 
 
 <tr>
   <td>(Near) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.horizontalDistance?.nearBaseline ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.near1 ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.near2 ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.near3 ?? '' }}</td>
 
   <!-- คอลัมน์ 6 -->
   <td rowspan="2">± 2.0 mm or 2%</td>
@@ -193,10 +197,10 @@
 
 <tr>
   <td>(Far) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.horizontalDistance?.farBaseline ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.far1 ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.far2 ?? '' }}</td>
+  <td>{{ formData.testData.horizontalDistance?.far3 ?? '' }}</td>
 </tr>
 
 
@@ -204,16 +208,16 @@
 <tr>
   <td colspan="7" style="text-align:left;">
     <strong>Lateral Resolution</strong>
-    Pin depth: Near=………..… mm, Mid=………..…… mm, Far=…..……… mm
+    Pin depth: Near={{ formData.testData.lateralResolution?.pinDepthNear ?? '………..…' }} mm, Mid={{ formData.testData.lateralResolution?.pinDepthMid ?? '………..……' }} mm, Far={{ formData.testData.lateralResolution?.pinDepthFar ?? '…..………' }} mm
   </td>
 </tr>
 
 <tr>
   <td>(Near) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.lateralResolution?.nearBaseline ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.near1 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.near2 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.near3 ?? '' }}</td>
 
   <!-- ผสานคอลัมน์ 6–7 และแถว 15–17 -->
   <td colspan="2" rowspan="3">
@@ -226,20 +230,20 @@
 
 <tr>
   <td>(Mid) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.lateralResolution?.midBaseline ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.mid1 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.mid2 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.mid3 ?? '' }}</td>
   <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
 </tr>
 
 
 <tr>
   <td>(Far) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.lateralResolution?.farBaseline ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.far1 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.far2 ?? '' }}</td>
+  <td>{{ formData.testData.lateralResolution?.far3 ?? '' }}</td>
   <!-- ❌ ไม่ต้องมี td คอลัมน์ 6–7 -->
 </tr>
 
@@ -251,10 +255,10 @@
 
 <tr>
   <td>(Near) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.axialResolution?.nearBaseline ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.near1 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.near2 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.near3 ?? '' }}</td>
 
   <!-- ผสานคอลัมน์ 6–7 และแถว 19–21 -->
   <td colspan="2" rowspan="3">
@@ -267,20 +271,20 @@
 
 <tr>
   <td>(Mid) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.axialResolution?.midBaseline ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.mid1 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.mid2 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.mid3 ?? '' }}</td>
   <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
 </tr>
 
 
 <tr>
   <td>(Far) Measured (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.axialResolution?.farBaseline ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.far1 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.far2 ?? '' }}</td>
+  <td>{{ formData.testData.axialResolution?.far3 ?? '' }}</td>
   <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
 </tr>
 
@@ -288,17 +292,17 @@
 <tr>
   <td colspan="7" style="text-align:left;">
     <strong>Image Geometry (Cyst Imaging)</strong>
-    Actual diameter………………….mm
+    Actual diameter {{ formData.testData.imageGeometry?.actualDiameter ?? '……………….' }} mm
   </td>
 </tr>
 
 <tr>
   <td>(Near) Cyst: Height / Width<br>
       Image quality (normal/noise)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.imageGeometry?.nearCystBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.nearCyst1 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.nearCyst2 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.nearCyst3 ?? '' }}</td>
 
   <!-- ผสานคอลัมน์ 6–7 และแถว 23–25 -->
   <td colspan="2" rowspan="3">
@@ -311,10 +315,10 @@
 <tr>
   <td>(Mid) Cyst: Height / Width<br>
       Image quality (normal/noise)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.imageGeometry?.midCystBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.midCyst1 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.midCyst2 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.midCyst3 ?? '' }}</td>
   <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
 </tr>
 
@@ -322,10 +326,10 @@
 <tr>
   <td>(Far) Cyst: Height / Width<br>
       Image quality (normal/noise)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.imageGeometry?.farCystBaseline ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.farCyst1 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.farCyst2 ?? '' }}</td>
+  <td>{{ formData.testData.imageGeometry?.farCyst3 ?? '' }}</td>
   <!-- ❌ ไม่มี td คอลัมน์ 6–7 -->
 </tr>
 
@@ -338,10 +342,10 @@
 
 <tr>
   <td>Dead zone (mm)</td>
-  <td></td>
-  <td></td>
-  <td></td>
-  <td></td>
+  <td>{{ formData.testData.grayScale?.deadZone ?? '' }}</td>
+  <td>{{ formData.testData.grayScale?.deadZone1 ?? '' }}</td>
+  <td>{{ formData.testData.grayScale?.deadZone2 ?? '' }}</td>
+  <td>{{ formData.testData.grayScale?.deadZone3 ?? '' }}</td>
 
   <!-- ผสานคอลัมน์ที่ 6 และ 7 -->
   <td colspan="2">
@@ -364,159 +368,24 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// ข้อมูลหัวฟอร์ม (จะถูกแทนที่ด้วยข้อมูลจากฐาน)
-const header = ref({
-  frequencyLabel: 'ตามกำหนดการ QC',
-  probeInfo: '',
-  phantom: '',
-  power: '',
-  tgc: '',
-  gain: '',
-  testDate: ''
+// โครงสร้าง jsonData ตัวอย่าง: deviceForm, testData, summary
+const formData = ref({
+  deviceForm: {},
+  testData: { testDates: {}, imageUniformity: {}, depthPenetration: {}, verticalDistance: {}, horizontalDistance: {}, lateralResolution: {}, axialResolution: {}, imageGeometry: {}, grayScale: {} },
+  summary: {}
 })
 
-/**
- * ตารางหัวข้อทดสอบ
- * baseline / action / defect อันนี้ตั้งค่า default ให้เหมือนในฟอร์ม
- * ถ้าฐานข้อมูลคุณเก็บเป็น field แยก สามารถ map มาใส่แทนได้
- */
-const tests = ref([
-  // Image uniformity
-  {
-    id: 'image-uniformity',
-    isGroup: true,
-    label: 'Image Uniformity',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'iu-vertical',
-    label: 'Vertical band (ซ้าย–ขวา), Horizontal band (บน–ล่าง), Artifacts',
-    baseline: 'ไม่พบ band ผิดปกติเมื่อเทียบกับการตั้งค่าอ้างอิง',
-    actionLevel: 'ความแตกต่าง ≤ 4 dB หรือมี band เล็กน้อยจาก baseline',
-    defectLevel: 'ความแตกต่าง ≥ 6 dB หรือ band ชัดเจน ต้องส่งซ่อม'
-  },
-
-  // Depth of penetration
-  {
-    id: 'depth-group',
-    isGroup: true,
-    label: 'Depth of penetration',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'depth-row',
-    label: 'ความลึกการมองเห็นสูงสุดที่ยังเห็นโครงสร้างได้ชัดเจน',
-    baseline: 'ค่าความลึกจากการทดสอบครั้งแรก (Baseline)',
-    actionLevel: 'แตกต่างจาก baseline ≤ 6 mm',
-    defectLevel: 'แตกต่างจาก baseline ≥ 10 mm'
-  },
-
-  // Vertical distance accuracy
-  {
-    id: 'vda-group',
-    isGroup: true,
-    label: 'Vertical distance accuracy',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'vda-rows',
-    label: 'วัดจากตำแหน่ง pin ในแนวตั้ง (เช่น Pin 1–3, 3–5, 6–8)',
-    baseline: 'ค่าระยะห่างตามที่ phantom กำหนด',
-    actionLevel: 'ความคลาดเคลื่อน ±1.5 mm หรือ 1.5%',
-    defectLevel: 'ความคลาดเคลื่อน ≥2 mm หรือ ≥2%'
-  },
-
-  // Horizontal distance accuracy
-  {
-    id: 'hda-group',
-    isGroup: true,
-    label: 'Horizontal distance accuracy',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'hda-rows',
-    label: 'วัดจากตำแหน่ง pin ในแนวนอน (Near / Far)',
-    baseline: 'ค่าระยะห่างตามที่ phantom กำหนด',
-    actionLevel: 'ความคลาดเคลื่อน ±2.0 mm หรือ 2%',
-    defectLevel: 'ความคลาดเคลื่อน ≥3.0 mm หรือ 3%'
-  },
-
-  // Lateral resolution
-  {
-    id: 'lat-group',
-    isGroup: true,
-    label: 'Lateral resolution',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'lat-rows',
-    label: 'ประเมินความสามารถแยกวัตถุด้านข้างที่ระดับความลึกต่าง ๆ (Near / Mid / Far)',
-    baseline: 'ความกว้างของจุดทดสอบตามการทดสอบ baseline',
-    actionLevel: 'ค่ากว้างเพิ่มขึ้นเล็กน้อยเมื่อเทียบกับ baseline',
-    defectLevel: 'ค่ากว้างเพิ่มขึ้นชัดเจนจนกระทบต่อการวินิจฉัย'
-  },
-
-  // Axial resolution
-  {
-    id: 'ax-group',
-    isGroup: true,
-    label: 'Axial resolution',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'ax-rows',
-    label: 'การแยกวัตถุในแนวลึก (Near / Mid / Far)',
-    baseline: 'ค่าความละเอียดตาม baseline',
-    actionLevel: 'Action level : 1 mm',
-    defectLevel: 'Defect level : ≥2 mm'
-  },
-
-  // Image geometry
-  {
-    id: 'geo-group',
-    isGroup: true,
-    label: 'Image geometry (รูปทรงภาพ)',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'geo-row',
-    label: 'ตรวจสอบว่าภาพไม่เบี้ยว / ไม่ยืด / สัดส่วนความสูง–ความกว้างถูกต้อง',
-    baseline: 'ไม่มี distortion หรือเพียงเล็กน้อย',
-    actionLevel: 'เริ่มมี distortion แต่ยังไม่เกินเกณฑ์ (เช่น Height/Width ผิด ≤ 20%)',
-    defectLevel: 'ความผิดเพี้ยนชัดเจน เช่น Height/Width ผิด > 20%'
-  },
-
-  // No. of gray scale objects / Dead zone
-  {
-    id: 'gray-group',
-    isGroup: true,
-    label: 'No. of gray scale objects / Dead zone',
-    baseline: '',
-    actionLevel: '',
-    defectLevel: ''
-  },
-  {
-    id: 'gray-row',
-    label: 'ตรวจจำนวน step ของ gray scale ที่มองเห็น และ dead zone บริเวณใกล้ผิว phantom',
-    baseline: 'จำนวนบันไดระดับเทาและ dead zone ตาม baseline',
-    actionLevel: 'มีการเปลี่ยนแปลงเล็กน้อยแต่ยังอยู่ในเกณฑ์ยอมรับได้',
-    defectLevel: 'จำนวน step หายไปมากหรือ dead zone ลึกเกินเกณฑ์มาตรฐาน'
+function formatDate (val) {
+  if (val === undefined || val === null) return ''
+  const s = String(val).trim()
+  if (!s) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split('-')
+    const thaiYear = Number.parseInt(y, 10) + 543
+    return `${d}/${m}/${thaiYear}`
   }
-])
+  return s
+}
 
 function handlePrint () {
   window.print()
@@ -524,20 +393,31 @@ function handlePrint () {
 
 const API_BASE = '/api/Xraycare'
 
+function applyRecordData (data) {
+  if (!data) return
+  const raw = data.jsonData
+  if (raw === undefined || raw === null) return
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (parsed.deviceForm) formData.value.deviceForm = parsed.deviceForm
+    if (parsed.testData) formData.value.testData = { ...formData.value.testData, ...parsed.testData }
+    if (parsed.summary) formData.value.summary = parsed.summary
+  } catch (_) {}
+}
+
 onMounted(async () => {
   const id = route.query.id || route.params.id
+  const stateRecord = history.state?.record
+  if (stateRecord && (stateRecord.formType === 'F13' || stateRecord.jsonData)) {
+    applyRecordData(stateRecord)
+    return
+  }
   if (!id) return
   try {
     const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
-    if (data.jsonData) {
-      try {
-        const parsed = JSON.parse(data.jsonData)
-        if (parsed.header && typeof parsed.header === 'object') Object.assign(header.value, parsed.header)
-        if (Array.isArray(parsed.tests)) tests.value = parsed.tests
-      } catch (_) {}
-    }
+    applyRecordData(data)
   } catch (e) {
     console.error('Load checklist record error:', e)
   }
@@ -707,5 +587,8 @@ onMounted(async () => {
 
 @media print {
   .qc-table th, .qc-table td { border: 1px solid #000 !important; }
+  /* ให้ตารางและเนื้อหาสามารถแบ่งข้ามหน้า A4 ได้ */
+  .qc-table { page-break-inside: auto; }
+  .sheet-inner--flow { overflow: visible !important; }
 }
 </style>

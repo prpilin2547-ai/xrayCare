@@ -68,17 +68,17 @@
 
           <tbody>
             <tr
-              v-for="(row, index) in record.rows"
-              :key="index"
+              v-for="(row, index) in examRows"
+              :key="'row-' + index"
             >
               <td class="align-left">
-                {{ row.region }}
+                {{ row.regionDisplay }}
               </td>
-              <td>{{ row.kv }}</td>
-              <td>{{ row.mas }}</td>
-              <td>{{ row.ftd }}</td>
-              <td>{{ row.tp }}</td>
-              <td>{{ row.bucky }}</td>
+              <td>{{ row.kv ?? '' }}</td>
+              <td>{{ row.mas ?? '' }}</td>
+              <td>{{ row.ftd ?? '' }}</td>
+              <td>{{ row.tp ?? '' }}</td>
+              <td>{{ row.bucky ?? '' }}</td>
             </tr>
           </tbody>
         </table>
@@ -105,23 +105,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 const record = ref({
-  id: route.params.id || null,
-  rows: [
-    { region: 'Chest PA',     kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'L-Spine AP',   kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'L-Spine LAT',  kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'Abdomen AP',   kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'Pelvis AP',    kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'Skull AP/PA',  kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: 'Skull LAT',    kv: '', mas: '', ftd: '', tp: '', bucky: '' },
-    { region: '',             kv: '', mas: '', ftd: '', tp: '', bucky: '' }
-  ]
+  id: null,
+  formA: {},
+  formC: {},
+  examRowsRaw: []
+})
+
+/** แถวตารางสำหรับแสดง (บริเวณฉายรังสี, kV, mAs, FTD, tₚ, Bucky) จาก jsonData.examRows */
+const examRows = computed(() => {
+  const raw = record.value.examRowsRaw
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return [
+      { regionDisplay: '', kv: '', mas: '', ftd: '', tp: '', bucky: '' },
+      { regionDisplay: '', kv: '', mas: '', ftd: '', tp: '', bucky: '' }
+    ]
+  }
+  return raw.map(row => ({
+    regionDisplay: row.regionResolved || row.region || row.regionOther || '',
+    kv: row.kv,
+    mas: row.mas,
+    ftd: row.ftd,
+    tp: row.tp,
+    bucky: row.bucky
+  }))
 })
 
 function handlePrint () {
@@ -130,20 +142,50 @@ function handlePrint () {
 
 const API_BASE = '/api/Xraycare'
 
+/** อ่าน jsonData แล้วใส่ formA, examRows, formC ตามโครงสร้างตัวอย่าง */
+function applyRecordData (data) {
+  if (!data) return
+  record.value.id = data.id ?? record.value.id
+
+  let raw = data.jsonData
+  if (raw === undefined || raw === null) return
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (parsed.formA) record.value.formA = parsed.formA
+    if (parsed.formC) record.value.formC = parsed.formC
+    if (Array.isArray(parsed.examRows)) {
+      record.value.examRowsRaw = parsed.examRows
+    } else if (Array.isArray(parsed.rows)) {
+      record.value.examRowsRaw = parsed.rows.map(r => ({
+        regionResolved: r.region,
+        region: r.region,
+        regionOther: r.regionOther || '',
+        kv: r.kv,
+        mas: r.mas,
+        ftd: r.ftd,
+        tp: r.tp,
+        bucky: r.bucky,
+        note: r.note
+      }))
+    }
+  } catch (_) {}
+}
+
 onMounted(async () => {
   const id = route.query.id || route.params.id
+  const stateRecord = history.state?.record
+
+  if (stateRecord && (stateRecord.formType === 'F11' || stateRecord.jsonData)) {
+    applyRecordData(stateRecord)
+    return
+  }
+
   if (!id) return
   try {
     const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
-    record.value.id = data.id ?? id
-    if (data.jsonData) {
-      try {
-        const parsed = JSON.parse(data.jsonData)
-        if (Array.isArray(parsed.rows)) record.value.rows = parsed.rows
-      } catch (_) {}
-    }
+    applyRecordData(data)
   } catch (e) {
     console.error('Load checklist record error:', e)
   }
