@@ -272,7 +272,12 @@ const isExactly3Months = computed(() => {
 })
 
 function goNext() {
-  router.push('/monthly-check')
+  const query = {}
+  if (selectedDevice.value?.name) {
+    query.equipmentName = selectedDevice.value.name
+    query.room = selectedDevice.value.room || ''
+  }
+  router.push({ path: '/monthly-check', query })
 }
 
 // checklist
@@ -366,14 +371,12 @@ function formTypeRoute(formType) {
   return FORM_TYPE_ROUTES[formType]?.path || null
 }
 
-/** สร้าง route ไปหน้าฟอร์ม (ส่งชื่อเครื่อง/ห้องไปด้วยเมื่อไป F7-F8 เพื่อให้แสดงเครื่องเดิม) */
+/** สร้าง route ไปหน้าฟอร์ม (ส่งชื่อเครื่อง/ห้องไปด้วยเพื่อให้ทุกหน้าถัดไปแสดงเครื่องเดิม) */
 function formTypeTo(formType) {
   const path = formTypeRoute(formType)
   if (!path) return null
   const q = { equipmentName: selectedDevice.value?.name || '', room: selectedDevice.value?.room || '' }
-  if (path === '/monthly-check-all' && q.equipmentName) {
-    return { path, query: q }
-  }
+  if (q.equipmentName) return { path, query: q }
   return path
 }
 
@@ -433,7 +436,7 @@ async function performSaveChecklist() {
   }
 }
 
-/** บันทึกแล้วไปหน้าถัดไป (เมื่อมีฟอร์มที่ต้องทำในวันเดียวกัน) */
+/** บันทึกแล้วไปหน้าถัดไป (เมื่อมีฟอร์มที่ต้องทำในวันเดียวกัน) — ส่งชื่อเครื่องไปด้วยเพื่อให้หน้าถัดไปแสดงเครื่องเดิม */
 async function goToNextForm() {
   await performSaveChecklist()
   const next = nextFormsAfterCurrent.value
@@ -447,7 +450,7 @@ async function goToNextForm() {
     return
   }
   const query = { formTypes: next.join(',') }
-  if (path === '/monthly-check-all' && selectedDevice.value?.name) {
+  if (selectedDevice.value?.name) {
     query.equipmentName = selectedDevice.value.name
     query.room = selectedDevice.value.room || ''
   }
@@ -506,7 +509,7 @@ const saveChecklist = async () => {
 
 .schedule-form-current {
   font-weight: 600;
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
 }
 
 .schedule-form-link {
@@ -540,10 +543,10 @@ const saveChecklist = async () => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 .content-panel {
@@ -664,14 +667,14 @@ const saveChecklist = async () => {
 }
 
 .btn-next {
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.35);
 }
 
 .btn-next:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108,60,224,0.45);
+  box-shadow: 0 4px 14px rgba(3,105,161,0.45);
 }
 
 .modal-backdrop {
@@ -745,8 +748,8 @@ const saveChecklist = async () => {
 }
 
 .input-textarea:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 
@@ -759,8 +762,8 @@ const saveChecklist = async () => {
 }
 
 .form-control:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 

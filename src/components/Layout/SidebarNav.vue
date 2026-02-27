@@ -6,12 +6,13 @@
     </Transition>
 
     <Transition name="slide">
-      <aside v-show="isVisible" class="sidebar" :class="{ 'sidebar-mobile': isMobileMode }">
+      <aside v-show="isVisible" class="sidebar" :class="{ 'sidebar-mobile': isMobileMode, 'sidebar-fill': !isMobileMode }">
         <nav class="menu">
-          <div class="menu-section">
+          <!-- MAIN section: Tech = all, Admin = all except Dashboard -->
+          <div v-if="showMain" class="menu-section">
             <span class="section-label">MAIN</span>
             <ul>
-              <li :class="{ active: active === 'dashboard' }" @click="handleNav('dashboard')">
+              <li v-if="!isAdmin" :class="{ active: active === 'dashboard' }" @click="handleNav('dashboard')">
                 <div class="menu-icon"><i class="fa-solid fa-house"></i></div>
                 <span>Dashboard</span>
               </li>
@@ -42,7 +43,8 @@
             </ul>
           </div>
 
-          <div class="menu-section">
+          <!-- ADMIN section: Admin only -->
+          <div v-if="isAdmin" class="menu-section">
             <span class="section-label">ADMIN</span>
             <ul>
               <li :class="{ active: active === 'admindashboard' }" @click="handleNav('admindashboard')">
@@ -60,10 +62,11 @@
             </ul>
           </div>
 
-          <div class="menu-section">
+          <!-- ENGINEER section: Engineer = all, Admin = all except Engineer Dashboard -->
+          <div v-if="showEngineer" class="menu-section">
             <span class="section-label">ENGINEER</span>
             <ul>
-              <li :class="{ active: active === 'engineerdashboard' }" @click="handleNav('engineerdashboard')">
+              <li v-if="!isAdmin" :class="{ active: active === 'engineerdashboard' }" @click="handleNav('engineerdashboard')">
                 <div class="menu-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
                 <span>Engineer Dashboard</span>
               </li>
@@ -101,8 +104,18 @@ const props = defineProps({
   open: {
     type: Boolean,
     default: false
+  },
+  role: {
+    type: String,
+    default: ''
   }
 })
+
+const normalizedRole = computed(() => (props.role || '').toLowerCase())
+const isAdmin = computed(() => normalizedRole.value === 'admin')
+const isEngineer = computed(() => normalizedRole.value === 'engineer')
+const showMain = computed(() => isAdmin.value || normalizedRole.value === 'radiological technologist')
+const showEngineer = computed(() => isAdmin.value || isEngineer.value)
 
 const emit = defineEmits(['navigate', 'close'])
 
@@ -137,11 +150,18 @@ function handleNav(menu) {
 <style scoped>
 .sidebar {
   width: var(--sidebar-w, 260px);
-  background: var(--bg-sidebar, #111827);
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-sidebar, #0F172A);
   display: flex;
   flex-direction: column;
   padding: 20px 12px 16px;
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+.sidebar-fill {
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar-mobile {
@@ -152,6 +172,7 @@ function handleNav(menu) {
   z-index: 200;
   padding-top: 20px;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  height: 100vh;
 }
 
 .sidebar-overlay {
@@ -164,6 +185,8 @@ function handleNav(menu) {
 
 .menu {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -221,8 +244,8 @@ function handleNav(menu) {
 }
 
 .menu li.active {
-  background: linear-gradient(135deg, rgba(108, 60, 224, 0.2), rgba(139, 92, 246, 0.12));
-  color: #c4b5fd;
+  background: linear-gradient(135deg, rgba(3, 105, 161, 0.22), rgba(14, 165, 233, 0.12));
+  color: #7DD3FC;
   font-weight: 600;
 }
 
@@ -234,16 +257,18 @@ function handleNav(menu) {
   bottom: 6px;
   width: 3px;
   border-radius: var(--radius-full, 9999px);
-  background: linear-gradient(180deg, #8b5cf6, #6c3ce0);
+  background: linear-gradient(180deg, #0EA5E9, #0369A1);
 }
 
 .menu li.active .menu-icon {
-  color: #a78bfa;
+  color: #38BDF8;
 }
 
 .sidebar-bottom {
+  flex-shrink: 0;
   margin-top: auto;
   padding-top: 16px;
+  padding-bottom: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 

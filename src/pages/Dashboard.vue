@@ -1072,8 +1072,8 @@ onMounted(async () => {
 }
 
 .icon-purple {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #7c3aed;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0284C7;
 }
 
 .icon-orange {
@@ -1152,19 +1152,19 @@ onMounted(async () => {
   padding: 8px 16px;
   border-radius: var(--radius-sm, 8px);
   border: none;
-  background: var(--purple-main, #6c3ce0);
+  background: var(--purple-main, #0369A1);
   color: white;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
   transition: all var(--transition-fast, 150ms);
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.3);
 }
 
 .btn-add:hover {
-  background: var(--purple-soft, #8b5cf6);
+  background: var(--purple-soft, #0EA5E9);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
+  box-shadow: 0 4px 14px rgba(3, 105, 161, 0.4);
 }
 
 .btn-add i {
@@ -1305,12 +1305,12 @@ onMounted(async () => {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md, 12px);
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: #7c3aed;
+  color: #0284C7;
 }
 
 .date-text {
@@ -1428,11 +1428,11 @@ onMounted(async () => {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.78rem;
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.35);
 }
 
 /* tag stack */
@@ -1605,7 +1605,7 @@ onMounted(async () => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--purple-main, #6c3ce0);
+  background: var(--purple-main, #0369A1);
   margin-top: 7px;
   flex-shrink: 0;
 }

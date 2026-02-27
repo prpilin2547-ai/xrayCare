@@ -258,8 +258,8 @@ onMounted(() => {
   border-radius: var(--radius-full, 9999px);
   font-size: 0.7rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #7c3aed;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0284C7;
   margin-bottom: 10px;
 }
 
@@ -299,19 +299,19 @@ onMounted(() => {
   border: none;
   padding: 7px 16px;
   border-radius: var(--radius-sm, 8px);
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
   font-weight: 600;
   font-size: 0.78rem;
   cursor: pointer;
   transition: all var(--transition-fast, 150ms);
-  box-shadow: 0 2px 6px rgba(108, 60, 224, 0.25);
+  box-shadow: 0 2px 6px rgba(3, 105, 161, 0.25);
   margin-top: 12px;
   align-self: flex-start;
 }
 
 .btn-card:hover {
-  box-shadow: 0 4px 12px rgba(108, 60, 224, 0.35);
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.35);
 }
 
 .btn-delete {

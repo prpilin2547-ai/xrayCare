@@ -20,8 +20,8 @@
       </button>
     </div>
 
-    <!-- แผ่น A4 -->
-    <div class="sheet-inner">
+    <!-- แผ่น A4 (อนุญาตต่อหน้าใหม่เมื่อเนื้อหาไม่พอ) -->
+    <div class="sheet-inner sheet-inner--flow">
         <!-- ส่วนหัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -78,10 +78,10 @@
           <!-- แถว 4 : สมาร์ทโฟน ยี่ห้อ / รุ่น -->
           <div class="meta-row meta-row-grid">
             <span class="meta-label">สมาร์ทโฟน ยี่ห้อ</span>
-            <span class="underline mid">{{ record.deviceName }}</span>
+            <span class="underline mid">{{ record.phoneBrand }}</span>
 
             <span class="meta-label">รุ่น :</span>
-            <span class="underline short-narrow">{{ record.model }}</span>
+            <span class="underline short-narrow">{{ record.phoneModel }}</span>
 
             <span></span>
             <span></span>
@@ -116,57 +116,15 @@
   </thead>
 
   <tbody>
-
-    <!-- แถวที่ 2–3 : ผสานคอลัมน์ที่ 1 -->
-    <tr>
-      <td rowspan="2">1</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <tr>
-      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <!-- แถวที่ 4–5 : ผสานคอลัมน์ที่ 1 -->
-    <tr>
-      <td rowspan="2">2</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <tr>
-      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <!-- แถวที่ 6–7 : ผสานคอลัมน์ที่ 1 -->
-    <tr>
-      <td rowspan="2">3</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-
-    <tr>
-      <!-- คอลัมน์ 1 ถูกผสานแล้ว -->
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
+    <template v-for="(meas, idx) in record.measurements" :key="meas.id">
+      <tr v-for="(rowIdx, i) in rowIndices(meas)" :key="`${meas.id}-${rowIdx}`" class="f10-data-row">
+        <td v-if="i === 0" :rowspan="rowCount(meas)" class="col-run">{{ meas.id }}</td>
+        <td>{{ cell(meas, rowIdx, 'iav1') }}</td>
+        <td>{{ cell(meas, rowIdx, 'iav2') }}</td>
+        <td>{{ cell(meas, rowIdx, 'ibg1') }}</td>
+        <td>{{ cell(meas, rowIdx, 'ibg2') }}</td>
+      </tr>
+    </template>
   </tbody>
 </table>
 
@@ -193,6 +151,12 @@
     </span>
   </div>
 </div>
+
+        <!-- หมายเหตุ (จาก jsonData) -->
+        <div v-if="record.remark" class="remark-block">
+          <span class="meta-label">หมายเหตุ :</span>
+          <span class="underline remark-text">{{ record.remark }}</span>
+        </div>
 
         <!-- ลายเซ็นผู้ทดสอบ -->
         <div class="signature-block">
@@ -226,20 +190,37 @@ const record = ref({
   deviceName: '',
   model: '',
   serialNo: '',
+  phoneBrand: '',
+  phoneModel: '',
   application: '',
   calibration: '',
-  runs: [
-    { runNo: 1 },
-    { runNo: 2 },
-    { runNo: 3 }
+  measurements: [
+    { id: 1, rows: [{ iav1: '', iav2: '', ibg1: '', ibg2: '' }, { iav1: '', iav2: '', ibg1: '', ibg2: '' }] },
+    { id: 2, rows: [{ iav1: '', iav2: '', ibg1: '', ibg2: '' }, { iav1: '', iav2: '', ibg1: '', ibg2: '' }] },
+    { id: 3, rows: [{ iav1: '', iav2: '', ibg1: '', ibg2: '' }, { iav1: '', iav2: '', ibg1: '', ibg2: '' }] }
   ],
   iav: '',
   ibg: '',
   ilbd: '',
+  remark: '',
   testerName: '',
   testerFullName: '',
   testerPosition: ''
 })
+
+function cell (meas, rowIdx, key) {
+  const rows = meas.rows || []
+  const row = rows[rowIdx]
+  return row ? (row[key] ?? '') : ''
+}
+
+function rowCount (meas) {
+  return (meas.rows && meas.rows.length) ? Math.min(meas.rows.length, 3) : 2
+}
+
+function rowIndices (meas) {
+  return Array.from({ length: rowCount(meas) }, (_, i) => i)
+}
 
 function handlePrint () {
   window.print()
@@ -254,15 +235,48 @@ onMounted(async () => {
     const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
+
     record.value.date = data.checkDate || ''
     record.value.testerName = data.tester || ''
+
     if (data.jsonData) {
       try {
         const parsed = JSON.parse(data.jsonData)
-        Object.keys(parsed).forEach(k => {
-          if (record.value[k] !== undefined) record.value[k] = parsed[k]
-        })
-        if (parsed.runs && Array.isArray(parsed.runs)) record.value.runs = parsed.runs
+        const h = parsed.header || {}
+        record.value.date = record.value.date || h.date || ''
+        record.value.deviceType = h.xrayType ?? ''
+        record.value.department = h.department ?? ''
+        record.value.location = h.tambon ?? ''
+        record.value.district = h.amphur ?? ''
+        record.value.province = h.province ?? ''
+        record.value.deviceName = h.xrayName ?? ''
+        record.value.model = h.model ?? ''
+        record.value.serialNo = h.serial ?? ''
+        record.value.phoneBrand = h.phoneBrand ?? ''
+        record.value.phoneModel = h.phoneModel ?? ''
+        record.value.application = h.application ?? ''
+        record.value.calibration = h.calibration ?? ''
+        record.value.iav = parsed.iavAvg ?? ''
+        record.value.ibg = parsed.ibgAvg ?? ''
+        record.value.ilbd = parsed.ilbd ?? ''
+        record.value.remark = parsed.remark ?? ''
+        record.value.deviceName = record.value.deviceName || data.machineName || ''
+
+        if (parsed.measurements && Array.isArray(parsed.measurements) && parsed.measurements.length > 0) {
+          record.value.measurements = parsed.measurements.map((m) => {
+            const rows = (m.rows || []).slice(0, 3)
+            while (rows.length < 2) rows.push({ iav1: '', iav2: '', ibg1: '', ibg2: '' })
+            return {
+              id: m.id ?? 0,
+              rows: rows.map((r) => ({
+                iav1: r.iav1 ?? '',
+                iav2: r.iav2 ?? '',
+                ibg1: r.ibg1 ?? '',
+                ibg2: r.ibg2 ?? ''
+              }))
+            }
+          })
+        }
       } catch (_) {}
     }
   } catch (e) {
@@ -441,6 +455,15 @@ onMounted(async () => {
   text-indent: 3mm;
 }
 
+.remark-block {
+  margin-top: 4mm;
+  margin-bottom: 4mm;
+}
+
+.remark-text {
+  min-width: 80mm;
+}
+
 .freq-label {
   font-weight: 700 !important; /* ตัวหนา */
 }
@@ -450,56 +473,101 @@ onMounted(async () => {
 }
 
 
-/* ===== PRINT ===== */
+/* ===== PRINT — แสดงตารางครบ ถ้าไม่พอต่อหน้าใหม่ ===== */
 @media print {
-.col-iav-group,
-.col-bg-group {
-  text-align: center;
-  font-weight: 700;
-}
+  .sheet-inner--flow {
+    overflow: visible !important;
+  }
 
-.col-iav-half,
-.col-bg-half {
-  text-align: center;
-  height: 8mm;
-}
+  /* หัวตารางซ้ำทุกหน้าเมื่อตารางข้ามหน้า */
+  .f10-table thead {
+    display: table-header-group;
+  }
 
-/* ความกว้างแบบสมมาตรเหมือนฟอร์มราชการ */
-.col-iav { width: 80mm; }
-.col-bg  { width: 80mm; }
+  .f10-table tr.f10-data-row {
+    page-break-inside: avoid;
+  }
 
+  .header-main .title-main {
+    font-size: 16pt;
+    margin-bottom: 1mm;
+  }
 
-  
+  .header-main .title-sub {
+    margin-bottom: 1mm;
+  }
+
+  .meta-block {
+    margin-bottom: 2mm;
+  }
+
+  .meta-row {
+    margin-bottom: 1mm;
+  }
+
+  .f10-table {
+    margin-bottom: 8mm;
+    page-break-inside: auto;
+  }
+
+  .f10-table th,
+  .f10-table td {
+    padding: 4mm 2mm;
+    font-size: 14pt;
+  }
+
+  .formula-block {
+    margin-bottom: 6mm;
+  }
+
+  .formula-row {
+    margin-bottom: 1mm;
+  }
+
+  .remark-block {
+    margin-top: 2mm;
+    margin-bottom: 2mm;
+  }
+
+  .signature-block {
+    margin-top: 6mm;
+  }
+
+  .sig-row {
+    margin-bottom: 2mm;
+  }
+
+  .col-iav-group,
+  .col-bg-group {
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .col-iav-half,
+  .col-bg-half {
+    text-align: center;
+    height: 8mm;
+  }
+
+  .col-iav { width: 80mm; }
+  .col-bg  { width: 80mm; }
+
   .equal-header {
-  width: 50%;            /* กินพื้นที่ฝั่งขวา 50%-50% อย่างสมมาตร */
-  text-align: center;
-  font-weight: 700;
-}
-/* กล่องแบ่งเป็น 4 ช่อง ใน 1 เซลล์ (บน-ล่าง ซ้าย-ขวา) */
-.quad-box {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 100%;
-  height: 18mm;           /* ปรับได้ตามความสูงที่ต้องการ */
-  gap: 0;
-}
+    width: 50%;
+    text-align: center;
+    font-weight: 700;
+  }
 
-.quad-box > div {
-  border: 0.4pt solid #000;
-}
+  .quad-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    height: 25mm;
+  }
 
-.quad-box {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 100%;
-  height: 25mm;
-}
-
-.quad-box > div {
-  border: 0.4pt solid #000;
-}
-
+  .quad-box > div {
+    border: 0.4pt solid #000;
+  }
 }
 </style> 

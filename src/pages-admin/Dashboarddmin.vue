@@ -778,7 +778,7 @@ onMounted(async () => {
 }
 
 .summary-card .card-label.purple {
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
 }
 
 .summary-card .card-label.orange {
@@ -1062,12 +1062,12 @@ onMounted(async () => {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
   font-weight: 700;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.35);
 }
 
 .tag-stack {

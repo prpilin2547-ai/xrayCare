@@ -717,7 +717,7 @@ td:nth-child(8) {
 
 /* Links */
 .detail-link {
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -725,7 +725,7 @@ td:nth-child(8) {
 }
 
 .detail-link:hover {
-  color: var(--purple-soft, #8b5cf6);
+  color: var(--purple-soft, #0EA5E9);
 }
 
 .delete-link {
@@ -817,7 +817,7 @@ ul.content-list li::before {
   border-radius: var(--radius-sm, 8px);
   padding: 8px 16px;
   cursor: pointer;
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
   font-weight: 600;
   width: 140px;
   height: 50px;
@@ -832,7 +832,7 @@ ul.content-list li::before {
 }
 
 .btn-file i {
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
 }
 
 /* Status dropdown button */
@@ -1107,8 +1107,8 @@ ul.content-list li::before {
 
 .year-selector select:focus {
   outline: none;
-  border-color: var(--purple-main, #6c3ce0);
-  box-shadow: 0 0 0 3px rgba(108, 60, 224, 0.15);
+  border-color: var(--purple-main, #0369A1);
+  box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.15);
 }
 
 .chart-container {

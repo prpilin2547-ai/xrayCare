@@ -55,7 +55,7 @@ const displayRole = computed(() => props.role || 'Tech')
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background: var(--bg-topbar, linear-gradient(135deg, #1e1145 0%, #3b1f8e 50%, #6c3ce0 100%));
+  background: var(--bg-topbar, linear-gradient(135deg, #0C4A6E 0%, #0369A1 50%, #0284C7 100%));
   color: #ffffff;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -103,7 +103,7 @@ const displayRole = computed(() => props.role || 'Tech')
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: #c4b5fd;
+  color: #7DD3FC;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -159,7 +159,7 @@ const displayRole = computed(() => props.role || 'Tech')
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  color: #e0d7ff;
+  color: #BAE6FD;
 }
 
 .user-info {

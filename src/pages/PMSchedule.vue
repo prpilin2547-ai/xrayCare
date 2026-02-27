@@ -944,11 +944,11 @@ watch(
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md, 12px);
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7c3aed;
+  color: #0284C7;
   margin-right: 14px;
 }
 
@@ -1028,12 +1028,12 @@ watch(
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
   font-weight: 700;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.35);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.35);
 }
 
 .tag-stack {
@@ -1150,14 +1150,14 @@ watch(
 }
 
 .icon-btn-primary {
-  border-color: #c4b5fd;
-  background: #ede9fe;
-  color: var(--purple-main, #6c3ce0);
+  border-color: #7DD3FC;
+  background: #E0F2FE;
+  color: var(--purple-main, #0369A1);
 }
 
 .icon-btn-primary:hover {
-  background: #ddd6fe;
-  border-color: #a78bfa;
+  background: #BAE6FD;
+  border-color: #38BDF8;
 }
 
 .icon-btn-close {
@@ -1208,12 +1208,12 @@ watch(
 }
 
 .icon-btn-sm-primary {
-  background: #ede9fe;
-  color: var(--purple-main, #6c3ce0);
+  background: #E0F2FE;
+  color: var(--purple-main, #0369A1);
 }
 
 .icon-btn-sm-primary:hover {
-  background: #ddd6fe;
+  background: #BAE6FD;
 }
 
 .item-delete-btn {

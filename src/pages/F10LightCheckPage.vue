@@ -363,9 +363,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const API_BASE = '/api/Xraycare'
+const router = useRouter()
+const route = useRoute()
 
 const props = defineProps({
   initial: Object,
@@ -380,9 +382,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['save'])
-const router = useRouter()
 
-/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
+/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage (ถ้ามี equipmentName ใน query ใช้เครื่องนั้น — มาจาก Daily ถัดไป) ---------- */
 const deviceInfo = ref({ name: '', model: '', room: '' })
 const userName = ref('')
 
@@ -404,11 +405,29 @@ onMounted(async () => {
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
-        const m = machines[0]
-        deviceInfo.value = {
-          name: m.machineName,
-          model: m.machineName,
-          room: m.room || ''
+        const fromQuery = route.query.equipmentName || props.selectedDevice?.name
+        const m = fromQuery
+          ? machines.find(mx => (mx.machineName || '').trim() === String(fromQuery).trim())
+          : null
+        if (m) {
+          deviceInfo.value = {
+            name: m.machineName,
+            model: m.model || m.machineName,
+            room: m.room || route.query.room || props.selectedDevice?.room || ''
+          }
+        } else if (fromQuery) {
+          deviceInfo.value = {
+            name: String(fromQuery).trim(),
+            model: props.selectedDevice?.model || String(fromQuery).trim(),
+            room: route.query.room || props.selectedDevice?.room || ''
+          }
+        } else {
+          const first = machines[0]
+          deviceInfo.value = {
+            name: first.machineName,
+            model: first.machineName,
+            room: first.room || ''
+          }
         }
       }
     }
@@ -567,10 +586,10 @@ const saveForm = async () => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 /* Content panel */
@@ -620,7 +639,7 @@ const saveForm = async () => {
 }
 
 .input-underline:focus {
-  border-color: var(--purple-soft, #8b5cf6);
+  border-color: var(--purple-soft, #0EA5E9);
   outline: none;
 }
 
@@ -676,7 +695,7 @@ const saveForm = async () => {
 }
 
 .cell-input:focus {
-  border-color: var(--purple-soft, #8b5cf6);
+  border-color: var(--purple-soft, #0EA5E9);
   outline: none;
 }
 
@@ -808,8 +827,8 @@ const saveForm = async () => {
 }
 
 .input-textarea:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
   outline: none;
 }
 

@@ -1060,8 +1060,8 @@ const saveForm = async () => {
 
 .input-text:focus,
 .input-select:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 
@@ -1077,8 +1077,8 @@ const saveForm = async () => {
 }
 
 .input-textarea:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 

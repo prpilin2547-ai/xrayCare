@@ -486,8 +486,8 @@ async function handleSave() {
 }
 
 .form-input input:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 
@@ -568,15 +568,15 @@ async function handleSave() {
 .btn.save {
   border: none;
   border-radius: var(--radius-sm, 8px);
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.3);
 }
 
 .btn.save:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+  box-shadow: 0 4px 14px rgba(3,105,161,0.4);
 }
 
 .section-header-blue {
@@ -800,15 +800,15 @@ async function handleSave() {
 }
 
 .day-cell.is-today .day-number span {
-  border: 2px solid var(--purple-main, #6c3ce0);
-  color: var(--purple-main, #6c3ce0);
+  border: 2px solid var(--purple-main, #0369A1);
+  color: var(--purple-main, #0369A1);
   font-weight: 700;
 }
 
 .day-cell.is-selected .day-number span {
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.35);
 }
 
 @media (max-width: 1024px) {
