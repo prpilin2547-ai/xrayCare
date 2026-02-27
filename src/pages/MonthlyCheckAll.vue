@@ -266,10 +266,10 @@ const handleSave = async (payloadF8_2) => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 .page-layout {
@@ -312,10 +312,10 @@ const handleSave = async (payloadF8_2) => {
 }
 
 .form-tab.active {
-  background: linear-gradient(135deg, rgba(108,60,224,0.1), rgba(139,92,246,0.06));
-  color: var(--purple-main, #6c3ce0);
+  background: linear-gradient(135deg, rgba(3,105,161,0.1), rgba(14,165,233,0.06));
+  color: var(--purple-main, #0369A1);
   font-weight: 600;
-  border-left: 3px solid var(--purple-main, #6c3ce0);
+  border-left: 3px solid var(--purple-main, #0369A1);
 }
 
 .form-code {

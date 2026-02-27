@@ -755,14 +755,14 @@ const deleteItem = async (id) => {
 }
 
 .detail-link {
-    color: var(--purple-soft, #8b5cf6);
+    color: var(--purple-soft, #0EA5E9);
     text-decoration: underline;
     cursor: pointer;
     font-weight: 500;
 }
 
 .detail-link:hover {
-    color: var(--purple-main, #6c3ce0);
+    color: var(--purple-main, #0369A1);
 }
 
 .delete-link {
@@ -854,7 +854,7 @@ ul.content-list {
 
 ul.content-list li::before {
     content: '•';
-    color: var(--purple-main, #6c3ce0);
+    color: var(--purple-main, #0369A1);
     font-weight: bold;
     display: inline-block;
     width: 1em;
@@ -934,8 +934,8 @@ ul.content-list li::before {
 
 .btn-file {
     background: #fff;
-    border: 1px solid var(--purple-soft, #8b5cf6);
-    color: var(--purple-main, #6c3ce0);
+    border: 1px solid var(--purple-soft, #0EA5E9);
+    color: var(--purple-main, #0369A1);
     width: 140px;
     height: 44px;
     display: flex;
@@ -948,11 +948,11 @@ ul.content-list li::before {
 }
 
 .btn-file i {
-    color: var(--purple-main, #6c3ce0);
+    color: var(--purple-main, #0369A1);
 }
 
 .btn-file:hover {
-    background: #ede9fe;
+    background: #E0F2FE;
     transform: translateY(-1px);
 }
 
@@ -966,7 +966,7 @@ ul.content-list li::before {
 .file-link {
     text-decoration: underline;
     cursor: pointer;
-    color: var(--purple-soft, #8b5cf6);
+    color: var(--purple-soft, #0EA5E9);
 }
 
 .file-remove {
@@ -978,12 +978,13 @@ ul.content-list li::before {
     cursor: pointer;
 }
 
+/* overlay รูปภาพต้องอยู่เหนือ modal ระบบแจ้งซ่อม (Bootstrap ~1050) */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(6px);
-    z-index: 999;
+    z-index: 2070;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -994,10 +995,13 @@ ul.content-list li::before {
     background: var(--bg-card, #fff);
     border-radius: var(--radius-xl, 20px);
     overflow: hidden;
-    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.18);
-    max-width: 620px;
+    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.22);
+    max-width: 90vw;
+    max-height: 90vh;
     width: 100%;
     border: 1px solid var(--border-soft, #e2e8f0);
+    display: flex;
+    flex-direction: column;
 }
 
 /* หัว modal รูปภาพ - สีเขียวแบบเดิม */
@@ -1039,7 +1043,9 @@ ul.content-list li::before {
 .image-modal-body {
     padding: 24px;
     background: #f8fafc;
-    min-height: 280px;
+    min-height: 200px;
+    max-height: calc(90vh - 120px);
+    overflow: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1052,9 +1058,10 @@ ul.content-list li::before {
 
 .image-modal-img {
     max-width: 100%;
-    max-height: 400px;
+    max-height: min(400px, 60vh);
     width: auto;
     height: auto;
+    object-fit: contain;
     border-radius: var(--radius-md, 12px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     margin-bottom: 16px;
@@ -1165,15 +1172,15 @@ ul.content-list li::before {
 }
 
 .day-cell.is-today .day-number span {
-    border: 2px solid var(--purple-main, #6c3ce0);
-    color: var(--purple-main, #6c3ce0);
+    border: 2px solid var(--purple-main, #0369A1);
+    color: var(--purple-main, #0369A1);
     font-weight: 700;
 }
 
 .day-cell.is-selected .day-number span {
-    background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+    background: linear-gradient(135deg, #0369A1, #0EA5E9);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(108,60,224,0.35);
+    box-shadow: 0 2px 8px rgba(3,105,161,0.35);
 }
 
 .date-wrapper {

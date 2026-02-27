@@ -183,18 +183,18 @@ const submitForm = () => {
   border: none;
   border-radius: var(--radius-sm, 8px);
   padding: 10px 24px;
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.3);
   transition: all var(--transition-fast, 150ms);
 }
 
 .btn-submit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+  box-shadow: 0 4px 14px rgba(3,105,161,0.4);
 }
 
 .textarea-input {
@@ -212,8 +212,8 @@ const submitForm = () => {
 }
 
 .textarea-input:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
 }
 
 .textarea-input::placeholder {

@@ -411,8 +411,8 @@ const cancelEdit = (user) => {
 
 .search-bar-container :deep(.form-control:focus),
 .search-bar-container :deep(input:focus) {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
   outline: none;
 }
 
@@ -421,17 +421,17 @@ const cancelEdit = (user) => {
   border: none;
   border-radius: var(--radius-sm, 8px);
   padding: 10px 20px;
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.3);
   transition: all 150ms;
 }
 
 .btn-purple:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
+  box-shadow: 0 4px 14px rgba(3, 105, 161, 0.4);
   color: #fff;
 }
 
@@ -485,8 +485,8 @@ const cancelEdit = (user) => {
 }
 
 .table-input:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
   outline: none;
 }
 
@@ -602,17 +602,17 @@ const cancelEdit = (user) => {
   border: none;
   border-radius: var(--radius-sm, 8px);
   padding: 12px;
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(108, 60, 224, 0.3);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.3);
   transition: all 150ms;
 }
 
 .btn-create-account:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108, 60, 224, 0.4);
+  box-shadow: 0 4px 14px rgba(3, 105, 161, 0.4);
 }
 
 /* Form inputs in modal */
@@ -632,8 +632,8 @@ const cancelEdit = (user) => {
 .modal-card :deep(select:focus),
 .modal-card :deep(.form-control:focus),
 .modal-card :deep(.form-select:focus) {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
   outline: none;
 }
 
@@ -650,8 +650,8 @@ const cancelEdit = (user) => {
 }
 
 .password-input-wrap:focus-within {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
 }
 
 .password-input-wrap .password-input {

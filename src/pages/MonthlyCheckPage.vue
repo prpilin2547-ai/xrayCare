@@ -72,7 +72,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
 import F3MonitorForm from '../components/forms/F3MonitorForm.vue'
@@ -94,8 +94,9 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const route = useRoute()
 
-/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
+/* ---------- โหลดข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage (ถ้ามี equipmentName ใน query ใช้เครื่องนั้น — มาจาก Daily ถัดไป) ---------- */
 const deviceInfo = ref({ name: '', model: '', room: '' })
 const userName = ref('')
 
@@ -117,11 +118,29 @@ onMounted(async () => {
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
-        const m = machines[0]
-        deviceInfo.value = {
-          name: m.machineName,
-          model: m.machineName,
-          room: m.room || ''
+        const fromQuery = route.query.equipmentName || props.selectedDevice?.name
+        const m = fromQuery
+          ? machines.find(mx => (mx.machineName || '').trim() === String(fromQuery).trim())
+          : null
+        if (m) {
+          deviceInfo.value = {
+            name: m.machineName,
+            model: m.model || m.machineName,
+            room: m.room || route.query.room || props.selectedDevice?.room || ''
+          }
+        } else if (fromQuery) {
+          deviceInfo.value = {
+            name: String(fromQuery).trim(),
+            model: props.selectedDevice?.model || String(fromQuery).trim(),
+            room: route.query.room || props.selectedDevice?.room || ''
+          }
+        } else {
+          const first = machines[0]
+          deviceInfo.value = {
+            name: first.machineName,
+            model: first.machineName,
+            room: first.room || ''
+          }
         }
       }
     }
@@ -237,10 +256,10 @@ const handleSave = async (payloadF6) => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 .page-layout {
@@ -274,10 +293,10 @@ const handleSave = async (payloadF6) => {
 }
 
 .form-tab.active {
-  background: linear-gradient(135deg, rgba(108,60,224,0.1), rgba(139,92,246,0.06));
-  color: var(--purple-main, #6c3ce0);
+  background: linear-gradient(135deg, rgba(3,105,161,0.1), rgba(14,165,233,0.06));
+  color: var(--purple-main, #0369A1);
   font-weight: 600;
-  border-left: 3px solid var(--purple-main, #6c3ce0);
+  border-left: 3px solid var(--purple-main, #0369A1);
 }
 
 .form-code {

@@ -375,10 +375,10 @@ const saveChecklist = async () => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 /* Content panel */
@@ -482,8 +482,8 @@ const saveChecklist = async () => {
 
 .input-text:focus,
 .input-select:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 
@@ -530,15 +530,15 @@ const saveChecklist = async () => {
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.3);
   transition: all var(--transition-fast, 150ms);
 }
 
 .btn-add:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+  box-shadow: 0 4px 14px rgba(3,105,161,0.4);
 }
 
 .btn-remove-device {

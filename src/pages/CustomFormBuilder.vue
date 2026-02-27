@@ -659,12 +659,12 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(108, 60, 224, 0.25);
+  box-shadow: 0 2px 6px rgba(3, 105, 161, 0.25);
 }
 .btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(108, 60, 224, 0.35);
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.35);
 }
 
 .btn-outline {
@@ -725,7 +725,7 @@ onMounted(() => {
   background: #f1f5f9;
 }
 .tab-btn.active {
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   border-color: transparent;
   color: #fff;
 }
@@ -813,8 +813,8 @@ onMounted(() => {
   transition: border-color var(--transition-fast, 150ms);
 }
 .rich-editor:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 2px rgba(108, 60, 224, 0.15);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 2px rgba(3, 105, 161, 0.15);
 }
 
 .meta-panel {
@@ -851,7 +851,7 @@ onMounted(() => {
 }
 .meta-input:focus {
   outline: none;
-  border-color: var(--purple-soft, #8b5cf6);
+  border-color: var(--purple-soft, #0EA5E9);
 }
 
 .builder-body {
@@ -890,8 +890,8 @@ onMounted(() => {
 }
 
 .preview-field.selected {
-  border-color: var(--purple-soft, #8b5cf6);
-  background: #ede9fe;
+  border-color: var(--purple-soft, #0EA5E9);
+  background: #E0F2FE;
 }
 
 .field-name-tag {
@@ -951,7 +951,7 @@ onMounted(() => {
 }
 .html-textarea:focus {
   outline: none;
-  border-color: var(--purple-soft, #8b5cf6);
+  border-color: var(--purple-soft, #0EA5E9);
 }
 .html-hint {
   font-size: 0.78rem;

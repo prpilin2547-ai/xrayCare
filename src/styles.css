@@ -1,14 +1,22 @@
 :root {
-  --purple-deep: #1e1145;
-  --purple-main: #6c3ce0;
-  --purple-soft: #8b5cf6;
-  --purple-light: #ede9fe;
-  --purple-glow: rgba(108, 60, 224, 0.15);
+  /* Primary palette — Medical Blue */
+  --primary-deep: #0C4A6E;
+  --primary-main: #0369A1;
+  --primary-soft: #0EA5E9;
+  --primary-light: #E0F2FE;
+  --primary-glow: rgba(3, 105, 161, 0.15);
 
-  --bg-body: #f0f2f5;
+  /* Backward-compat aliases */
+  --purple-deep: var(--primary-deep);
+  --purple-main: var(--primary-main);
+  --purple-soft: var(--primary-soft);
+  --purple-light: var(--primary-light);
+  --purple-glow: var(--primary-glow);
+
+  --bg-body: #f0f4f8;
   --bg-card: #ffffff;
-  --bg-sidebar: #111827;
-  --bg-topbar: linear-gradient(135deg, #1e1145 0%, #3b1f8e 50%, #6c3ce0 100%);
+  --bg-sidebar: #0F172A;
+  --bg-topbar: linear-gradient(135deg, #0C4A6E 0%, #0369A1 50%, #0284C7 100%);
 
   --text-main: #0f172a;
   --text-secondary: #475569;
@@ -20,8 +28,8 @@
 
   --danger: #ef4444;
   --warning: #f59e0b;
-  --info: #3b82f6;
-  --success: #10b981;
+  --info: #0EA5E9;
+  --success: #14B8A6;
 
   --radius-sm: 8px;
   --radius-md: 12px;

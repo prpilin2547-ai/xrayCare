@@ -11,6 +11,7 @@
       <SidebarNav
         :active="activeMenu"
         :open="sidebarOpen"
+        :role="userRole"
         @navigate="onNavigate"
         @close="sidebarOpen = false"
         class="sidebar-slot"
@@ -129,6 +130,7 @@ const onNavigate = (menu) => {
   display: flex;
   padding-top: var(--topbar-h, 60px);
   min-height: 100vh;
+  background: var(--bg-body, #f0f4f8);
 }
 
 .sidebar-desktop {
@@ -137,7 +139,10 @@ const onNavigate = (menu) => {
   left: 0;
   bottom: 0;
   width: var(--sidebar-w, 260px);
-  overflow-y: auto;
+  height: calc(100vh - var(--topbar-h, 60px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   z-index: 90;
 }
 
@@ -146,7 +151,7 @@ const onNavigate = (menu) => {
   margin-left: var(--sidebar-w, 260px);
   padding: 28px 32px 40px;
   overflow-y: auto;
-  background: var(--bg-body, #f0f2f5);
+  background: var(--bg-body, #f0f4f8);
   min-height: calc(100vh - var(--topbar-h, 60px));
 }
 

@@ -161,7 +161,7 @@ const handleLogin = async () => {
 .shape-1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, #6c3ce0 0%, transparent 70%);
+  background: radial-gradient(circle, #0369A1 0%, transparent 70%);
   top: -15%;
   left: -10%;
   animation: floatShape 8s ease-in-out infinite;
@@ -179,7 +179,7 @@ const handleLogin = async () => {
 .shape-3 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  background: radial-gradient(circle, #0EA5E9 0%, transparent 70%);
   top: 50%;
   left: 60%;
   animation: floatShape 12s ease-in-out infinite;
@@ -213,11 +213,11 @@ const handleLogin = async () => {
   height: 72px;
   border-radius: 20px;
   margin: 0 auto 20px;
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(108, 60, 224, 0.4);
+  box-shadow: 0 8px 24px rgba(3, 105, 161, 0.4);
 }
 
 .login-avatar i {
@@ -268,9 +268,9 @@ label {
 }
 
 .input-wrapper:focus-within {
-  border-color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.08);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  border-color: #0EA5E9;
+  background: rgba(14, 165, 233, 0.08);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
 }
 
 .input-icon {
@@ -281,7 +281,7 @@ label {
 }
 
 .input-wrapper:focus-within .input-icon {
-  color: #a78bfa;
+  color: #38BDF8;
 }
 
 .input-wrapper input {
@@ -317,7 +317,7 @@ label {
   margin-top: 8px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: white;
   font-weight: 700;
   padding: 13px 0;
@@ -328,13 +328,13 @@ label {
   justify-content: center;
   gap: 8px;
   transition: all 200ms ease;
-  box-shadow: 0 4px 16px rgba(108, 60, 224, 0.4);
+  box-shadow: 0 4px 16px rgba(3, 105, 161, 0.4);
   letter-spacing: 0.01em;
 }
 
 .btn-login:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(108, 60, 224, 0.5);
+  box-shadow: 0 8px 24px rgba(3, 105, 161, 0.5);
 }
 
 .btn-login:active:not(:disabled) {

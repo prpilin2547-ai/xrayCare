@@ -348,10 +348,10 @@ const goNext = () => {
 }
 
 .pill-main {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-  color: #6d28d9;
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0369A1;
   font-weight: 700;
-  border-color: #c4b5fd;
+  border-color: #7DD3FC;
 }
 
 .content-panel {
@@ -474,8 +474,8 @@ const goNext = () => {
 }
 
 .input-textarea:focus {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   outline: none;
 }
 

@@ -47,7 +47,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="col-month" rowspan="3">
+              <td class="col-month" rowspan="2">
                 <div class="month-wrapper">
                   <div class="month-label">เดือน</div>
                   <span class="underline month-line">{{ section.monthLabel }}</span>
@@ -60,12 +60,14 @@
               <td class="col-second">สภาพผิดปกติ<br>ของแผ่น<br>หรือตำแหน่งบนภาพ</td>
               <td v-for="d in section.days" :key="'r2-'+d" class="col-day cell-small">{{ getRemark(d, blockIndex) }}</td>
             </tr>
-            <tr>
-              <td class="col-second">ผู้ตรวจสอบ</td>
-              <td v-for="d in section.days" :key="'r3-'+d" class="col-day cell-small">{{ getInspector(d, blockIndex) }}</td>
-            </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="signature-block">
+        <div class="sig-line">ลงชื่อ.........................................................ผู้ทดสอบ</div>
+        <div class="sig-line">(...........................................................................)</div>
+        <div class="sig-line">ตำแหน่ง...................................................................</div>
       </div>
     </div>
   </div>
@@ -337,6 +339,16 @@ onMounted(async () => {
   margin-top: 1mm;
 }
 
+.signature-block {
+  margin-top: 10mm;
+  text-align: right;
+  font-size: 16pt !important;
+  line-height: 1.8;
+}
+.sig-line {
+  font-size: 16pt !important;
+}
+
 @page { size: A4 portrait; margin: 10mm; }
 @media print {
   .print-root { padding: 0; background: white; }
@@ -398,5 +410,7 @@ onMounted(async () => {
   .print-root > .sheet-inner.sheet-inner--flow .month-label { font-size: 18pt !important; }
   .print-root > .sheet-inner.sheet-inner--flow .f2-table th,
   .print-root > .sheet-inner.sheet-inner--flow .f2-table td { padding: 2.5mm 1.2mm !important; }
+  .print-root > .sheet-inner.sheet-inner--flow .signature-block { font-size: 18pt !important; margin-top: 10mm; }
+  .print-root > .sheet-inner.sheet-inner--flow .sig-line { font-size: 18pt !important; }
 }
 </style>

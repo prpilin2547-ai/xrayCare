@@ -1056,8 +1056,8 @@ function goToMonthlyPrint() {
 }
 
 .input-shell:focus-within {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   background: #fff;
 }
 
@@ -1111,7 +1111,7 @@ select::-ms-expand {
   transform: translateY(-50%);
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--purple-soft, #8b5cf6);
+  color: var(--purple-soft, #0EA5E9);
   pointer-events: none;
 }
 
@@ -1139,9 +1139,9 @@ select::-ms-expand {
 .chip {
   padding: 4px 12px;
   border-radius: var(--radius-full, 9999px);
-  background: #ede9fe;
+  background: #E0F2FE;
   font-size: 0.78rem;
-  color: var(--purple-main, #6c3ce0);
+  color: var(--purple-main, #0369A1);
   font-weight: 600;
 }
 
@@ -1228,7 +1228,7 @@ select::-ms-expand {
 }
 
 .radio-dot-checked {
-  border-color: var(--purple-main, #6c3ce0);
+  border-color: var(--purple-main, #0369A1);
 }
 
 .radio-dot-checked::after {
@@ -1236,7 +1236,7 @@ select::-ms-expand {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--purple-main, #6c3ce0);
+  background: var(--purple-main, #0369A1);
 }
 
 .date-wrapper {
@@ -1284,7 +1284,7 @@ select::-ms-expand {
   border: none;
   border-radius: var(--radius-sm, 8px);
   padding: 10px 24px;
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-weight: 600;
   font-size: 0.85rem;
@@ -1293,13 +1293,13 @@ select::-ms-expand {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.3);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.3);
   transition: all var(--transition-fast, 150ms);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108,60,224,0.4);
+  box-shadow: 0 4px 14px rgba(3,105,161,0.4);
 }
 
 .preview-wrapper {
@@ -1385,11 +1385,11 @@ select::-ms-expand {
 }
 
 .month-cell.is-today {
-  border: 2px solid var(--purple-main, #6c3ce0);
+  border: 2px solid var(--purple-main, #0369A1);
 }
 
 .month-cell.is-selected {
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
 }
 
@@ -1439,15 +1439,15 @@ select::-ms-expand {
 }
 
 .day-cell.is-today .day-number span {
-  border: 2px solid var(--purple-main, #6c3ce0);
-  color: var(--purple-main, #6c3ce0);
+  border: 2px solid var(--purple-main, #0369A1);
+  color: var(--purple-main, #0369A1);
   font-weight: 700;
 }
 
 .day-cell.is-selected .day-number span {
-  background: linear-gradient(135deg, #6c3ce0, #8b5cf6);
+  background: linear-gradient(135deg, #0369A1, #0EA5E9);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(108,60,224,0.35);
+  box-shadow: 0 2px 8px rgba(3,105,161,0.35);
 }
 
 /* ---------- Export รายเดือน ---------- */
@@ -1542,8 +1542,8 @@ select::-ms-expand {
 }
 
 .filter-date-wrapper:focus-within {
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
   background: #fff;
 }
 
@@ -1565,7 +1565,7 @@ select::-ms-expand {
   border: none;
   border-radius: var(--radius-sm, 8px);
   background: transparent;
-  color: var(--purple-soft, #8b5cf6);
+  color: var(--purple-soft, #0EA5E9);
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -1575,7 +1575,7 @@ select::-ms-expand {
 }
 
 .filter-date-icon:hover {
-  background: #ede9fe;
+  background: #E0F2FE;
 }
 
 .filter-select,
@@ -1592,8 +1592,8 @@ select::-ms-expand {
 .filter-select:focus,
 .filter-input:focus {
   outline: none;
-  border-color: var(--purple-soft, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  border-color: var(--purple-soft, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
   background: #fff;
 }
 
@@ -1761,19 +1761,19 @@ select::-ms-expand {
   padding: 6px 14px;
   border: none;
   border-radius: var(--radius-sm, 8px);
-  background: linear-gradient(135deg, var(--purple-main, #6c3ce0), var(--purple-soft, #8b5cf6));
+  background: linear-gradient(135deg, var(--purple-main, #0369A1), var(--purple-soft, #0EA5E9));
   color: #fff;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(108,60,224,0.3);
+  box-shadow: 0 2px 6px rgba(3,105,161,0.3);
   transition: all var(--transition-fast, 150ms);
 }
 
 .btn-preview-row:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(108,60,224,0.4);
+  box-shadow: 0 4px 12px rgba(3,105,161,0.4);
 }
 
 @media (max-width: 640px) {
