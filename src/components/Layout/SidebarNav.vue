@@ -10,7 +10,7 @@
         <nav class="menu">
           <!-- MAIN section: Tech = all, Admin = all except Dashboard -->
           <div v-if="showMain" class="menu-section">
-            <span class="section-label">MAIN</span>
+            <span class="section-label">RADIOLOGICAL TECHNOLOGIST</span>
             <ul>
               <li v-if="!isAdmin" :class="{ active: active === 'dashboard' }" @click="handleNav('dashboard')">
                 <div class="menu-icon"><i class="fa-solid fa-house"></i></div>
