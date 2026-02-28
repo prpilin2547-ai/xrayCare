@@ -125,13 +125,13 @@
   </div>
 
   <div class="table-scroll">
-    <table class="check-table mt-2">
+    <table class="check-table mt-2 test-result-table">
       <thead>
         <tr class="row-header-columns">
-          <td class="text-center">วันที่ทำการทดสอบ</td>
-          <td class="text-center">อ้างอิง</td>
-          <td class="text-center">ขอบเขตล่าง</td>
-          <td class="text-center">ขอบเขตบน</td>
+          <td class="text-center col-date">วันที่ทำการทดสอบ</td>
+          <td class="text-center col-data">อ้างอิง</td>
+          <td class="text-center col-data">ขอบเขตล่าง</td>
+          <td class="text-center col-data">ขอบเขตบน</td>
           <td class="text-center action-col"></td>
         </tr>
       </thead>
@@ -644,11 +644,57 @@ const submitSave = () => {
 }
 
 .ei-unit-input {
-  flex: 1; /* ยืดให้เต็มที่ */
-  min-width: 250px; /* ความยาวขั้นต่ำ */
+  flex: 1;
+  min-width: 250px;
   padding: 6px 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
+.test-result-table {
+  table-layout: fixed;
+}
+
+.test-result-table .col-date {
+  width: 34%;
+}
+
+.test-result-table .col-data {
+  width: 18%;
+}
+
+.test-result-table .action-col {
+  width: 12%;
+}
+
+.test-result-table .cell-label {
+  width: auto;
+}
+
+.test-result-table .input-cell {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.test-result-table td {
+  padding: 8px 6px;
+  vertical-align: middle;
+}
+
+.test-result-table input[type="number"].input-cell {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  text-align: center;
+}
+
+.test-result-table input[type="number"].input-cell::-webkit-inner-spin-button,
+.test-result-table input[type="number"].input-cell::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.test-result-table select.input-cell {
+  text-align: center;
+}
 </style>

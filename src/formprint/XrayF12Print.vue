@@ -21,7 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--flow">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -466,6 +466,18 @@ onMounted(async () => {
 }
 
 @media print {
+  .print-root {
+    background: #fff;
+  }
+
   .f12-table th, .f12-table td { border: 1px solid #000 !important; }
+
+  .meta-block,
+  .f12-table,
+  .comment-block,
+  .note-block,
+  .sign-block {
+    page-break-inside: avoid;
+  }
 }
 </style>

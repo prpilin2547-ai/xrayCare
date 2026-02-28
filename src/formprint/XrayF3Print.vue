@@ -174,15 +174,19 @@
           <tbody>
             <tr>
               <td colspan="4" class="align-left multi-line-cell">
-                <div>ข้อมูลสำหรับระบบ CR / DR</div>
-                <div>หมายเลขคาสเซท CR / DR : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.cassetteNumber }}</span></div>
-                <div>หมายเลขเครื่องอ่าน CR / DR : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.readerNumber }}</span></div>
+                <div>ข้อมูลสำหรับระบบ {{ f6Record.systemType || 'CR / DR' }}</div>
+                <div>หมายเลขคาสเซท {{ f6Record.systemType || 'CR / DR' }} : <span class="underline short">{{ f6Record.cassetteNumber }}</span></div>
+                <div>หมายเลขเครื่องอ่าน {{ f6Record.systemType || 'CR / DR' }} : <span class="underline short">{{ f6Record.readerNumber }}</span></div>
               </td>
             </tr>
             <tr>
               <td colspan="4" class="align-left multi-line-cell">
                 <div>ข้อมูลเครื่องเอกซเรย์</div>
-                <div>ยี่ห้อ : <span class="full-underline">{{ f6Record.xrayBrand }}</span> รุ่น : <span class="short-line full-underline">{{ f6Record.xrayModel }}</span> หมายเลขเครื่อง : <span class="short-line full-underline">{{ f6Record.xraySerial }}</span></div>
+                <div class="device-info-row">
+                  <span>ยี่ห้อ : <span class="val-underline wide">{{ f6Record.xrayBrand }}</span></span>
+                  <span>รุ่น : <span class="val-underline">{{ f6Record.xrayModel }}</span></span>
+                  <span>หมายเลขเครื่อง : <span class="val-underline">{{ f6Record.xraySerial }}</span></span>
+                </div>
               </td>
             </tr>
             <tr>
@@ -195,22 +199,46 @@
               <td colspan="4" class="align-left">ข้อมูลเบื้องต้น : ระบุเทอมของตัวชี้บอกปริมาณรังสี เช่น ฟูจิ ใช้ S, EI คือ <span class="underline short">{{ f6Record.eiUnitInfo }}</span></td>
             </tr>
             <tr>
-              <td colspan="4" class="align-left">เทคนิคประมวลผลภาพ : <span class="underline long">{{ f6Record.processingTechnique }}</span></td>
+              <td colspan="4" class="align-left">เทคนิคประมวลผลภาพ : <span class="val-underline wide">{{ f6Record.processingTechnique }}</span></td>
             </tr>
             <tr class="ei-header">
               <th>วันที่ทำการทดสอบ</th><th>อ้างอิง</th><th>ขอบเขตล่าง</th><th>ขอบเขตบน</th>
             </tr>
-            <tr v-for="row in (f6Record.eiRows || []).slice(0, 3)" :key="'ei-' + row.id">
-              <td class="align-left">{{ row.technique }}</td>
-              <td>{{ row.eiRef }}</td>
-              <td>{{ row.eiMeasured }}</td>
-              <td>{{ row.passFail }}</td>
-            </tr>
-            <tr v-if="!(f6Record.eiRows && f6Record.eiRows.length)">
-              <td class="align-left">EI</td><td></td><td></td><td></td></tr>
-            <tr v-if="!(f6Record.eiRows && f6Record.eiRows.length)"><td class="align-left">EI จากเครื่อง</td><td></td><td></td><td></td></tr>
-            <tr><td class="align-left" colspan="2">EI อยู่ในเกณฑ์ (P/F)</td><td></td><td></td></tr>
-            <tr><td class="align-left" colspan="2">ข้อคิดเห็น</td><td colspan="2">{{ f6Record.comment }}</td></tr>
+            <template v-for="row in f6TestRows" :key="'ei-' + row.id">
+              <tr>
+                <td class="align-left">{{ formatDate(row.date) }}</td>
+                <td></td><td></td><td></td>
+              </tr>
+              <tr>
+                <td class="align-left">EI</td>
+                <td class="align-center">{{ row.ei_ref }}</td>
+                <td class="align-center">{{ row.ei_lower }}</td>
+                <td class="align-center">{{ row.ei_upper }}</td>
+              </tr>
+              <tr>
+                <td class="align-left">EI จากเครื่อง</td>
+                <td class="align-center">{{ row.eiMeasured_ref }}</td>
+                <td class="align-center">{{ row.eiMeasured_lower }}</td>
+                <td class="align-center">{{ row.eiMeasured_upper }}</td>
+              </tr>
+              <tr>
+                <td class="align-left">EI อยู่ในเกณฑ์ (P/F)</td>
+                <td class="align-center">{{ row.passFail_ref }}</td>
+                <td class="align-center">{{ row.passFail_lower }}</td>
+                <td class="align-center">{{ row.passFail_upper }}</td>
+              </tr>
+              <tr>
+                <td class="align-left">ข้อคิดเห็น</td>
+                <td colspan="3" class="align-left">{{ row.comment }}</td>
+              </tr>
+            </template>
+            <template v-if="!f6TestRows.length">
+              <tr><td></td><td></td><td></td><td></td></tr>
+              <tr><td class="align-left">EI</td><td></td><td></td><td></td></tr>
+              <tr><td class="align-left">EI จากเครื่อง</td><td></td><td></td><td></td></tr>
+              <tr><td class="align-left">EI อยู่ในเกณฑ์ (P/F)</td><td></td><td></td><td></td></tr>
+              <tr><td class="align-left">ข้อคิดเห็น</td><td colspan="3"></td></tr>
+            </template>
             <tr class="section-header">
               <td colspan="4" class="align-left">ปริมาณรังสีที่ใช้สำหรับการทดสอบ (กรณีศูนย์วิทยาศาสตร์การแพทย์ ดำเนินการวัดให้พร้อมตรวจมาตรฐานเครื่องเอกซเรย์ประจำปี)</td>
             </tr>
@@ -242,7 +270,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -282,9 +310,39 @@ const f5Record = ref({
 
 // F6 – โครงสร้างตรงกับ jsonData.F6
 const f6Record = ref({
-  cassetteNumber: '', readerNumber: '', xrayBrand: '', xrayModel: '', xraySerial: '', eiUnitInfo: '', processingTechnique: '', comment: '',
-  eiRows: [], testRows: [], doseRows: []
+  cassetteNumber: '', readerNumber: '', xrayBrand: '', xrayModel: '', xraySerial: '', eiUnitInfo: '', processingTechnique: '', remark: '',
+  testRows: [], doseRows: []
 })
+
+const f6TestRows = computed(() => {
+  if (Array.isArray(f6Record.value.testRows) && f6Record.value.testRows.length) {
+    return f6Record.value.testRows
+  }
+  return []
+})
+
+function formatDate(val) {
+  if (!val) return ''
+  const s = String(val).trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split('-')
+    const thaiYear = Number.parseInt(y, 10) + 543
+    return `${d}/${m}/${thaiYear}`
+  }
+  return s
+}
+
+function getLoggedInUser() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    return stored.username || ''
+  } catch (_) { return '' }
+}
+
+function resolveTester(saved) {
+  if (saved && saved !== 'Demo User') return saved
+  return getLoggedInUser() || saved || ''
+}
 
 onMounted(async () => {
   const id = route.query.id || route.params.id
@@ -294,7 +352,9 @@ onMounted(async () => {
     if (!res.ok) return
     const data = await res.json()
     const checkDate = data.checkDate || ''
-    const tester = data.tester || ''
+    const tester = resolveTester(data.tester)
+    const machineName = data.machineName || ''
+    const room = data.room || ''
     let parsed = {}
     if (data.jsonData) {
       try {
@@ -306,28 +366,50 @@ onMounted(async () => {
       Object.assign(f3Record.value, parsed.F3)
     }
     f3Record.value.date = f3Record.value.date || checkDate
-    f3Record.value.tester = f3Record.value.tester || tester
+    f3Record.value.tester = resolveTester(f3Record.value.tester) || tester
     // F4 – ใช้ items[] จาก jsonData
     if (parsed.F4 && typeof parsed.F4 === 'object') {
       Object.assign(f4Record.value, {
-        room: parsed.F4.room ?? '',
-        model: parsed.F4.model ?? '',
-        date: parsed.F4.date ?? checkDate,
-        tester: parsed.F4.tester ?? tester,
+        room: parsed.F4.room || room,
+        model: parsed.F4.model || machineName,
+        date: parsed.F4.date || checkDate,
+        tester: resolveTester(parsed.F4.tester) || tester,
         remark: parsed.F4.remark ?? ''
       })
       f4Rows.value = Array.isArray(parsed.F4.items) ? parsed.F4.items : []
+    } else {
+      f4Record.value.room = room
+      f4Record.value.model = machineName
+      f4Record.value.date = checkDate
+      f4Record.value.tester = tester
     }
     // F5
     if (parsed.F5 && typeof parsed.F5 === 'object') {
       Object.assign(f5Record.value, parsed.F5)
     }
     f5Record.value.date = f5Record.value.date || checkDate
-    f5Record.value.tester = f5Record.value.tester || tester
+    f5Record.value.tester = resolveTester(f5Record.value.tester) || tester
     // F6
     if (parsed.F6 && typeof parsed.F6 === 'object') {
       Object.assign(f6Record.value, parsed.F6)
     }
+    // ดึงข้อมูลเครื่องจาก API เพื่อเติมข้อมูลที่ฟอร์มไม่ได้เก็บ
+    let machineModel = ''
+    if (machineName) {
+      try {
+        const mRes = await fetch(`${API_BASE}/GetAllMachines`)
+        if (mRes.ok) {
+          const machines = await mRes.json()
+          const found = machines.find(mx => (mx.machineName || '').trim() === machineName.trim())
+          if (found) {
+            machineModel = found.model || ''
+          }
+        }
+      } catch (_) {}
+    }
+    f6Record.value.xrayBrand = f6Record.value.xrayBrand || machineName
+    f6Record.value.xrayModel = f6Record.value.xrayModel || machineModel
+    f6Record.value.xraySerial = f6Record.value.xraySerial || ''
   } catch (e) {
     console.error('Load checklist record error:', e)
   }
@@ -454,6 +536,9 @@ function handlePrint() {
 .multi-line-cell .underline.short { text-decoration: none !important; }
 .full-underline { display: inline-block; border-bottom: 0.4pt solid #000; width: 40mm; height: 4mm; vertical-align: middle; }
 .short-line { width: 25mm; }
+.device-info-row { display: flex; flex-wrap: wrap; gap: 4mm; align-items: baseline; }
+.val-underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 25mm; padding: 0 2mm 0.5mm; vertical-align: baseline; }
+.val-underline.wide { min-width: 40mm; }
 .section-header td { font-weight: 700; }
 .ei-header th { font-weight: 700; }
 .empty-row td { height: 10mm; }

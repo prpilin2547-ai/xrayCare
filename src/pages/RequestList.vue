@@ -14,40 +14,48 @@
 
                 <!-- ตารางแจ้งซ่อม -->
                 <div class="table-wrapper">
-                    <table class="table">
+                    <table class="table repair-table">
                         <thead>
                             <tr>
-                                <th>ลำดับ</th>
-                                <th>อุปกรณ์</th>
-                                <th>ห้องตรวจ</th>
-                                <th>วันที่แจ้ง</th>
-                                <th>รายละเอียด</th>
-                                <th>สถานะ</th>
-                                <th>รายละเอียด</th>
-                                <th>จัดการ</th>
+                                <th class="col-no">#</th>
+                                <th class="col-equip">อุปกรณ์</th>
+                                <th class="col-room">ห้อง</th>
+                                <th class="col-date">วันที่แจ้ง</th>
+                                <th class="col-time">เวลา</th>
+                                <th class="col-user">ผู้ทำ</th>
+                                <th class="col-detail">รายละเอียด</th>
+                                <th class="col-status">สถานะ</th>
+                                <th class="col-action" colspan="2">การจัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item, index) in activeItems" :key="item.id">
-                                <!-- ใช้ index + 1 เป็นลำดับแทน id -->
-                                <td>{{ index + 1 }}</td>
-                                <td>{{ getEquipmentText(item) }}</td>
-                                <td>{{ getRoomText(item) }}</td>
-                                <td>{{ item.requestDate || '-' }}</td>
-                                <td>{{ item.detail }}</td>
-                                <td class="status" :class="getStatusCellClass(item.statusText)">
-                                    {{ item.statusText }}
+                            <tr v-if="activeItems.length === 0">
+                                <td colspan="10" class="empty-row">
+                                    <i class="bi bi-inbox"></i>
+                                    <span>ไม่มีรายการแจ้งซ่อม</span>
                                 </td>
-                                <!-- ✅ คอลัมน์ใหม่: ลิงก์ไปดูรายละเอียด -->
-                                <td>
-                                    <span class="detail-link" @click="openDetail(item)">
-                                        ดูรายละเอียด
+                            </tr>
+                            <tr v-for="(item, index) in activeItems" :key="item.id">
+                                <td class="col-no">{{ index + 1 }}</td>
+                                <td class="col-equip">{{ getEquipmentText(item) }}</td>
+                                <td class="col-room">{{ getRoomText(item) }}</td>
+                                <td class="col-date">{{ getDisplayDate(item.requestDate) }}</td>
+                                <td class="col-time">{{ getDisplayTime(item.requestDate) }}</td>
+                                <td class="col-user">{{ item.reporterName || '-' }}</td>
+                                <td class="col-detail">{{ item.detail }}</td>
+                                <td class="col-status">
+                                    <span class="status-badge" :class="getStatusCellClass(item.statusText)">
+                                        {{ item.statusText }}
                                     </span>
                                 </td>
-                                <!-- ✅ คอลัมน์ใหม่: ลบ -->
-                                <td>
+                                <td class="col-action">
+                                    <span class="detail-link" @click="openDetail(item)">
+                                        <i class="bi bi-eye me-1"></i>ดูรายละเอียด
+                                    </span>
+                                </td>
+                                <td class="col-action">
                                     <span class="delete-link" @click="deleteItem(item.id)">
-                                        ลบ
+                                        <i class="bi bi-trash3 me-1"></i>ลบ
                                     </span>
                                 </td>
                             </tr>
@@ -93,11 +101,27 @@
                             </ul>
                         </div>
 
-                        <!-- วันที่แจ้ง (ใหม่) -->
+                        <!-- วันที่แจ้ง -->
                         <div class="mb-3">
                             <strong>วันที่แจ้ง</strong>
                             <ul class="content-list">
-                                <li>{{ selectedItem.requestDate || '-' }}</li>
+                                <li>{{ getDisplayDate(selectedItem.requestDate) || '-' }}</li>
+                            </ul>
+                        </div>
+
+                        <!-- เวลาที่ทำ -->
+                        <div class="mb-3">
+                            <strong>เวลาที่ทำ</strong>
+                            <ul class="content-list">
+                                <li>{{ getDisplayTime(selectedItem.requestDate) }}</li>
+                            </ul>
+                        </div>
+
+                        <!-- ผู้ทำ -->
+                        <div class="mb-3">
+                            <strong>ผู้ทำ</strong>
+                            <ul class="content-list">
+                                <li>{{ selectedItem.reporterName || '-' }}</li>
                             </ul>
                         </div>
 
@@ -185,7 +209,7 @@
                             </div>
                         </div>
 
-                        <!-- วันที่แจ้งซ่อม (ใหม่) -->
+                        <!-- วันที่แจ้งซ่อม -->
                         <div class="row mt-3">
                             <label class="label">วันที่แจ้งซ่อม :</label>
                             <div class="field">
@@ -196,6 +220,15 @@
                                         <i class="bi bi-calendar-event"></i>
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- ชื่อผู้แจ้ง (ดึงจากบัญชี user ที่ล็อกอิน) -->
+                        <div class="row mt-3">
+                            <label class="label">ชื่อผู้แจ้ง :</label>
+                            <div class="field">
+                                <input v-model="reporterName" type="text" class="form-control form-control-sm"
+                                    placeholder="จากบัญชีที่ล็อกอิน" />
                             </div>
                         </div>
 
@@ -303,9 +336,10 @@ const fileInput = ref(null)
 const fileName = ref('')
 
 const detail = ref('')
-const remarks = ref('')           // หมายเหตุ (ใหม่)
+const remarks = ref('')
 const selectedEquipment = ref('')
-const selectedRoom = ref('')       // ห้องตรวจ (ใหม่)
+const selectedRoom = ref('')
+const reporterName = ref('')
 // วันที่แจ้งซ่อม — ค่าเริ่มต้นเป็นวันปัจจุบัน DD/MM/YYYY
 const _now = new Date()
 const _defaultDate = `${String(_now.getDate()).padStart(2, '0')}/${String(_now.getMonth() + 1).padStart(2, '0')}/${_now.getFullYear()}`
@@ -400,6 +434,63 @@ const formatEnglishDate = (dateObj) => {
     return `${day}/${month}/${year}`
 }
 
+// เวลาปัจจุบันในรูปแบบ HH:mm:ss (ใช้ตอนบันทึก)
+const formatTimeNow = () => {
+    const d = new Date()
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+
+// ดึงเฉพาะวันที่จาก requestDate (DD/MM/YYYY หรือส่วนก่อนช่องว่าง)
+function getDisplayDate(str) {
+    if (!str || typeof str !== 'string') return '-'
+    const part = str.trim().split(/\s+/)[0]
+    return part || '-'
+}
+
+// ดึงเฉพาะเวลาจาก requestDate (HH:mm:ss) ถ้าไม่มีให้ 00:00:00
+function getDisplayTime(str) {
+    if (!str || typeof str !== 'string') return '00:00:00'
+    const parts = str.trim().split(/\s+/)
+    for (let i = parts.length - 1; i >= 0; i--) {
+        const m = parts[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+        if (m) return `${m[1].padStart(2, '0')}:${m[2]}:${(m[3] || '00').padStart(2, '0')}`
+    }
+    return '00:00:00'
+}
+
+// ดึงชื่อผู้ใช้ที่ล็อกอินจาก localStorage (บัญชี user)
+function getLoggedInUsername() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+        return (stored && stored.username) ? String(stored.username).trim() : ''
+    } catch {
+        return ''
+    }
+}
+
+// คำนวณ timestamp สำหรับเรียงลำดับจาก requestDate (รองรับ DD/MM/YYYY และ DD/MM/YYYY HH:mm:ss)
+function parseRequestDateForSort(str) {
+    if (!str || typeof str !== 'string') return 0
+    const trimmed = str.trim()
+    const datePart = (trimmed.split(/\s+/)[0] || trimmed).trim()
+    const parts = datePart.split('/')
+    if (parts.length >= 3) {
+        const d = parseInt(parts[0], 10)
+        const m = parseInt(parts[1], 10) - 1
+        const y = parseInt(parts[2], 10)
+        const yAd = y > 2400 ? y - 543 : y
+        let t = new Date(yAd, m, d).getTime()
+        if (isNaN(t)) return 0
+        const timePart = trimmed.split(/\s+/)[1]
+        const timeMatch = timePart && timePart.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+        if (timeMatch) {
+            t += (parseInt(timeMatch[1], 10) * 3600 + parseInt(timeMatch[2], 10) * 60 + parseInt(timeMatch[3] || '0', 10)) * 1000
+        }
+        return t
+    }
+    return 0
+}
+
 // Grid
 const daysGrid = computed(() => {
     const cells = []
@@ -460,10 +551,11 @@ const openCalendar = () => {
 
 // -------------------------------------------------------------
 
-// แสดงเฉพาะรายการที่ยังไม่ "ดำเนินการแล้ว"
-const activeItems = computed(() =>
-    items.value.filter(i => i.statusText !== 'ดำเนินการแล้ว')
-)
+// แสดงเฉพาะรายการที่ยังไม่ "ดำเนินการแล้ว" และเรียงจากทำล่าสุดเป็นลำดับแรก
+const activeItems = computed(() => {
+    const list = items.value.filter(i => i.statusText !== 'ดำเนินการแล้ว')
+    return [...list].sort((a, b) => parseRequestDateForSort(b.requestDate) - parseRequestDateForSort(a.requestDate))
+})
 
 // helper แสดงชื่ออุปกรณ์ (ตัดคำว่า "ห้อง X" ออกกรณีเป็นข้อมูลเก่า)
 const getEquipmentText = (item) => {
@@ -486,8 +578,9 @@ const getEquipmentWithRoom = (item) => {
     return room ? `${equip} ${room}` : equip
 }
 
-// เปิด modal
+// เปิด modal — เติมชื่อผู้แจ้งจากบัญชี user ที่ล็อกอิน
 const openModal = () => {
+    reporterName.value = getLoggedInUsername()
     modal.show()
 }
 
@@ -565,13 +658,17 @@ const submitForm = async () => {
     showError.value = false
 
     try {
+        const dateTimeStr = requestDate.value.trim().includes(' ')
+            ? requestDate.value
+            : `${requestDate.value} ${formatTimeNow()}`
         const res = await fetch(`${API_BASE}/AddRepairRequest`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 equipment: selectedEquipment.value,
                 room: selectedRoom.value,
-                requestDate: requestDate.value,
+                requestDate: dateTimeStr,
+                reporterName: reporterName.value?.trim() || '',
                 detail: detail.value,
                 remarks: remarks.value,
                 statusText: 'รอซ่อม',
@@ -589,6 +686,7 @@ const submitForm = async () => {
         selectedEquipment.value = ''
         selectedRoom.value = ''
         requestDate.value = _defaultDate
+        reporterName.value = ''
         detail.value = ''
         remarks.value = ''
         fileName.value = ''
@@ -703,78 +801,119 @@ const deleteItem = async (id) => {
 }
 
 .table-wrapper {
-    border-radius: var(--radius-lg, 16px);
+    border-radius: 16px;
     overflow-x: auto;
-    overflow-y: visible;
-    border: 1px solid var(--border-card, rgba(0,0,0,0.06));
-    box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06));
-    background: var(--bg-card, #fff);
-    padding: 14px 16px 18px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+    background: #fff;
     -webkit-overflow-scrolling: touch;
 }
 
-.table {
+.repair-table {
     width: 100%;
+    min-width: 960px;
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
 }
 
-.table thead {
-    background: #f8fafc;
+.repair-table thead {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-.table th {
-    padding: 12px 16px;
+.repair-table th {
+    padding: 14px 12px;
     font-size: 0.72rem;
     font-weight: 700;
-    color: var(--text-muted, #94a3b8);
-    letter-spacing: 0.05em;
+    color: #64748b;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    border-bottom: 1px solid var(--border-soft, #e2e8f0);
-    text-align: center;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
 }
 
-/* ลบเอฟเฟกต์ hover สีเทาที่หัวคอลัมน์ (ลำดับ อุปกรณ์ ห้องตรวจ สถานะ เป็นต้น) */
-.table thead th:hover {
-    background: #f8fafc;
-}
-
-.table td {
-    padding: 12px 16px;
-    color: var(--text-secondary, #475569);
+.repair-table td {
+    padding: 12px;
+    color: #334155;
     border-bottom: 1px solid #f1f5f9;
-    text-align: center;
+    vertical-align: middle;
 }
 
-.table tbody tr {
-    transition: background 150ms;
+.repair-table tbody tr {
+    transition: background 120ms ease;
 }
 
-.table tbody tr:hover {
+.repair-table tbody tr:hover {
     background: #f8fafc;
 }
 
+.repair-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column widths */
+.col-no { width: 44px; text-align: center; }
+.col-equip { min-width: 140px; }
+.col-room { width: 64px; text-align: center; }
+.col-date { width: 106px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.col-time { width: 80px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.col-user { width: 110px; }
+.col-detail { min-width: 130px; }
+.col-status { width: 120px; text-align: center; }
+.col-action { white-space: nowrap; text-align: center; }
+
+.empty-row {
+    text-align: center;
+    padding: 48px 16px !important;
+    color: #94a3b8;
+    font-size: 0.92rem;
+}
+.empty-row i { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+
+/* Status badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.status-badge.status-waiting { background: #fef2f2; color: #dc2626; }
+.status-badge.status-progress { background: #fff7ed; color: #ea580c; }
+.status-badge.status-completed { background: #f0fdf4; color: #16a34a; }
+
+/* Action links */
 .detail-link {
-    color: var(--purple-soft, #0EA5E9);
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.detail-link:hover {
-    color: var(--purple-main, #0369A1);
-}
-
-.delete-link {
-    padding: 5px 14px;
-    border-radius: var(--radius-sm, 8px);
-    border: 1px solid #fecaca;
-    background: #fef2f2;
-    color: #dc2626;
+    display: inline-flex;
+    align-items: center;
+    color: #0EA5E9;
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-fast, 150ms);
+    white-space: nowrap;
+    transition: color 150ms;
+}
+
+.detail-link:hover {
+    color: #0369A1;
+    text-decoration: underline;
+}
+
+.delete-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #dc2626;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 150ms;
 }
 
 .delete-link:hover {
@@ -813,22 +952,23 @@ const deleteItem = async (id) => {
 }
 
 .box-header {
-    background: #f8fafc;
-    border-bottom: 1px solid var(--border-soft, #e2e8f0);
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    font-weight: 700;
     display: flex;
     min-height: 60px;
 }
 
 .header-label {
     width: 120px;
-    border-right: 1px solid var(--border-soft, #e2e8f0);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     padding: 10px;
-    font-size: 0.85rem;
-    color: var(--text-secondary, #475569);
+    color: #fff;
 }
 
 .header-value {
@@ -836,8 +976,8 @@ const deleteItem = async (id) => {
     display: flex;
     align-items: center;
     padding: 10px 20px;
-    font-weight: 400;
-    color: var(--text-main, #0f172a);
+    font-weight: 500;
+    color: #fff;
 }
 
 .box-body {
@@ -903,34 +1043,7 @@ ul.content-list li::before {
     border: 1px solid #86efac;
 }
 
-/* สีสถานะให้ตรงกับ RequestEN: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
-.status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: var(--radius-full, 9999px);
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.status.status-waiting,
-.status.pending {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.status.status-progress,
-.status.in-progress {
-    background: #fff7ed;
-    color: #ea580c;
-}
-
-.status.status-completed,
-.status.completed {
-    background: #f0fdf4;
-    color: #16a34a;
-}
+/* (status badge styles moved above into .status-badge) */
 
 .btn-file {
     background: #fff;

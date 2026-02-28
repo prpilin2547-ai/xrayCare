@@ -12,6 +12,9 @@
         <div class="pill">
           ผู้บันทึก : {{ currentUserName }}
         </div>
+        <div class="pill">
+          เวลา : {{ currentTime }}
+        </div>
       </div>
 
       <!-- กล่องเนื้อหาหลัก -->
@@ -250,7 +253,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -276,6 +279,12 @@ onMounted(() => {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
   } catch (e) { /* ignore */ }
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
+})
+
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
 })
 
 const todayText = computed(() => {
@@ -286,6 +295,14 @@ const todayText = computed(() => {
     year: 'numeric'
   })
 })
+
+const currentTime = ref('')
+function updateTime() {
+  const d = new Date()
+  currentTime.value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+
+let timeInterval = null
 
 let runningId = 1
 const createEmptyItem = () => ({
@@ -319,7 +336,7 @@ const saveChecklist = async () => {
     formType: 'F9',
     machineName: '',
     room: '',
-    checkDate: todayText.value,
+    checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
       items: items.value

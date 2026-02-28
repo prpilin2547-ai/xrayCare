@@ -85,6 +85,9 @@ namespace api.xraycare.Migrations
                     b.Property<string>("RequestDate")
                         .HasColumnType("text");
 
+                    b.Property<string>("ReporterName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Detail")
                         .HasColumnType("text");
 

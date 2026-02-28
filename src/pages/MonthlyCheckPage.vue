@@ -13,6 +13,7 @@
         <div class="pill">ห้อง {{ selectedDevice.room }}</div>
         <div class="pill">วันที่ : {{ todayText }}</div>
         <div class="pill">ผู้ทดสอบ : {{ currentUserName }}</div>
+        <div class="pill">เวลา : {{ currentTime }}</div>
       </div>  
       <!-- layout หลัก: sidebar + content -->
       <div class="page-layout">
@@ -71,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -112,6 +113,9 @@ onMounted(async () => {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
   } catch (e) { /* ignore */ }
+
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
 
   try {
     const res = await fetch(`${API_BASE}/GetAllMachines`)
@@ -158,6 +162,17 @@ const todayText = computed(() => {
   })
 })
 
+const currentTime = ref('')
+function updateTime() {
+  const d = new Date()
+  currentTime.value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+let timeInterval = null
+
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
+})
+
 /* sidebar */
 const formTabs = [
   { id: 'F3', code: 'F3', title: 'Display monitor' },
@@ -196,7 +211,7 @@ const handleSave = async (payloadF6) => {
     formType: 'F3_F6',
     machineName: selectedDevice.value.name,
     room: selectedDevice.value.room,
-    checkDate: todayText.value,
+    checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
       F3: formF3.value,

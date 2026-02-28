@@ -3,7 +3,7 @@
   <MainLayout>
     <div class="checklist-page">
       <!-- หัวข้อ CHECKLIST -->
-      <h1 class="page-title">อัตราการถ่ายภาพซ้ำ</h1>
+      <h1 class="page-title">แบบบันทึก F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ</h1>
 
       <!-- แถวแคปซูลสีส้มด้านบน -->
       <div class="pill-row">
@@ -22,6 +22,9 @@
         <div class="pill">
           ผู้บันทึก : {{ currentUserName }}
         </div>
+        <div class="pill">
+          เวลา : {{ currentTime }}
+        </div>
       </div>
 
       <!-- กล่องเนื้อหาขาวตรงกลาง -->
@@ -33,7 +36,7 @@
               <!-- หัวตารางหลัก -->
               <tr class="row-header-main">
                 <td colspan="2" class="text-center">
-                  แบบบันทึก F12 : แบบบันทึกอัตราการถ่ายภาพซ้ำ
+                  แบบบันทึกอัตราการถ่ายภาพซ้ำ
                 </td>
               </tr>
 
@@ -127,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -153,11 +156,24 @@ const currentUserName = computed(() =>
   userName.value || props.currentUserName || 'Demo User'
 )
 
+const currentTime = ref('')
+function updateTime() {
+  const d = new Date()
+  currentTime.value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+let timeInterval = null
+
 onMounted(() => {
   try {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
   } catch (e) { /* ignore */ }
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
+})
+
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
 })
 
 const todayText = computed(() => {
@@ -213,7 +229,7 @@ const saveChecklist = async () => {
     formType: 'F12',
     machineName: '',
     room: '',
-    checkDate: todayText.value,
+    checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
       reason: selectedReason.value,

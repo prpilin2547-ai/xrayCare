@@ -11,7 +11,7 @@
         <i class="fa-solid fa-shield-halved"></i>
       </div>
 
-      <h1 class="login-title">Welcome Back</h1>
+      <h1 class="login-title">Welcome</h1>
       <p class="login-subtitle">Sign in to X-RayCare QC System</p>
 
       <form class="login-form" @submit.prevent="handleLogin">

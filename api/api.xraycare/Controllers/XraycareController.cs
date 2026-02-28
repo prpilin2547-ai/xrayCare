@@ -248,13 +248,14 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> GetAllRepairRequests()
         {
             var list = await _db.RepairRequests
-                .OrderBy(r => r.RID)
+                .OrderByDescending(r => r.RID)
                 .Select(r => new
                 {
                     id = r.RID,
                     equipment = r.Equipment,
                     room = r.Room,
                     requestDate = r.RequestDate,
+                    reporterName = r.ReporterName,
                     detail = r.Detail,
                     remarks = r.Remarks,
                     statusText = r.StatusText,
@@ -278,6 +279,7 @@ namespace api.xraycare.Controllers
                     Equipment = request.equipment,
                     Room = request.room ?? "",
                     RequestDate = request.requestDate ?? "",
+                    ReporterName = request.reporterName ?? "",
                     Detail = request.detail ?? "",
                     Remarks = request.remarks ?? "",
                     StatusText = request.statusText ?? "รอซ่อม",
@@ -292,6 +294,7 @@ namespace api.xraycare.Controllers
                     equipment = entity.Equipment,
                     room = entity.Room,
                     requestDate = entity.RequestDate,
+                    reporterName = entity.ReporterName,
                     detail = entity.Detail,
                     remarks = entity.Remarks,
                     statusText = entity.StatusText,
@@ -328,6 +331,7 @@ namespace api.xraycare.Controllers
                     equipment = entity.Equipment,
                     room = entity.Room,
                     requestDate = entity.RequestDate,
+                    reporterName = entity.ReporterName,
                     detail = entity.Detail,
                     remarks = entity.Remarks,
                     statusText = entity.StatusText,
@@ -736,6 +740,7 @@ namespace api.xraycare.Controllers
         public string equipment { get; set; } = "";
         public string? room { get; set; }
         public string? requestDate { get; set; }
+        public string? reporterName { get; set; }
         public string? detail { get; set; }
         public string? remarks { get; set; }
         public string? statusText { get; set; }
