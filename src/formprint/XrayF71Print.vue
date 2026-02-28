@@ -399,6 +399,18 @@ function handlePrint () {
 
 const API_BASE = '/api/Xraycare'
 
+function getLoggedInUser() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+    return stored.username || ''
+  } catch (_) { return '' }
+}
+
+function resolveTester(saved) {
+  if (saved && saved !== 'Demo User') return saved
+  return getLoggedInUser() || saved || ''
+}
+
 function mapJsonToF7 (obj) {
   if (!obj || typeof obj !== 'object') return defaultF7()
   const lm = Array.isArray(obj.lightMismatch) && obj.lightMismatch.length
@@ -432,8 +444,9 @@ onMounted(async () => {
     if (!res.ok) return
     const data = await res.json()
     header.value.testDate = data.checkDate || ''
-    header.value.tester = data.tester || ''
+    header.value.tester = resolveTester(data.tester)
     header.value.machineBrand = data.machineName || ''
+    const machineName = data.machineName || ''
     if (data.jsonData) {
       try {
         const parsed = JSON.parse(data.jsonData)
@@ -442,15 +455,38 @@ onMounted(async () => {
         if (parsed.machineModel !== undefined) header.value.machineModel = parsed.machineModel
         if (parsed.roomNo !== undefined) header.value.roomNo = parsed.roomNo
         if (parsed.testDate !== undefined) header.value.testDate = parsed.testDate
-        if (parsed.tester !== undefined) header.value.tester = parsed.tester
+        if (parsed.tester !== undefined) header.value.tester = resolveTester(parsed.tester)
         // F7_1 / F7_2
         if (parsed.F7_1) f71.value = mapJsonToF7(parsed.F7_1)
         if (parsed.F7_2) f72.value = mapJsonToF7(parsed.F7_2)
+
+        // resolve tester ใน f71/f72 ให้ไม่เป็น "Demo User"
+        f71.value.tester = resolveTester(f71.value.tester)
+        f72.value.tester = resolveTester(f72.value.tester)
+
+        // ดึง model จาก API machines
+        let machineModel = ''
+        try {
+          const mRes = await fetch(`${API_BASE}/GetAllMachines`)
+          if (mRes.ok) {
+            const machines = await mRes.json()
+            const nameToMatch = (machineName || f71.value.machineName || header.value.machineBrand || '').trim()
+            if (nameToMatch) {
+              const found = machines.find(mx => (mx.machineName || '').trim() === nameToMatch)
+              if (found) machineModel = found.model || ''
+            }
+          }
+        } catch (_) {}
+
         // Header จาก F7_1 ถ้ายังไม่มี
         if (f71.value.machineName) header.value.machineBrand = f71.value.machineName
-        if (f71.value.machineModel) header.value.machineModel = f71.value.machineModel
+        header.value.machineModel = f71.value.machineModel || machineModel || header.value.machineModel
         if (f71.value.testDate) header.value.testDate = f71.value.testDate
         if (f71.value.tester) header.value.tester = f71.value.tester
+
+        // เติม machineModel ให้ f71/f72 ด้วย (ใช้ค่าจาก API machines)
+        if (!f71.value.machineModel) f71.value.machineModel = machineModel
+        if (!f72.value.machineModel) f72.value.machineModel = machineModel
         // F8-1 (รองรับ F8_1.rows, F8_1 เป็น array, F8_1 เป็น object เดี่ยว จากฟอร์ม F8CRDarkNoiseForm)
         let rawF81 = []
         if (parsed.F8_1 != null) {
@@ -470,17 +506,23 @@ onMounted(async () => {
         }
         // F8-2
         if (parsed.F8_2) {
-          if (parsed.F8_2.basicInfo?.testerName) header.value.tester = parsed.F8_2.basicInfo.testerName
+          if (parsed.F8_2.basicInfo?.testerName) header.value.tester = resolveTester(parsed.F8_2.basicInfo.testerName)
           if (parsed.F8_2.basicInfo?.testDate) header.value.testDate = parsed.F8_2.basicInfo.testDate
           if (Array.isArray(parsed.F8_2.rows)) {
-            f82Rows.value = parsed.F8_2.rows.map(r => ({
-              fpdNo: r.fpdNo ?? '',
-              fpdSize: r.fpdSize ?? (r.fpdSizeOther && r.fpdSizeOther !== '' ? r.fpdSizeOther : ''),
-              id: r.imageId ?? r.id ?? '',
-              ei: r.ei != null ? String(r.ei) : '',
-              ddi: r.ddi != null ? String(r.ddi) : '',
-              pixelMean: r.pixelMean != null ? String(r.pixelMean) : ''
-            }))
+            f82Rows.value = parsed.F8_2.rows.map(r => {
+              let size = r.fpdSize ?? ''
+              if (size === 'other') {
+                size = r.fpdSizeOther ? `อื่นๆ (${r.fpdSizeOther})` : 'อื่นๆ'
+              }
+              return {
+                fpdNo: r.fpdNo ?? '',
+                fpdSize: size,
+                id: r.imageId ?? r.id ?? '',
+                ei: r.ei != null ? String(r.ei) : '',
+                ddi: r.ddi != null ? String(r.ddi) : '',
+                pixelMean: r.pixelMean != null ? String(r.pixelMean) : ''
+              }
+            })
           }
         }
         if (parsed.formTitle !== undefined) f82FormTitle.value = parsed.formTitle

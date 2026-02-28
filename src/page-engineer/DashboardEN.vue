@@ -44,6 +44,7 @@
             <th>No.</th>
             <th>Equipment (Brand/Model)</th>
             <th>Room</th>
+            <th>Reporter</th>
             <th>Repair Status</th>
           </tr>
         </thead>
@@ -52,6 +53,7 @@
             <td>{{ index + 1 }}</td>
             <td>{{ item.equipment || '-' }}</td>
             <td>{{ item.room || '-' }}</td>
+            <td>{{ item.reporterName || '-' }}</td>
             <td class="status" :class="getStatusClass(item.statusText)">{{ item.statusText || '-' }}</td>
           </tr>
         </tbody>
