@@ -18,7 +18,7 @@
                 <th class="col-room">ห้อง</th>
                 <th class="col-date">วันที่ได้รับแจ้ง</th>
                 <th class="col-time">เวลา</th>
-                <th class="col-user">ผู้ทำ</th>
+                <th class="col-user">ผู้แจ้งซ่อม</th>
                 <th class="col-detail">รายละเอียด</th>
                 <th class="col-status">สถานะ</th>
                 <th class="col-action" colspan="2">การจัดการ</th>

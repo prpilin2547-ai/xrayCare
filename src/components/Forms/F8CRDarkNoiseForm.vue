@@ -8,8 +8,26 @@
             <!-- <p class="text-muted mb-3">ความถี่ : ทุก 6 เดือน</p> -->
 
             <!-- ตาราง -->
-            <div class="table-responsive mb-3">
-                <table class="table table-bordered table-sm align-middle mb-0">
+            <div class="table-responsive mb-3 cr-table-wrap">
+                <table class="table table-bordered table-sm align-middle mb-0 cr-noise-table">
+                    <colgroup>
+                      <col class="col-ip-no" />
+                      <col class="col-ip-size" />
+                      <col class="col-id" />
+                      <col class="col-type" />
+                      <col class="col-eis" />
+                      <col class="col-val" />
+                      <col class="col-val" />
+                      <col class="col-val" />
+                      <col class="col-mean" />
+                      <col class="col-val" />
+                      <col class="col-val" />
+                      <col class="col-val" />
+                      <col class="col-mean" />
+                      <col class="col-pf" />
+                      <col class="col-pf" />
+                      <col class="col-action" />
+                    </colgroup>
                     <thead class="table-light text-center small">
                         <!-- แถวหัวบนสุด -->
                         <tr>
@@ -234,4 +252,80 @@ const submitNext = () => {
     }
     emit('next', { rows: allRows })
 }
+
+const attachmentFileName = ref('')
+const onFileChange = (e) => {
+  const file = e.target.files[0]
+  attachmentFileName.value = file ? file.name : ''
+}
 </script>
+
+<style scoped>
+.cr-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cr-noise-table {
+  min-width: 1100px;
+  table-layout: fixed;
+}
+
+.cr-noise-table th,
+.cr-noise-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 6px 4px;
+}
+
+.cr-noise-table th {
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+/* column widths */
+.cr-noise-table colgroup col.col-ip-no    { width: 70px; }
+.cr-noise-table colgroup col.col-ip-size  { width: 70px; }
+.cr-noise-table colgroup col.col-id       { width: 70px; }
+.cr-noise-table colgroup col.col-type     { width: 70px; }
+.cr-noise-table colgroup col.col-eis      { width: 65px; }
+.cr-noise-table colgroup col.col-val      { width: 65px; }
+.cr-noise-table colgroup col.col-mean     { width: 68px; }
+.cr-noise-table colgroup col.col-pf       { width: 55px; }
+.cr-noise-table colgroup col.col-action   { width: 80px; }
+
+.cr-noise-table td input.form-control {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 5px;
+  font-size: 0.82rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.cr-noise-table td input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.cr-noise-table td input[type="number"]::-webkit-inner-spin-button,
+.cr-noise-table td input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cr-noise-table td button {
+  white-space: nowrap;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cr-noise-table td button:hover {
+  background: #e5e7eb;
+}
+</style>

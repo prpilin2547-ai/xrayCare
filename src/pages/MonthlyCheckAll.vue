@@ -13,6 +13,7 @@
         <div class="pill">ห้อง {{ selectedDevice.room }}</div>
         <div class="pill">วันที่ : {{ todayText }}</div>
         <div class="pill">ผู้ทดสอบ : {{ currentUserName }}</div>
+        <div class="pill">เวลา : {{ currentTime }}</div>
       </div>
 
       <!-- layout หลัก: sidebar + content -->
@@ -74,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -111,6 +112,9 @@ const currentUserName = computed(() =>
 )
 
 onMounted(async () => {
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
+
   try {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
@@ -152,6 +156,10 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
+})
+
 const todayText = computed(() => {
   const d = new Date()
   return d.toLocaleDateString('th-TH', {
@@ -160,6 +168,14 @@ const todayText = computed(() => {
     year: 'numeric'
   })
 })
+
+const currentTime = ref('')
+let timeInterval = null
+
+function updateTime() {
+  const d = new Date()
+  currentTime.value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
 
 /* sidebar tab config: เหลือเฉพาะ 6 เดือน */
 const formTabs6M = [
@@ -206,7 +222,7 @@ const handleSave = async (payloadF8_2) => {
     formType: 'F7_F8',
     machineName: selectedDevice.value.name,
     room: selectedDevice.value.room,
-    checkDate: todayText.value,
+    checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
       F7_1: formF7_1.value,
