@@ -19,6 +19,9 @@
         <div class="pill">
           ผู้ทดสอบ : {{ currentUserName }}
         </div>
+        <div class="pill">
+          เวลา : {{ currentTime }}
+        </div>
       </div>
 
       <!-- รายการที่ต้องทำวันนี้ตาม Schedule (จาก Dashboard) -->
@@ -168,7 +171,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -207,6 +210,9 @@ onMounted(async () => {
     if (stored.username) userName.value = stored.username;
   } catch (e) {}
 
+  updateTime()
+  timeInterval = setInterval(updateTime, 1000)
+
   try {
     const res = await fetch(`${API_BASE}/GetAllMachines`);
     if (!res.ok) return;
@@ -241,17 +247,24 @@ const today = ref(new Date())
 // แสดงวันที่บน UI
 // แสดงวันเวลาไทย (Asia/Bangkok)
 const todayText = computed(() =>
-  today.value.toLocaleString('th-TH', {
+  today.value.toLocaleDateString('th-TH', {
     timeZone: 'Asia/Bangkok',
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
+    day: '2-digit'
   })
 )
+
+const currentTime = ref('')
+function updateTime() {
+  const d = new Date()
+  currentTime.value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+let timeInterval = null
+
+onUnmounted(() => {
+  if (timeInterval) clearInterval(timeInterval)
+})
 
 // วันครบ 3 เดือน
 const threeMonthDate = computed(() => {
@@ -399,7 +412,7 @@ async function performSaveChecklist() {
     formType: 'F1_F2',
     machineName: selectedDevice.value.name,
     room: selectedDevice.value.room,
-    checkDate: todayText.value,
+    checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
       checklist: checklistItems.value,

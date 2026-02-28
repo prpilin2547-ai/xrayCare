@@ -352,6 +352,7 @@
                 <thead>
                   <tr>
                     <th>วันที่</th>
+                    <th>เวลาที่ทำ</th>
                     <th>ผู้ทำ</th>
                     <th>เครื่อง / ห้อง</th>
                     <th>ประเภทรายการ</th>
@@ -360,13 +361,14 @@
                 </thead>
                 <tbody>
                   <tr v-if="paginatedHistory.length === 0">
-                    <td colspan="5" class="text-center text-muted py-5">
+                    <td colspan="6" class="text-center text-muted py-5">
                       <i class="bi bi-inbox display-6 d-block mb-2"></i>
                       ไม่พบรายการตามเงื่อนไข
                     </td>
                   </tr>
                   <tr v-else v-for="(item, idx) in paginatedHistory" :key="item.uid">
                     <td class="history-date">{{ item.displayDate }}</td>
+                    <td class="history-time">{{ item.displayTime }}</td>
                     <td>{{ item.user }}</td>
                     <td>{{ item.machine }}</td>
                     <td>
@@ -410,6 +412,7 @@
           </h3>
           <div class="modal-body-inner">
             <p><strong>วันที่:</strong> {{ historyModal.data.displayDate }}</p>
+            <p><strong>เวลาที่ทำ:</strong> {{ historyModal.data.displayTime }}</p>
             <p><strong>ผู้ทำ:</strong> {{ historyModal.data.user }}</p>
             <p><strong>เครื่อง / ห้อง:</strong> {{ historyModal.data.machine }}</p>
             <p><strong>ประเภทรายการ:</strong> {{ historyModal.data.typeLabel }}</p>
@@ -839,6 +842,24 @@ const historyFilters = ref({
 const historyPage = ref(1)
 const HISTORY_PAGE_SIZE = 20
 
+/** ดึงเฉพาะเวลาจากสตริงวันที่ (เช่น "27/02/2569 19:39:27" -> "19:39:27") ถ้าไม่มีเวลาให้แสดง "00:00:00" เพื่อให้ทุกรายการมีเวลาในรูปแบบ HH:mm:ss */
+function extractDisplayTime(str) {
+  const fallback = '00:00:00'
+  if (!str || typeof str !== 'string') return fallback
+  const trimmed = str.trim()
+  const parts = trimmed.split(/\s+/)
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const timeMatch = parts[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+    if (timeMatch) {
+      const h = timeMatch[1].padStart(2, '0')
+      const m = timeMatch[2]
+      const s = (timeMatch[3] || '00').padStart(2, '0')
+      return `${h}:${m}:${s}`
+    }
+  }
+  return fallback
+}
+
 function parseCheckDateForSort(str) {
   if (!str || typeof str !== 'string') return 0
   const trimmed = str.trim()
@@ -849,8 +870,17 @@ function parseCheckDateForSort(str) {
     const m = parseInt(parts[1], 10) - 1
     const y = parseInt(parts[2], 10)
     const yAd = y > 2400 ? y - 543 : y
-    const t = new Date(yAd, m, d).getTime()
-    return isNaN(t) ? 0 : t
+    let t = new Date(yAd, m, d).getTime()
+    if (isNaN(t)) return 0
+    const timePart = trimmed.split(/\s+/)[1]
+    const timeMatch = timePart && timePart.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+    if (timeMatch) {
+      const h = parseInt(timeMatch[1], 10)
+      const min = parseInt(timeMatch[2], 10)
+      const sec = parseInt(timeMatch[3] || '0', 10)
+      t += (h * 3600 + min * 60 + sec) * 1000
+    }
+    return t
   }
   return 0
 }
@@ -858,24 +888,38 @@ function parseCheckDateForSort(str) {
 function parseRequestDateForSort(str) {
   if (!str || typeof str !== 'string') return 0
   const thaiMonths = { 'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5, 'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11 }
-  const thaiMatch = str.match(/(\d+)\s+([^\s]+)\s+(\d{4})/)
+  const thaiMatch = str.match(/(\d+)\s+([^\s]+)\s+(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/)
   if (thaiMatch) {
     const d = parseInt(thaiMatch[1], 10)
     const m = thaiMonths[thaiMatch[2]]
     const y = parseInt(thaiMatch[3], 10) - 543
     if (m !== undefined) {
-      const t = new Date(y, m, d).getTime()
-      return isNaN(t) ? 0 : t
+      let t = new Date(y, m, d).getTime()
+      if (isNaN(t)) return 0
+      if (thaiMatch[4] != null) {
+        const h = parseInt(thaiMatch[4], 10)
+        const min = parseInt(thaiMatch[5], 10)
+        const sec = parseInt(thaiMatch[6] || '0', 10)
+        t += (h * 3600 + min * 60 + sec) * 1000
+      }
+      return t
     }
   }
-  const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
+  const slashMatch = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/)
   if (slashMatch) {
     const d = parseInt(slashMatch[1], 10)
     const m = parseInt(slashMatch[2], 10) - 1
     const y = parseInt(slashMatch[3], 10)
     const yAd = y > 2400 ? y - 543 : y
-    const t = new Date(yAd, m, d).getTime()
-    return isNaN(t) ? 0 : t
+    let t = new Date(yAd, m, d).getTime()
+    if (isNaN(t)) return 0
+    if (slashMatch[4] != null) {
+      const h = parseInt(slashMatch[4], 10)
+      const min = parseInt(slashMatch[5], 10)
+      const sec = parseInt(slashMatch[6] || '0', 10)
+      t += (h * 3600 + min * 60 + sec) * 1000
+    }
+    return t
   }
   return 0
 }
@@ -889,6 +933,7 @@ const historyUnified = computed(() => {
       type: 'checklist',
       sortTime,
       displayDate: r.checkDate || '-',
+      displayTime: extractDisplayTime(r.checkDate),
       user: r.tester || '-',
       machine: [r.machineName, r.room].filter(Boolean).join(' ') || '-',
       typeLabel: formTypeToLabel[r.formType] || r.formType || 'แบบฟอร์ม',
@@ -909,6 +954,7 @@ const historyUnified = computed(() => {
       type: 'repair',
       sortTime,
       displayDate: r.requestDate || '-',
+      displayTime: extractDisplayTime(r.requestDate),
       user: r.reporterName || r.tester || '-',
       machine: [r.equipment, r.room].filter(Boolean).join(' ') || '-',
       typeLabel: 'แจ้งซ่อม',
@@ -1376,6 +1422,10 @@ watch(
 }
 
 .history-date {
+  white-space: nowrap;
+}
+
+.history-time {
   white-space: nowrap;
 }
 

@@ -10,39 +10,48 @@
 
         <!-- ตารางแจ้งซ่อม -->
         <div class="table-wrapper">
-          <table class="table">
+          <table class="table repair-table">
             <thead>
               <tr>
-                <th>ลำดับ</th>
-                <th>อุปกรณ์</th>
-                <th>ห้องตรวจ</th>
-                <th>วันที่ได้รับแจ้ง</th>
-                <th>รายละเอียด</th>
-                <th>สถานะ</th>
-                <th>รายละเอียด</th>
-                <th>จัดการ</th>
+                <th class="col-no">#</th>
+                <th class="col-equip">อุปกรณ์</th>
+                <th class="col-room">ห้อง</th>
+                <th class="col-date">วันที่ได้รับแจ้ง</th>
+                <th class="col-time">เวลา</th>
+                <th class="col-user">ผู้ทำ</th>
+                <th class="col-detail">รายละเอียด</th>
+                <th class="col-status">สถานะ</th>
+                <th class="col-action" colspan="2">การจัดการ</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in items" :key="item.id">
-                <td>{{ index + 1 }}</td>
-                <td>{{ getEquipmentText(item) }}</td>
-                <td>{{ getRoomText(item) }}</td>
-                <td>{{ item.requestDate || '-' }}</td>
-                <td>{{ item.detail }}</td>
-                <td class="status" :class="getStatusCellClass(item.statusText)">
-                  {{ item.statusText }}
+              <tr v-if="sortedItems.length === 0">
+                <td colspan="10" class="empty-row">
+                  <i class="bi bi-inbox"></i>
+                  <span>ไม่มีรายการแจ้งซ่อม</span>
                 </td>
-                <!-- ✅ คอลัมน์ใหม่: ลิงก์ "ตรวจสอบ" -->
-                <td>
-                  <span class="detail-link" @click="openDetail(item)">
-                    ตรวจสอบ
+              </tr>
+              <tr v-for="(item, index) in sortedItems" :key="item.id">
+                <td class="col-no">{{ index + 1 }}</td>
+                <td class="col-equip">{{ getEquipmentText(item) }}</td>
+                <td class="col-room">{{ getRoomText(item) }}</td>
+                <td class="col-date">{{ getDisplayDate(item.requestDate) }}</td>
+                <td class="col-time">{{ getDisplayTime(item.requestDate) }}</td>
+                <td class="col-user">{{ item.reporterName || '-' }}</td>
+                <td class="col-detail">{{ item.detail }}</td>
+                <td class="col-status">
+                  <span class="status-badge" :class="getStatusCellClass(item.statusText)">
+                    {{ item.statusText }}
                   </span>
                 </td>
-                <!-- ✅ คอลัมน์ใหม่: ลบ -->
-                <td>
+                <td class="col-action">
+                  <span class="detail-link" @click="openDetail(item)">
+                    <i class="bi bi-search me-1"></i>ตรวจสอบ
+                  </span>
+                </td>
+                <td class="col-action">
                   <span class="delete-link" @click="deleteItem(item.id)">
-                    ลบ
+                    <i class="bi bi-trash3 me-1"></i>ลบ
                   </span>
                 </td>
               </tr>
@@ -91,11 +100,27 @@
               </ul>
             </div>
 
-            <!-- วันที่ได้รับแจ้ง (ใหม่) -->
+            <!-- วันที่ได้รับแจ้ง -->
             <div class="mb-3">
               <strong>วันที่ได้รับแจ้ง</strong>
               <ul class="content-list">
-                <li>{{ selectedItem.requestDate || '-' }}</li>
+                <li>{{ getDisplayDate(selectedItem.requestDate) || '-' }}</li>
+              </ul>
+            </div>
+
+            <!-- เวลาที่ทำ -->
+            <div class="mb-3">
+              <strong>เวลาที่ทำ</strong>
+              <ul class="content-list">
+                <li>{{ getDisplayTime(selectedItem.requestDate) }}</li>
+              </ul>
+            </div>
+
+            <!-- ผู้ทำ -->
+            <div class="mb-3">
+              <strong>ผู้ทำ</strong>
+              <ul class="content-list">
+                <li>{{ selectedItem.reporterName || '-' }}</li>
               </ul>
             </div>
 
@@ -212,6 +237,11 @@ async function loadItems() {
   }
 }
 
+// เรียงรายการแจ้งซ่อมล่าสุดเป็นลำดับแรก (ตามวันที่+เวลา)
+const sortedItems = computed(() => {
+  return [...items.value].sort((a, b) => parseRequestDateForSort(b.requestDate) - parseRequestDateForSort(a.requestDate))
+})
+
 onMounted(() => {
   loadItems()
 
@@ -257,12 +287,53 @@ const getRoomText = (item) => {
   return match ? match[0] : ''
 }
 
-// *** ใหม่: ใช้สำหรับกล่องสีส้ม ***
+// *** ใช้สำหรับกล่องสีส้ม ***
 const getEquipmentWithRoom = (item) => {
   if (!item) return ''
   const equip = getEquipmentText(item)
   const room = getRoomText(item)
   return room ? `${equip} ${room}` : equip
+}
+
+// ดึงเฉพาะวันที่จาก requestDate
+function getDisplayDate(str) {
+  if (!str || typeof str !== 'string') return '-'
+  const part = str.trim().split(/\s+/)[0]
+  return part || '-'
+}
+
+// ดึงเฉพาะเวลาจาก requestDate (HH:mm:ss)
+function getDisplayTime(str) {
+  if (!str || typeof str !== 'string') return '00:00:00'
+  const parts = str.trim().split(/\s+/)
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const m = parts[i].match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+    if (m) return `${m[1].padStart(2, '0')}:${m[2]}:${(m[3] || '00').padStart(2, '0')}`
+  }
+  return '00:00:00'
+}
+
+// คำนวณ timestamp สำหรับเรียงลำดับจาก requestDate (แจ้งซ่อมล่าสุดอยู่บน)
+function parseRequestDateForSort(str) {
+  if (!str || typeof str !== 'string') return 0
+  const trimmed = str.trim()
+  const datePart = (trimmed.split(/\s+/)[0] || trimmed).trim()
+  const parts = datePart.split('/')
+  if (parts.length >= 3) {
+    const d = parseInt(parts[0], 10)
+    const m = parseInt(parts[1], 10) - 1
+    const y = parseInt(parts[2], 10)
+    const yAd = y > 2400 ? y - 543 : y
+    let t = new Date(yAd, m, d).getTime()
+    if (isNaN(t)) return 0
+    const timePart = trimmed.split(/\s+/)[1]
+    const timeMatch = timePart && timePart.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+    if (timeMatch) {
+      t += (parseInt(timeMatch[1], 10) * 3600 + parseInt(timeMatch[2], 10) * 60 + parseInt(timeMatch[3] || '0', 10)) * 1000
+    }
+    return t
+  }
+  return 0
 }
 
 // class สีของปุ่มสถานะ
@@ -583,161 +654,126 @@ watch(items, () => {
   transform: scale(1.08);
 }
 
-/* TABLE (ให้ตรงกับ RequestList.vue) */
+/* TABLE */
 .table-wrapper {
-  background: var(--bg-card, #ffffff);
-  border-radius: var(--radius-lg, 16px);
-  border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
-  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
+  border-radius: 16px;
   overflow-x: auto;
-  overflow-y: visible;
-  padding: 14px 16px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  background: #fff;
   -webkit-overflow-scrolling: touch;
 }
 
-.table {
+.repair-table {
   width: 100%;
-  min-width: 880px;
+  min-width: 960px;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
 }
 
-.table thead {
-  background: #f8fafc;
+.repair-table thead {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-.table th {
-  padding: 12px 16px;
+.repair-table th {
+  padding: 14px 12px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--text-muted, #94a3b8);
-  letter-spacing: 0.05em;
+  color: #64748b;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--border-soft, #e2e8f0);
-  text-align: center;
-}
-
-/* ลบเอฟเฟกต์ hover สีเทาที่หัวคอลัมน์ (สถานะ เป็นต้น) */
-.table thead th:hover {
-  background: #f8fafc;
-}
-
-.table td {
-  padding: 12px 16px;
-  color: var(--text-secondary, #475569);
-  border-bottom: 1px solid #f1f5f9;
-  text-align: center;
-}
-
-.table tbody tr {
-  transition: background var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
-}
-
-.table tbody tr:hover {
-  background: #f8fafc;
-}
-
-th:nth-child(1),
-td:nth-child(1) {
-  width: 60px;
-  min-width: 60px;
-}
-
-th:nth-child(2),
-td:nth-child(2) {
-  width: 180px;
-  min-width: 180px;
-}
-
-th:nth-child(3),
-td:nth-child(3) {
-  width: 100px;
-  min-width: 100px;
-}
-
-th:nth-child(4),
-td:nth-child(4) {
-  width: 130px;
-  min-width: 130px;
-}
-
-th:nth-child(5),
-td:nth-child(5) {
-  width: 150px;
-  min-width: 150px;
-}
-
-th:nth-child(6),
-td:nth-child(6) {
-  width: 180px;
-  min-width: 180px;
-}
-
-th:nth-child(7),
-td:nth-child(7) {
-  width: 100px;
-  min-width: 100px;
-}
-
-th:nth-child(8),
-td:nth-child(8) {
-  width: 90px;
-  min-width: 90px;
+  border-bottom: 2px solid #e2e8f0;
   white-space: nowrap;
 }
 
-/* Status badges: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.repair-table td {
+  padding: 12px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.repair-table tbody tr {
+  transition: background 120ms ease;
+}
+
+.repair-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.repair-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Column widths */
+.col-no { width: 44px; text-align: center; }
+.col-equip { min-width: 140px; }
+.col-room { width: 64px; text-align: center; }
+.col-date { width: 120px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.col-time { width: 80px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.col-user { width: 110px; }
+.col-detail { min-width: 130px; }
+.col-status { width: 130px; text-align: center; }
+.col-action { white-space: nowrap; text-align: center; }
+
+.empty-row {
+  text-align: center;
+  padding: 48px 16px !important;
+  color: #94a3b8;
+  font-size: 0.92rem;
+}
+.empty-row i { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
   padding: 4px 12px;
-  border-radius: var(--radius-full, 9999px);
-  font-size: 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.73rem;
   font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
-.status.status-waiting,
-.status.pending {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.status.status-progress,
-.status.in-progress {
-  background: #fff7ed;
-  color: #ea580c;
-}
-
-.status.status-completed,
-.status.completed {
-  background: #f0fdf4;
-  color: #16a34a;
-}
+.status-badge.status-waiting { background: #fef2f2; color: #dc2626; }
+.status-badge.status-progress { background: #fff7ed; color: #ea580c; }
+.status-badge.status-completed { background: #f0fdf4; color: #16a34a; }
 
 /* Links */
 .detail-link {
-  color: var(--purple-main, #0369A1);
+  display: inline-flex;
+  align-items: center;
+  color: #0EA5E9;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  text-decoration: none;
-  transition: color var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+  white-space: nowrap;
+  transition: color 150ms;
 }
 
 .detail-link:hover {
-  color: var(--purple-soft, #0EA5E9);
+  color: #0369A1;
+  text-decoration: underline;
 }
 
 .delete-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
   color: #dc2626;
-  cursor: pointer;
+  font-size: 0.75rem;
   font-weight: 600;
-  text-decoration: none;
-  transition: color var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 150ms;
 }
 
 .delete-link:hover {
-  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
 /* MAIN BOX - Detail view */

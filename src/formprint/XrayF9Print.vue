@@ -192,7 +192,10 @@ const internalRows = computed(() => internalChecks.value)
 function labelDeviceType (code) {
   if (!code) return ''
   const map = {
-    leadApron: 'เสื้อตะกั่ว'
+    leadApron: 'เสื้อตะกั่ว',
+    radiationCloth: 'ผ้ากันรังสี',
+    collar: 'ปลอกคอ',
+    other: 'อื่น ๆ'
   }
   return map[String(code).trim()] || code
 }
@@ -201,8 +204,12 @@ function labelDeviceType (code) {
 function labelDamageType (code) {
   if (!code) return ''
   const map = {
+    none: 'ไม่พบความเสียหาย',
+    crack: 'รอยหัก',
+    fracture: 'รอยแตก',
     hole: 'รูทะลุ',
-    crack: 'รอยหัก'
+    seamSplit: 'เส้นรอยต่อแยก',
+    other: 'อื่น ๆ'
   }
   return map[String(code).trim()] || code
 }
@@ -211,9 +218,10 @@ function labelDamageType (code) {
 function labelStorageMethod (code) {
   if (!code) return ''
   const map = {
-    hang: 'ไม้แขวน',
+    hang: 'แขวน',
     flat: 'วางราบ',
-    layFlat: 'วางราบ'
+    layFlat: 'วางราบ',
+    specialCabinet: 'ตู้เก็บพิเศษ'
   }
   return map[String(code).trim()] || code
 }
