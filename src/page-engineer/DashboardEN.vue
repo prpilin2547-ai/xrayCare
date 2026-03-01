@@ -2,28 +2,58 @@
   <MainLayout>
     <!-- engineer dash -->
     <div class="page">
-      <h2 class="page-title">Dashboard</h2>
+      <div class="dashboard-header-row">
+        <div>
+          <h2 class="page-title">Dashboard</h2>
+          <p class="page-subtitle">Overview of repair requests and equipment</p>
+        </div>
+      </div>
 
       <div class="cards-row">
         <div class="card summary-card">
-          <p class="card-label pink">DATE</p>
-          <p class="card-value">{{ displayDate }}</p>
+          <div class="card-icon-wrap icon-pink">
+            <i class="fa-solid fa-calendar-day"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label pink">DATE</p>
+            <p class="card-value">{{ displayDate }}</p>
+          </div>
         </div>
         <div class="card summary-card">
-          <p class="card-label blue">EQUIPMENT</p>
-          <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
+          <div class="card-icon-wrap icon-purple">
+            <i class="fa-solid fa-laptop-medical"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label blue">EQUIPMENT</p>
+            <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
+          </div>
         </div>
         <div class="card summary-card">
-          <p class="card-label red">PENDING REPAIR</p>
-          <p class="card-value">{{ hasPendingrepair ? pendingRepairCount : '-' }}</p>
+          <div class="card-icon-wrap icon-red">
+            <i class="fa-solid fa-hourglass-half"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label red">PENDING REPAIR</p>
+            <p class="card-value">{{ hasPendingrepair ? pendingRepairCount : '-' }}</p>
+          </div>
         </div>
         <div class="card summary-card">
-          <p class="card-label orange">IN PROGRESS</p>
-          <p class="card-value">{{ hasProgress ? inProgressCount : '-' }}</p>
+          <div class="card-icon-wrap icon-amber">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label orange">IN PROGRESS</p>
+            <p class="card-value">{{ hasProgress ? inProgressCount : '-' }}</p>
+          </div>
         </div>
         <div class="card summary-card">
-          <p class="card-label green">COMPLETED</p>
-          <p class="card-value">{{ hasCompleted ? completedCount : '-' }}</p>
+          <div class="card-icon-wrap icon-green">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div class="card-content">
+            <p class="card-label green">COMPLETED</p>
+            <p class="card-value">{{ hasCompleted ? completedCount : '-' }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -54,7 +84,9 @@
             <td>{{ item.equipment || '-' }}</td>
             <td>{{ item.room || '-' }}</td>
             <td>{{ item.reporterName || '-' }}</td>
-            <td class="status" :class="getStatusClass(item.statusText)">{{ item.statusText || '-' }}</td>
+            <td>
+              <span class="status-badge" :class="getStatusClass(item.statusText)">{{ item.statusText || '-' }}</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -119,10 +151,10 @@ const completedCount = computed(() =>
 /* Status class helper */
 function getStatusClass(status) {
   if (!status) return '';
-  if (PENDING_STATUSES.includes(status)) return 'pending';
-  if (PROGRESS_STATUSES.includes(status)) return 'in-progress';
-  if (COMPLETED_STATUSES.includes(status)) return 'completed';
-  return 'pending';
+  if (PENDING_STATUSES.includes(status)) return 'status-waiting';
+  if (PROGRESS_STATUSES.includes(status)) return 'status-progress';
+  if (COMPLETED_STATUSES.includes(status)) return 'status-completed';
+  return 'status-waiting';
 }
 
 /* ---------- โหลดข้อมูลจาก API ---------- */
@@ -158,36 +190,103 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* PAGE + CARDS */
+/* PAGE + HEADER */
 .page {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+.dashboard-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
 .page-title {
   margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-main, #0f172a);
 }
 
+.page-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 400;
+}
+
+/* ====== SUMMARY CARDS ====== */
 .cards-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
-.card.summary-card {
+.card {
   background: var(--bg-card, #ffffff);
   border-radius: var(--radius-lg, 16px);
-  padding: 18px 20px;
   border: 1px solid var(--border-card, rgba(0, 0, 0, 0.06));
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06));
-  transition: all var(--transition-base, 250ms cubic-bezier(0.4, 0, 0.2, 1));
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card.summary-card:hover {
+.summary-card {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: default;
+}
+
+.summary-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover, 0 8px 25px rgba(0, 0, 0, 0.1));
+}
+
+.card-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md, 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.icon-pink {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  color: #c2185b;
+}
+
+.icon-purple {
+  background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+  color: #0284C7;
+}
+
+.icon-red {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+}
+
+.icon-amber {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  color: #ea580c;
+}
+
+.icon-green {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  color: #16a34a;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .card-label {
@@ -198,26 +297,11 @@ onMounted(async () => {
   margin: 0;
 }
 
-.card-label.pink,
-.card-label.date {
-  color: #db2777;
-}
-
-.card-label.blue {
-  color: #2563eb;
-}
-
-.card-label.red {
-  color: #dc2626;
-}
-
-.card-label.orange {
-  color: #ea580c;
-}
-
-.card-label.green {
-  color: #16a34a;
-}
+.card-label.pink { color: #db2777; }
+.card-label.blue { color: #2563eb; }
+.card-label.red { color: #dc2626; }
+.card-label.orange { color: #ea580c; }
+.card-label.green { color: #16a34a; }
 
 .card-value {
   margin: 0;
@@ -231,10 +315,17 @@ onMounted(async () => {
   .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .table { min-width: 500px; }
 }
-@media (max-width: 640px) {
+
+@media (max-width: 768px) {
   .cards-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .summary-card { padding: 14px 16px; }
+  .page-title { font-size: 1.3rem; }
   .card-value { font-size: 1.2rem; }
+  .card-icon-wrap { width: 40px; height: 40px; font-size: 0.95rem; }
+}
+
+@media (max-width: 640px) {
+  .cards-row { grid-template-columns: 1fr; }
+  .summary-card { padding: 14px 16px; }
 }
 
 /* REQUEST SECTION HEADER - เว้นระยะบนล่างเท่ากัน */
@@ -315,32 +406,18 @@ onMounted(async () => {
   background: #f8fafc;
 }
 
-/* Status badges: รอซ่อม=แดง, อยู่ระหว่างดำเนินการ=ส้ม, ดำเนินการแล้ว=เขียว */
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+/* Status badge */
+.status-badge {
+  display: inline-block;
   padding: 4px 12px;
-  border-radius: var(--radius-full, 9999px);
-  font-size: 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
   font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
-.status.pending,
-.status[class*="pending"] {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.status.in-progress,
-.status[class*="progress"] {
-  background: #fff7ed;
-  color: #ea580c;
-}
-
-.status.completed,
-.status[class*="completed"] {
-  background: #f0fdf4;
-  color: #16a34a;
-}
+.status-badge.status-waiting { background: #fef2f2; color: #dc2626; }
+.status-badge.status-progress { background: #fff7ed; color: #ea580c; }
+.status-badge.status-completed { background: #f0fdf4; color: #16a34a; }
 </style>

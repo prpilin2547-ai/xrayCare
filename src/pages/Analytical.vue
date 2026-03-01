@@ -842,6 +842,13 @@ const historyFilters = ref({
 const historyPage = ref(1)
 const HISTORY_PAGE_SIZE = 20
 
+function extractDisplayDate(str) {
+  if (!str || typeof str !== 'string') return '-'
+  const trimmed = str.trim()
+  const parts = trimmed.split(/\s+/)
+  return parts[0] || '-'
+}
+
 /** ดึงเฉพาะเวลาจากสตริงวันที่ (เช่น "27/02/2569 19:39:27" -> "19:39:27") ถ้าไม่มีเวลาให้แสดง "00:00:00" เพื่อให้ทุกรายการมีเวลาในรูปแบบ HH:mm:ss */
 function extractDisplayTime(str) {
   const fallback = '00:00:00'
@@ -932,7 +939,7 @@ const historyUnified = computed(() => {
       uid: 'c-' + r.id,
       type: 'checklist',
       sortTime,
-      displayDate: r.checkDate || '-',
+      displayDate: extractDisplayDate(r.checkDate),
       displayTime: extractDisplayTime(r.checkDate),
       user: r.tester || '-',
       machine: [r.machineName, r.room].filter(Boolean).join(' ') || '-',
@@ -953,7 +960,7 @@ const historyUnified = computed(() => {
       uid: 'r-' + r.id,
       type: 'repair',
       sortTime,
-      displayDate: r.requestDate || '-',
+      displayDate: extractDisplayDate(r.requestDate),
       displayTime: extractDisplayTime(r.requestDate),
       user: r.reporterName || r.tester || '-',
       machine: [r.equipment, r.room].filter(Boolean).join(' ') || '-',
