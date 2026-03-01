@@ -1,11 +1,11 @@
 <template>
   <MainLayout>
     <div class="page">
-      <h2 class="page-note">Created New Machine</h2>
+      <h2 class="page-note">ระบบลงทะเบียน</h2>
 
       <!-- กล่องฟอร์มหลัก -->
       <div class="form-card">
-        <h1 class="form-title">Created New Machine</h1>
+        <h1 class="form-title">ระบบบันทึกข้อมูลเครื่องเอกซ์เรย์ที่ทำการลงทะเบียน</h1>
 
         <form class="form-grid" @submit.prevent="handleSave">
           <!-- ชื่อเครื่อง -->
