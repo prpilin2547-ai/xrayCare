@@ -219,13 +219,13 @@ function handlePrint () {
   window.print()
 }
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 onMounted(async () => {
   const id = route.query.id || route.params.id
   if (!id) return
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    const res = await apiFetch(`/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
     header.value.machineName = data.machineName || ''

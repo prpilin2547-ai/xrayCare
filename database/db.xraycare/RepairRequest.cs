@@ -2,6 +2,7 @@ namespace db.xraycare;
 
 public class RepairRequest : BaseTable
 {
+    public int HospitalId { get; set; }
     public string? Equipment { get; set; }
     public string? Room { get; set; }
     public string? RequestDate { get; set; }

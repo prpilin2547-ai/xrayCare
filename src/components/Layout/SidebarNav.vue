@@ -112,7 +112,7 @@ const props = defineProps({
 })
 
 const normalizedRole = computed(() => (props.role || '').toLowerCase())
-const isAdmin = computed(() => normalizedRole.value === 'admin')
+const isAdmin = computed(() => ['admin', 'superadmin'].includes(normalizedRole.value))
 const isEngineer = computed(() => normalizedRole.value === 'engineer')
 const showMain = computed(() => isAdmin.value || normalizedRole.value === 'radiological technologist')
 const showEngineer = computed(() => isAdmin.value || isEngineer.value)

@@ -391,7 +391,7 @@ function handlePrint () {
   window.print()
 }
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 function applyRecordData (data) {
   if (!data) return
@@ -414,7 +414,7 @@ onMounted(async () => {
   }
   if (!id) return
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    const res = await apiFetch(`/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
     applyRecordData(data)

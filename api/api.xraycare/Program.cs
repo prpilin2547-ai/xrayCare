@@ -1,3 +1,4 @@
+using api.xraycare.Middleware;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,8 @@ builder.InitAppService();
 builder.SetupDataContext();
 
 var app = builder.Build();
+
+app.UseMiddleware<ApiExceptionMiddleware>();
 
 // ✅ เปิด Swagger ตลอดไปเลย (ใน Docker ใช้ง่ายสุด)
 app.UseSwagger();

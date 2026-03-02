@@ -81,7 +81,7 @@ import F4XrayCheckForm from '../components/forms/F4XrayCheckForm.vue'
 import F5UniformityForm from '../components/forms/F5UniformityForm.vue'
 import F6EIConsistencyForm from '../components/forms/F6EIConsistencyForm.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const props = defineProps({
   selectedDevice: {
@@ -118,7 +118,7 @@ onMounted(async () => {
   timeInterval = setInterval(updateTime, 1000)
 
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
@@ -222,7 +222,7 @@ const handleSave = async (payloadF6) => {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/SaveChecklist`, {
+    const res = await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

@@ -134,7 +134,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const props = defineProps({
   selectedDevice: {
@@ -239,7 +239,7 @@ const saveChecklist = async () => {
   }
 
   try {
-    await fetch(`${API_BASE}/SaveChecklist`, {
+    await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

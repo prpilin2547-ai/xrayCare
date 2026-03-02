@@ -21,6 +21,25 @@ namespace api.xraycare.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("db.xraycare.Hospital", b =>
+                {
+                    b.Property<int>("RID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.HasKey("RID");
+
+                    b.ToTable("Hospitals");
+                });
+
             modelBuilder.Entity("db.xraycare.Machine", b =>
                 {
                     b.Property<int>("RID")
@@ -28,6 +47,9 @@ namespace api.xraycare.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
+
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Machine_name")
                         .HasColumnType("text");
@@ -54,6 +76,9 @@ namespace api.xraycare.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
 
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Username")
                         .HasColumnType("text");
 
@@ -63,7 +88,13 @@ namespace api.xraycare.Migrations
                     b.Property<string>("Position")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsSuperAdmin")
+                        .HasColumnType("boolean");
+
                     b.HasKey("RID");
+
+                    b.HasIndex("HospitalId", "Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -75,6 +106,9 @@ namespace api.xraycare.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
+
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Equipment")
                         .HasColumnType("text");
@@ -113,6 +147,9 @@ namespace api.xraycare.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
 
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("FormType")
                         .HasColumnType("text");
 
@@ -143,6 +180,9 @@ namespace api.xraycare.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RID"));
+
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("StartDate")
                         .HasColumnType("text");

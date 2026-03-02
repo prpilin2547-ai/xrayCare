@@ -131,7 +131,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const API_BASE = '/api/Xraycare';
+import { apiFetch } from '../api/client';
 
 const defaultRecord = () => ({
   id: null,
@@ -197,7 +197,7 @@ onMounted(async () => {
   const id = route.query.id;
   if (!id) return;
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`);
+    const res = await apiFetch(`/GetChecklistRecord/${id}`);
     if (!res.ok) return;
     const data = await res.json();
     record.value = {

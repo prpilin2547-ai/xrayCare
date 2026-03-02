@@ -263,7 +263,7 @@ function handlePrint() {
   window.print();
 }
 
-const API_BASE = '/api/Xraycare';
+import { apiFetch } from '../api/client';
 
 /** อ่าน jsonData ตัวอย่าง: { reason, otherText, remark } และรองรับ header/reasons/summary แบบเก่า */
 function applyRecordData(data) {
@@ -300,7 +300,7 @@ onMounted(async () => {
 
   if (!id) return;
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`);
+    const res = await apiFetch(`/GetChecklistRecord/${id}`);
     if (!res.ok) return;
     const data = await res.json();
     applyRecordData(data);

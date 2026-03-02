@@ -724,7 +724,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const props = defineProps({
   currentUserName: {
@@ -953,7 +953,7 @@ const saveForm = async () => {
   }
 
   try {
-    await fetch(`${API_BASE}/SaveChecklist`, {
+    await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

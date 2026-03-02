@@ -353,9 +353,9 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import MainLayout from "../components/Layout/MainLayout.vue";
+import { apiFetch } from "../api/client";
 
 const router = useRouter();
-const API_BASE = '/api/Xraycare';
 
 /* ---------------- Table Data (จาก API) ---------------- */
 const machines = ref([]);
@@ -450,7 +450,7 @@ const scheduleConfigs = ref([]);
 
 async function loadScheduleConfigs() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllScheduleConfigs`);
+    const res = await apiFetch('/GetAllScheduleConfigs');
     if (!res.ok) return;
     const data = await res.json();
     scheduleConfigs.value = Array.isArray(data) ? data : [];
@@ -521,7 +521,7 @@ async function loadNotifications() {
   const allNotifs = [];
 
   try {
-    const res = await fetch(`${API_BASE}/GetNotifications`);
+    const res = await apiFetch('/GetNotifications');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) allNotifs.push(...data);
@@ -593,7 +593,7 @@ function dismissNotification(id) {
 /* ---------- API ---------- */
 async function loadMachines() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`);
+    const res = await apiFetch('/GetAllMachines');
     if (!res.ok) throw new Error('โหลดข้อมูลเครื่องไม่สำเร็จ');
     const data = await res.json();
     machines.value = Array.isArray(data) ? data : [];
@@ -605,7 +605,7 @@ async function loadMachines() {
 
 async function loadRepairRequests() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllRepairRequests`);
+    const res = await apiFetch('/GetAllRepairRequests');
     if (!res.ok) throw new Error('โหลดข้อมูลแจ้งซ่อมไม่สำเร็จ');
     const data = await res.json();
     repairRequests.value = Array.isArray(data) ? data : [];

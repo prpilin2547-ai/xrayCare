@@ -1,5 +1,6 @@
 using System.Text.Json;
 using api.xraycare.Database;
+using api.xraycare.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using db.xraycare;
@@ -12,11 +13,133 @@ namespace api.xraycare.Controllers
     {
         private readonly DataContext _db;
         private readonly ILogger<XraycareController> _logger;
+        private readonly IHospitalContext _hospital;
+        private readonly ICurrentUserContext _currentUser;
 
-        public XraycareController(DataContext db, ILogger<XraycareController> logger)
+        public XraycareController(DataContext db, ILogger<XraycareController> logger, IHospitalContext hospital, ICurrentUserContext currentUser)
         {
             _db = db;
             _logger = logger;
+            _hospital = hospital;
+            _currentUser = currentUser;
+        }
+
+        private int? GetHospitalId() => _hospital.HospitalId;
+
+        // ===================== Health (no auth required) =====================
+
+        // GET: api/xraycare/Ping
+        [HttpGet("Ping")]
+        public IActionResult Ping()
+        {
+            return Ok(new { ok = true, service = "Xraycare" });
+        }
+
+        // ===================== Hospital Endpoints (no hospital header required) =====================
+
+        // GET: api/xraycare/GetHospitals
+        [HttpGet("GetHospitals")]
+        public async Task<IActionResult> GetHospitals()
+        {
+            var list = await _db.Hospitals
+                .OrderBy(h => h.RID)
+                .Select(h => new { id = h.RID, name = h.Name, code = h.Code })
+                .ToListAsync();
+            return Ok(list);
+        }
+
+        // POST: api/xraycare/AddHospital (Root Admin only)
+        [HttpPost("AddHospital")]
+        public async Task<IActionResult> AddHospital([FromBody] AddHospitalRequest request)
+        {
+            if (!_currentUser.IsSuperAdmin)
+                return StatusCode(403, new { message = "เฉพาะ Root Admin เท่านั้นที่สร้างโรงพยาบาลใหม่ได้" });
+            if (request == null || string.IsNullOrWhiteSpace(request.name))
+                return BadRequest(new { message = "name is required." });
+
+            try
+            {
+                var hospital = new Hospital
+                {
+                    Name = request.name,
+                    Code = request.code ?? (request.name.Length > 0 ? request.name.Substring(0, Math.Min(10, request.name.Length)).ToUpperInvariant() : null)
+                };
+                _db.Hospitals.Add(hospital);
+                await _db.SaveChangesAsync();
+                return Ok(new { id = hospital.RID, name = hospital.Name, code = hospital.Code });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AddHospital failed");
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = message });
+            }
+        }
+
+        // PUT: api/xraycare/UpdateHospital/5 (Root Admin: any hospital; SuperAdmin/Admin: own hospital only)
+        [HttpPut("UpdateHospital/{id}")]
+        public async Task<IActionResult> UpdateHospital(int id, [FromBody] UpdateHospitalRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { message = "Request body is required." });
+
+            if (!_currentUser.IsSuperAdmin)
+            {
+                var hid = GetHospitalId();
+                if (!hid.HasValue || hid.Value != id)
+                    return StatusCode(403, new { message = "แก้ไขได้เฉพาะโรงพยาบาลของตนเองเท่านั้น" });
+            }
+
+            try
+            {
+                var hospital = await _db.Hospitals.FindAsync(id);
+                if (hospital == null)
+                    return NotFound(new { message = "ไม่พบโรงพยาบาลที่ระบุ" });
+
+                if (!string.IsNullOrWhiteSpace(request.name)) hospital.Name = request.name;
+                if (request.code != null) hospital.Code = request.code;
+                await _db.SaveChangesAsync();
+                return Ok(new { id = hospital.RID, name = hospital.Name, code = hospital.Code });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateHospital failed for ID {Id}", id);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = message });
+            }
+        }
+
+        // DELETE: api/xraycare/DeleteHospital/5 (Root Admin only; fails if hospital has users/machines)
+        [HttpDelete("DeleteHospital/{id}")]
+        public async Task<IActionResult> DeleteHospital(int id)
+        {
+            if (!_currentUser.IsSuperAdmin)
+                return StatusCode(403, new { message = "เฉพาะ Root Admin เท่านั้นที่ลบโรงพยาบาลได้" });
+
+            try
+            {
+                var hospital = await _db.Hospitals.FindAsync(id);
+                if (hospital == null)
+                    return NotFound(new { message = "ไม่พบโรงพยาบาลที่ระบุ" });
+
+                var hasUsers = await _db.Users.AnyAsync(u => u.HospitalId == id);
+                if (hasUsers)
+                    return BadRequest(new { message = "ไม่สามารถลบได้ เนื่องจากมีผู้ใช้ในโรงพยาบาลนี้ กรุณาย้ายหรือลบผู้ใช้ก่อน" });
+
+                var hasMachines = await _db.Machines.AnyAsync(m => m.HospitalId == id);
+                if (hasMachines)
+                    return BadRequest(new { message = "ไม่สามารถลบได้ เนื่องจากมีเครื่องมือในโรงพยาบาลนี้" });
+
+                _db.Hospitals.Remove(hospital);
+                await _db.SaveChangesAsync();
+                return Ok(new { message = "ลบโรงพยาบาลสำเร็จ", id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DeleteHospital failed for ID {Id}", id);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = message });
+            }
         }
 
         // ===================== Machine Endpoints =====================
@@ -25,7 +148,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetAllMachines")]
         public async Task<IActionResult> GetMachines()
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var list = await _db.Machines
+                .Where(m => m.HospitalId == hid)
                 .OrderBy(m => m.RID)
                 .Select(m => new
                 {
@@ -44,12 +170,15 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> AddMachine([FromBody] AddMachineRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.machineName))
-                return BadRequest("machineName is required.");
+                return BadRequest(new { message = "machineName is required." });
 
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
                 var machine = new Machine
                 {
+                    HospitalId = hid.Value,
                     Machine_name = request.machineName,
                     Room = request.room ?? "",
                     Register_date = request.registerDate ?? "",
@@ -71,7 +200,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "AddMachine failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -79,9 +208,11 @@ namespace api.xraycare.Controllers
         [HttpDelete("DeleteMachine/{id}")]
         public async Task<IActionResult> DeleteMachine(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var machine = await _db.Machines.FindAsync(id);
+                var machine = await _db.Machines.FirstOrDefaultAsync(m => m.RID == id && m.HospitalId == hid);
                 if (machine == null)
                     return NotFound($"ไม่พบเครื่องเอกซ์เรย์ที่มี ID = {id}");
 
@@ -94,79 +225,128 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "DeleteMachine failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
         // ===================== Login Endpoint =====================
 
-        // POST: api/xraycare/Login
+        // POST: api/xraycare/Login (hospitalId optional; if omitted, first hospital is used)
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.username))
-                return BadRequest("username is required.");
+                return BadRequest(new { message = "username is required." });
             if (string.IsNullOrWhiteSpace(request.password))
-                return BadRequest("password is required.");
+                return BadRequest(new { message = "password is required." });
 
             try
             {
+                int hospitalId = request.hospitalId ?? _db.Hospitals.OrderBy(h => h.RID).Select(h => h.RID).FirstOrDefault();
+                if (hospitalId <= 0)
+                    return Unauthorized(new { message = "ไม่พบโรงพยาบาลในระบบ" });
+
                 var user = await _db.Users
-                    .FirstOrDefaultAsync(u => u.Username == request.username && u.Password == request.password);
+                    .FirstOrDefaultAsync(u => u.Username == request.username && u.Password == request.password && u.HospitalId == hospitalId);
 
                 if (user == null)
-                    return Unauthorized(new { message = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+                    return Unauthorized(new { message = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง หรือไม่สังกัดโรงพยาบาลที่เลือก" });
 
+                var hospital = await _db.Hospitals.FindAsync(hospitalId);
                 return Ok(new
                 {
                     id = user.RID,
                     username = user.Username,
-                    position = user.Position
+                    position = user.Position,
+                    hospitalId = hospitalId,
+                    hospitalName = hospital?.Name ?? "",
+                    isSuperAdmin = user.IsSuperAdmin
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Login failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
         // ===================== User Endpoints =====================
 
-        // GET: api/xraycare/GetAllUsers
+        // GET: api/xraycare/GetAllUsers (X-User-Id required for superadmin; X-Hospital-Id: 0 = all hospitals when superadmin)
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var list = await _db.Users
+            var hid = GetHospitalId();
+            var isSuperAdmin = _currentUser.IsSuperAdmin;
+            IQueryable<UserAccount> query = _db.Users;
+            if (isSuperAdmin && (hid == null || hid == 0))
+            {
+                // SuperAdmin with no hospital or "all" (0): return users from all hospitals
+            }
+            else if (hid.HasValue && hid.Value > 0)
+            {
+                query = query.Where(u => u.HospitalId == hid.Value);
+            }
+            else
+            {
+                return BadRequest(new { message = "X-Hospital-Id header is required." });
+            }
+
+            var list = await query
                 .OrderBy(u => u.RID)
                 .Select(u => new
                 {
                     id = u.RID,
                     username = u.Username,
                     password = u.Password,
-                    position = u.Position
+                    position = u.Position,
+                    hospitalId = u.HospitalId,
+                    isSuperAdmin = u.IsSuperAdmin
                 })
                 .ToListAsync();
             return Ok(list);
         }
 
-        // POST: api/xraycare/AddUser
+        // POST: api/xraycare/AddUser (SuperAdmin can pass hospitalId when X-Hospital-Id is 0)
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser([FromBody] AddUserRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.username))
-                return BadRequest("username is required.");
+                return BadRequest(new { message = "username is required." });
             if (string.IsNullOrWhiteSpace(request.password))
-                return BadRequest("password is required.");
-
+                return BadRequest(new { message = "password is required." });
+            var hid = GetHospitalId();
+            var isSuperAdmin = _currentUser.IsSuperAdmin;
+            int targetHospitalId;
+            if (isSuperAdmin && (hid == null || hid == 0))
+            {
+                if (!request.hospitalId.HasValue || request.hospitalId.Value <= 0)
+                    return BadRequest(new { message = "SuperAdmin must provide hospitalId when managing all hospitals." });
+                var exists = await _db.Hospitals.AnyAsync(h => h.RID == request.hospitalId.Value);
+                if (!exists) return BadRequest(new { message = "Invalid hospitalId." });
+                targetHospitalId = request.hospitalId.Value;
+            }
+            else
+            {
+                if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
+                targetHospitalId = hid.Value;
+                if (request.hospitalId.HasValue && request.hospitalId.Value > 0)
+                {
+                    var exists = await _db.Hospitals.AnyAsync(h => h.RID == request.hospitalId.Value);
+                    if (exists)
+                        targetHospitalId = request.hospitalId.Value;
+                }
+            }
             try
             {
                 var user = new UserAccount
                 {
+                    HospitalId = targetHospitalId,
                     Username = request.username,
                     Password = request.password,
-                    Position = request.position ?? ""
+                    Position = request.position ?? "",
+                    IsSuperAdmin = isSuperAdmin && (request.isSuperAdmin == true)
                 };
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
@@ -176,29 +356,34 @@ namespace api.xraycare.Controllers
                     id = user.RID,
                     username = user.Username,
                     password = user.Password,
-                    position = user.Position
+                    position = user.Position,
+                    hospitalId = user.HospitalId,
+                    isSuperAdmin = user.IsSuperAdmin
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AddUser failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
-        // PUT: api/xraycare/UpdateUserPassword/5
+        // PUT: api/xraycare/UpdateUserPassword/5 (SuperAdmin can update any user)
         [HttpPut("UpdateUserPassword/{id}")]
         public async Task<IActionResult> UpdateUserPassword(int id, [FromBody] UpdatePasswordRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.password))
-                return BadRequest("password is required.");
-
+                return BadRequest(new { message = "password is required." });
+            var hid = GetHospitalId();
+            if (hid == null && !_currentUser.IsSuperAdmin) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var user = await _db.Users.FindAsync(id);
+                var user = _currentUser.IsSuperAdmin
+                    ? await _db.Users.FirstOrDefaultAsync(u => u.RID == id)
+                    : await _db.Users.FirstOrDefaultAsync(u => u.RID == id && u.HospitalId == hid);
                 if (user == null)
-                    return NotFound($"ไม่พบผู้ใช้ที่มี ID = {id}");
+                    return NotFound(new { message = $"ไม่พบผู้ใช้ที่มี ID = {id}" });
 
                 user.Password = request.password;
                 await _db.SaveChangesAsync();
@@ -208,26 +393,80 @@ namespace api.xraycare.Controllers
                     id = user.RID,
                     username = user.Username,
                     password = user.Password,
-                    position = user.Position
+                    position = user.Position,
+                    hospitalId = user.HospitalId
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "UpdateUserPassword failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
-        // DELETE: api/xraycare/DeleteUser/5
+        // PUT: api/xraycare/UpdateUser/5 (change hospital, role, and/or password; SuperAdmin can edit any user)
+        [HttpPut("UpdateUser/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { message = "Request body is required." });
+            var hid = GetHospitalId();
+            if (hid == null && !_currentUser.IsSuperAdmin) return BadRequest(new { message = "X-Hospital-Id header is required." });
+            try
+            {
+                var user = _currentUser.IsSuperAdmin
+                    ? await _db.Users.FirstOrDefaultAsync(u => u.RID == id)
+                    : await _db.Users.FirstOrDefaultAsync(u => u.RID == id && u.HospitalId == hid);
+                if (user == null)
+                    return NotFound(new { message = $"ไม่พบผู้ใช้ที่มี ID = {id}" });
+
+                if (request.hospitalId.HasValue && request.hospitalId.Value > 0)
+                {
+                    var hospitalExists = await _db.Hospitals.AnyAsync(h => h.RID == request.hospitalId.Value);
+                    if (hospitalExists)
+                        user.HospitalId = request.hospitalId.Value;
+                }
+                if (!string.IsNullOrWhiteSpace(request.position))
+                    user.Position = request.position;
+                if (!string.IsNullOrWhiteSpace(request.password))
+                    user.Password = request.password;
+                if (_currentUser.IsSuperAdmin && request.isSuperAdmin.HasValue)
+                    user.IsSuperAdmin = request.isSuperAdmin.Value;
+
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    id = user.RID,
+                    username = user.Username,
+                    password = user.Password,
+                    position = user.Position,
+                    hospitalId = user.HospitalId,
+                    isSuperAdmin = user.IsSuperAdmin
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateUser failed for ID {Id}", id);
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = message });
+            }
+        }
+
+        // DELETE: api/xraycare/DeleteUser/5 (SuperAdmin can delete any user)
         [HttpDelete("DeleteUser/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null && !_currentUser.IsSuperAdmin) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var user = await _db.Users.FindAsync(id);
+                var user = _currentUser.IsSuperAdmin
+                    ? await _db.Users.FirstOrDefaultAsync(u => u.RID == id)
+                    : await _db.Users.FirstOrDefaultAsync(u => u.RID == id && u.HospitalId == hid);
                 if (user == null)
-                    return NotFound($"ไม่พบผู้ใช้ที่มี ID = {id}");
+                    return NotFound(new { message = $"ไม่พบผู้ใช้ที่มี ID = {id}" });
 
                 _db.Users.Remove(user);
                 await _db.SaveChangesAsync();
@@ -238,7 +477,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "DeleteUser failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
         // ===================== Repair Request Endpoints =====================
@@ -247,7 +486,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetAllRepairRequests")]
         public async Task<IActionResult> GetAllRepairRequests()
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var list = await _db.RepairRequests
+                .Where(r => r.HospitalId == hid)
                 .OrderByDescending(r => r.RID)
                 .Select(r => new
                 {
@@ -270,12 +512,15 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> AddRepairRequest([FromBody] AddRepairRequestDto request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.equipment))
-                return BadRequest("equipment is required.");
+                return BadRequest(new { message = "equipment is required." });
 
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
                 var entity = new RepairRequest
                 {
+                    HospitalId = hid.Value,
                     Equipment = request.equipment,
                     Room = request.room ?? "",
                     RequestDate = request.requestDate ?? "",
@@ -305,7 +550,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "AddRepairRequest failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -314,11 +559,12 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> UpdateRepairStatus(int id, [FromBody] UpdateRepairStatusDto request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.statusText))
-                return BadRequest("statusText is required.");
-
+                return BadRequest(new { message = "statusText is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var entity = await _db.RepairRequests.FindAsync(id);
+                var entity = await _db.RepairRequests.FirstOrDefaultAsync(r => r.RID == id && r.HospitalId == hid);
                 if (entity == null)
                     return NotFound($"ไม่พบรายการแจ้งซ่อมที่มี ID = {id}");
 
@@ -342,7 +588,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "UpdateRepairStatus failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -350,9 +596,11 @@ namespace api.xraycare.Controllers
         [HttpDelete("DeleteRepairRequest/{id}")]
         public async Task<IActionResult> DeleteRepairRequest(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var entity = await _db.RepairRequests.FindAsync(id);
+                var entity = await _db.RepairRequests.FirstOrDefaultAsync(r => r.RID == id && r.HospitalId == hid);
                 if (entity == null)
                     return NotFound($"ไม่พบรายการแจ้งซ่อมที่มี ID = {id}");
 
@@ -365,7 +613,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "DeleteRepairRequest failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -375,7 +623,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetAllChecklistRecords")]
         public async Task<IActionResult> GetAllChecklistRecords()
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var list = await _db.ChecklistRecords
+                .Where(c => c.HospitalId == hid)
                 .OrderByDescending(c => c.RID)
                 .Select(c => new
                 {
@@ -395,8 +646,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetChecklistRecord/{id}")]
         public async Task<IActionResult> GetChecklistRecord(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var record = await _db.ChecklistRecords
-                .Where(c => c.RID == id)
+                .Where(c => c.RID == id && c.HospitalId == hid)
                 .Select(c => new
                 {
                     id = c.RID,
@@ -417,8 +670,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetChecklistRecordsByForm/{formType}")]
         public async Task<IActionResult> GetChecklistRecordsByForm(string formType)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var list = await _db.ChecklistRecords
-                .Where(c => c.FormType == formType)
+                .Where(c => c.FormType == formType && c.HospitalId == hid)
                 .OrderByDescending(c => c.RID)
                 .Select(c => new
                 {
@@ -439,12 +694,14 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> SaveChecklist([FromBody] SaveChecklistRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.formType))
-                return BadRequest("formType is required.");
-
+                return BadRequest(new { message = "formType is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
                 var record = new ChecklistRecord
                 {
+                    HospitalId = hid.Value,
                     FormType = request.formType,
                     MachineName = request.machineName ?? "",
                     Room = request.room ?? "",
@@ -469,7 +726,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "SaveChecklist failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -477,9 +734,11 @@ namespace api.xraycare.Controllers
         [HttpDelete("DeleteChecklistRecord/{id}")]
         public async Task<IActionResult> DeleteChecklistRecord(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var record = await _db.ChecklistRecords.FindAsync(id);
+                var record = await _db.ChecklistRecords.FirstOrDefaultAsync(c => c.RID == id && c.HospitalId == hid);
                 if (record == null)
                     return NotFound($"ไม่พบรายการ Checklist ที่มี ID = {id}");
 
@@ -492,7 +751,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "DeleteChecklistRecord failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -502,7 +761,10 @@ namespace api.xraycare.Controllers
         [HttpGet("GetAllScheduleConfigs")]
         public async Task<IActionResult> GetAllScheduleConfigs()
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             var list = await _db.ScheduleConfigs
+                .Where(s => s.HospitalId == hid)
                 .OrderBy(s => s.RID)
                 .Select(s => new
                 {
@@ -521,10 +783,11 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> AddScheduleConfig([FromBody] AddScheduleConfigRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.startDate))
-                return BadRequest("startDate is required.");
+                return BadRequest(new { message = "startDate is required." });
             if (string.IsNullOrWhiteSpace(request.frequencyType))
-                return BadRequest("frequencyType is required.");
-
+                return BadRequest(new { message = "frequencyType is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
                 var formTypesJson = request.formTypes != null && request.formTypes.Count > 0
@@ -532,6 +795,7 @@ namespace api.xraycare.Controllers
                     : null;
                 var entity = new ScheduleConfig
                 {
+                    HospitalId = hid.Value,
                     StartDate = request.startDate,
                     FrequencyType = request.frequencyType,
                     Description = request.description ?? "",
@@ -553,7 +817,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "AddScheduleConfig failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -562,10 +826,12 @@ namespace api.xraycare.Controllers
         public async Task<IActionResult> UpdateScheduleConfig(int id, [FromBody] UpdateScheduleConfigRequest request)
         {
             if (request == null)
-                return BadRequest("Request body is required.");
+                return BadRequest(new { message = "Request body is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var entity = await _db.ScheduleConfigs.FindAsync(id);
+                var entity = await _db.ScheduleConfigs.FirstOrDefaultAsync(s => s.RID == id && s.HospitalId == hid);
                 if (entity == null)
                     return NotFound($"ไม่พบ Schedule Config ที่มี ID = {id}");
 
@@ -595,7 +861,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "UpdateScheduleConfig failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -603,9 +869,11 @@ namespace api.xraycare.Controllers
         [HttpDelete("DeleteScheduleConfig/{id}")]
         public async Task<IActionResult> DeleteScheduleConfig(int id)
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var entity = await _db.ScheduleConfigs.FindAsync(id);
+                var entity = await _db.ScheduleConfigs.FirstOrDefaultAsync(s => s.RID == id && s.HospitalId == hid);
                 if (entity == null)
                     return NotFound($"ไม่พบ Schedule Config ที่มี ID = {id}");
 
@@ -618,7 +886,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "DeleteScheduleConfig failed for ID {Id}", id);
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
 
@@ -626,9 +894,11 @@ namespace api.xraycare.Controllers
         [HttpGet("GetNotifications")]
         public async Task<IActionResult> GetNotifications()
         {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
             try
             {
-                var configs = await _db.ScheduleConfigs.ToListAsync();
+                var configs = await _db.ScheduleConfigs.Where(s => s.HospitalId == hid).ToListAsync();
                 var todayDate = DateTime.Today;
                 var notifications = new List<object>();
 
@@ -708,7 +978,7 @@ namespace api.xraycare.Controllers
             {
                 _logger.LogError(ex, "GetNotifications failed");
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, message);
+                return StatusCode(500, new { message = message });
             }
         }
     }
@@ -728,11 +998,23 @@ namespace api.xraycare.Controllers
         public string username { get; set; } = "";
         public string password { get; set; } = "";
         public string? position { get; set; }
+        public int? hospitalId { get; set; }
+        /// <summary>Only applied when the caller is SuperAdmin. Makes the new user a root admin (manage all hospitals).</summary>
+        public bool? isSuperAdmin { get; set; }
     }
 
     public class UpdatePasswordRequest
     {
         public string password { get; set; } = "";
+    }
+
+    public class UpdateUserRequest
+    {
+        public string? password { get; set; }
+        public int? hospitalId { get; set; }
+        public string? position { get; set; }
+        /// <summary>Only applied when the caller is SuperAdmin. Grant or revoke root admin (manage all hospitals).</summary>
+        public bool? isSuperAdmin { get; set; }
     }
 
     public class AddRepairRequestDto
@@ -756,6 +1038,7 @@ namespace api.xraycare.Controllers
     {
         public string username { get; set; } = "";
         public string password { get; set; } = "";
+        public int? hospitalId { get; set; }
     }
 
     public class SaveChecklistRequest
@@ -782,5 +1065,17 @@ namespace api.xraycare.Controllers
         public string? frequencyType { get; set; }
         public string? description { get; set; }
         public List<string>? formTypes { get; set; }
+    }
+
+    public class AddHospitalRequest
+    {
+        public string name { get; set; } = "";
+        public string? code { get; set; }
+    }
+
+    public class UpdateHospitalRequest
+    {
+        public string? name { get; set; }
+        public string? code { get; set; }
     }
 }

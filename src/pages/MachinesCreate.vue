@@ -191,12 +191,12 @@ const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(null)
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 async function loadMachines() {
   loading.value = true
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (!res.ok) throw new Error('โหลดรายการเครื่องไม่สำเร็จ')
     const data = await res.json()
     machines.value = Array.isArray(data) ? data : []
@@ -367,7 +367,7 @@ async function handleDelete(id, name) {
 
   deleting.value = id
   try {
-    const res = await fetch(`${API_BASE}/DeleteMachine/${id}`, {
+    const res = await apiFetch(`/DeleteMachine/${id}`, {
       method: 'DELETE'
     })
     if (!res.ok) {
@@ -396,7 +396,7 @@ async function handleSave() {
 
   saving.value = true
   try {
-    const res = await fetch(`${API_BASE}/AddMachine`, {
+    const res = await apiFetch('/AddMachine', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

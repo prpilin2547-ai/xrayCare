@@ -84,7 +84,7 @@ import F7CollimatorBuckyForm from '../components/forms/F7CollimatorBuckyForm.vue
 import F8CRDarkNoiseForm from '../components/forms/F8CRDarkNoiseForm.vue'
 import F8DRDarkNoiseForm from '../components/forms/F8DRDarkNoiseForm.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const props = defineProps({
   selectedDevice: {
@@ -121,7 +121,7 @@ onMounted(async () => {
   } catch (e) { /* ignore */ }
 
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
@@ -233,7 +233,7 @@ const handleSave = async (payloadF8_2) => {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/SaveChecklist`, {
+    const res = await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

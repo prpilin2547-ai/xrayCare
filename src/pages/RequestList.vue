@@ -327,8 +327,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { Modal } from 'bootstrap'
-
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const modalEl = ref(null)
 let modal = null
@@ -375,7 +374,7 @@ const items = ref([])
 
 async function loadMachines() {
     try {
-        const res = await fetch(`${API_BASE}/GetAllMachines`)
+        const res = await apiFetch('/GetAllMachines')
         if (res.ok) {
             const data = await res.json()
             machines.value = Array.isArray(data) ? data : []
@@ -388,7 +387,7 @@ async function loadMachines() {
 async function loadItems() {
     loading.value = true
     try {
-        const res = await fetch(`${API_BASE}/GetAllRepairRequests`)
+        const res = await apiFetch('/GetAllRepairRequests')
         if (!res.ok) throw new Error('โหลดรายการแจ้งซ่อมไม่สำเร็จ')
         const data = await res.json()
         items.value = Array.isArray(data) ? data : []
@@ -661,7 +660,7 @@ const submitForm = async () => {
         const dateTimeStr = requestDate.value.trim().includes(' ')
             ? requestDate.value
             : `${requestDate.value} ${formatTimeNow()}`
-        const res = await fetch(`${API_BASE}/AddRepairRequest`, {
+        const res = await apiFetch('/AddRepairRequest', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -744,7 +743,7 @@ const deleteItem = async (id) => {
     if (!window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')) return
 
     try {
-        const res = await fetch(`${API_BASE}/DeleteRepairRequest/${id}`, { method: 'DELETE' })
+        const res = await apiFetch(`/DeleteRepairRequest/${id}`, { method: 'DELETE' })
         if (!res.ok) {
             const err = await res.text()
             throw new Error(err || 'ลบไม่สำเร็จ')
