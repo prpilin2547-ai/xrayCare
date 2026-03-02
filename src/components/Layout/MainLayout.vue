@@ -3,8 +3,13 @@
     <TopBar
       :role="userRole"
       :username="userName"
+      :hospital-name="hospitalName"
+      :hospital-id="hospitalId"
+      :is-super-admin="isSuperAdmin"
+      :hospitals="hospitals"
       class="topbar-fixed"
       @toggle-sidebar="toggleSidebar"
+      @switch-hospital="onSwitchHospital"
     />
 
     <div class="layout-body">
@@ -27,6 +32,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getStoredUser } from '../../api/client'
 import SidebarNav from './SidebarNav.vue'
 import TopBar from './TopBar.vue'
 
@@ -35,6 +41,10 @@ const router = useRouter()
 
 const userName = ref('')
 const userRole = ref('Tech')
+const hospitalName = ref('')
+const hospitalId = ref(null)
+const isSuperAdmin = ref(false)
+const hospitals = ref([])
 const sidebarOpen = ref(false)
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
 
@@ -45,12 +55,53 @@ function onResize() {
   }
 }
 
+function refreshFromStorage() {
+  const stored = getStoredUser()
+  if (stored) {
+    if (stored.username) userName.value = stored.username
+    if (stored.position) userRole.value = stored.position
+    if (stored.hospitalName) hospitalName.value = stored.hospitalName
+    if (stored.hospitalId != null) hospitalId.value = stored.hospitalId
+    isSuperAdmin.value = stored.isSuperAdmin === true
+  }
+}
+
+async function loadHospitalsForSuperAdmin() {
+  const stored = getStoredUser()
+  if (!stored?.isSuperAdmin) return
+  try {
+    const { API_BASE } = await import('../../api/client')
+    const res = await fetch(`${API_BASE}/GetHospitals`)
+    if (res.ok) {
+      const list = await res.json()
+      hospitals.value = Array.isArray(list) ? list : []
+    }
+  } catch (e) {
+    console.warn('Load hospitals for switch failed', e)
+  }
+}
+
+function onSwitchHospital({ id, name }) {
+  const stored = getStoredUser()
+  if (!stored) return
+  const updated = { ...stored, hospitalId: id, hospitalName: name || '' }
+  localStorage.setItem('xraycare-user', JSON.stringify(updated))
+  hospitalName.value = name || ''
+  hospitalId.value = id
+}
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
   try {
     const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
     if (stored.username) userName.value = stored.username
     if (stored.position) userRole.value = stored.position
+    if (stored.hospitalName) hospitalName.value = stored.hospitalName
+    if (stored.hospitalId != null) hospitalId.value = stored.hospitalId
+    if (stored.isSuperAdmin === true) {
+      isSuperAdmin.value = true
+      loadHospitalsForSuperAdmin()
+    }
   } catch (e) {
     console.error('Cannot read user from localStorage', e)
   }

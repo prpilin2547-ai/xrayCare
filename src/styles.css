@@ -109,6 +109,20 @@ table {
   background: #94a3b8;
 }
 
+/* ====== GLOBAL SMALL CLASS (all pages) ====== */
+.small {
+  font-size: 13px;
+}
+.small h1 { font-size: 1.5rem; }
+.small h2 { font-size: 1.3rem; }
+.small h3 { font-size: 1.15rem; }
+.small h4, .small h5, .small h6 { font-size: 1.05rem; }
+.small .btn { font-size: 0.875rem; }
+.small small, .small .small-text { font-size: 0.8125rem; }
+.small table { font-size: inherit; }
+.small .form-control, .small .form-select { font-size: 0.875rem; }
+.small .form-label { font-size: 0.875rem; }
+
 /* ====== GLOBAL RESPONSIVE UTILITIES ====== */
 .table-responsive {
   width: 100%;

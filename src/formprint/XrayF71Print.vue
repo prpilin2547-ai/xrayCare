@@ -397,7 +397,7 @@ function handlePrint () {
   window.print()
 }
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 function getLoggedInUser() {
   try {
@@ -440,7 +440,7 @@ onMounted(async () => {
   const id = route.query.id || route.params.id
   if (!id) return
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    const res = await apiFetch(`/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
     header.value.testDate = data.checkDate || ''
@@ -467,7 +467,7 @@ onMounted(async () => {
         // ดึง model จาก API machines
         let machineModel = ''
         try {
-          const mRes = await fetch(`${API_BASE}/GetAllMachines`)
+          const mRes = await apiFetch('/GetAllMachines')
           if (mRes.ok) {
             const machines = await mRes.json()
             const nameToMatch = (machineName || f71.value.machineName || header.value.machineBrand || '').trim()

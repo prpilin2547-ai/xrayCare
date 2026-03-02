@@ -15,9 +15,15 @@ public class DataContext : DbContext
         optionsBuilder.UseNpgsql(connectionString);
     }
 
+    public DbSet<Hospital> Hospitals { get; set; }
     public DbSet<Machine> Machines { get; set; }
     public DbSet<UserAccount> Users { get; set; }
     public DbSet<RepairRequest> RepairRequests { get; set; }
     public DbSet<ChecklistRecord> ChecklistRecords { get; set; }
     public DbSet<ScheduleConfig> ScheduleConfigs { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserAccount>().HasIndex(u => new { u.HospitalId, u.Username }).IsUnique();
+    }
 }

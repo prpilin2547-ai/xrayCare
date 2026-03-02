@@ -243,7 +243,7 @@ function handlePrint () {
   window.print()
 }
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 /** แปลง items จาก jsonData ให้ตรงกับช่องในฟอร์ม (ลำดับที่, หมายเลขอุปกรณ์, ชนิดของอุปกรณ์, อายุการใช้งาน, วันที่ตรวจสอบ, ชนิดของความชำรุดเสียหาย, ตำแหน่ง, ขนาด, วิธีการจัดเก็บ, ผู้บันทึก) */
 function normalizeItems (items) {
@@ -302,7 +302,7 @@ onMounted(async () => {
 
   if (!id) return
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    const res = await apiFetch(`/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
     applyRecordData(data)

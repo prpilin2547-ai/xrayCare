@@ -44,6 +44,16 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="hospital">โรงพยาบาล</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-hospital input-icon"></i>
+            <select id="hospital" v-model.number="selectedHospitalId" class="login-select">
+              <option v-for="h in hospitals" :key="h.id" :value="h.id">{{ h.name }}</option>
+            </select>
+          </div>
+        </div>
+
         <p v-if="errorMsg" class="error-msg">
           <i class="fa-solid fa-circle-exclamation"></i>
           {{ errorMsg }}
@@ -63,17 +73,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_BASE } from '../api/client'
 
 const router = useRouter()
-const API_BASE = '/api/Xraycare'
 
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const errorMsg = ref('')
 const isLoading = ref(false)
+const hospitals = ref([])
+const selectedHospitalId = ref(null)
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_BASE}/GetHospitals`)
+    if (res.ok) {
+      const list = await res.json()
+      hospitals.value = list
+      if (list.length > 0 && selectedHospitalId.value == null) selectedHospitalId.value = list[0].id
+    }
+  } catch (e) {
+    console.error('Load hospitals failed', e)
+  }
+})
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -95,12 +120,14 @@ const handleLogin = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: username.value.trim(),
-        password: password.value
+        password: password.value,
+        hospitalId: selectedHospitalId.value || undefined
       })
     })
 
     if (res.status === 401) {
-      errorMsg.value = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+      const data = await res.json().catch(() => ({}))
+      errorMsg.value = data.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
       return
     }
 
@@ -114,11 +141,14 @@ const handleLogin = async () => {
     localStorage.setItem('xraycare-user', JSON.stringify({
       id: user.id,
       username: user.username,
-      position: user.position
+      position: user.position,
+      hospitalId: user.hospitalId,
+      hospitalName: user.hospitalName || '',
+      isSuperAdmin: user.isSuperAdmin === true
     }))
 
     const position = (user.position || '').toLowerCase()
-    if (position === 'admin') {
+    if (position === 'admin' || position === 'superadmin') {
       router.push('/admindashboard')
     } else if (position === 'engineer') {
       router.push('/engineerdashboard')
@@ -296,6 +326,21 @@ label {
 
 .input-wrapper input::placeholder {
   color: rgba(255, 255, 255, 0.3);
+}
+
+.login-select {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  color: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.login-select option {
+  color: #0f172a;
 }
 
 .eye-btn {

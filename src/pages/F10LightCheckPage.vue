@@ -366,7 +366,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { useRouter, useRoute } from 'vue-router'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 const router = useRouter()
 const route = useRoute()
 
@@ -405,7 +405,7 @@ onMounted(async () => {
   timeInterval = setInterval(updateTime, 1000)
 
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (res.ok) {
       const machines = await res.json()
       if (machines.length > 0) {
@@ -553,7 +553,7 @@ const saveForm = async () => {
   }
 
   try {
-    await fetch(`${API_BASE}/SaveChecklist`, {
+    await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

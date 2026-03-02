@@ -98,7 +98,7 @@
 import { ref, computed, onMounted } from 'vue';
 import MainLayout from '../components/Layout/MainLayout.vue';
 
-const API_BASE = '/api/Xraycare';
+import { apiFetch } from '../api/client';
 
 /* ---------------- Data จาก API ---------------- */
 const machines = ref([]);
@@ -160,7 +160,7 @@ function getStatusClass(status) {
 /* ---------- โหลดข้อมูลจาก API ---------- */
 async function loadMachines() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`);
+    const res = await apiFetch('/GetAllMachines');
     if (!res.ok) throw new Error('โหลดข้อมูลเครื่องไม่สำเร็จ');
     const data = await res.json();
     machines.value = Array.isArray(data) ? data : [];
@@ -172,7 +172,7 @@ async function loadMachines() {
 
 async function loadRepairRequests() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllRepairRequests`);
+    const res = await apiFetch('/GetAllRepairRequests');
     if (!res.ok) throw new Error('โหลดข้อมูลแจ้งซ่อมไม่สำเร็จ');
     const data = await res.json();
     repairRequests.value = Array.isArray(data) ? data : [];

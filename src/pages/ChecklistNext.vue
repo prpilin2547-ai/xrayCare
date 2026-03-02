@@ -165,7 +165,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const props = defineProps({
   selectedDevice: {
@@ -203,7 +203,7 @@ onMounted(async () => {
   const equipName = route.params.equipmentName
   if (equipName) {
     try {
-      const res = await fetch(`${API_BASE}/GetAllMachines`)
+      const res = await apiFetch('/GetAllMachines')
       if (res.ok) {
         const list = await res.json()
         const found = list.find(m => m.machineName === equipName)

@@ -77,7 +77,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 const route = useRoute()
 
 const fiscalYear = ref('')
@@ -158,7 +158,7 @@ onMounted(async () => {
 
   let allRecords = []
   try {
-    const res = await fetch(`${API_BASE}/GetAllChecklistRecords`)
+    const res = await apiFetch('/GetAllChecklistRecords')
     if (!res.ok) return
     const data = await res.json()
     allRecords = Array.isArray(data) ? data : []
@@ -183,7 +183,7 @@ onMounted(async () => {
 
   if (machineQuery && machineQuery.startsWith('machine-')) {
     const machineId = machineQuery.replace('machine-', '')
-    const machinesRes = await fetch(`${API_BASE}/GetAllMachines`)
+    const machinesRes = await apiFetch('/GetAllMachines')
     if (machinesRes.ok) {
       const machines = await machinesRes.json()
       const machine = (Array.isArray(machines) ? machines : []).find(m => String(m.id) === String(machineId))

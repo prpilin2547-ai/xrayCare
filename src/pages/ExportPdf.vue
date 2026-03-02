@@ -263,7 +263,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 const router = useRouter()
 
 const machine = ref('')
@@ -538,7 +538,7 @@ watch([filterMachine, filterFormType, filterDateFrom, filterDateTo], () => {
 async function loadChecklistRecords() {
   loadingRecords.value = true
   try {
-    const res = await fetch(`${API_BASE}/GetAllChecklistRecords`)
+    const res = await apiFetch('/GetAllChecklistRecords')
     if (res.ok) {
       const data = await res.json()
       checklistRecords.value = Array.isArray(data) ? data : []
@@ -582,7 +582,7 @@ function goToPrintFromRow(row) {
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (res.ok) {
       const data = await res.json()
       machines.value = Array.isArray(data) ? data : []

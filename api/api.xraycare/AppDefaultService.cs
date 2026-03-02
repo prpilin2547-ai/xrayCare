@@ -1,16 +1,17 @@
-
 using api.xraycare.Database;
+using api.xraycare.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
+
 public static class Extension
 {
     public static IHostApplicationBuilder InitAppService(this IHostApplicationBuilder builder)
     {
-        // builder.Services.AddTransient<IPurchaseOrderService, PurchaseOrdersAPIService>();    
-        // Add HttpClient for calling external APIs
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IHospitalContext, HospitalContext>();
+        builder.Services.AddScoped<api.xraycare.Services.ICurrentUserContext, api.xraycare.Services.CurrentUserContext>();
         builder.Services.AddHttpClient();
-        
         return builder;
     }
 
@@ -25,16 +26,16 @@ public static class Extension
     {
         try
         {
-            var scope = app.Services.CreateScope();
+            using var scope = app.Services.CreateScope();
             var bdb = scope.ServiceProvider.GetService<DataContext>();
-            if (bdb != null && bdb.Database.GetPendingMigrations().Any())
+            if (bdb != null)
                 bdb.Database.Migrate();
         }
         catch (Exception e)
         {
-            var scope = app.Services.CreateScope();
+            using var scope = app.Services.CreateScope();
             var log = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("Migrations") ?? NullLogger.Instance;
-            log.LogError(e.ToString());
+            log.LogError(e, "Migration failed");
         }
         return app;
     }
@@ -45,18 +46,32 @@ public static class Extension
         {
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            // Ensure default hospital exists
+            if (!db.Hospitals.Any())
+            {
+                db.Hospitals.Add(new db.xraycare.Hospital
+                {
+                    Name = "โรงพยาบาลหลัก (Default)",
+                    Code = "DEFAULT"
+                });
+                db.SaveChanges();
+            }
+            var firstHospital = db.Hospitals.OrderBy(h => h.RID).FirstOrDefault();
+            if (firstHospital == null) return app;
+            var defaultHospitalId = firstHospital.RID;
             if (!db.Users.Any(u => u.Username == "Superadmin"))
             {
                 db.Users.Add(new db.xraycare.UserAccount
                 {
+                    HospitalId = defaultHospitalId,
                     Username = "Superadmin",
                     Password = "Superadmin1234",
-                    Position = "Admin"
+                    Position = "Admin",
+                    IsSuperAdmin = true
                 });
                 db.SaveChanges();
-
                 var log = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("Seed");
-                log?.LogInformation("Default admin user created (username: admin)");
+                log?.LogInformation("Default admin user created (username: Superadmin)");
             }
         }
         catch (Exception e)

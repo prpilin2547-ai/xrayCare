@@ -309,7 +309,7 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 import Chart from 'chart.js/auto'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const loading = ref(true)
 const selectedYear = ref(new Date().getFullYear() + 543)
@@ -414,21 +414,21 @@ function getLastCheckDate(machineName, room, formType) {
 
 async function fetchMachines() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllMachines`)
+    const res = await apiFetch('/GetAllMachines')
     if (res.ok) machines.value = await res.json()
   } catch (e) { console.error('Fetch machines:', e) }
 }
 
 async function fetchRepairs() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllRepairRequests`)
+    const res = await apiFetch('/GetAllRepairRequests')
     if (res.ok) repairRequests.value = await res.json()
   } catch (e) { console.error('Fetch repairs:', e) }
 }
 
 async function fetchChecklists() {
   try {
-    const res = await fetch(`${API_BASE}/GetAllChecklistRecords`)
+    const res = await apiFetch('/GetAllChecklistRecords')
     if (res.ok) checklistRecords.value = await res.json()
   } catch (e) { console.error('Fetch checklists:', e) }
 }

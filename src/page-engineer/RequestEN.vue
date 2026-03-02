@@ -205,7 +205,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const dropdownOpen = ref(false)
 const loading = ref(false)
@@ -225,7 +225,7 @@ const items = ref([])
 async function loadItems() {
   loading.value = true
   try {
-    const res = await fetch(`${API_BASE}/GetAllRepairRequests`)
+    const res = await apiFetch('/GetAllRepairRequests')
     if (!res.ok) throw new Error('โหลดรายการแจ้งซ่อมไม่สำเร็จ')
     const data = await res.json()
     items.value = Array.isArray(data) ? data : []
@@ -374,7 +374,7 @@ const closeImageModal = () => {
 const saveData = async () => {
   if (selectedItem.value) {
     try {
-      const res = await fetch(`${API_BASE}/UpdateRepairStatus/${selectedItem.value.id}`, {
+      const res = await apiFetch(`/UpdateRepairStatus/${selectedItem.value.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ statusText: currentStatus.value })
@@ -407,7 +407,7 @@ const deleteItem = async (id) => {
   if (!window.confirm('คุณต้องการลบรายการแจ้งซ่อมนี้ใช่หรือไม่?')) return
 
   try {
-    const res = await fetch(`${API_BASE}/DeleteRepairRequest/${id}`, { method: 'DELETE' })
+    const res = await apiFetch(`/DeleteRepairRequest/${id}`, { method: 'DELETE' })
     if (!res.ok) {
       const err = await res.text()
       throw new Error(err || 'ลบไม่สำเร็จ')

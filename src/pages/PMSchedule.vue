@@ -271,8 +271,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
-
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -684,7 +683,7 @@ async function clearDayData () {
   const configId = configIdByStartDate.value[key]
   if (configId != null) {
     try {
-      await fetch(`${API_BASE}/DeleteScheduleConfig/${configId}`, { method: 'DELETE' })
+      await apiFetch(`/DeleteScheduleConfig/${configId}`, { method: 'DELETE' })
     } catch (e) {
       console.error('Delete schedule config failed', e)
     }
@@ -722,7 +721,7 @@ function parseFormTypesFromApi (formTypesJson) {
 
 async function loadScheduleConfigs () {
   try {
-    const res = await fetch(`${API_BASE}/GetAllScheduleConfigs`)
+    const res = await apiFetch('/GetAllScheduleConfigs')
     if (!res.ok) return
     const list = await res.json()
     if (!Array.isArray(list)) return
@@ -761,7 +760,7 @@ async function handleSaveSettings () {
     const configId = configIdByStartDate.value[startKey]
 
     if (configId != null) {
-      const res = await fetch(`${API_BASE}/UpdateScheduleConfig/${configId}`, {
+      const res = await apiFetch(`/UpdateScheduleConfig/${configId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -772,7 +771,7 @@ async function handleSaveSettings () {
         return
       }
     } else {
-      const res = await fetch(`${API_BASE}/AddScheduleConfig`, {
+      const res = await apiFetch('/AddScheduleConfig', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

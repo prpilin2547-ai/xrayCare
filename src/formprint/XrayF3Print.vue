@@ -274,7 +274,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const API_BASE = '/api/Xraycare'
+import { apiFetch } from '../api/client'
 
 // F3 – โครงสร้างตรงกับ jsonData.F3
 const f3Record = ref({
@@ -348,7 +348,7 @@ onMounted(async () => {
   const id = route.query.id || route.params.id
   if (!id) return
   try {
-    const res = await fetch(`${API_BASE}/GetChecklistRecord/${id}`)
+    const res = await apiFetch(`/GetChecklistRecord/${id}`)
     if (!res.ok) return
     const data = await res.json()
     const checkDate = data.checkDate || ''
@@ -397,7 +397,7 @@ onMounted(async () => {
     let machineModel = ''
     if (machineName) {
       try {
-        const mRes = await fetch(`${API_BASE}/GetAllMachines`)
+        const mRes = await apiFetch('/GetAllMachines')
         if (mRes.ok) {
           const machines = await mRes.json()
           const found = machines.find(mx => (mx.machineName || '').trim() === machineName.trim())
