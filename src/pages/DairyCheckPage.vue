@@ -81,17 +81,18 @@
                 </td>
                 <td>
                   <textarea class="input-textarea" v-model="item.remark" placeholder="บันทึกหมายเหตุ..."></textarea>
-                  <div class="mt-2">
-          <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
-          <input
-            type="file"
-            class="form-control form-control-sm"
-            @change="onFileChange"
-          />
-          <p v-if="attachmentFileName" class="file-name small mt-1">
-            ไฟล์ที่เลือก: {{ attachmentFileName }}
-          </p>
-        </div>
+                  <div class="file-attach-wrap mt-2">
+                    <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+                    <input type="file" accept="image/*" class="form-control form-control-sm" @change="onItemFileChange($event, item)" />
+                    <div v-if="item.fileName" class="file-info mt-1">
+                      <span v-if="item.imageData" class="file-link" @click="openFilePreview(item.imageData)">{{ item.fileName }}</span>
+                      <span v-else class="file-label">{{ item.fileName }}</span>
+                      <button type="button" class="file-remove" @click="clearItemFile(item, $event)">×</button>
+                    </div>
+                    <div v-if="item.imageData" class="img-preview-wrap mt-2">
+                      <img :src="item.imageData" alt="Preview" class="img-preview" />
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -125,17 +126,18 @@
                 </td>
                 <td>
                   <textarea class="input-textarea" v-model="plateEraseRemark" placeholder="บันทึกหมายเหตุ..."></textarea>
-                  <div class="mt-2">
-          <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
-          <input
-            type="file"
-            class="form-control form-control-sm"
-            @change="onFileChange"
-          />
-          <p v-if="attachmentFileName" class="file-name small mt-1">
-            ไฟล์ที่เลือก: {{ attachmentFileName }}
-          </p>
-        </div>
+                  <div class="file-attach-wrap mt-2">
+                    <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+                    <input type="file" accept="image/*" class="form-control form-control-sm" @change="onPlateEraseFileChange($event)" />
+                    <div v-if="plateEraseFileName" class="file-info mt-1">
+                      <span v-if="plateEraseImageData" class="file-link" @click="openFilePreview(plateEraseImageData)">{{ plateEraseFileName }}</span>
+                      <span v-else class="file-label">{{ plateEraseFileName }}</span>
+                      <button type="button" class="file-remove" @click="clearPlateEraseFile($event)">×</button>
+                    </div>
+                    <div v-if="plateEraseImageData" class="img-preview-wrap mt-2">
+                      <img :src="plateEraseImageData" alt="Preview" class="img-preview" />
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -164,6 +166,22 @@
           <button v-else class="btn-save" @click="saveChecklist">
             บันทึก
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div v-if="showFilePreviewModal" class="file-modal-overlay" @click.self="closeFilePreview">
+      <div class="file-modal-card">
+        <div class="file-modal-header">
+          <h5 class="file-modal-title">ไฟล์รูปภาพ</h5>
+          <button type="button" class="file-modal-close" @click="closeFilePreview">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="file-modal-body">
+          <img v-if="previewImageSrc" :src="previewImageSrc" alt="Preview" class="file-modal-img" />
+          <p class="file-modal-caption">รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม</p>
         </div>
       </div>
     </div>
@@ -301,7 +319,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'lockBrake',
@@ -309,7 +328,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'tableTubeBucky',
@@ -317,7 +337,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'tubeWarmup',
@@ -325,7 +346,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   }
 ])
 
@@ -336,15 +358,141 @@ const plateEraseFileName = computed(() =>
   plateEraseFile.value ? plateEraseFile.value.name : ''
 )
 
+const plateEraseImageData = ref('')
+const showFilePreviewModal = ref(false)
+const previewImageSrc = ref('')
+
+function compressImageToBase64(file, callback) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const maxSize = 800
+      let w = img.width, h = img.height
+      if (w > h) { if (w > maxSize) { h = (h * maxSize) / w; w = maxSize } }
+      else { if (h > maxSize) { w = (w * maxSize) / h; h = maxSize } }
+      canvas.width = w; canvas.height = h
+      ctx.drawImage(img, 0, 0, w, h)
+      callback(canvas.toDataURL('image/jpeg', 0.7))
+    }
+    img.onerror = () => callback('')
+    img.src = e.target.result
+  }
+  reader.onerror = () => callback('')
+  reader.readAsDataURL(file)
+}
+
 const onItemFileChange = (event, item) => {
   const file = event.target.files[0] || null
+  if (!file) return
   item.file = file
-  item.fileName = file ? file.name : ''
+  item.fileName = file.name
+  compressImageToBase64(file, (data) => { item.imageData = data })
+}
+
+const clearItemFile = (item, event) => {
+  if (event) event.stopPropagation()
+  item.file = null
+  item.fileName = ''
+  item.imageData = ''
+  const input = event?.target?.closest?.('.file-attach-wrap')?.querySelector('input[type="file"]')
+  if (input) input.value = ''
 }
 
 const onPlateEraseFileChange = (event) => {
   const file = event.target.files[0] || null
+  if (!file) return
   plateEraseFile.value = file
+  compressImageToBase64(file, (data) => { plateEraseImageData.value = data })
+}
+
+const clearPlateEraseFile = (event) => {
+  if (event) event.stopPropagation()
+  plateEraseFile.value = null
+  plateEraseImageData.value = ''
+  const input = event?.target?.closest?.('.file-attach-wrap')?.querySelector('input[type="file"]')
+  if (input) input.value = ''
+}
+
+const openFilePreview = (src) => {
+  if (!src) return
+  previewImageSrc.value = src
+  showFilePreviewModal.value = true
+}
+
+const closeFilePreview = () => {
+  showFilePreviewModal.value = false
+  previewImageSrc.value = ''
+}
+
+const CHECKLIST_DETAIL_MAP = {
+  powerCable: 'สายไฟ',
+  lockBrake: 'ระบบล็อกและเบรก',
+  tableTubeBucky: 'เตียง หลอดเอกซเรย์ และบักกี้',
+  tubeWarmup: 'X-ray tube warm-up'
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    if (!file) { resolve(''); return }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const maxSize = 800
+        let w = img.width, h = img.height
+        if (w > h) { if (w > maxSize) { h = (h * maxSize) / w; w = maxSize } }
+        else { if (h > maxSize) { w = (w * maxSize) / h; h = maxSize } }
+        canvas.width = w
+        canvas.height = h
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL('image/jpeg', 0.7))
+      }
+      img.onerror = () => resolve('')
+      img.src = e.target.result
+    }
+    reader.onerror = () => resolve('')
+    reader.readAsDataURL(file)
+  })
+}
+
+async function createRepairRequestsForFailedItems() {
+  const failedItems = checklistItems.value.filter(item => item.result === 'fail')
+  const now = new Date()
+  const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+  const dateTimeStr = `${dateStr} ${timeStr}`
+
+  for (const item of failedItems) {
+    const detail = CHECKLIST_DETAIL_MAP[item.id]
+    if (!detail) continue
+    let imageData = ''
+    if (item.file) {
+      imageData = await fileToBase64(item.file)
+    }
+    try {
+      await apiFetch('/AddRepairRequest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          equipment: selectedDevice.value.name,
+          room: selectedDevice.value.room,
+          requestDate: dateTimeStr,
+          reporterName: currentUserName.value,
+          detail: detail,
+          remarks: item.remark || '',
+          statusText: 'รอซ่อม',
+          imageData: imageData || null
+        })
+      })
+    } catch (e) {
+      console.error('Auto-create repair request error:', e)
+    }
+  }
 }
 
 const markAllPass = () => {
@@ -447,6 +595,8 @@ async function performSaveChecklist() {
   } catch (e) {
     console.error('Cannot save daily check to localStorage', e)
   }
+
+  await createRepairRequestsForFailedItems()
 }
 
 /** บันทึกแล้วไปหน้าถัดไป (เมื่อมีฟอร์มที่ต้องทำในวันเดียวกัน) — ส่งชื่อเครื่องไปด้วยเพื่อให้หน้าถัดไปแสดงเครื่องเดิม */
@@ -837,6 +987,142 @@ const saveChecklist = async () => {
   box-shadow: 0 4px 14px rgba(16,185,129,0.4);
 }
 
+/* ====== FILE ATTACH UI ====== */
+.file-attach-wrap { position: relative; }
+
+.file-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-link {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #0EA5E9;
+  font-size: 0.85rem;
+  transition: color 150ms;
+}
+
+.file-link:hover { color: #0369A1; }
+
+.file-label { font-size: 0.85rem; color: #475569; }
+
+.file-remove {
+  border: none;
+  background: none;
+  color: #94a3b8;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 150ms;
+}
+
+.file-remove:hover { color: #dc2626; }
+
+.img-preview-wrap { display: flex; justify-content: flex-start; }
+
+.img-preview {
+  max-width: 260px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Image Preview Modal */
+.file-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 2070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.file-modal-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.22);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-modal-header {
+  background: #198754;
+  color: #fff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.file-modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: background 150ms, transform 150ms;
+}
+
+.file-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.file-modal-body {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 200px;
+  max-height: calc(90vh - 120px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-modal-img {
+  max-width: 100%;
+  max-height: min(400px, 60vh);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.file-modal-caption {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
 @media (max-width: 1024px) {
   .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .check-table { min-width: 500px; }
@@ -849,5 +1135,6 @@ const saveChecklist = async () => {
   .content-panel { padding: 12px; border-radius: 12px; }
   .actions { flex-wrap: wrap; }
   .btn-remark, .btn-save, .btn-next { padding: 8px 16px; font-size: 0.8rem; flex: 1; min-width: 120px; text-align: center; }
+  .img-preview { max-width: 180px; max-height: 140px; }
 }
 </style>

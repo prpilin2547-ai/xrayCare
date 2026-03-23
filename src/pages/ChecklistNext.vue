@@ -68,14 +68,18 @@
                     v-model="item.remark"
                     placeholder="บันทึกหมายเหตุ..."
                   ></textarea>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    @change="onItemFileChange($event, item)"
-                  />
-                  <p v-if="item.fileName" class="file-name">
-                    ไฟล์ที่เลือก: {{ item.fileName }}
-                  </p>
+                  <div class="file-attach-wrap mt-2">
+                    <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+                    <input type="file" accept="image/*" class="form-control form-control-sm" @change="onItemFileChange($event, item)" />
+                    <div v-if="item.fileName" class="file-info mt-1">
+                      <span v-if="item.imageData" class="file-link" @click="openFilePreview(item.imageData)">{{ item.fileName }}</span>
+                      <span v-else class="file-label">{{ item.fileName }}</span>
+                      <button type="button" class="file-remove" @click="clearItemFile(item, $event)">×</button>
+                    </div>
+                    <div v-if="item.imageData" class="img-preview-wrap mt-2">
+                      <img :src="item.imageData" alt="Preview" class="img-preview" />
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -128,14 +132,18 @@
                     v-model="plateEraseRemark"
                     placeholder="บันทึกหมายเหตุ..."
                   ></textarea>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    @change="onPlateEraseFileChange"
-                  />
-                  <p v-if="plateEraseFileName" class="file-name">
-                    ไฟล์ที่เลือก: {{ plateEraseFileName }}
-                  </p>
+                  <div class="file-attach-wrap mt-2">
+                    <label class="form-label small mb-1">แนบไฟล์ภาพ</label>
+                    <input type="file" accept="image/*" class="form-control form-control-sm" @change="onPlateEraseFileChange($event)" />
+                    <div v-if="plateEraseFileName" class="file-info mt-1">
+                      <span v-if="plateEraseImageData" class="file-link" @click="openFilePreview(plateEraseImageData)">{{ plateEraseFileName }}</span>
+                      <span v-else class="file-label">{{ plateEraseFileName }}</span>
+                      <button type="button" class="file-remove" @click="clearPlateEraseFile($event)">×</button>
+                    </div>
+                    <div v-if="plateEraseImageData" class="img-preview-wrap mt-2">
+                      <img :src="plateEraseImageData" alt="Preview" class="img-preview" />
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -154,6 +162,18 @@
           <button class="btn-next" @click="goNext">
             ถัดไป
           </button>
+        </div>
+      </div>
+    </div>
+    <div v-if="showFilePreviewModal" class="file-modal-overlay" @click.self="closeFilePreview">
+      <div class="file-modal-card">
+        <div class="file-modal-header">
+          <h5 class="file-modal-title">ไฟล์รูปภาพ</h5>
+          <button type="button" class="file-modal-close" @click="closeFilePreview"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="file-modal-body">
+          <img v-if="previewImageSrc" :src="previewImageSrc" alt="Preview" class="file-modal-img" />
+          <p class="file-modal-caption">รูปภาพที่แนบมาพร้อมรายการแจ้งซ่อม</p>
         </div>
       </div>
     </div>
@@ -237,7 +257,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'lockBrake',
@@ -245,7 +266,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'tableTubeBucky',
@@ -253,7 +275,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   },
   {
     id: 'tubeWarmup',
@@ -261,7 +284,8 @@ const checklistItems = ref([
     result: '',
     remark: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    imageData: ''
   }
 ])
 
@@ -273,17 +297,69 @@ const plateEraseFileName = computed(() =>
   plateEraseFile.value ? plateEraseFile.value.name : ''
 )
 
-// เปลี่ยนไฟล์ของแต่ละรายการ checklist
-const onItemFileChange = (event, item) => {
-  const file = event.target.files[0] || null
-  item.file = file
-  item.fileName = file ? file.name : ''
+const plateEraseImageData = ref('')
+const showFilePreviewModal = ref(false)
+const previewImageSrc = ref('')
+
+function compressImageToBase64(file, callback) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const maxSize = 800
+      let w = img.width, h = img.height
+      if (w > h) { if (w > maxSize) { h = (h * maxSize) / w; w = maxSize } }
+      else { if (h > maxSize) { w = (w * maxSize) / h; h = maxSize } }
+      canvas.width = w; canvas.height = h
+      ctx.drawImage(img, 0, 0, w, h)
+      callback(canvas.toDataURL('image/jpeg', 0.7))
+    }
+    img.onerror = () => callback('')
+    img.src = e.target.result
+  }
+  reader.onerror = () => callback('')
+  reader.readAsDataURL(file)
 }
 
-// เปลี่ยนไฟล์ของการลบแผ่นเพลท
+const onItemFileChange = (event, item) => {
+  const file = event.target.files[0] || null
+  if (!file) return
+  item.file = file
+  item.fileName = file.name
+  compressImageToBase64(file, (data) => { item.imageData = data })
+}
+
+const clearItemFile = (item, event) => {
+  if (event) event.stopPropagation()
+  item.file = null
+  item.fileName = ''
+  item.imageData = ''
+}
+
 const onPlateEraseFileChange = (event) => {
   const file = event.target.files[0] || null
+  if (!file) return
   plateEraseFile.value = file
+  compressImageToBase64(file, (data) => { plateEraseImageData.value = data })
+}
+
+const clearPlateEraseFile = (event) => {
+  if (event) event.stopPropagation()
+  plateEraseFile.value = null
+  plateEraseImageData.value = ''
+}
+
+const openFilePreview = (src) => {
+  if (!src) return
+  previewImageSrc.value = src
+  showFilePreviewModal.value = true
+}
+
+const closeFilePreview = () => {
+  showFilePreviewModal.value = false
+  previewImageSrc.value = ''
 }
 
 // ปุ่ม "ผ่านทั้งหมด"
@@ -593,4 +669,30 @@ const goNext = () => {
   .actions { flex-wrap: wrap; }
   .btn-remark, .btn-next { padding: 8px 16px; font-size: 0.8rem; flex: 1; min-width: 120px; text-align: center; }
 }
+
+.file-attach-wrap { position: relative; }
+.file-info { display: inline-flex; align-items: center; gap: 6px; }
+.file-link { text-decoration: underline; cursor: pointer; color: #0EA5E9; font-size: 0.85rem; }
+.file-link:hover { color: #0369A1; }
+.file-label { font-size: 0.85rem; color: #475569; }
+.file-remove { border: none; background: none; color: #94a3b8; font-size: 18px; line-height: 1; cursor: pointer; }
+.file-remove:hover { color: #dc2626; }
+.img-preview-wrap { display: flex; }
+.img-preview { max-width: 260px; max-height: 200px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.file-modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); z-index: 2070; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.file-modal-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 24px 56px rgba(0,0,0,0.22); max-width: 90vw; max-height: 90vh; width: 100%; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+.file-modal-header { background: #198754; color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.file-modal-title { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.file-modal-close { width: 36px; height: 36px; border: none; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; }
+.file-modal-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+.file-modal-body { padding: 24px; background: #f8fafc; min-height: 200px; max-height: calc(90vh - 120px); overflow: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.file-modal-img { max-width: 100%; max-height: min(400px, 60vh); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 16px; }
+.file-modal-caption { margin: 0; font-size: 0.9rem; color: #64748b; }
+
+.form-label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary, #475569); }
+.mb-1 { margin-bottom: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-1 { margin-top: 4px; }
+.form-control,
+.form-control-sm { width: 100%; border-radius: var(--radius-sm, 8px); border: 1px solid var(--border-soft, #e2e8f0); padding: 8px 12px; font-size: 0.85rem; }
 </style>

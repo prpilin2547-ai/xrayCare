@@ -166,64 +166,140 @@
         </table>
       </div>
 
-      <!-- ---------------------- CALENDAR ---------------------- -->
-      <div class="calendar-wrapper">
+      <!-- ---------------------- CALENDAR + EQUIPMENT STATUS ---------------------- -->
+      <div class="calendar-status-row">
 
-        <!-- DATE CARD -->
-        <div class="card date-card">
-          <div class="date-inner">
-            <div class="calendar-icon-wrap">
-              <i class="fa-solid fa-calendar"></i>
+        <div class="calendar-wrapper">
+          <!-- DATE CARD -->
+          <div class="card date-card">
+            <div class="date-inner">
+              <div class="calendar-icon-wrap">
+                <i class="fa-solid fa-calendar"></i>
+              </div>
+              <div class="date-text">
+                <p class="date-main">{{ headerDateText }}</p>
+                <p class="date-sub">{{ headerWeekdayText }}</p>
+              </div>
             </div>
-            <div class="date-text">
-              <p class="date-main">{{ headerDateText }}</p>
-              <p class="date-sub">{{ headerWeekdayText }}</p>
+          </div>
+
+          <!-- CALENDAR BODY -->
+          <div class="card calendar-card">
+            <div class="calendar-header">
+              <button class="cal-nav-btn" @click="goPrevMonth">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <span class="cal-month-label">
+                {{ monthNames[currentMonth] }} {{ currentYear }}
+              </span>
+              <button class="cal-nav-btn" @click="goNextMonth">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="calendar-grid">
+              <div v-for="d in weekdays" :key="d" class="weekday">
+                {{ d }}
+              </div>
+
+              <div v-for="cell in calendarCells" :key="cell.key" class="day-cell"
+                :class="{ empty: !cell.day, today: isToday(cell.day) }" @click="cell.day && openDayPopup(cell)">
+                <div v-if="cell.day" class="day-number">
+                  <span>{{ cell.day }}</span>
+                </div>
+
+                <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)">
+                  <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
+                    <span class="tag-dot"></span>
+                    <span>Monthly</span>
+                  </div>
+                  <div v-if="isDailySpecialCell(cell)" class="tag-pill monthly-tag-red">
+                    <span class="tag-dot"></span>
+                    <span>Daily</span>
+                  </div>
+                  <div v-if="getCustomTagLabel(cell)" class="tag-pill custom-tag">
+                    <span class="tag-dot"></span>
+                    <span>{{ getCustomTagLabel(cell) }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- CALENDAR BODY -->
-        <div class="card calendar-card">
-          <div class="calendar-header">
-            <button class="cal-nav-btn" @click="goPrevMonth">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <span class="cal-month-label">
-              {{ monthNames[currentMonth] }} {{ currentYear }}
-            </span>
-            <button class="cal-nav-btn" @click="goNextMonth">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
+        <!-- EQUIPMENT STATUS PANEL -->
+        <div class="equip-status-panel card">
+          <div class="equip-panel-header">
+            <div class="equip-panel-icon">
+              <i class="fa-solid fa-stethoscope"></i>
+            </div>
+            <div>
+              <h3 class="equip-panel-title">สถานะเครื่อง</h3>
+              <p class="equip-panel-subtitle">Equipment Readiness</p>
+            </div>
           </div>
 
-          <div class="calendar-grid">
-            <div v-for="d in weekdays" :key="d" class="weekday">
-              {{ d }}
+          <div class="equip-summary-row">
+            <div class="equip-summary-chip chip-ready">
+              <i class="fa-solid fa-circle-check"></i>
+              <span class="chip-count">{{ readyMachines.length }}</span>
+              <span class="chip-label">พร้อมใช้งาน</span>
+            </div>
+            <div class="equip-summary-chip chip-not-ready">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <span class="chip-count">{{ notReadyMachines.length }}</span>
+              <span class="chip-label">ไม่พร้อมใช้งาน</span>
+            </div>
+          </div>
+
+          <div class="equip-sections">
+            <div class="equip-section" v-if="readyMachines.length">
+              <div class="equip-section-head">
+                <span class="equip-section-dot dot-green"></span>
+                <span class="equip-section-label">พร้อมใช้งาน</span>
+                <span class="equip-section-count count-green">{{ readyMachines.length }} เครื่อง</span>
+              </div>
+              <div class="equip-list">
+                <div v-for="m in readyMachines" :key="'r-' + m.machineName" class="equip-item item-ready">
+                  <div class="equip-item-icon icon-ok">
+                    <i class="fa-solid fa-check"></i>
+                  </div>
+                  <div class="equip-item-info">
+                    <span class="equip-item-name">{{ m.machineName }}</span>
+                    <span class="equip-item-room" v-if="m.room">ห้อง {{ m.room }}</span>
+                  </div>
+                  <span class="equip-item-badge badge-pass">ผ่าน</span>
+                </div>
+              </div>
             </div>
 
-            <div v-for="cell in calendarCells" :key="cell.key" class="day-cell"
-              :class="{ empty: !cell.day, today: isToday(cell.day) }" @click="cell.day && openDayPopup(cell)">
-              <div v-if="cell.day" class="day-number">
-                <span>{{ cell.day }}</span>
+            <div class="equip-section" v-if="notReadyMachines.length">
+              <div class="equip-section-head">
+                <span class="equip-section-dot dot-red"></span>
+                <span class="equip-section-label">ไม่พร้อมใช้งาน</span>
+                <span class="equip-section-count count-red">{{ notReadyMachines.length }} เครื่อง</span>
               </div>
+              <div class="equip-list">
+                <div v-for="m in notReadyMachines" :key="'nr-' + m.machineName" class="equip-item item-not-ready">
+                  <div class="equip-item-icon icon-fail">
+                    <i class="fa-solid fa-xmark"></i>
+                  </div>
+                  <div class="equip-item-info">
+                    <span class="equip-item-name">{{ m.machineName }}</span>
+                    <span class="equip-item-room" v-if="m.room">ห้อง {{ m.room }}</span>
+                  </div>
+                  <span class="equip-item-badge badge-fail">ไม่ผ่าน</span>
+                </div>
+              </div>
+            </div>
 
-              <div class="tag-stack" v-if="hasMonthlyTag(cell) || isDailySpecialCell(cell) || getCustomTagLabel(cell)">
-                <div v-if="hasMonthlyTag(cell)" class="tag-pill monthly-tag-blue">
-                  <span class="tag-dot"></span>
-                  <span>Monthly</span>
-                </div>
-                <div v-if="isDailySpecialCell(cell)" class="tag-pill monthly-tag-red">
-                  <span class="tag-dot"></span>
-                  <span>Daily</span>
-                </div>
-                <div v-if="getCustomTagLabel(cell)" class="tag-pill custom-tag">
-                  <span class="tag-dot"></span>
-                  <span>{{ getCustomTagLabel(cell) }}</span>
-                </div>
-              </div>
+            <div v-if="!readyMachines.length && !notReadyMachines.length" class="equip-empty-state">
+              <i class="fa-solid fa-clipboard-question"></i>
+              <span>ยังไม่มีข้อมูลการตรวจสอบ</span>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- ---------------------- REPAIR REQUESTS ---------------------- -->
@@ -590,6 +666,82 @@ function dismissNotification(id) {
   notifications.value = notifications.value.filter(n => n.id !== id);
 }
 
+/* ---------- Equipment Readiness (from today's checklist records only) ---------- */
+const checklistRecords = ref([]);
+
+const todayDateText = computed(() => {
+  const d = new Date();
+  return d.toLocaleDateString('th-TH', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+});
+
+async function loadChecklistRecords() {
+  try {
+    const res = await apiFetch('/GetAllChecklistRecords');
+    if (!res.ok) return;
+    const data = await res.json();
+    checklistRecords.value = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error('loadChecklistRecords error:', e);
+    checklistRecords.value = [];
+  }
+}
+
+function deriveCheckStatus(record) {
+  try {
+    const parsed = record.jsonData ? JSON.parse(record.jsonData) : {};
+    if (parsed.summaryResult) return parsed.summaryResult.toLowerCase();
+    if (Array.isArray(parsed.checklist)) {
+      const hasFail = parsed.checklist.some(x => (x.result || '').toLowerCase() === 'fail');
+      return hasFail ? 'fail' : 'pass';
+    }
+    const raw = (record.jsonData || '').toLowerCase();
+    if (raw.includes('"fail"')) return 'fail';
+    if (raw.includes('"pass"')) return 'pass';
+  } catch (_) {}
+  return 'unknown';
+}
+
+const todayCheckByMachine = computed(() => {
+  const map = {};
+  const todayStr = todayDateText.value;
+  for (const rec of checklistRecords.value) {
+    const name = rec.machineName;
+    if (!name) continue;
+    if (!rec.checkDate || !rec.checkDate.startsWith(todayStr)) continue;
+    if (!map[name] || (rec.checkDate || '') > (map[name].checkDate || '')) {
+      map[name] = rec;
+    }
+  }
+  return map;
+});
+
+const readyMachines = computed(() => {
+  const result = [];
+  for (const m of machines.value) {
+    const rec = todayCheckByMachine.value[m.machineName];
+    if (rec && deriveCheckStatus(rec) === 'pass') {
+      result.push({ machineName: m.machineName, room: m.room });
+    }
+  }
+  return result;
+});
+
+const notReadyMachines = computed(() => {
+  const result = [];
+  for (const m of machines.value) {
+    const rec = todayCheckByMachine.value[m.machineName];
+    if (rec && deriveCheckStatus(rec) === 'fail') {
+      result.push({ machineName: m.machineName, room: m.room });
+    }
+  }
+  return result;
+});
+
 /* ---------- API ---------- */
 async function loadMachines() {
   try {
@@ -925,7 +1077,7 @@ onMounted(async () => {
   }
 
   loading.value = true;
-  await Promise.all([loadMachines(), loadRepairRequests(), loadNotifications(), loadScheduleConfigs()]);
+  await Promise.all([loadMachines(), loadRepairRequests(), loadNotifications(), loadScheduleConfigs(), loadChecklistRecords()]);
   loading.value = false;
 });
 </script>
@@ -1377,12 +1529,260 @@ onMounted(async () => {
   font-size: 0.72rem;
 }
 
-/* ====== CALENDAR ====== */
+/* ====== CALENDAR + EQUIPMENT STATUS ROW ====== */
+.calendar-status-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
 .calendar-wrapper {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 340px;
   max-width: 460px;
+  flex: 0 0 auto;
+}
+
+/* ====== EQUIPMENT STATUS PANEL ====== */
+.equip-status-panel {
+  flex: 1;
+  min-width: 280px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.equip-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.equip-panel-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 12px);
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #7c3aed;
+}
+
+.equip-panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+}
+
+.equip-panel-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.equip-summary-row {
+  display: flex;
+  gap: 10px;
+}
+
+.equip-summary-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 12px);
+  font-size: 0.82rem;
+}
+
+.chip-ready {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.chip-not-ready {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.equip-summary-chip i {
+  font-size: 1rem;
+}
+
+.chip-count {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.chip-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.equip-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.equip-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.equip-section-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.dot-green { background: #16a34a; }
+.dot-red { background: #dc2626; }
+
+.equip-section-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.equip-section-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.count-green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.count-red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.equip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.equip-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 8px);
+  transition: all var(--transition-fast, 150ms);
+}
+
+.item-ready {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+}
+
+.item-ready:hover {
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.item-not-ready {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+}
+
+.item-not-ready:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.equip-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.icon-ok {
+  background: #16a34a;
+  color: #fff;
+}
+
+.icon-fail {
+  background: #dc2626;
+  color: #fff;
+}
+
+.equip-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.equip-item-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equip-item-room {
+  font-size: 0.7rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.equip-item-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full, 9999px);
+  flex-shrink: 0;
+}
+
+.badge-pass {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-fail {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.equip-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+
+.equip-empty-state i {
+  font-size: 1.6rem;
+  opacity: 0.5;
 }
 
 .date-card {
@@ -1776,6 +2176,18 @@ onMounted(async () => {
     flex-wrap: wrap;
     gap: 10px;
   }
+
+  .calendar-status-row {
+    flex-direction: column;
+  }
+
+  .calendar-wrapper {
+    max-width: 100%;
+  }
+
+  .equip-status-panel {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1815,6 +2227,10 @@ onMounted(async () => {
 
   .calendar-wrapper {
     max-width: 100%;
+  }
+
+  .equip-summary-row {
+    flex-direction: column;
   }
 
   .calendar-card {
