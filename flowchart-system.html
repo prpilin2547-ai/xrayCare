@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xrayCare — System Flowchart</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --accent: #4f6ef7;
+      --accent2: #7c3aed;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Noto Sans Thai', Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── header ── */
+    .top-bar {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-bar h1 { font-size: 26px; font-weight: 700; letter-spacing: .5px; }
+    .top-bar .sub { opacity: .85; font-size: 14px; margin-top: 2px; }
+    .btn-pdf {
+      background: #fff;
+      color: var(--accent);
+      border: none;
+      padding: 10px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+    .btn-pdf svg { width: 18px; height: 18px; }
+
+    /* ── nav ── */
+    .toc {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 48px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      position: sticky;
+      top: 90px;
+      z-index: 99;
+    }
+    .toc a {
+      text-decoration: none;
+      font-size: 13px;
+      color: var(--muted);
+      background: #f1f5f9;
+      padding: 5px 14px;
+      border-radius: 20px;
+      transition: .2s;
+      white-space: nowrap;
+    }
+    .toc a:hover { background: var(--accent); color: #fff; }
+
+    /* ── main ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .section {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 36px;
+      overflow: hidden;
+      page-break-inside: avoid;
+    }
+    .section-head {
+      padding: 24px 32px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .section-head .num {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .section-head h2 { font-size: 18px; font-weight: 700; }
+    .section-head p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .section-body { padding: 28px 32px 32px; overflow-x: auto; }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+    .mermaid svg { max-width: 100%; height: auto !important; }
+
+    .legend {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend .shape {
+      display: inline-block;
+      width: 28px;
+      height: 16px;
+      border-radius: 3px;
+      border: 2px solid;
+    }
+    .legend .sh-start { background: #d1fae5; border-color: #10b981; border-radius: 8px; }
+    .legend .sh-process { background: #dbeafe; border-color: #3b82f6; }
+    .legend .sh-decision { background: #fef3c7; border-color: #f59e0b; transform: rotate(45deg); width: 16px; height: 16px; border-radius: 2px; }
+    .legend .sh-io { background: #e0e7ff; border-color: #6366f1; transform: skewX(-12deg); }
+    .legend .sh-db { background: #fce7f3; border-color: #ec4899; border-radius: 8px 8px 3px 3px; }
+
+    /* ── footer ── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ── print ── */
+    @media print {
+      .top-bar, .toc { position: static; }
+      .btn-pdf { display: none; }
+      body { background: #fff; }
+      .section { box-shadow: none; border: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="top-bar">
+  <div>
+    <h1>xrayCare — System Flowchart</h1>
+    <div class="sub">Comprehensive Workflow Diagram &nbsp;|&nbsp; ระบบจัดการคุณภาพเครื่องเอกซเรย์</div>
+  </div>
+  <button class="btn-pdf" onclick="exportPDF()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+    บันทึกเป็น PDF
+  </button>
+</header>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav class="toc">
+  <a href="#s1">1. ภาพรวมระบบ</a>
+  <a href="#s2">2. Login & Authentication</a>
+  <a href="#s3">3. Role-Based Access</a>
+  <a href="#s4">4. Dashboard (Tech)</a>
+  <a href="#s5">5. Dashboard (Admin)</a>
+  <a href="#s6">6. Dashboard (Engineer)</a>
+  <a href="#s7">7. Daily QC — F1/F2</a>
+  <a href="#s8">8. Monthly QC 3M — F3-F6</a>
+  <a href="#s9">9. Monthly QC 6M — F7/F8</a>
+  <a href="#s10">10. Additional Forms — F9-F13</a>
+  <a href="#s11">11. Repair Request</a>
+  <a href="#s12">12. Equipment Management</a>
+  <a href="#s13">13. PM Schedule</a>
+  <a href="#s14">14. Admin Management</a>
+  <a href="#s15">15. Analytics & Reports</a>
+  <a href="#s16">16. Export / Print</a>
+  <a href="#s17">17. Equipment Status (Daily Reset)</a>
+  <a href="#s18">18. API Architecture</a>
+</nav>
+
+<!-- ═══════════════════ CONTENT ═══════════════════ -->
+<div class="container" id="flowchart-content">
+
+<!-- ────────── 1. SYSTEM OVERVIEW ────────── -->
+<div class="section" id="s1">
+  <div class="section-head">
+    <div class="num">1</div>
+    <div><h2>ภาพรวมทั้งระบบ (System Overview)</h2><p>แสดงโครงสร้างหลักและการเชื่อมต่อของทุกโมดูล</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TB
+  subgraph CLIENT["🖥️ Frontend — Vue 3 + Vite"]
+    direction TB
+    LOGIN["🔐 Login Page"]
+    subgraph TECH_ZONE["👩‍⚕️ Radiological Technologist Zone"]
+      DASH["Dashboard"]
+      QC["QC Checklist\nF1–F13"]
+      MACH["Equipment\nManagement"]
+      REQ["Repair Request"]
+      PM["PM Schedule"]
+      ANA["Analytics"]
+      EXP["Export / Print PDF"]
+    end
+    subgraph ADMIN_ZONE["👨‍💼 Admin Zone"]
+      ADASH["Admin Dashboard"]
+      UACC["User & Hospital\nManagement"]
+      AANA["Admin Analytics"]
+    end
+    subgraph ENG_ZONE["🔧 Engineer Zone"]
+      EDASH["Engineer Dashboard"]
+      EREQ["Repair Queue\nManagement"]
+      EANA["Engineer Analytics"]
+    end
+  end
+
+  subgraph SERVER["Backend API /api/Xraycare"]
+    API_AUTH["Auth API\nLogin - GetHospitals"]
+    API_MACHINE["Machine API\nCRUD Machines"]
+    API_CHECK["Checklist API\nSave - Get Records"]
+    API_REPAIR["Repair API\nCRUD - Status Update"]
+    API_SCHED["Schedule API\nCRUD Configs\nNotifications"]
+    API_USER["User API\nCRUD Users\nCRUD Hospitals"]
+  end
+
+  DB[("Database")]
+
+  LOGIN -- authenticate --> API_AUTH
+  DASH --> API_MACHINE & API_CHECK & API_REPAIR & API_SCHED
+  QC --> API_CHECK
+  QC -.-> API_REPAIR
+  MACH --> API_MACHINE
+  REQ --> API_REPAIR
+  PM --> API_SCHED
+  ANA --> API_CHECK & API_MACHINE & API_REPAIR
+  EXP --> API_CHECK & API_MACHINE
+  ADASH --> API_MACHINE & API_CHECK & API_REPAIR & API_SCHED
+  UACC --> API_USER
+  AANA --> API_CHECK & API_MACHINE & API_REPAIR
+  EDASH --> API_MACHINE & API_REPAIR
+  EREQ --> API_REPAIR
+  EANA --> API_CHECK & API_MACHINE & API_REPAIR
+
+  API_AUTH & API_MACHINE & API_CHECK & API_REPAIR & API_SCHED & API_USER --> DB
+
+  style CLIENT fill:#f0f4ff,stroke:#4f6ef7,stroke-width:2px
+  style SERVER fill:#fdf4ff,stroke:#7c3aed,stroke-width:2px
+  style TECH_ZONE fill:#ecfdf5,stroke:#10b981
+  style ADMIN_ZONE fill:#fff7ed,stroke:#f59e0b
+  style ENG_ZONE fill:#eff6ff,stroke:#3b82f6
+  style DB fill:#fce7f3,stroke:#ec4899,stroke-width:2px
+    </pre>
+    <div class="legend">
+      <span><span class="shape sh-start"></span> Start / End</span>
+      <span><span class="shape sh-process"></span> Process</span>
+      <span><span class="shape sh-decision"></span> Decision</span>
+      <span><span class="shape sh-io"></span> Input / Output</span>
+      <span><span class="shape sh-db"></span> Database</span>
+    </div>
+  </div>
+</div>
+
+<!-- ────────── 2. LOGIN & AUTH ────────── -->
+<div class="section" id="s2">
+  <div class="section-head">
+    <div class="num">2</div>
+    <div><h2>Login & Authentication Flow</h2><p>ขั้นตอนการเข้าสู่ระบบ เลือกโรงพยาบาล และตรวจสอบสิทธิ์</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A([🟢 เริ่มต้น — เปิดเว็บ]) --> B[/เข้าหน้า Login/]
+  B --> C[GET /GetHospitals\nดึงรายชื่อโรงพยาบาล]
+  C --> D[/เลือกโรงพยาบาล/]
+  D --> E[/กรอก Username & Password/]
+  E --> F[POST /Login\nส่งข้อมูลเข้าสู่ระบบ]
+  F --> G{Login สำเร็จ?}
+  G -- ❌ ไม่สำเร็จ --> H[แสดงข้อผิดพลาด\nUsername/Password ไม่ถูกต้อง]
+  H --> E
+  G -- ✅ สำเร็จ --> I[บันทึกข้อมูลผู้ใช้\nลง localStorage\nid · username · position\nhospitalId · hospitalName]
+  I --> J{ตรวจ position}
+  J -- admin / superadmin --> K[🔀 ไปหน้า\n/admindashboard]
+  J -- engineer --> L[🔀 ไปหน้า\n/engineerdashboard]
+  J -- radiological\ntechnologist --> M[🔀 ไปหน้า\n/dashboard]
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style G fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style J fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style H fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+  style K fill:#dbeafe,stroke:#3b82f6
+  style L fill:#dbeafe,stroke:#3b82f6
+  style M fill:#dbeafe,stroke:#3b82f6
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 3. ROLE-BASED ACCESS ────────── -->
+<div class="section" id="s3">
+  <div class="section-head">
+    <div class="num">3</div>
+    <div><h2>Role-Based Access Control</h2><p>สิทธิ์การเข้าถึงตาม Role ของแต่ละผู้ใช้</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart LR
+  subgraph ROLES["บทบาทผู้ใช้ (User Roles)"]
+    RT["👩‍⚕️ Radiological\nTechnologist"]
+    ADM["👨‍💼 Admin\n/ SuperAdmin"]
+    ENG["🔧 Engineer"]
+  end
+
+  subgraph RT_ACCESS["ฟีเจอร์ Technologist"]
+    direction TB
+    R1["Dashboard"]
+    R2["Daily Check — F1/F2"]
+    R3["Monthly Check 3M — F3-F6"]
+    R4["Monthly Check 6M — F7/F8"]
+    R5["Additional Forms — F9-F13"]
+    R6["Repair Request"]
+    R7["Equipment Management"]
+    R8["PM Schedule"]
+    R9["Analytics"]
+    R10["Export PDF"]
+    R11["QC Forms Hub"]
+    R12["Custom Form Builder"]
+    R13["Profile"]
+  end
+
+  subgraph ADM_ACCESS["ฟีเจอร์ Admin"]
+    direction TB
+    A1["Admin Dashboard"]
+    A2["User & Hospital Management"]
+    A3["Admin Analytics"]
+    A4["+ ทุกฟีเจอร์ของ Tech\n(ยกเว้น Tech Dashboard)"]
+    A5["+ Engineer Analytics"]
+    A6["+ Engineer Request"]
+  end
+
+  subgraph ENG_ACCESS["ฟีเจอร์ Engineer"]
+    direction TB
+    E1["Engineer Dashboard"]
+    E2["Repair Queue (RequestEN)"]
+    E3["Engineer Analytics"]
+    E4["Profile"]
+  end
+
+  RT --> RT_ACCESS
+  ADM --> ADM_ACCESS
+  ENG --> ENG_ACCESS
+
+  style ROLES fill:#f8fafc,stroke:#94a3b8
+  style RT_ACCESS fill:#ecfdf5,stroke:#10b981
+  style ADM_ACCESS fill:#fff7ed,stroke:#f59e0b
+  style ENG_ACCESS fill:#eff6ff,stroke:#3b82f6
+  style RT fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style ADM fill:#fed7aa,stroke:#f59e0b,stroke-width:2px
+  style ENG fill:#bfdbfe,stroke:#3b82f6,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 4. DASHBOARD TECH ────────── -->
+<div class="section" id="s4">
+  <div class="section-head">
+    <div class="num">4</div>
+    <div><h2>Dashboard — Radiological Technologist</h2><p>หน้าหลักของนักรังสีเทคนิค แสดงข้อมูลสรุป ปฏิทิน สถานะเครื่อง และรายการซ่อม</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  START(["เข้าหน้า Dashboard"]) --> LOAD_API
+
+  subgraph LOAD_API["โหลดข้อมูลจาก API"]
+    L1["GET /GetAllMachines"]
+    L2["GET /GetAllChecklistRecords"]
+    L3["GET /GetAllRepairRequests"]
+    L4["GET /GetAllScheduleConfigs"]
+    L5["GET /GetNotifications"]
+  end
+
+  LOAD_API --> READ_LS["อ่าน localStorage\nตรวจสอบเครื่องที่ Check แล้ว"]
+  READ_LS --> CALC["คำนวณ pendingMachines\nกรองเฉพาะเครื่องที่ยังไม่ Check"]
+
+  CALC --> NOTIF["Notification Banner\nแจ้งเตือนรอบ Check ที่ถึงกำหนด"]
+  CALC --> CARDS["Summary Cards\nDate - Equipment - Pending - Repair"]
+  CALC --> TABLE["Checklist Overview Table\nรายการเครื่อง + สถานะ Pending"]
+  CALC --> CALENDAR["Calendar + Equipment Status Panel\nพร้อมใช้งาน / ไม่พร้อมใช้งาน\nรีเซ็ตรายวัน"]
+  CALC --> REPAIR_T["Repair Requests Table\nรายการแจ้งซ่อม + สถานะ"]
+
+  TABLE --> CLICK_CHECK{"คลิกปุ่ม Check?"}
+  CLICK_CHECK -- ใช่ --> GOTO_CHECK["ไปหน้า Daily Check\n/dairy-check/:equipmentName\nพร้อมส่ง formTypes"]
+  CLICK_CHECK -- ยังไม่คลิก --> TABLE
+
+  GOTO_CHECK --> SAVE_Q{"บันทึกข้อมูลแล้ว?"}
+  SAVE_Q -- ยังไม่บันทึก\nกดย้อนกลับ --> BACK["กลับ Dashboard\nเครื่องยังแสดง Pending\nข้อมูลไม่หายไป"]
+  SAVE_Q -- บันทึกแล้ว --> DONE["เครื่องหายจากรายการ Pending\nบันทึกลง localStorage"]
+  BACK --> TABLE
+  DONE --> TABLE
+
+  style START fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style LOAD_API fill:#e0e7ff,stroke:#6366f1
+  style CLICK_CHECK fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style SAVE_Q fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style GOTO_CHECK fill:#dbeafe,stroke:#3b82f6,stroke-width:2px
+  style BACK fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style DONE fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 5. DASHBOARD ADMIN ────────── -->
+<div class="section" id="s5">
+  <div class="section-head">
+    <div class="num">5</div>
+    <div><h2>Dashboard — Admin</h2><p>หน้าหลักของแอดมิน คล้าย Tech Dashboard พร้อมฟีเจอร์จัดการเพิ่ม</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  START([🟢 เข้า Admin Dashboard]) --> LOAD
+
+  subgraph LOAD["📡 โหลดข้อมูล"]
+    L1["GET /GetAllMachines"]
+    L2["GET /GetAllChecklistRecords"]
+    L3["GET /GetAllRepairRequests"]
+    L4["GET /GetAllScheduleConfigs"]
+    L5["GET /GetNotifications"]
+  end
+
+  LOAD --> PANEL
+
+  subgraph PANEL["📊 Admin Dashboard Panel"]
+    direction TB
+    P1["🔔 Notification Banner"]
+    P2["📋 Summary Cards\nDate · Equipment · Pending · Repair"]
+    P3["📅 Calendar + Equipment Status Panel\nรีเซ็ตรายวัน (Daily Reset)"]
+    P4["📋 Checklist Overview\n+ ปุ่ม Check เหมือน Tech"]
+    P5["🔧 Repair Requests\nดู + จัดการแจ้งซ่อม"]
+  end
+
+  PANEL --> NAV
+
+  subgraph NAV["🧭 Admin เข้าถึงเพิ่มเติม"]
+    N1["👤 User & Hospital\nManagement"]
+    N2["📈 Admin Analytics"]
+    N3["🔧 Engineer\nAnalytics & Requests"]
+  end
+
+  style START fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style LOAD fill:#e0e7ff,stroke:#6366f1
+  style PANEL fill:#fff7ed,stroke:#f59e0b
+  style NAV fill:#fdf4ff,stroke:#7c3aed
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 6. DASHBOARD ENGINEER ────────── -->
+<div class="section" id="s6">
+  <div class="section-head">
+    <div class="num">6</div>
+    <div><h2>Dashboard — Engineer</h2><p>หน้าหลักของช่าง แสดงสถานะการซ่อมทั้งหมด</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  START([🟢 เข้า Engineer Dashboard]) --> LOAD
+
+  subgraph LOAD["📡 โหลดข้อมูล"]
+    L1["GET /GetAllMachines"]
+    L2["GET /GetAllRepairRequests"]
+  end
+
+  LOAD --> DISPLAY
+
+  subgraph DISPLAY["📊 Engineer Dashboard"]
+    direction TB
+    D1["📋 Summary Cards\nDate · Equipment · Pending Repair\nIn Progress · Completed"]
+    D2["📊 Chart — สถิติการซ่อม"]
+    D3["📋 Repair Requests Table\nรายละเอียด · สถานะ · รูปภาพ"]
+  end
+
+  DISPLAY --> ACT
+
+  subgraph ACT["⚡ การดำเนินการ"]
+    A1["🔀 ไป /requesten\nจัดการสถานะซ่อม"]
+    A2["🔀 ไป /analyticalen\nวิเคราะห์ข้อมูล"]
+  end
+
+  style START fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style LOAD fill:#e0e7ff,stroke:#6366f1
+  style DISPLAY fill:#eff6ff,stroke:#3b82f6
+  style ACT fill:#fef3c7,stroke:#f59e0b
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 7. DAILY QC F1/F2 ────────── -->
+<div class="section" id="s7">
+  <div class="section-head">
+    <div class="num">7</div>
+    <div><h2>Daily QC Check — F1/F2</h2><p>ขั้นตอนการตรวจสอบรายวัน พร้อมระบบแจ้งซ่อมอัตโนมัติ</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า Daily Check"]) --> B["แสดงข้อมูลเครื่อง\nชื่อ - รุ่น - ห้อง - ผู้ทดสอบ - เวลา"]
+  B --> C["แสดง Schedule\nรายการที่ต้องทำวันนี้"]
+  C --> D["ตรวจรายการ Checklist แต่ละรายการ"]
+
+  D --> E{"เลือกผลตรวจ"}
+  E -- Pass --> F["ผ่าน"]
+  E -- Fail --> G["ไม่ผ่าน"]
+
+  F --> H["แนบรูปภาพ ถ้ามี\nCompress และแปลง Base64"]
+  G --> H
+  H --> I["กรอกหมายเหตุ ถ้ามี"]
+  I --> J["ส่วน Plate Erasure\nกรอกข้อมูล + แนบไฟล์"]
+
+  J --> ALLPASS{"กดผ่านทั้งหมด\nหรือกดบันทึก?"}
+  ALLPASS -- ผ่านทั้งหมด --> SETPASS["ตั้งทุกรายการเป็น Pass\nรวม Plate Erase"]
+  ALLPASS -- บันทึก --> K["กดบันทึก SaveChecklist"]
+  SETPASS --> K
+
+  K --> L["POST /SaveChecklist\nformType: F1_F2\nส่ง jsonData + images"]
+  L --> M{"บันทึกสำเร็จ?"}
+  M -- ไม่สำเร็จ --> N["แสดง Error"]
+  M -- สำเร็จ --> LS["บันทึกลง localStorage\nเครื่องหายจาก Pending"]
+  LS --> O{"มีรายการ Fail\nในหมวดหลัก?"}
+
+  O -- ไม่มี --> P["แสดง Success\nไปขั้นตอนถัดไป"]
+  O -- มี Fail --> SKIP{"รายการ Fail\nอยู่ในหมวดหลัก?"}
+
+  SKIP -- "สายไฟ / ล็อกเบรก\nเตียงหลอด / Warm-up" --> Q["สร้าง Repair Request อัตโนมัติ\nPOST /AddRepairRequest"]
+  SKIP -- "ส่วนอื่นเพิ่มเติม\nPlate Erase" --> P
+
+  Q --> R["ข้อมูลที่ส่ง:\nชื่อเครื่อง + ห้อง\nรายละเอียดที่ Fail\nรูปภาพ + หมายเหตุ\nสถานะ: รอซ่อม"]
+  R --> P
+
+  P --> S{"มี formTypes ถัดไป?"}
+  S -- F3_F6 --> T["ไป /monthly-check"]
+  S -- F7_F8 --> U["ไป /monthly-check-all"]
+  S -- F10 --> V["ไป /monthly-check-light"]
+  S -- F12 --> W["ไป /f12"]
+  S -- ไม่มี --> X(["เสร็จสิ้น"])
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style O fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style M fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style S fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style SKIP fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style Q fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+  style X fill:#fecaca,stroke:#ef4444,stroke-width:2px
+  style LS fill:#dbeafe,stroke:#3b82f6,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 8. MONTHLY 3M ────────── -->
+<div class="section" id="s8">
+  <div class="section-head">
+    <div class="num">8</div>
+    <div><h2>Monthly QC Check 3 เดือน — F3-F6</h2><p>ตรวจสอบ Monitor, X-ray, Uniformity, EI Consistency</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า Monthly Check 3M"]) --> B["แสดงข้อมูลเครื่อง\nชื่อ - รุ่น - ห้อง"]
+
+  B --> TABS
+
+  subgraph TABS["Sidebar Tabs - เลือกแบบฟอร์ม"]
+    T1["F3 - Monitor\nPerformance Check"]
+    T2["F4 - X-ray Tube\nOutput Check"]
+    T3["F5 - Uniformity\nCheck"]
+    T4["F6 - EI\nConsistency Check"]
+  end
+
+  TABS --> FORM
+
+  subgraph FORM["กรอกข้อมูลฟอร์ม"]
+    direction TB
+    FI1["กรอกค่าตรวจวัด\nตามแต่ละฟอร์ม"]
+    FI2["ระบุผลตรวจ\nPass / Fail"]
+    FI3["แนบรูปภาพ\nCompress + Base64\nดู Preview - ลบได้"]
+    FI4["กรอกหมายเหตุ"]
+    FI1 --> FI2 --> FI3 --> FI4
+  end
+
+  FORM --> NEXT["กด Next\nบันทึกข้อมูลฟอร์มปัจจุบัน\nสลับไปฟอร์มถัดไป"]
+  NEXT --> DONE{"ครบทุกฟอร์ม?"}
+  DONE -- ยังไม่ครบ --> TABS
+  DONE -- ครบแล้ว --> SAVE["กดบันทึกทั้งหมด\nPOST /SaveChecklist\nformType: F3_F6"]
+  SAVE --> RESULT{"สำเร็จ?"}
+  RESULT -- สำเร็จ --> END1(["เสร็จสิ้น กลับ Dashboard"])
+  RESULT -- ไม่สำเร็จ --> ERR["แสดง Error"]
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style TABS fill:#e0e7ff,stroke:#6366f1
+  style FORM fill:#f0f4ff,stroke:#4f6ef7
+  style DONE fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style RESULT fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style END1 fill:#fecaca,stroke:#ef4444,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 9. MONTHLY 6M ────────── -->
+<div class="section" id="s9">
+  <div class="section-head">
+    <div class="num">9</div>
+    <div><h2>Monthly QC Check 6 เดือน — F7/F8</h2><p>ตรวจสอบ Collimator, Bucky Alignment, Dark Noise (CR/DR)</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า Monthly Check 6M"]) --> B["แสดงข้อมูลเครื่อง"]
+
+  B --> TABS
+
+  subgraph TABS["Sidebar Tabs - 6 Month Forms"]
+    T1["F7-1 - Collimator\nPerformance"]
+    T2["F7-2 - Collimator\nBucky Alignment"]
+    T3["F8-1 - CR Dark Noise"]
+    T4["F8-2 - DR Dark Noise"]
+  end
+
+  TABS --> FILL["กรอกค่าตรวจวัด\nแนบรูปภาพ - หมายเหตุ"]
+  FILL --> NEXT["กด Next\nบันทึก + สลับ Tab"]
+  NEXT --> CHECK{"ครบทุกฟอร์ม?"}
+  CHECK -- ยังไม่ครบ --> TABS
+  CHECK -- ครบ --> SAVE["POST /SaveChecklist\nformType: F7_F8"]
+  SAVE --> END1(["เสร็จสิ้น"])
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style TABS fill:#e0e7ff,stroke:#6366f1
+  style CHECK fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style END1 fill:#fecaca,stroke:#ef4444,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 10. ADDITIONAL FORMS ────────── -->
+<div class="section" id="s10">
+  <div class="section-head">
+    <div class="num">10</div>
+    <div><h2>Additional QC Forms — F9, F10, F11, F12, F13</h2><p>แบบบันทึกเพิ่มเติม รวมถึง Custom Form Builder</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้า QC Forms Hub"]) --> B["แสดงรายการฟอร์ม\nBuilt-in + Custom"]
+
+  B --> C{"เลือกฟอร์ม"}
+
+  C --> F9["F9 - ชุดอุปกรณ์ป้องกันรังสี\nProtective Clothing Check"]
+  C --> F10["F10 - Light Field Check"]
+  C --> F11["F11 - แบบบันทึก\nSpecial Form"]
+  C --> F12["F12 - แบบบันทึก\nAdditional Check"]
+  C --> F13["F13 - แบบบันทึก\nExtra Form"]
+  C --> CUSTOM["Custom Form\nสร้างโดย User"]
+
+  F9 & F10 & F11 & F12 & F13 --> FILL
+
+  subgraph FILL["กรอกข้อมูล"]
+    direction TB
+    G1["กรอกค่าตรวจ"]
+    G2["แนบรูปภาพ\nPreview - Remove"]
+    G3["หมายเหตุ"]
+    G1 --> G2 --> G3
+  end
+
+  FILL --> SAVE["POST /SaveChecklist\nformType ตาม Form ที่เลือก"]
+  SAVE --> END1(["เสร็จสิ้น"])
+
+  B --> CREATE["+ สร้างแบบบันทึก\nCustom Form Builder"]
+  CREATE --> STORE["บันทึกลง localStorage"]
+  STORE --> B
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style C fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style FILL fill:#f0f4ff,stroke:#4f6ef7
+  style END1 fill:#fecaca,stroke:#ef4444,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 11. REPAIR REQUEST ────────── -->
+<div class="section" id="s11">
+  <div class="section-head">
+    <div class="num">11</div>
+    <div><h2>Repair Request Flow</h2><p>ขั้นตอนการแจ้งซ่อม ทั้งแบบ Manual และ Auto จาก Daily Check</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  subgraph SOURCE["แหล่งที่มาของ Repair Request"]
+    S1["อัตโนมัติ\nจาก Daily Check F1/F2\nเฉพาะรายการหลักที่ Fail"]
+    S2["Manual\nจากหน้า /requests\nกรอกฟอร์มเอง"]
+  end
+
+  S1 --> CREATE["POST /AddRepairRequest\nequipmentName - room\ndetails - image - remarks\nstatus pending"]
+  S2 --> FORM["กรอกข้อมูลซ่อม\nชื่อเครื่อง - ห้อง\nรายละเอียด - รูปภาพ"]
+  FORM --> CREATE
+
+  CREATE --> DB[("บันทึกลง Database")]
+  DB --> SHOW
+
+  subgraph SHOW["แสดงรายการซ่อม"]
+    direction LR
+    V1["RequestList\n/requests\nTech/Admin"]
+    V2["RequestEN\n/requesten\nEngineer/Admin"]
+    V3["Dashboard\nRepair Requests Section"]
+  end
+
+  V2 --> STATUS
+
+  subgraph STATUS["จัดการสถานะ - Engineer"]
+    direction TB
+    ST1["Pending\nรอดำเนินการ"]
+    ST2["In Progress\nกำลังซ่อม"]
+    ST3["Completed\nซ่อมเสร็จ"]
+    ST1 -- "UpdateRepairStatus" --> ST2
+    ST2 -- "UpdateRepairStatus" --> ST3
+  end
+
+  V1 --> DEL["ลบรายการ\nDELETE /DeleteRepairRequest"]
+  V2 --> DEL
+
+  style SOURCE fill:#fee2e2,stroke:#ef4444
+  style SHOW fill:#f0f4ff,stroke:#4f6ef7
+  style STATUS fill:#ecfdf5,stroke:#10b981
+  style DB fill:#fce7f3,stroke:#ec4899,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 12. EQUIPMENT ────────── -->
+<div class="section" id="s12">
+  <div class="section-head">
+    <div class="num">12</div>
+    <div><h2>Equipment Management</h2><p>จัดการข้อมูลเครื่องเอกซเรย์</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า Equipment Management"]) --> LOAD["GET /GetAllMachines\nโหลดรายการเครื่อง"]
+  LOAD --> LIST["แสดงรายการเครื่อง\nชื่อ - รุ่น - Serial - ห้อง"]
+
+  LIST --> ADD["+ เพิ่มเครื่องใหม่\nกรอก ชื่อ - รุ่น - Serial\nNumber - ห้อง"]
+  ADD --> SAVE["POST /AddMachine"]
+  SAVE --> LOAD
+
+  LIST --> DEL["ลบเครื่อง\nDELETE /DeleteMachine"]
+  DEL --> LOAD
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style LIST fill:#f0f4ff,stroke:#4f6ef7
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 13. PM SCHEDULE ────────── -->
+<div class="section" id="s13">
+  <div class="section-head">
+    <div class="num">13</div>
+    <div><h2>PM Schedule Management</h2><p>จัดการตารางบำรุงรักษาเชิงป้องกัน</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า PM Schedule"]) --> LOAD["GET /GetAllScheduleConfigs\nGET /GetAllMachines"]
+
+  LOAD --> LIST["แสดง Schedule\nรายการตาราง Check"]
+
+  LIST --> ADD["+ เพิ่ม Schedule\nเลือกเครื่อง - ความถี่\nDaily / 3M / 6M / Yearly\nวันเริ่มต้น - คำอธิบาย\nเลือก Form Types"]
+  ADD --> SAVE["POST /AddScheduleConfig"]
+  SAVE --> LOAD
+
+  LIST --> EDIT["แก้ไข Schedule\nปรับค่าต่างๆ"]
+  EDIT --> UPDATE["PUT /UpdateScheduleConfig"]
+  UPDATE --> LOAD
+
+  LIST --> DEL["ลบ Schedule\nDELETE /DeleteScheduleConfig"]
+  DEL --> LOAD
+
+  LOAD --> NOTIFY["GET /GetNotifications\nคำนวณวัน Check ถัดไป"]
+  NOTIFY --> DASH["แสดงการแจ้งเตือนบน Dashboard"]
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style LIST fill:#f0f4ff,stroke:#4f6ef7
+  style NOTIFY fill:#fef3c7,stroke:#f59e0b
+  style DASH fill:#e0e7ff,stroke:#6366f1
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 14. ADMIN MANAGEMENT ────────── -->
+<div class="section" id="s14">
+  <div class="section-head">
+    <div class="num">14</div>
+    <div><h2>Admin — User & Hospital Management</h2><p>จัดการผู้ใช้และโรงพยาบาล (Admin / SuperAdmin)</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า User Accounts"]) --> LOAD
+
+  subgraph LOAD["โหลดข้อมูล"]
+    L1["GET /GetAllUsers"]
+    L2["GET /GetHospitals"]
+  end
+
+  LOAD --> SUPER{"เป็น SuperAdmin?"}
+
+  SUPER -- ใช่ --> FILTER["เลือกกรองตามโรงพยาบาล"]
+  SUPER -- ไม่ใช่ --> USER_LIST
+
+  FILTER --> USER_LIST["รายการผู้ใช้"]
+
+  subgraph USER_MGMT["จัดการผู้ใช้"]
+    U_ADD["+ เพิ่มผู้ใช้\nชื่อ - Username - Password\nPosition - Hospital"]
+    U_EDIT["แก้ไขข้อมูล"]
+    U_DEL["ลบผู้ใช้"]
+  end
+
+  USER_LIST --> USER_MGMT
+  U_ADD -- "POST /AddUser" --> LOAD
+  U_EDIT -- "PUT /UpdateUser" --> LOAD
+  U_DEL -- "DELETE /DeleteUser" --> LOAD
+
+  subgraph HOSP_MGMT["จัดการโรงพยาบาล - SuperAdmin"]
+    H_ADD["+ เพิ่มโรงพยาบาล"]
+    H_EDIT["แก้ไข"]
+    H_DEL["ลบ"]
+  end
+
+  SUPER -- ใช่ --> HOSP_MGMT
+  H_ADD -- "POST /AddHospital" --> LOAD
+  H_EDIT -- "PUT /UpdateHospital" --> LOAD
+  H_DEL -- "DELETE /DeleteHospital" --> LOAD
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style SUPER fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style USER_MGMT fill:#f0f4ff,stroke:#4f6ef7
+  style HOSP_MGMT fill:#fff7ed,stroke:#f59e0b
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 15. ANALYTICS ────────── -->
+<div class="section" id="s15">
+  <div class="section-head">
+    <div class="num">15</div>
+    <div><h2>Analytics & Reports</h2><p>วิเคราะห์ข้อมูลสำหรับแต่ละ Role</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  subgraph ANALYTICS["Analytics ทั้ง 3 มุมมอง"]
+    direction TB
+
+    subgraph TECH_ANA["Analytical - Tech/Admin"]
+      TA1["GET /GetAllMachines"]
+      TA2["GET /GetAllChecklistRecords"]
+      TA3["GET /GetAllRepairRequests"]
+      TA1 & TA2 & TA3 --> TA4["แสดงกราฟ\nสถิติการตรวจ - ผล Pass/Fail\nจำนวนเครื่อง - การซ่อม"]
+    end
+
+    subgraph ADMIN_ANA["Admin Analytics"]
+      AA1["GET /GetAllMachines"]
+      AA2["GET /GetAllChecklistRecords"]
+      AA3["GET /GetAllRepairRequests"]
+      AA1 & AA2 & AA3 --> AA4["Admin-level\nสรุปภาพรวมทั้งระบบ"]
+    end
+
+    subgraph ENG_ANA["Engineer Analytics"]
+      EA1["GET /GetAllMachines"]
+      EA2["GET /GetAllChecklistRecords"]
+      EA3["GET /GetAllRepairRequests"]
+      EA1 & EA2 & EA3 --> EA4["สถิติการซ่อม\nPending - In Progress\nCompleted - Timeline"]
+    end
+  end
+
+  style ANALYTICS fill:#f8fafc,stroke:#94a3b8
+  style TECH_ANA fill:#ecfdf5,stroke:#10b981
+  style ADMIN_ANA fill:#fff7ed,stroke:#f59e0b
+  style ENG_ANA fill:#eff6ff,stroke:#3b82f6
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 16. EXPORT / PRINT ────────── -->
+<div class="section" id="s16">
+  <div class="section-head">
+    <div class="num">16</div>
+    <div><h2>Export / Print PDF</h2><p>ส่งออกข้อมูลและพิมพ์แบบฟอร์ม</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["เข้าหน้า Export PDF"]) --> LOAD["GET /GetAllChecklistRecords\nGET /GetAllMachines"]
+  LOAD --> SELECT["เลือกรายการที่ต้องการ Export"]
+
+  SELECT --> PRINT
+
+  subgraph PRINT["Print Routes"]
+    direction TB
+    P1["F1 - Daily Check"]
+    P2["F2 - Daily Check"]
+    P3["F3 - Monitor Check"]
+    P4["F4 - X-ray Tube"]
+    P5["F5 - Uniformity"]
+    P6["F6 - EI Consistency"]
+    P7["F7 - Collimator"]
+    P8["F8 - Dark Noise"]
+    P9["F9 - Protective Clothing"]
+    P10["F10 - Light Field"]
+    P11["F11 / F12 / F13"]
+  end
+
+  PRINT --> VIEW["แสดง Print View\nGET /GetChecklistRecord"]
+  VIEW --> PDF["Browser Print\nบันทึกเป็น PDF"]
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style PRINT fill:#f0f4ff,stroke:#4f6ef7
+  style PDF fill:#e0e7ff,stroke:#6366f1,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 17. EQUIPMENT STATUS ────────── -->
+<div class="section" id="s17">
+  <div class="section-head">
+    <div class="num">17</div>
+    <div><h2>Equipment Status — Daily Reset Notification</h2><p>ระบบแจ้งสถานะเครื่อง พร้อมใช้งาน / ไม่พร้อมใช้งาน (รีเซ็ตทุกวัน)</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart TD
+  A(["โหลด Dashboard"]) --> B["GET /GetAllChecklistRecords\nGET /GetAllMachines"]
+  B --> C["คำนวณวันที่วันนี้\ntodayDateText"]
+  C --> D["กรอง Checklist\nเฉพาะวันนี้เท่านั้น"]
+
+  D --> E{"มีการตรวจวันนี้?"}
+
+  E -- ไม่มี --> F["แสดงสถานะ\nพร้อมใช้งาน 0 เครื่อง\nไม่พร้อม 0 เครื่อง"]
+
+  E -- มี --> G["จัดกลุ่มผลตรวจตามเครื่อง"]
+  G --> H{"ทุกรายการ Pass?"}
+
+  H -- ผ่านทั้งหมด --> I["พร้อมใช้งาน\nเพิ่มจำนวนเครื่อง\nแสดงชื่อเครื่อง"]
+  H -- มี Fail --> J["ไม่พร้อมใช้งาน\nเพิ่มจำนวนเครื่อง\nแสดงชื่อเครื่อง"]
+
+  I & J --> K["Equipment Status Panel\nแสดงข้างปฏิทิน"]
+
+  K --> L["วันถัดไป\nข้อมูลรีเซ็ตเป็น 0\nรอการตรวจใหม่"]
+
+  style A fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style E fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style H fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style I fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  style J fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+  style L fill:#e0e7ff,stroke:#6366f1,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+<!-- ────────── 18. API ARCHITECTURE ────────── -->
+<div class="section" id="s18">
+  <div class="section-head">
+    <div class="num">18</div>
+    <div><h2>API Architecture Overview</h2><p>โครงสร้าง API ทั้งหมดของระบบ</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+flowchart LR
+  subgraph FRONTEND["Vue 3 Frontend"]
+    direction TB
+    AF["apiFetch\nsrc/api/client.js"]
+    HEADERS["Headers\nX-User-Id\nX-Hospital-Id"]
+    AF --> HEADERS
+  end
+
+  FRONTEND -- "HTTP Request\nVite Proxy" --> API
+
+  subgraph API["Backend /api/Xraycare"]
+    direction TB
+
+    subgraph AUTH_API["Authentication"]
+      A1["GET /GetHospitals"]
+      A2["POST /Login"]
+    end
+
+    subgraph MACHINE_API["Machines"]
+      M1["GET /GetAllMachines"]
+      M2["POST /AddMachine"]
+      M3["DELETE /DeleteMachine"]
+    end
+
+    subgraph CHECK_API["Checklists"]
+      C1["POST /SaveChecklist"]
+      C2["GET /GetAllChecklistRecords"]
+      C3["GET /GetChecklistRecord"]
+    end
+
+    subgraph REPAIR_API["Repairs"]
+      R1["GET /GetAllRepairRequests"]
+      R2["POST /AddRepairRequest"]
+      R3["PUT /UpdateRepairStatus"]
+      R4["DELETE /DeleteRepairRequest"]
+    end
+
+    subgraph SCHED_API["Schedules"]
+      S1["GET /GetAllScheduleConfigs"]
+      S2["POST /AddScheduleConfig"]
+      S3["PUT /UpdateScheduleConfig"]
+      S4["DELETE /DeleteScheduleConfig"]
+      S5["GET /GetNotifications"]
+    end
+
+    subgraph USER_API["Users and Hospitals"]
+      U1["GET /GetAllUsers"]
+      U2["POST /AddUser"]
+      U3["PUT /UpdateUser"]
+      U4["DELETE /DeleteUser"]
+      U5["POST /AddHospital"]
+      U6["PUT /UpdateHospital"]
+      U7["DELETE /DeleteHospital"]
+    end
+  end
+
+  API --> DB[("Database")]
+
+  style FRONTEND fill:#f0f4ff,stroke:#4f6ef7,stroke-width:2px
+  style API fill:#fdf4ff,stroke:#7c3aed,stroke-width:2px
+  style AUTH_API fill:#d1fae5,stroke:#10b981
+  style MACHINE_API fill:#dbeafe,stroke:#3b82f6
+  style CHECK_API fill:#e0e7ff,stroke:#6366f1
+  style REPAIR_API fill:#fee2e2,stroke:#ef4444
+  style SCHED_API fill:#fef3c7,stroke:#f59e0b
+  style USER_API fill:#fff7ed,stroke:#f97316
+  style DB fill:#fce7f3,stroke:#ec4899,stroke-width:2px
+    </pre>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer class="footer">
+  xrayCare System Flowchart &nbsp;·&nbsp; Generated 2026-03-23 &nbsp;·&nbsp; Vue 3 + Vite + Backend API
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#dbeafe',
+      primaryTextColor: '#1e293b',
+      primaryBorderColor: '#3b82f6',
+      lineColor: '#94a3b8',
+      secondaryColor: '#f0f4ff',
+      tertiaryColor: '#f8fafc',
+      fontFamily: 'Segoe UI, Noto Sans Thai, Tahoma, sans-serif',
+      fontSize: '14px'
+    },
+    flowchart: {
+      htmlLabels: true,
+      curve: 'basis',
+      rankSpacing: 60,
+      nodeSpacing: 40,
+      padding: 16
+    }
+  });
+
+  function exportPDF() {
+    const btn = document.querySelector('.btn-pdf');
+    btn.textContent = 'กำลังสร้าง PDF...';
+    btn.disabled = true;
+
+    const el = document.getElementById('flowchart-content');
+    const opt = {
+      margin:       [10, 10, 10, 10],
+      filename:     'xrayCare-System-Flowchart.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF:        { unit: 'mm', format: 'a3', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(el).save().then(() => {
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg> บันทึกเป็น PDF`;
+      btn.disabled = false;
+    });
+  }
+</script>
+</body>
+</html>
