@@ -16,11 +16,15 @@
     .toc{background:var(--card);border-bottom:1px solid var(--border);padding:10px 40px;display:flex;flex-wrap:wrap;gap:5px;position:sticky;top:70px;z-index:99}
     .toc a{text-decoration:none;font-size:11px;color:var(--muted);background:#f1f5f9;padding:3px 10px;border-radius:16px;transition:.2s;white-space:nowrap}
     .toc a:hover{background:var(--accent);color:#fff}
-    .container{max-width:1400px;margin:0 auto;padding:28px 20px 50px}
+    .container{max-width:1500px;margin:0 auto;padding:28px 20px 50px}
     .section{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:28px;overflow:hidden}
-    .section-head{padding:18px 24px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .section-head{padding:18px 24px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:relative}
     .section-head .num{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;min-width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
     .section-head h2{font-size:16px;font-weight:700}.section-head p{font-size:11px;color:var(--muted);margin-top:1px}
+    .btn-section-pdf{margin-left:auto;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:6px 14px;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;opacity:.85}
+    .btn-section-pdf:hover{opacity:1;transform:translateY(-1px);box-shadow:0 3px 12px rgba(79,110,247,.3)}
+    .btn-section-pdf:disabled{opacity:.5;cursor:wait;transform:none}
+    .btn-section-pdf svg{width:13px;height:13px}
     .section-body{padding:20px 24px 24px;overflow-x:auto}
     .mermaid{display:flex;justify-content:center}.mermaid svg{max-width:100%;height:auto!important}
     .legend{margin-top:14px;display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted)}
@@ -30,11 +34,13 @@
     .legend .sh-process{background:#dbeafe;border-color:#3b82f6}
     .legend .sh-decision{background:#fef3c7;border-color:#f59e0b;transform:rotate(45deg);width:12px;height:12px;border-radius:2px}
     .legend .sh-db{background:#fce7f3;border-color:#ec4899;border-radius:6px 6px 3px 3px;display:none}
+    #s21 .er.relationshipLabel rect{fill:#fff!important;stroke:#94a3b8!important;stroke-width:1.5px!important;rx:6!important;ry:6!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.08))}
+    #s21 .er.relationshipLabel text{font-weight:700!important;fill:#4f6ef7!important;font-size:12px!important}
     .footer{text-align:center;padding:18px;color:var(--muted);font-size:11px}
     @media print{
       @page{size:A4 landscape;margin:8mm}
       .top-bar,.toc,.footer{display:none!important}
-      .btn-pdf{display:none!important}
+      .btn-pdf,.btn-section-pdf{display:none!important}
       body{background:#fff;font-size:10px}
       .container{max-width:100%;padding:0}
       .section{box-shadow:none;border:1px solid #e2e8f0;page-break-after:always;page-break-inside:avoid;margin-bottom:0;border-radius:0}
@@ -81,6 +87,8 @@
   <a href="#s18">18. Equip Status</a>
   <a href="#s19">19. API</a>
   <a href="#s20">20. System Overview</a>
+  <a href="#s21">21. ER Diagram</a>
+  <a href="#s22">22. Context Diagram</a>
 </nav>
 
 <div class="container" id="flowchart-content">
@@ -987,6 +995,352 @@ flowchart TB
   </div>
 </div>
 
+<!-- ══════════ 21. ER DIAGRAM ══════════ -->
+<div class="section" id="s21">
+  <div class="section-head">
+    <div class="num">21</div>
+    <div><h2>Entity Relationship Diagram (ER Diagram)</h2><p>แผนภาพความสัมพันธ์ระหว่าง Entity ทั้งหมดในฐานข้อมูล PostgreSQL ของระบบ xrayCare</p></div>
+  </div>
+  <div class="section-body">
+    <pre class="mermaid">
+erDiagram
+  Hospital {
+    int RID PK
+    text Name
+    text Code
+  }
+
+  UserAccount {
+    int RID PK
+    int HospitalId FK
+    text Username
+    text Password
+    text Position
+    boolean IsSuperAdmin
+  }
+
+  Machine {
+    int RID PK
+    int HospitalId FK
+    text Machine_name
+    text Room
+    text Register_date
+    text Caretaker
+  }
+
+  ScheduleConfig {
+    int RID PK
+    int HospitalId FK
+    text StartDate
+    text FrequencyType
+    text Description
+    text FormTypes
+  }
+
+  ChecklistRecord {
+    int RID PK
+    int HospitalId FK
+    text FormType
+    text MachineName
+    text Room
+    text CheckDate
+    text Tester
+    text JsonData
+  }
+
+  RepairRequest {
+    int RID PK
+    int HospitalId FK
+    text Equipment
+    text Room
+    text RequestDate
+    text ReporterName
+    text Detail
+    text Remarks
+    text StatusText
+    text ImageData
+  }
+
+  Hospital ||--o{ UserAccount : "1-N"
+  Hospital ||--o{ Machine : "1-N"
+  Hospital ||--o{ ScheduleConfig : "1-N"
+  Hospital ||--o{ ChecklistRecord : "1-N"
+  Hospital ||--o{ RepairRequest : "1-N"
+  ScheduleConfig ||--o{ ChecklistRecord : "triggers"
+  Machine ||--o{ ChecklistRecord : "checked"
+  Machine ||--o{ RepairRequest : "repaired"
+  UserAccount ||--o{ ChecklistRecord : "tested"
+  UserAccount ||--o{ RepairRequest : "reported"
+    </pre>
+    <div style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid var(--border)">
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text)">Entity Details</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;font-size:12px">
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#4f6ef7">Hospital</strong> <span style="color:var(--muted)">(Hospitals)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK, int, auto-increment)<br>
+            Name (text) - ชื่อโรงพยาบาล<br>
+            Code (text) - รหัสโรงพยาบาล
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#10b981">Machine</strong> <span style="color:var(--muted)">(Machines)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK), HospitalId (FK)<br>
+            Machine_name - ชื่อเครื่อง<br>
+            Room - ห้อง<br>
+            Register_date - วันที่ลงทะเบียน<br>
+            Caretaker - ผู้ดูแล
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#ea580c">UserAccount</strong> <span style="color:var(--muted)">(Users)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK), HospitalId (FK)<br>
+            Username (unique per hospital)<br>
+            Password, Position<br>
+            IsSuperAdmin (boolean)
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#7c3aed">ChecklistRecord</strong> <span style="color:var(--muted)">(ChecklistRecords)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK), HospitalId (FK)<br>
+            FormType - F1_F2, F10, F3_F6, F7_F8, F9, F11, F12, F13<br>
+            MachineName, Room, CheckDate<br>
+            Tester - ผู้ทดสอบ<br>
+            JsonData - ข้อมูลผลตรวจ JSON
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#ef4444">RepairRequest</strong> <span style="color:var(--muted)">(RepairRequests)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK), HospitalId (FK)<br>
+            Equipment, Room, RequestDate<br>
+            ReporterName - ผู้แจ้งซ่อม<br>
+            Detail, Remarks, StatusText<br>
+            ImageData - รูปภาพ Base64
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
+          <strong style="color:#3b82f6">ScheduleConfig</strong> <span style="color:var(--muted)">(ScheduleConfigs)</span>
+          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
+            RID (PK), HospitalId (FK)<br>
+            StartDate - วันเริ่มต้น<br>
+            FrequencyType - 1m, 3m, 6m<br>
+            Description - รายละเอียด<br>
+            FormTypes - JSON array เช่น ["F10","F12"]
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#eef2ff,#f0f4ff);padding:12px;border-radius:8px;border:1px solid #c7d2fe;grid-column:1/-1">
+          <strong style="color:#4f6ef7">Relationship Labels (ความหมายของป้ายบนเส้นเชื่อม)</strong>
+          <div style="margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 16px;font-size:12px;color:var(--muted);line-height:1.7">
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">1-N</span> Hospital มีข้อมูลลูกหลายรายการ (One-to-Many)</div>
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">triggers</span> ScheduleConfig กำหนดเวลาตรวจให้ ChecklistRecord</div>
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">checked</span> Machine ถูกตรวจสอบ บันทึกใน ChecklistRecord</div>
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">repaired</span> Machine ถูกแจ้งซ่อมผ่าน RepairRequest</div>
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">tested</span> UserAccount เป็นผู้ทดสอบ บันทึกใน ChecklistRecord</div>
+            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">reported</span> UserAccount เป็นผู้แจ้งซ่อม สร้าง RepairRequest</div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#818cf8">
+            <strong>สัญลักษณ์:</strong> <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">||--o{</code> = One-to-Many (1 ต่อ หลาย) | <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">PK</code> = Primary Key | <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">FK</code> = Foreign Key
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted)">
+        <strong>หมายเหตุ:</strong> ทุก Entity สืบทอด RID (Primary Key, auto-increment) จาก BaseTable | HospitalId เป็น Foreign Key อ้างอิงไปยัง Hospital.RID | ChecklistRecord เชื่อมกับ Machine ผ่าน MachineName + Room (denormalized) | Unique constraint: UserAccount(HospitalId, Username) | Database: PostgreSQL via Entity Framework Core + Npgsql
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 22. CONTEXT DIAGRAM ══════════ -->
+<div class="section" id="s22">
+  <div class="section-head">
+    <div class="num">22</div>
+    <div><h2>Context Diagram</h2><p>แผนภาพบริบทของระบบ xrayCare แสดงความสัมพันธ์ระหว่างระบบกับ External Entity ทั้งหมด</p></div>
+  </div>
+  <div class="section-body">
+    <svg viewBox="0 0 1400 830" style="width:100%;max-width:1400px;margin:0 auto;display:block;font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arw" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7 Z" fill="#64748b"/></marker>
+      </defs>
+
+      <!-- ===== LINES (behind everything) ===== -->
+      <!-- SA → SYS -->
+      <line x1="215" y1="75" x2="448" y2="310" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- SYS → SA -->
+      <line x1="455" y1="305" x2="220" y2="70" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- AD → SYS -->
+      <line x1="1085" y1="75" x2="752" y2="310" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- SYS → AD -->
+      <line x1="745" y1="305" x2="1080" y2="70" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- TECH → SYS -->
+      <line x1="260" y1="725" x2="448" y2="420" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- SYS → TECH -->
+      <line x1="455" y1="425" x2="265" y2="730" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- ENG → SYS -->
+      <line x1="1040" y1="725" x2="752" y2="420" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- SYS → ENG -->
+      <line x1="745" y1="425" x2="1035" y2="730" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- SYS → DB -->
+      <line x1="590" y1="440" x2="590" y2="642" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- DB → SYS -->
+      <line x1="610" y1="645" x2="610" y2="440" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+
+      <!-- ===== CENTER SYSTEM BOX ===== -->
+      <rect x="450" y="295" width="300" height="145" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="3"/>
+      <text x="600" y="345" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">ระบบจัดการคุณภาพ</text>
+      <text x="600" y="370" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">เครื่องเอกซเรย์</text>
+      <text x="600" y="395" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="700" font-style="italic">xrayCare</text>
+
+      <!-- ===== SUPERADMIN (top-left) ===== -->
+      <rect x="80" y="20" width="190" height="55" rx="6" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+      <text x="175" y="44" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">SuperAdmin</text>
+      <text x="175" y="63" text-anchor="middle" fill="#64748b" font-size="11">ผู้ดูแลระบบ</text>
+      <!-- SA→SYS Input (far left, clear of line) -->
+      <text fill="#1e293b" font-size="10.5">
+        <tspan x="15" dy="120">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="15" dy="15">- ข้อมูลผู้ใช้งาน</tspan>
+        <tspan x="15" dy="15">- ข้อมูลโรงพยาบาล</tspan>
+        <tspan x="15" dy="15">- ข้อมูลการตั้งค่า</tspan>
+      </text>
+      <!-- SYS→SA Output (right of line, clear) -->
+      <text fill="#64748b" font-size="10.5">
+        <tspan x="310" dy="105">- ผลการจัดการผู้ใช้</tspan>
+        <tspan x="310" dy="15">- ผลการจัดการ รพ.</tspan>
+        <tspan x="310" dy="15">- รายงานภาพรวมทุก รพ.</tspan>
+        <tspan x="310" dy="15">- Admin Analytics</tspan>
+      </text>
+
+      <!-- ===== ADMIN (top-right) ===== -->
+      <rect x="1030" y="20" width="190" height="55" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="1125" y="44" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">Admin</text>
+      <text x="1125" y="63" text-anchor="middle" fill="#64748b" font-size="11">ผู้ดูแล รพ.</text>
+      <!-- AD→SYS Input (left of line) -->
+      <text fill="#1e293b" font-size="10.5">
+        <tspan x="770" dy="110">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="770" dy="15">- จัดการ User เฉพาะ รพ.</tspan>
+        <tspan x="770" dy="15">- ข้อมูลการตั้งค่า</tspan>
+      </text>
+      <!-- SYS→AD Output (far right) -->
+      <text fill="#64748b" font-size="10.5">
+        <tspan x="1105" dy="115">- ผลการจัดการผู้ใช้</tspan>
+        <tspan x="1105" dy="15">- รายงานสรุปเฉพาะ รพ.</tspan>
+        <tspan x="1105" dy="15">- Admin Analytics</tspan>
+      </text>
+
+      <!-- ===== TECHNOLOGIST (bottom-left) ===== -->
+      <rect x="25" y="720" width="250" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+      <text x="150" y="743" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="700">Radiological Technologist</text>
+      <text x="150" y="762" text-anchor="middle" fill="#64748b" font-size="11">นักรังสีเทคนิค</text>
+      <!-- TECH→SYS Input (far left, stacked above output) -->
+      <text fill="#1e293b" font-size="10.5">
+        <tspan x="15" dy="475">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="15" dy="15">- ข้อมูลการตรวจ F1-F13</tspan>
+        <tspan x="15" dy="15">- ข้อมูลเครื่องเอกซเรย์</tspan>
+        <tspan x="15" dy="15">- ข้อมูลแจ้งซ่อม</tspan>
+        <tspan x="15" dy="15">- ข้อมูลตาราง PM Schedule</tspan>
+        <tspan x="15" dy="15">- แนบรูปภาพ หมายเหตุ</tspan>
+      </text>
+      <!-- SYS→TECH Output (far left, below input) -->
+      <text fill="#64748b" font-size="10.5">
+        <tspan x="15" dy="580">- ผลตรวจสอบ Pass/Fail</tspan>
+        <tspan x="15" dy="15">- สถานะเครื่อง พร้อม/ไม่พร้อม</tspan>
+        <tspan x="15" dy="15">- รายการซ่อมอัตโนมัติ</tspan>
+        <tspan x="15" dy="15">- แจ้งเตือน Schedule</tspan>
+        <tspan x="15" dy="15">- รายงานสถิติ Analytics</tspan>
+        <tspan x="15" dy="15">- Export PDF F1-F13</tspan>
+      </text>
+
+      <!-- ===== ENGINEER (bottom-right) ===== -->
+      <rect x="980" y="720" width="210" height="55" rx="6" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="1085" y="743" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">Engineer</text>
+      <text x="1085" y="762" text-anchor="middle" fill="#64748b" font-size="11">ช่างซ่อมบำรุง</text>
+      <!-- ENG→SYS Input (far right, stacked above output) -->
+      <text fill="#1e293b" font-size="10.5">
+        <tspan x="1100" dy="490">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="1100" dy="15">- อัปเดตสถานะซ่อม</tspan>
+        <tspan x="1100" dy="15">  Pending/InProgress/Completed</tspan>
+      </text>
+      <!-- SYS→ENG Output (far right, below input) -->
+      <text fill="#64748b" font-size="10.5">
+        <tspan x="1100" dy="555">- รายการแจ้งซ่อมทั้งหมด</tspan>
+        <tspan x="1100" dy="15">- สถิติการซ่อม</tspan>
+        <tspan x="1100" dy="15">- Engineer Analytics</tspan>
+      </text>
+
+      <!-- ===== DATABASE (bottom-center) ===== -->
+      <ellipse cx="600" cy="660" rx="82" ry="16" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+      <rect x="518" y="660" width="164" height="38" fill="#fce7f3" stroke="none"/>
+      <line x1="518" y1="660" x2="518" y2="698" stroke="#ec4899" stroke-width="2"/>
+      <line x1="682" y1="660" x2="682" y2="698" stroke="#ec4899" stroke-width="2"/>
+      <ellipse cx="600" cy="698" rx="82" ry="16" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+      <text x="600" y="680" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="700">PostgreSQL</text>
+      <text x="600" y="696" text-anchor="middle" fill="#64748b" font-size="10">Database</text>
+      <!-- SYS→DB Input (left of vertical line) -->
+      <text fill="#1e293b" font-size="10" text-anchor="end">
+        <tspan x="570" dy="475">- CRUD Hospitals/Users</tspan>
+        <tspan x="570" dy="14">- CRUD Machines/Schedules</tspan>
+        <tspan x="570" dy="14">- Save/Get Checklists</tspan>
+        <tspan x="570" dy="14">- CRUD RepairRequests</tspan>
+        <tspan x="570" dy="14">- Get Notifications</tspan>
+      </text>
+      <!-- DB→SYS Output (right of vertical line) -->
+      <text fill="#64748b" font-size="10">
+        <tspan x="635" dy="475">- ข้อมูลโรงพยาบาล</tspan>
+        <tspan x="635" dy="14">- ข้อมูลผู้ใช้งาน/เครื่อง</tspan>
+        <tspan x="635" dy="14">- ข้อมูลผลตรวจ</tspan>
+        <tspan x="635" dy="14">- ข้อมูลแจ้งซ่อม</tspan>
+        <tspan x="635" dy="14">- ข้อมูลตาราง Schedule</tspan>
+      </text>
+    </svg>
+    <div style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid var(--border)">
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text)">External Entities and Data Flows</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;font-size:12px">
+        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #ea580c">
+          <strong>SuperAdmin</strong>
+          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
+            <u>Input:</u> Login, จัดการผู้ใช้ทุก รพ., จัดการโรงพยาบาล, ตั้งค่าระบบ<br>
+            <u>Output:</u> ผลจัดการ User/Hospital, Admin Analytics, รายงานภาพรวม
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #d97706">
+          <strong>Admin</strong>
+          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
+            <u>Input:</u> Login, จัดการผู้ใช้เฉพาะ รพ.<br>
+            <u>Output:</u> ผลจัดการ User, Admin Analytics เฉพาะ รพ.
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #10b981">
+          <strong>Radiological Technologist</strong>
+          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
+            <u>Input:</u> Login, บันทึกผลตรวจ F1-F13, จัดการเครื่อง, แจ้งซ่อม, PM Schedule, แนบรูปภาพ<br>
+            <u>Output:</u> ผลตรวจ Pass/Fail, สถานะเครื่อง, Repair อัตโนมัติ, แจ้งเตือน, Analytics, Export PDF
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #3b82f6">
+          <strong>Engineer</strong>
+          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
+            <u>Input:</u> Login, อัปเดตสถานะซ่อม (Pending/In Progress/Completed)<br>
+            <u>Output:</u> รายการแจ้งซ่อม, สถิติการซ่อม, Engineer Analytics
+          </div>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #ec4899">
+          <strong>PostgreSQL Database</strong>
+          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
+            <u>Input:</u> CRUD operations ผ่าน REST API (Hospitals, Users, Machines, Checklists, Repairs, Schedules)<br>
+            <u>Output:</u> ข้อมูลทั้งหมดของระบบ, Notifications (คำนวณจาก ScheduleConfigs)
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted)">
+        <strong>Architecture:</strong> Vue 3 SPA (port 5173) → Vite Proxy → ASP.NET Core API (port 8001) → PostgreSQL via EF Core + Npgsql | Headers: X-User-Id, X-Hospital-Id | CORS: localhost:5173
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <footer class="footer">xrayCare System Flowchart | Generated 2026-03-24 | Vue 3 + Vite + Backend API</footer>
@@ -1007,6 +1361,123 @@ flowchart TB
     },
     flowchart: { htmlLabels: true, curve: 'linear', rankSpacing: 50, nodeSpacing: 30, padding: 12 }
   });
+
+  const PDF_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.section').forEach(sec => {
+      const head = sec.querySelector('.section-head');
+      if (!head) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn-section-pdf';
+      btn.innerHTML = PDF_ICON + ' PDF';
+      btn.title = 'บันทึกหัวข้อนี้เป็น PDF';
+      btn.onclick = () => exportSectionPDF(sec, btn);
+      head.appendChild(btn);
+    });
+
+    setTimeout(() => {
+      const svg = document.querySelector('#s21 .mermaid svg');
+      if (!svg) return;
+      const labels = svg.querySelectorAll('g');
+      labels.forEach(g => {
+        if (!g.classList.contains('er') || !g.querySelector('text')) return;
+        const cl = Array.from(g.classList);
+        if (!cl.includes('relationshipLabel')) return;
+        const t = g.getAttribute('transform');
+        if (!t) return;
+        const m = t.match(/translate\(\s*([\d.\-e]+)\s*,\s*([\d.\-e]+)\s*\)/);
+        if (!m) return;
+        const x = parseFloat(m[1]), y = parseFloat(m[2]);
+        g.setAttribute('transform', 'translate(' + x + ',' + (y - 20) + ')');
+        const rect = g.querySelector('rect');
+        if (rect) {
+          rect.setAttribute('fill', '#ffffff');
+          rect.setAttribute('stroke', '#4f6ef7');
+          rect.setAttribute('stroke-width', '2');
+          rect.setAttribute('rx', '8');
+          rect.setAttribute('ry', '8');
+          const rh = parseFloat(rect.getAttribute('height') || 20);
+          rect.setAttribute('height', rh + 8);
+          const rw = parseFloat(rect.getAttribute('width') || 40);
+          rect.setAttribute('width', rw + 12);
+          const rx = parseFloat(rect.getAttribute('x') || 0);
+          rect.setAttribute('x', rx - 6);
+          const ry2 = parseFloat(rect.getAttribute('y') || 0);
+          rect.setAttribute('y', ry2 - 4);
+        }
+      });
+    }, 2000);
+  });
+
+  async function exportSectionPDF(section, btn) {
+    const origHTML = btn.innerHTML;
+    btn.innerHTML = PDF_ICON + ' กำลังสร้าง...';
+    btn.disabled = true;
+    await new Promise(r => setTimeout(r, 300));
+
+    section.querySelectorAll('.mermaid svg').forEach(svg => {
+      const bb = svg.getBBox ? svg.getBBox() : null;
+      if (bb) {
+        svg.setAttribute('width', Math.ceil(bb.width + 40));
+        svg.setAttribute('height', Math.ceil(bb.height + 40));
+      }
+    });
+
+    const loadScript = (url, check) => new Promise((resolve, reject) => {
+      if (check()) return resolve();
+      const s = document.createElement('script');
+      s.src = url; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+
+    try {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', () => window.html2canvas);
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => window.jspdf);
+
+      const { jsPDF } = window.jspdf;
+      const mg = 8, A4_SHORT = 210, A4_LONG = 297;
+
+      const sectionBtn = section.querySelector('.btn-section-pdf');
+      if (sectionBtn) sectionBtn.style.display = 'none';
+
+      const canvas = await html2canvas(section, {
+        scale: 2, useCORS: true, logging: false,
+        backgroundColor: '#ffffff', windowWidth: 1500
+      });
+
+      if (sectionBtn) sectionBtn.style.display = '';
+
+      const imgRatio = canvas.width / canvas.height;
+      const isWide = imgRatio >= 1;
+      const orient = isWide ? 'landscape' : 'portrait';
+      const pageW = isWide ? A4_LONG : A4_SHORT;
+      const pageH = isWide ? A4_SHORT : A4_LONG;
+      const usableW = pageW - mg * 2;
+      const usableH = pageH - mg * 2;
+
+      const pdf = new jsPDF({ orientation: orient, unit: 'mm', format: 'a4' });
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+      let w = usableW, h = w / imgRatio;
+      if (h > usableH) { h = usableH; w = h * imgRatio; }
+
+      const x = mg + (usableW - w) / 2;
+      const y = mg + (usableH - h) / 2;
+      pdf.addImage(imgData, 'JPEG', x, y, w, h);
+
+      const numEl = section.querySelector('.num');
+      const h2El = section.querySelector('h2');
+      const num = numEl ? numEl.textContent.trim() : '';
+      const title = h2El ? h2El.textContent.trim().replace(/[^a-zA-Z0-9ก-๙\s-]/g, '').trim() : 'Section';
+      pdf.save('xrayCare-' + num + '-' + title.substring(0, 40) + '.pdf');
+    } catch (e) {
+      console.error('Section PDF error:', e);
+      alert('ไม่สามารถสร้าง PDF ได้ กรุณาลองใหม่');
+    }
+    btn.innerHTML = origHTML;
+    btn.disabled = false;
+  }
 
   async function exportPDF() {
     const btn = document.querySelector('.btn-pdf');
@@ -1045,7 +1516,7 @@ flowchart TB
 
         const canvas = await html2canvas(sections[i], {
           scale: 2, useCORS: true, logging: false,
-          backgroundColor: '#ffffff', windowWidth: 1200
+          backgroundColor: '#ffffff', windowWidth: 1500
         });
 
         const imgRatio = canvas.width / canvas.height;
