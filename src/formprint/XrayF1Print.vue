@@ -107,8 +107,6 @@
                   <td class="f2-col-fail">{{ record.plateErase.result === 'fail' ? '✗' : '' }}</td>
                   <td class="f2-col-remark">
                     <span class="f2-remark-text">{{ record.plateErase.remark || '–' }}</span>
-                    <span v-if="record.plateErase.fileName" class="f2-file">แนบไฟล์: {{ record.plateErase.fileName
-                      }}</span>
                   </td>
                 </tr>
               </tbody>
@@ -224,8 +222,7 @@ onMounted(async () => {
         if (parsed.plateErase && typeof parsed.plateErase === 'object') {
           record.value.plateErase = {
             result: parsed.plateErase.result || '',
-            remark: parsed.plateErase.remark || '',
-            fileName: parsed.plateErase.fileName || ''
+            remark: parsed.plateErase.remark || ''
           };
         }
       } catch (_) { }
@@ -531,12 +528,6 @@ onMounted(async () => {
   word-break: break-word;
 }
 
-.f2-file {
-  display: block;
-  margin-top: 2mm;
-  font-size: 14pt !important;
-  color: #475569;
-}
 
 /* ตารางหัว "วันที่ / ผู้ทดสอบ" ให้ชิดกับตารางใหญ่ */
 .qc-meta-table {

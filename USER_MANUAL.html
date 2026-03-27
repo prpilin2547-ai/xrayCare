@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คู่มือการใช้งาน X-RayCare QC Management System</title>
+<style>
+  @page {
+    size: A4;
+    margin: 22mm 20mm 25mm 20mm;
+    @bottom-center {
+      content: "X-RayCare QC Management System — คู่มือการใช้งาน";
+      font-size: 8pt;
+      color: #94A3B8;
+    }
+    @bottom-right {
+      content: counter(page);
+      font-size: 8pt;
+      color: #64748B;
+    }
+  }
+  @page :first {
+    margin: 0;
+    @bottom-center { content: none; }
+    @bottom-right { content: none; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', 'Noto Sans Thai', 'Segoe UI', 'Tahoma', sans-serif;
+    font-size: 11.5pt;
+    line-height: 1.7;
+    color: #1E293B;
+    background: #FFFFFF;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0;
+    counter-reset: chapter;
+  }
+
+  /* ──── Cover Page ──── */
+  .cover-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: linear-gradient(145deg, #0F172A 0%, #1E3A5F 40%, #2563EB 100%);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40mm 25mm;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-page::after {
+    content: '';
+    position: absolute;
+    bottom: -40%;
+    left: -20%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-logo {
+    font-size: 60pt;
+    margin-bottom: 10px;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-system-name {
+    font-size: 30pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-system-sub {
+    font-size: 15pt;
+    font-weight: 300;
+    color: #93C5FD;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #60A5FA, transparent);
+    margin: 0 auto 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-title {
+    font-size: 22pt;
+    font-weight: 600;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-subtitle {
+    font-size: 13pt;
+    color: #BFDBFE;
+    font-weight: 300;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 25px;
+    font-size: 10.5pt;
+    color: #CBD5E1;
+    line-height: 2;
+  }
+  .cover-meta strong { color: #E2E8F0; font-weight: 600; }
+
+  /* ──── Typography ──── */
+  h1 {
+    font-size: 22pt;
+    color: #0F172A;
+    font-weight: 700;
+    margin: 35px 0 15px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #2563EB;
+    page-break-after: avoid;
+    counter-increment: chapter;
+  }
+  h1::before {
+    content: "บทที่ " counter(chapter) " ";
+    font-size: 12pt;
+    color: #2563EB;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+    letter-spacing: 1px;
+  }
+  h1.no-counter::before { content: none; }
+  h1.no-counter { counter-increment: none; }
+
+  h2 {
+    font-size: 16pt;
+    color: #1E40AF;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    padding: 8px 0 6px 14px;
+    border-left: 4px solid #3B82F6;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 13pt;
+    color: #1E3A5F;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 11.5pt;
+    color: #334155;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    page-break-after: avoid;
+  }
+
+  p { margin: 6px 0 10px; text-align: justify; }
+
+  /* ──── Table of Contents ──── */
+  .toc-page {
+    page-break-after: always;
+    padding: 15mm 0;
+  }
+  .toc-title {
+    font-size: 22pt;
+    color: #0F172A;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #2563EB;
+  }
+  .toc-title::before { content: none; }
+  .toc-list { list-style: none; padding: 0; }
+  .toc-list li {
+    padding: 6px 0;
+    border-bottom: 1px dotted #CBD5E0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .toc-list li a {
+    color: #1E293B;
+    text-decoration: none;
+    font-size: 11.5pt;
+    flex: 1;
+  }
+  .toc-list li a:hover { color: #2563EB; }
+  .toc-chapter {
+    font-weight: 700;
+    font-size: 12pt;
+    padding-top: 12px;
+    border-bottom: none !important;
+  }
+  .toc-chapter a { color: #0F172A !important; font-weight: 700; }
+  .toc-sub { padding-left: 24px; }
+  .toc-sub a { font-size: 10.5pt !important; color: #475569 !important; }
+
+  /* ──── Tables ──── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 10.5pt;
+    page-break-inside: auto;
+  }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th {
+    background: linear-gradient(180deg, #EFF6FF, #DBEAFE);
+    color: #1E3A5F;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid #93C5FD;
+    font-size: 10.5pt;
+  }
+  td {
+    border: 1px solid #CBD5E0;
+    padding: 6px 10px;
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: #F8FAFC; }
+  tbody tr:hover { background: #EFF6FF; }
+
+  /* ──── Code ──── */
+  code {
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    background: #F1F5F9;
+    color: #B91C1C;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 9.5pt;
+    border: 1px solid #E2E8F0;
+  }
+  pre {
+    background: #0F172A;
+    color: #E2E8F0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 9pt;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    page-break-inside: avoid;
+    margin: 12px 0 16px;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border: none;
+    font-size: inherit;
+  }
+
+  /* ──── Info Boxes ──── */
+  .info-box {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    page-break-inside: avoid;
+    line-height: 1.6;
+    font-size: 10.5pt;
+  }
+  .info-box-title {
+    font-weight: 700;
+    font-size: 10.5pt;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .info-note {
+    background: #EFF6FF;
+    border: 1px solid #93C5FD;
+    border-left: 4px solid #3B82F6;
+    color: #1E3A5F;
+  }
+  .info-note .info-box-title { color: #1D4ED8; }
+  .info-tip {
+    background: #F0FDF4;
+    border: 1px solid #86EFAC;
+    border-left: 4px solid #22C55E;
+    color: #14532D;
+  }
+  .info-tip .info-box-title { color: #15803D; }
+  .info-warning {
+    background: #FFFBEB;
+    border: 1px solid #FCD34D;
+    border-left: 4px solid #F59E0B;
+    color: #78350F;
+  }
+  .info-warning .info-box-title { color: #B45309; }
+  .info-danger {
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-left: 4px solid #EF4444;
+    color: #7F1D1D;
+  }
+  .info-danger .info-box-title { color: #DC2626; }
+
+  /* ──── Steps ──── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    counter-increment: step;
+    padding: 8px 0 8px 42px;
+    position: relative;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 28px;
+    height: 28px;
+    background: #2563EB;
+    color: #FFF;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 10pt;
+    font-weight: 700;
+  }
+
+  /* ──── Lists ──── */
+  ul, ol { margin: 6px 0 10px; padding-left: 26px; }
+  li { margin: 3px 0; }
+
+  /* ──── Badges ──── */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-green { background: #DCFCE7; color: #166534; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-yellow { background: #FEF3C7; color: #92400E; }
+  .badge-gray { background: #F1F5F9; color: #475569; }
+
+  /* ──── Key Reference ──── */
+  kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #F8FAFC;
+    border: 1px solid #CBD5E0;
+    border-bottom: 2px solid #94A3B8;
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 9pt;
+    color: #334155;
+  }
+
+  /* ──── Horizontal Rule ──── */
+  hr {
+    border: none;
+    border-top: 1px solid #E2E8F0;
+    margin: 24px 0;
+  }
+
+  /* ──── Links ──── */
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  strong { color: #0F172A; }
+
+  /* ──── Workflow Diagram ──── */
+  .workflow-box {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+    page-break-inside: avoid;
+  }
+  .workflow-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+  }
+  .workflow-item {
+    background: #FFFFFF;
+    border: 2px solid #3B82F6;
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1E3A5F;
+    min-width: 110px;
+  }
+  .workflow-item.active {
+    background: #2563EB;
+    color: #FFF;
+    border-color: #1D4ED8;
+  }
+  .workflow-item.secondary {
+    background: #F0FDF4;
+    border-color: #22C55E;
+    color: #166534;
+  }
+  .workflow-arrow {
+    text-align: center;
+    color: #94A3B8;
+    font-size: 16pt;
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  /* ──── Section Divider ──── */
+  .section-break {
+    page-break-before: always;
+  }
+
+  /* ──── Force Color Printing ──── */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  /* ──── Print Styles ──── */
+  @media print {
+    body { margin: 0; padding: 0; max-width: none; color: #1E293B; }
+    .cover-page { margin: -22mm -20mm 0 -20mm; padding: 40mm 25mm; width: calc(100% + 40mm); }
+    .info-box { break-inside: avoid; }
+    table { break-inside: auto; }
+    tr { break-inside: avoid; }
+    h1, h2, h3, h4 { break-after: avoid; }
+    .workflow-box { break-inside: avoid; }
+    a { color: #1E293B !important; }
+  }
+
+  /* ──── Screen Styles ──── */
+  @media screen {
+    body { padding: 20mm; }
+    .cover-page { margin: -20mm -20mm 20mm; width: calc(100% + 40mm); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- COVER PAGE                                                     -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="cover-page">
+  <div class="cover-logo">&#x2695;</div>
+  <div class="cover-system-name">X-RayCare</div>
+  <div class="cover-system-sub">QC Management System</div>
+  <div class="cover-divider"></div>
+  <div class="cover-title">คู่มือการใช้งานระบบ</div>
+  <div class="cover-subtitle">ระบบจัดการคุณภาพเครื่องเอกซเรย์และอุปกรณ์ทางรังสีวิทยาสำหรับโรงพยาบาล</div>
+  <div class="cover-meta">
+    <strong>วันที่จัดทำ:</strong> 27 มีนาคม 2569<br>
+    <strong>ประเภทเอกสาร:</strong> คู่มือผู้ใช้งาน (User Manual)
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS                                              -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="toc-page">
+  <div class="toc-title">สารบัญ</div>
+  <ul class="toc-list">
+    <li class="toc-chapter"><a href="#ch1">บทที่ 1 — ภาพรวมของระบบ</a></li>
+    <li class="toc-sub"><a href="#ch1-1">1.1 วัตถุประสงค์</a></li>
+    <li class="toc-sub"><a href="#ch1-2">1.2 คุณสมบัติหลักของระบบ</a></li>
+    <li class="toc-sub"><a href="#ch1-3">1.3 เทคโนโลยีที่ใช้</a></li>
+    <li class="toc-sub"><a href="#ch1-4">1.4 การรองรับหลายโรงพยาบาล</a></li>
+
+    <li class="toc-chapter"><a href="#ch2">บทที่ 2 — บทบาทผู้ใช้งานและสิทธิ์การเข้าถึง</a></li>
+    <li class="toc-sub"><a href="#ch2-1">2.1 ตารางบทบาทและสิทธิ์</a></li>
+    <li class="toc-sub"><a href="#ch2-2">2.2 เมนูที่แต่ละบทบาทเข้าถึงได้</a></li>
+
+    <li class="toc-chapter"><a href="#ch3">บทที่ 3 — การเข้าสู่ระบบ</a></li>
+    <li class="toc-sub"><a href="#ch3-1">3.1 ขั้นตอนการเข้าสู่ระบบ</a></li>
+    <li class="toc-sub"><a href="#ch3-2">3.2 กรณีเข้าสู่ระบบไม่สำเร็จ</a></li>
+    <li class="toc-sub"><a href="#ch3-3">3.3 บัญชีผู้ใช้เริ่มต้น</a></li>
+
+    <li class="toc-chapter"><a href="#ch4">บทที่ 4 — โครงสร้างหน้าจอหลัก</a></li>
+    <li class="toc-sub"><a href="#ch4-1">4.1 แถบด้านบน (Top Bar)</a></li>
+    <li class="toc-sub"><a href="#ch4-2">4.2 แถบเมนูด้านข้าง (Sidebar Navigation)</a></li>
+    <li class="toc-sub"><a href="#ch4-3">4.3 การแสดงผลบนอุปกรณ์พกพา</a></li>
+
+    <li class="toc-chapter"><a href="#ch5">บทที่ 5 — เมนูนักรังสีเทคนิค</a></li>
+    <li class="toc-sub"><a href="#ch5-1">5.1 Dashboard — หน้าภาพรวม</a></li>
+    <li class="toc-sub"><a href="#ch5-2">5.2 Equipment — ลงทะเบียนเครื่อง</a></li>
+    <li class="toc-sub"><a href="#ch5-3">5.3 Daily Check — ตรวจสอบประจำวัน</a></li>
+    <li class="toc-sub"><a href="#ch5-4">5.4 Monthly Check — ตรวจสอบประจำเดือน</a></li>
+    <li class="toc-sub"><a href="#ch5-5">5.5 PM Schedule — ตารางบำรุงรักษา</a></li>
+    <li class="toc-sub"><a href="#ch5-6">5.6 Export PDF — ส่งออกรายงาน</a></li>
+    <li class="toc-sub"><a href="#ch5-7">5.7 Analytical — วิเคราะห์ความเสี่ยง</a></li>
+    <li class="toc-sub"><a href="#ch5-8">5.8 Request — แจ้งซ่อม</a></li>
+    <li class="toc-sub"><a href="#ch5-9">5.9 QC Forms — แบบบันทึกเพิ่มเติม</a></li>
+
+    <li class="toc-chapter"><a href="#ch6">บทที่ 6 — เมนูผู้ดูแลระบบ</a></li>
+    <li class="toc-sub"><a href="#ch6-1">6.1 Admin Dashboard</a></li>
+    <li class="toc-sub"><a href="#ch6-2">6.2 User Accounts — จัดการผู้ใช้งาน</a></li>
+    <li class="toc-sub"><a href="#ch6-3">6.3 Admin Analytics</a></li>
+
+    <li class="toc-chapter"><a href="#ch7">บทที่ 7 — เมนูวิศวกร</a></li>
+    <li class="toc-sub"><a href="#ch7-1">7.1 Engineer Dashboard</a></li>
+    <li class="toc-sub"><a href="#ch7-2">7.2 Engineer Analytics</a></li>
+    <li class="toc-sub"><a href="#ch7-3">7.3 Engineer Request — จัดการแจ้งซ่อม</a></li>
+
+    <li class="toc-chapter"><a href="#ch8">บทที่ 8 — โปรไฟล์ผู้ใช้งาน</a></li>
+
+    <li class="toc-chapter"><a href="#ch9">บทที่ 9 — แบบบันทึก QC ทั้งหมดในระบบ</a></li>
+    <li class="toc-sub"><a href="#ch9-1">9.1 ตารางสรุปแบบบันทึก</a></li>
+    <li class="toc-sub"><a href="#ch9-2">9.2 ขั้นตอนการทำงานตามรอบ (Workflow)</a></li>
+
+    <li class="toc-chapter"><a href="#ch10">บทที่ 10 — การออกจากระบบ</a></li>
+
+    <li class="toc-chapter"><a href="#ch11">บทที่ 11 — ข้อมูลทางเทคนิค</a></li>
+    <li class="toc-sub"><a href="#ch11-1">11.1 สถาปัตยกรรมระบบ</a></li>
+    <li class="toc-sub"><a href="#ch11-2">11.2 ฐานข้อมูล</a></li>
+    <li class="toc-sub"><a href="#ch11-3">11.3 API Endpoints</a></li>
+
+    <li class="toc-chapter"><a href="#ch12">บทที่ 12 — คำถามที่พบบ่อย (FAQ)</a></li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 1: OVERVIEW                                            -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch1">ภาพรวมของระบบ</h1>
+
+<h2 id="ch1-1">1.1 วัตถุประสงค์</h2>
+<p>ระบบ <strong>X-RayCare QC Management System</strong> เป็นระบบเว็บแอปพลิเคชันที่ได้รับการพัฒนาขึ้นเพื่อ<strong>จัดการงานควบคุมคุณภาพ (Quality Control — QC)</strong> ของเครื่องเอกซเรย์และอุปกรณ์ทางรังสีวิทยาภายในโรงพยาบาล โดยมุ่งเน้นการยกระดับมาตรฐานความปลอดภัยและประสิทธิภาพการทำงานของแผนกรังสีวิทยาให้เป็นไปตามข้อกำหนดด้านคุณภาพ</p>
+
+<h2 id="ch1-2">1.2 คุณสมบัติหลักของระบบ</h2>
+<table>
+  <thead>
+    <tr><th style="width:35%">คุณสมบัติ</th><th>รายละเอียด</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>ลงทะเบียนเครื่องเอกซเรย์</strong></td><td>บันทึกข้อมูลเครื่อง ห้องตรวจ และผู้ดูแลเครื่องอย่างเป็นระบบ</td></tr>
+    <tr><td><strong>ตรวจสอบคุณภาพประจำวัน</strong></td><td>บันทึกผลการตรวจสอบเครื่องเอกซเรย์ในแต่ละวัน (Daily Check — F1/F2)</td></tr>
+    <tr><td><strong>ตรวจสอบคุณภาพประจำเดือน</strong></td><td>บันทึกผลการตรวจสอบตามรอบ 1, 3 หรือ 6 เดือน (F3–F13)</td></tr>
+    <tr><td><strong>แบบบันทึก QC เพิ่มเติม</strong></td><td>แบบฟอร์ม F9 ถึง F13 และการสร้างแบบฟอร์มกำหนดเอง (Custom Form)</td></tr>
+    <tr><td><strong>ตารางบำรุงรักษาเชิงป้องกัน</strong></td><td>จัดตาราง Preventive Maintenance (PM) พร้อมระบบแจ้งเตือนอัตโนมัติ</td></tr>
+    <tr><td><strong>ระบบแจ้งซ่อม</strong></td><td>แจ้งซ่อมอุปกรณ์พร้อมแนบภาพถ่าย ติดตามสถานะการดำเนินงาน</td></tr>
+    <tr><td><strong>ศูนย์วิเคราะห์ความเสี่ยง</strong></td><td>แสดงผลวิเคราะห์ KPI อัตราผ่าน QC กราฟแนวโน้ม และระดับความเสี่ยง</td></tr>
+    <tr><td><strong>ส่งออกรายงาน PDF</strong></td><td>กรองรายการ Checklist พร้อมพิมพ์เป็นเอกสาร PDF อย่างเป็นทางการ</td></tr>
+    <tr><td><strong>จัดการผู้ใช้งานและโรงพยาบาล</strong></td><td>รองรับการบริหารจัดการแบบหลายโรงพยาบาล (Multi-Hospital)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="ch1-3">1.3 เทคโนโลยีที่ใช้</h2>
+<table>
+  <thead>
+    <tr><th style="width:30%">ส่วนประกอบ</th><th>เทคโนโลยี</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>ส่วนหน้า (Frontend)</td><td>Vue 3, Vue Router 4, Bootstrap 5, Chart.js</td></tr>
+    <tr><td>ส่วนหลัง (Backend API)</td><td>ASP.NET Core (.NET 10)</td></tr>
+    <tr><td>ฐานข้อมูล</td><td>PostgreSQL 16</td></tr>
+    <tr><td>ORM</td><td>Entity Framework Core</td></tr>
+    <tr><td>Build Tool</td><td>Vite 6</td></tr>
+  </tbody>
+</table>
+
+<h2 id="ch1-4">1.4 การรองรับหลายโรงพยาบาล</h2>
+<p>ระบบรองรับการทำงาน<strong>แบบหลายโรงพยาบาล (Multi-Hospital)</strong> ข้อมูลทั้งหมดจะถูกแบ่งแยกตามโรงพยาบาลที่ผู้ใช้สังกัด ผู้ใช้ที่มีสถานะ Root Admin สามารถสลับดูข้อมูลและบริหารจัดการข้ามโรงพยาบาลได้</p>
+
+<div class="info-box info-note">
+  <div class="info-box-title">&#9432; หมายเหตุ</div>
+  ผู้ใช้งานทั่วไปจะสามารถเข้าถึงได้เฉพาะข้อมูลของโรงพยาบาลที่ตนสังกัดเท่านั้น ข้อมูลของโรงพยาบาลอื่นจะไม่ปรากฏในระบบ
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 2: ROLES                                               -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch2" class="section-break">บทบาทผู้ใช้งานและสิทธิ์การเข้าถึง</h1>
+
+<p>ระบบกำหนดบทบาทผู้ใช้งานออกเป็น <strong>5 ระดับ</strong> โดยแต่ละบทบาทมีสิทธิ์การเข้าถึงฟังก์ชันที่แตกต่างกัน</p>
+
+<h2 id="ch2-1">2.1 ตารางบทบาทและสิทธิ์</h2>
+<table>
+  <thead>
+    <tr><th style="width:5%">ลำดับ</th><th style="width:22%">ชื่อบทบาท</th><th style="width:20%">คำอธิบาย</th><th>สิทธิ์การเข้าถึง</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>Root Admin</strong></td>
+      <td>ผู้ดูแลระบบสูงสุด</td>
+      <td>เข้าถึงได้ทุกเมนู ทุกโรงพยาบาล สามารถเพิ่ม/ลบโรงพยาบาล สลับโรงพยาบาลจากแถบด้านบน และจัดการบัญชีผู้ใช้ทุกโรงพยาบาล</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>SuperAdmin</strong></td>
+      <td>ผู้ดูแลระดับโรงพยาบาล</td>
+      <td>เข้าถึงเมนู Admin ได้ทั้งหมด แต่จำกัดขอบเขตเฉพาะโรงพยาบาลที่สังกัด</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Admin</strong></td>
+      <td>ผู้ดูแลทั่วไป</td>
+      <td>เข้าถึงเมนู Admin, เมนูนักรังสีเทคนิค (ยกเว้น Dashboard ของ Tech) และเมนูวิศวกร (ยกเว้น Dashboard ของ Engineer)</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Radiological Technologist</strong></td>
+      <td>นักรังสีเทคนิค</td>
+      <td>Dashboard, Equipment, Daily/Monthly Check, PM Schedule, Export PDF, Analytical, Request, QC Forms</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Engineer</strong></td>
+      <td>วิศวกร</td>
+      <td>Engineer Dashboard, Engineer Analytics, Engineer Request</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="ch2-2">2.2 เมนูที่แต่ละบทบาทเข้าถึงได้</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:40%">เมนู</th>
+      <th style="width:12%; text-align:center">Root Admin</th>
+      <th style="width:12%; text-align:center">SuperAdmin</th>
+      <th style="width:12%; text-align:center">Admin</th>
+      <th style="width:12%; text-align:center">Tech</th>
+      <th style="width:12%; text-align:center">Engineer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Dashboard (Tech)</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>Equipment</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>PM Schedule</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>Export PDF</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>Analytical</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>Request (แจ้งซ่อม)</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>QC Forms</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td></tr>
+    <tr><td>Admin Dashboard</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td><td style="text-align:center">—</td></tr>
+    <tr><td>User Accounts</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td><td style="text-align:center">—</td></tr>
+    <tr><td>Admin Analytics</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td><td style="text-align:center">—</td></tr>
+    <tr><td>Engineer Dashboard</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center">&#10004;</td></tr>
+    <tr><td>Engineer Analytics</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td><td style="text-align:center">&#10004;</td></tr>
+    <tr><td>Engineer Request</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">&#10004;</td><td style="text-align:center">—</td><td style="text-align:center">&#10004;</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 3: LOGIN                                               -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch3" class="section-break">การเข้าสู่ระบบ (Login)</h1>
+
+<h2 id="ch3-1">3.1 ขั้นตอนการเข้าสู่ระบบ</h2>
+<p>เปิดเว็บเบราว์เซอร์และเข้าไปยัง URL ของระบบ ระบบจะแสดงหน้าเข้าสู่ระบบพร้อมข้อความ <em>"Welcome — Sign in to X-RayCare QC System"</em></p>
+
+<ol class="steps">
+  <li>กรอก <strong>Username</strong> — ชื่อผู้ใช้ที่ได้รับจากผู้ดูแลระบบ</li>
+  <li>กรอก <strong>Password</strong> — รหัสผ่านของบัญชีผู้ใช้ (สามารถคลิกไอคอนรูปตาทางด้านขวาเพื่อแสดง/ซ่อนรหัสผ่าน)</li>
+  <li>เลือก <strong>โรงพยาบาล</strong> — เลือกโรงพยาบาลที่ท่านสังกัดจากรายการแบบเลื่อนลง (Drop-down)</li>
+  <li>คลิกปุ่ม <strong>"Sign In"</strong> เพื่อเข้าสู่ระบบ</li>
+  <li>ระบบจะนำท่านเข้าสู่หน้า Dashboard ตามบทบาทของท่านโดยอัตโนมัติ</li>
+</ol>
+
+<table>
+  <thead>
+    <tr><th style="width:25%">ช่องข้อมูล</th><th>คำอธิบาย</th><th style="width:25%">ตัวอย่าง</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Username</strong></td><td>ชื่อผู้ใช้ที่ได้รับจากผู้ดูแลระบบ</td><td><code>Superadmin</code></td></tr>
+    <tr><td><strong>Password</strong></td><td>รหัสผ่านของบัญชีผู้ใช้</td><td><code>Superadmin1234</code></td></tr>
+    <tr><td><strong>โรงพยาบาล</strong></td><td>เลือกโรงพยาบาลที่สังกัดจากรายการ</td><td><code>โรงพยาบาลตัวอย่าง</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>การนำทางหลังเข้าสู่ระบบ:</strong> ระบบจะพาท่านไปยังหน้าแรกตามบทบาทโดยอัตโนมัติ ดังนี้</p>
+<ul>
+  <li><strong>Admin / SuperAdmin / Root Admin</strong> → หน้า Admin Dashboard</li>
+  <li><strong>Radiological Technologist</strong> → หน้า Dashboard</li>
+  <li><strong>Engineer</strong> → หน้า Engineer Dashboard</li>
+</ul>
+
+<h2 id="ch3-2">3.2 กรณีเข้าสู่ระบบไม่สำเร็จ</h2>
+<p>หากกรอกข้อมูลไม่ถูกต้อง ระบบจะแสดงข้อความแจ้งเตือนสีแดงใต้แบบฟอร์ม ท่านสามารถตรวจสอบสาเหตุได้ตามรายการต่อไปนี้:</p>
+
+<table>
+  <thead>
+    <tr><th style="width:35%">ข้อความแจ้งเตือน</th><th>สาเหตุที่เป็นไปได้</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>กรุณากรอก Username และ Password</code></td><td>ยังไม่ได้กรอกชื่อผู้ใช้หรือรหัสผ่าน</td></tr>
+    <tr><td><code>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</code></td><td>ชื่อผู้ใช้หรือรหัสผ่านไม่ตรงกับข้อมูลในระบบ</td></tr>
+    <tr><td><code>เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</code></td><td>เซิร์ฟเวอร์ไม่สามารถตอบสนองได้ หรือเกิดปัญหาการเชื่อมต่อ</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box info-tip">
+  <div class="info-box-title">&#10003; เคล็ดลับ</div>
+  ตรวจสอบให้แน่ใจว่าท่านเลือก<strong>โรงพยาบาล</strong>ที่ถูกต้อง เนื่องจากระบบจะตรวจสอบทั้งชื่อผู้ใช้ รหัสผ่าน และโรงพยาบาลพร้อมกัน หากเลือกโรงพยาบาลผิด จะไม่สามารถเข้าสู่ระบบได้แม้ชื่อผู้ใช้และรหัสผ่านจะถูกต้อง
+</div>
+
+<h2 id="ch3-3">3.3 บัญชีผู้ใช้เริ่มต้น</h2>
+<p>เมื่อติดตั้งระบบครั้งแรก ระบบจะสร้างบัญชี Root Admin โดยอัตโนมัติพร้อมข้อมูลดังนี้:</p>
+<table>
+  <thead>
+    <tr><th style="width:30%">รายการ</th><th>ค่าเริ่มต้น</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Username</td><td><code>Superadmin</code></td></tr>
+    <tr><td>Password</td><td><code>Superadmin1234</code></td></tr>
+    <tr><td>บทบาท</td><td>Admin (Root Admin / SuperAdmin)</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box info-warning">
+  <div class="info-box-title">&#9888; คำแนะนำด้านความปลอดภัย</div>
+  เพื่อความปลอดภัยของระบบ ควรดำเนินการเปลี่ยนรหัสผ่านของบัญชี Superadmin <strong>ทันที</strong>หลังจากเข้าสู่ระบบครั้งแรก โดยให้ผู้ดูแลระบบดำเนินการผ่านหน้า User Accounts
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 4: LAYOUT                                              -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch4" class="section-break">โครงสร้างหน้าจอหลัก</h1>
+
+<p>หลังจากเข้าสู่ระบบสำเร็จ หน้าจอหลักของระบบประกอบด้วยส่วนสำคัญ 3 ส่วนหลัก ดังนี้:</p>
+
+<div class="workflow-box">
+  <table style="border:none; margin:0;">
+    <tr style="background:none">
+      <td colspan="2" style="border:2px solid #3B82F6; background:#EFF6FF; text-align:center; padding:10px; border-radius:6px 6px 0 0;">
+        <strong>TOP BAR</strong> — แถบด้านบน<br>
+        <span style="font-size:9.5pt; color:#64748B;">[ปุ่มเมนู ☰] &nbsp;&nbsp; ชื่อระบบ X-RayCare &nbsp;&nbsp; ชื่อโรงพยาบาล &nbsp;&nbsp; [สลับโรงพยาบาล*]</span>
+      </td>
+    </tr>
+    <tr style="background:none">
+      <td style="width:25%; border:2px solid #22C55E; background:#F0FDF4; text-align:center; padding:12px; vertical-align:top;">
+        <strong>SIDEBAR</strong><br>
+        <span style="font-size:9pt; color:#64748B;">
+          ── Tech ──<br>Dashboard<br>Equipment<br>PM Schedule<br>Export PDF<br>Analytical<br>Request<br>QC Forms<br>
+          ── Admin ──<br>Admin Dashboard<br>User Accounts<br>Admin Analytics<br>
+          ── Engineer ──<br>Engineer Dashboard<br>Engineer Analytics<br>Engineer Request<br>
+          ───────<br>[Log out]
+        </span>
+      </td>
+      <td style="border:2px solid #E2E8F0; background:#FFFFFF; text-align:center; padding:20px; vertical-align:middle;">
+        <strong style="font-size:14pt; color:#94A3B8;">พื้นที่เนื้อหาหลัก</strong><br>
+        <span style="font-size:9.5pt; color:#94A3B8;">(Page Content)</span>
+      </td>
+    </tr>
+  </table>
+  <p style="font-size:9pt; color:#94A3B8; text-align:center; margin-top:8px;">* การสลับโรงพยาบาลจะแสดงเฉพาะผู้ใช้ที่มีสถานะ Root Admin เท่านั้น</p>
+</div>
+
+<h2 id="ch4-1">4.1 แถบด้านบน (Top Bar)</h2>
+<ul>
+  <li><strong>ปุ่มเมนู (☰)</strong> — ใช้สำหรับแสดงหรือซ่อนแถบเมนูด้านข้าง เหมาะสำหรับหน้าจอขนาดเล็ก</li>
+  <li><strong>ชื่อระบบ X-RayCare</strong> — แสดงชื่อระบบและข้อความ "QC Management"</li>
+  <li><strong>ชื่อโรงพยาบาล</strong> — แสดงชื่อโรงพยาบาลที่ท่านเข้าสู่ระบบอยู่</li>
+  <li><strong>สลับโรงพยาบาล</strong> — สำหรับ Root Admin จะมีเมนูแบบเลื่อนลง (Drop-down) ให้เลือกเปลี่ยนโรงพยาบาลที่ต้องการดูข้อมูลได้</li>
+</ul>
+
+<h2 id="ch4-2">4.2 แถบเมนูด้านข้าง (Sidebar Navigation)</h2>
+<p>แถบเมนูด้านซ้ายจัดกลุ่มเมนูตามบทบาท โดยแต่ละบทบาทจะมองเห็นเมนูที่แตกต่างกัน:</p>
+
+<table>
+  <thead>
+    <tr><th>กลุ่มเมนู</th><th>รายการเมนู</th><th style="text-align:center">สัญลักษณ์</th></tr>
+  </thead>
+  <tbody>
+    <tr><td rowspan="7"><strong>RADIOLOGICAL<br>TECHNOLOGIST</strong></td><td>Dashboard</td><td style="text-align:center; font-size:16pt">&#x1F3E0;</td></tr>
+    <tr><td>Equipment</td><td style="text-align:center; font-size:16pt">&#x1F4BB;</td></tr>
+    <tr><td>PM Schedule</td><td style="text-align:center; font-size:16pt">&#x1F4C5;</td></tr>
+    <tr><td>Export PDF</td><td style="text-align:center; font-size:16pt">&#x1F4C4;</td></tr>
+    <tr><td>Analytical</td><td style="text-align:center; font-size:16pt">&#x1F4CA;</td></tr>
+    <tr><td>Request</td><td style="text-align:center; font-size:16pt">&#x1F527;</td></tr>
+    <tr><td>QC Forms</td><td style="text-align:center; font-size:16pt">&#x1F4CB;</td></tr>
+    <tr><td rowspan="3"><strong>ADMIN</strong></td><td>Admin Dashboard</td><td style="text-align:center; font-size:16pt">&#x1F4DF;</td></tr>
+    <tr><td>User Accounts</td><td style="text-align:center; font-size:16pt">&#x1F465;</td></tr>
+    <tr><td>Admin Analytics</td><td style="text-align:center; font-size:16pt">&#x1F4C8;</td></tr>
+    <tr><td rowspan="3"><strong>ENGINEER</strong></td><td>Engineer Dashboard</td><td style="text-align:center; font-size:16pt">&#x1F6E0;</td></tr>
+    <tr><td>Engineer Analytics</td><td style="text-align:center; font-size:16pt">&#x1F4C9;</td></tr>
+    <tr><td>Engineer Request</td><td style="text-align:center; font-size:16pt">&#x1F3AB;</td></tr>
+  </tbody>
+</table>
+
+<p>ปุ่ม <strong>"Log out"</strong> อยู่ที่ด้านล่างสุดของแถบเมนู สำหรับออกจากระบบ</p>
+
+<h2 id="ch4-3">4.3 การแสดงผลบนอุปกรณ์พกพา</h2>
+<p>ระบบรองรับการแสดงผลแบบ <strong>Responsive Design</strong> เมื่อหน้าจอมีขนาดเล็กกว่า 1,024 พิกเซล:</p>
+<ul>
+  <li>แถบเมนูด้านข้าง (Sidebar) จะถูกซ่อนโดยอัตโนมัติ</li>
+  <li>กดปุ่ม <strong>☰</strong> ที่แถบด้านบนเพื่อเปิดเมนูแบบ Overlay</li>
+  <li>กดพื้นที่นอกเมนูหรือเลือกรายการเมนูแล้ว เมนูจะปิดโดยอัตโนมัติ</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 5: TECHNOLOGIST MENU                                   -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch5" class="section-break">เมนูนักรังสีเทคนิค (Radiological Technologist)</h1>
+
+<h2 id="ch5-1">5.1 Dashboard — หน้าภาพรวม</h2>
+<p><span class="badge badge-blue">เส้นทาง: /dashboard</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Radiological Technologist</span></p>
+
+<p>หน้า Dashboard เป็นหน้าแรกหลังเข้าสู่ระบบสำหรับนักรังสีเทคนิค แสดงข้อมูลสรุปและรายการสำคัญทั้งหมดในหน้าเดียว</p>
+
+<h3>5.1.1 ระบบการแจ้งเตือน (Notification Banner)</h3>
+<p>ด้านบนสุดของหน้าจะแสดงแถบแจ้งเตือนเมื่อมีกำหนดการตรวจสอบใกล้จะถึง โดยจำแนกตามระดับความเร่งด่วน:</p>
+
+<table>
+  <thead>
+    <tr><th style="width:20%">ระดับ</th><th style="width:15%">สีแถบ</th><th>คำอธิบาย</th><th style="width:20%">ข้อความ</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>TODAY</strong></td><td><span class="badge badge-red">แดง (Pulse)</span></td><td>ถึงกำหนดตรวจสอบในวันนี้</td><td>"ถึงกำหนดแล้ว!"</td></tr>
+    <tr><td><strong>เร่งด่วน</strong></td><td><span class="badge badge-red">แดง</span></td><td>เหลือเวลาอีก 1–3 วัน</td><td>"เหลืออีก N วัน"</td></tr>
+    <tr><td><strong>เตือนล่วงหน้า</strong></td><td><span class="badge badge-yellow">เหลือง</span></td><td>เหลือเวลาอีก 4–7 วัน</td><td>"เหลืออีก N วัน"</td></tr>
+    <tr><td><strong>ข้อมูล</strong></td><td><span class="badge badge-green">เขียว</span></td><td>เหลือเวลามากกว่า 7 วัน</td><td>"เหลืออีก N วัน"</td></tr>
+  </tbody>
+</table>
+
+<p>ท่านสามารถปิดการแจ้งเตือนแต่ละรายการได้โดยคลิกปุ่ม <strong>&#10005;</strong> ที่มุมขวาของแถบแจ้งเตือน (ปุ่ม "ปิดการแจ้งเตือน")</p>
+
+<h3>5.1.2 การ์ดสรุปข้อมูล (Summary Cards)</h3>
+<p>แสดงข้อมูลสรุปใน 4 การ์ด ดังนี้:</p>
+<table>
+  <thead><tr><th style="width:25%">การ์ด</th><th>ข้อมูลที่แสดง</th></tr></thead>
+  <tbody>
+    <tr><td><strong>DATE</strong></td><td>วันที่ปัจจุบัน</td></tr>
+    <tr><td><strong>EQUIPMENT</strong></td><td>จำนวนเครื่องเอกซเรย์ทั้งหมดที่ลงทะเบียนในระบบ</td></tr>
+    <tr><td><strong>PM SCHEDULE</strong></td><td>จำนวนรายการตารางบำรุงรักษาที่ตั้งค่าไว้</td></tr>
+    <tr><td><strong>CHECKLIST</strong></td><td>จำนวนรายการ Checklist ที่บันทึกในเดือนปัจจุบัน</td></tr>
+  </tbody>
+</table>
+
+<h3>5.1.3 ตารางรายการเครื่อง</h3>
+<p>แสดงรายการเครื่องเอกซเรย์ทั้งหมดที่ลงทะเบียน พร้อมข้อมูล: ชื่อเครื่อง (ยี่ห้อ/รุ่น), ห้องตรวจ, ผู้ดูแลเครื่อง และสถานะ</p>
+<p>คลิกปุ่ม <strong>"Check"</strong> ในคอลัมน์ Action เพื่อเริ่มทำ Daily Check ของเครื่องนั้น ระบบจะนำท่านไปยังหน้า Checklist โดยอัตโนมัติ</p>
+
+<h3>5.1.4 ปฏิทินกิจกรรม</h3>
+<p>แสดงปฏิทินเดือนปัจจุบัน โดยวันที่มีกำหนดการจะแสดงป้ายกำกับ <span class="badge badge-blue">Monthly</span> หรือ <span class="badge badge-green">Daily</span> สามารถคลิกที่วันที่เพื่อดูรายละเอียดกิจกรรม</p>
+
+<h3>5.1.5 สถานะเครื่อง (Equipment Readiness)</h3>
+<p>แสดงสถานะความพร้อมของเครื่องเอกซเรย์แต่ละเครื่อง:</p>
+<ul>
+  <li><span class="badge badge-green">พร้อมใช้งาน</span> — ผ่านการตรวจ QC ล่าสุด</li>
+  <li><span class="badge badge-red">ไม่พร้อมใช้งาน</span> — ไม่ผ่านการตรวจ QC หรือยังไม่มีข้อมูลการตรวจสอบ</li>
+</ul>
+
+<hr>
+
+<h2 id="ch5-2">5.2 Equipment — ระบบลงทะเบียนเครื่อง</h2>
+<p><span class="badge badge-blue">เส้นทาง: /machines/create</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้านี้ใช้สำหรับ<strong>ลงทะเบียนเครื่องเอกซเรย์ใหม่</strong>เข้าสู่ระบบ และจัดการเครื่องที่ลงทะเบียนแล้ว</p>
+
+<h3>5.2.1 ข้อมูลที่ต้องกรอก</h3>
+<table>
+  <thead><tr><th style="width:30%">ช่องข้อมูล</th><th>รายละเอียด</th><th style="width:25%">ตัวอย่าง</th></tr></thead>
+  <tbody>
+    <tr><td><strong>เครื่อง X-ray (ระบุชื่อ, ยี่ห้อ, รุ่น)</strong></td><td>ระบุชื่อเครื่อง ยี่ห้อ และรุ่นอย่างครบถ้วน</td><td><code>X-Ray (BrandA/ModelX)</code></td></tr>
+    <tr><td><strong>ห้องตรวจ</strong></td><td>หมายเลขหรือชื่อห้องที่ติดตั้งเครื่อง</td><td><code>2</code></td></tr>
+    <tr><td><strong>วันที่ลงทะเบียนเครื่องครั้งแรก</strong></td><td>วันที่เริ่มใช้งานเครื่อง (รูปแบบ DD/MM/YYYY)</td><td><code>25/11/2568</code></td></tr>
+    <tr><td><strong>ผู้ดูแลเครื่อง</strong></td><td>ชื่อ-นามสกุลผู้รับผิดชอบดูแลเครื่อง</td><td><code>ศุภกร งามเมือง</code></td></tr>
+  </tbody>
+</table>
+
+<h3>5.2.2 ขั้นตอนการลงทะเบียน</h3>
+<ol class="steps">
+  <li>คลิกเมนู <strong>"Equipment"</strong> ที่แถบเมนูด้านข้าง</li>
+  <li>กรอกข้อมูลเครื่องเอกซเรย์ตามช่องที่กำหนด</li>
+  <li>สำหรับวันที่ สามารถพิมพ์โดยตรง (DD/MM/YYYY) หรือคลิกไอคอนปฏิทินเพื่อเลือกวันที่</li>
+  <li>คลิกปุ่ม <strong>"Save"</strong> เพื่อบันทึกข้อมูล</li>
+</ol>
+
+<h3>5.2.3 ตารางเครื่องที่ลงทะเบียน</h3>
+<p>ด้านล่างของฟอร์มจะแสดงตาราง <strong>"เครื่องที่ทำการลงทะเบียน"</strong> ประกอบด้วยคอลัมน์: ลำดับ, เครื่อง X-ray, ห้องตรวจ, ผู้ดูแลเครื่อง, วันที่ลงทะเบียนเครื่องครั้งแรก และปุ่ม <strong>"ลบ"</strong> ในคอลัมน์จัดการ</p>
+
+<div class="info-box info-warning">
+  <div class="info-box-title">&#9888; ข้อควรระวัง</div>
+  การลบเครื่องเอกซเรย์จะเป็นการลบออกจากระบบอย่างถาวร กรุณาตรวจสอบให้แน่ใจก่อนดำเนินการ
+</div>
+
+<hr>
+
+<h2 id="ch5-3">5.3 Daily Check — การตรวจสอบประจำวัน</h2>
+<p><span class="badge badge-blue">เส้นทาง: /dairy-check/:equipmentName</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้า Daily Check ใช้สำหรับ<strong>บันทึกผลการตรวจสอบเครื่องเอกซเรย์ประจำวัน</strong> ตามแบบบันทึก F1 (การดูแลรักษาและตรวจสอบ) และ F2 (การลบแผ่นเพลท)</p>
+
+<h3>5.3.1 ข้อมูลที่แสดงด้านบน</h3>
+<p>เมื่อเข้าสู่หน้า Daily Check ระบบจะแสดงข้อมูลสำคัญในแถบ Capsule ดังนี้:</p>
+<ul>
+  <li><strong>ชื่อเครื่อง</strong> — เครื่องที่เลือกตรวจสอบ</li>
+  <li><strong>รุ่น</strong> — รุ่นของเครื่อง</li>
+  <li><strong>ห้อง</strong> — ห้องที่ตั้งเครื่อง</li>
+  <li><strong>วันที่</strong> — วันที่ปัจจุบัน (กำหนดโดยอัตโนมัติ)</li>
+  <li><strong>ผู้ทดสอบ</strong> — ชื่อผู้ใช้ที่เข้าสู่ระบบ</li>
+  <li><strong>เวลา</strong> — เวลาปัจจุบัน (อัปเดตโดยอัตโนมัติ)</li>
+</ul>
+
+<h3>5.3.2 รายการที่ต้องทำวันนี้ (ตาม Schedule)</h3>
+<p>หากมีรายการตรวจสอบที่ครบกำหนดตาม PM Schedule ระบบจะแสดงแถบรายการที่ต้องดำเนินการ เช่น:</p>
+<div class="workflow-box">
+  <div class="workflow-row">
+    <div class="workflow-item active">F1/F2 (กำลังทำ)</div>
+    <div class="workflow-item">F3–F6</div>
+    <div class="workflow-item">F7–F8</div>
+  </div>
+</div>
+<p>ท่านสามารถคลิกลิงก์ของแบบบันทึกที่ต้องทำถัดไปได้โดยตรง</p>
+
+<h3>5.3.3 ตารางบันทึกผลการตรวจ</h3>
+<p>ตารางแบบบันทึก <strong>"การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์"</strong> ประกอบด้วยคอลัมน์:</p>
+<table>
+  <thead><tr><th style="width:20%">คอลัมน์</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>รายการ</strong></td><td>หัวข้อที่ต้องตรวจสอบ (เช่น สายไฟ, ระบบล็อกและเบรก, เตียง เป็นต้น)</td></tr>
+    <tr><td><strong>ผ่าน</strong></td><td>เลือก (Radio Button) หากรายการผ่านเกณฑ์มาตรฐาน</td></tr>
+    <tr><td><strong>ไม่ผ่าน</strong></td><td>เลือก (Radio Button) หากรายการไม่ผ่านเกณฑ์มาตรฐาน</td></tr>
+    <tr><td><strong>หมายเหตุ</strong></td><td>บันทึกรายละเอียดเพิ่มเติมและแนบไฟล์ภาพประกอบได้</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3.4 การแนบไฟล์ภาพ</h3>
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"เลือกไฟล์"</strong> ใต้ช่องหมายเหตุของแต่ละรายการ</li>
+  <li>เลือกไฟล์รูปภาพจากเครื่องคอมพิวเตอร์ (รองรับรูปแบบ JPG, PNG, GIF, WebP)</li>
+  <li>ภาพจะแสดงตัวอย่าง (Preview) ด้านล่างทันที</li>
+  <li>หากต้องการลบภาพ คลิกปุ่ม <strong>&#10005;</strong> ข้างชื่อไฟล์</li>
+</ol>
+
+<h3>5.3.5 ปุ่มดำเนินการ</h3>
+<ul>
+  <li><strong>"ผ่านทั้งหมด"</strong> — เลือก "ผ่าน" ให้กับทุกรายการพร้อมกัน</li>
+  <li><strong>"ถัดไป" / "บันทึกและดำเนินการต่อ"</strong> — บันทึกผลและนำไปยังหน้าถัดไป (Checklist Next หรือ Monthly Check ตาม Schedule)</li>
+  <li><strong>"บันทึก"</strong> — บันทึกผลโดยไม่ไปยังหน้าถัดไป</li>
+</ul>
+
+<hr>
+
+<h2 id="ch5-4">5.4 Monthly Check — การตรวจสอบประจำเดือน</h2>
+<p>ระบบ Monthly Check แบ่งออกเป็น 3 ระดับตามรอบความถี่ของการตรวจสอบ ดังนี้:</p>
+
+<h3>5.4.1 Monthly Check — รอบ 3 เดือน (F3–F6)</h3>
+<p><span class="badge badge-blue">เส้นทาง: /monthly-check</span></p>
+<p>ประกอบด้วยแถบแบบฟอร์มด้านซ้าย (Tab) ให้เลือกแบบบันทึกทีละรายการ:</p>
+
+<table>
+  <thead><tr><th style="width:12%">แบบบันทึก</th><th style="width:28%">ชื่อ</th><th>เนื้อหาการตรวจสอบ</th></tr></thead>
+  <tbody>
+    <tr><td><strong>F3</strong></td><td>Monitor Performance</td><td>ตรวจสอบคุณภาพจอแสดงผล — คุณภาพภาพ, ความคมชัด, ความสว่าง เป็นต้น</td></tr>
+    <tr><td><strong>F4</strong></td><td>X-ray Check</td><td>ตรวจสอบคุณภาพเครื่องเอกซเรย์</td></tr>
+    <tr><td><strong>F5</strong></td><td>Uniformity Test</td><td>ทดสอบความสม่ำเสมอของภาพ</td></tr>
+    <tr><td><strong>F6</strong></td><td>EI Consistency</td><td>ตรวจสอบความสม่ำเสมอของค่า Exposure Index</td></tr>
+  </tbody>
+</table>
+
+<p><strong>ขั้นตอนการใช้งาน:</strong></p>
+<ol class="steps">
+  <li>เลือกแบบบันทึกจากแถบ Tab ด้านซ้าย (เริ่มจาก F3)</li>
+  <li>กรอกข้อมูลตามแบบฟอร์ม เลือก ผ่าน/ไม่ผ่าน (P/F) ในแต่ละหัวข้อ</li>
+  <li>แนบไฟล์ภาพประกอบ (หากต้องการ)</li>
+  <li>คลิก <strong>"Next"</strong> เพื่อบันทึกและไปยังแบบบันทึกถัดไป</li>
+  <li>ที่แบบบันทึกสุดท้าย (F6) คลิก <strong>"Save"</strong> เพื่อบันทึกข้อมูลทั้งหมด</li>
+</ol>
+
+<h3>5.4.2 Monthly Check Light — รอบ 1 เดือน (F10)</h3>
+<p><span class="badge badge-blue">เส้นทาง: /monthly-check-light</span></p>
+<p>แบบบันทึก F10 สำหรับตรวจสอบรายการที่ต้องทำทุกเดือน เช่น การตรวจสอบความสว่างของ Light Field พร้อมรองรับการแนบภาพประกอบ</p>
+
+<h3>5.4.3 Monthly Check All — รอบ 6 เดือน (F7–F8)</h3>
+<p><span class="badge badge-blue">เส้นทาง: /monthly-check-all</span></p>
+<p>แบบบันทึกการตรวจสอบเชิงลึกที่ดำเนินการทุก 6 เดือน ประกอบด้วยชุดฟอร์ม:</p>
+<table>
+  <thead><tr><th style="width:15%">แบบบันทึก</th><th>เนื้อหา</th></tr></thead>
+  <tbody>
+    <tr><td><strong>F7.1</strong></td><td>Collimator Check — ตรวจสอบ Collimator</td></tr>
+    <tr><td><strong>F7.2</strong></td><td>Collimator Bucky Check — ตรวจสอบ Collimator Bucky</td></tr>
+    <tr><td><strong>F8.1</strong></td><td>CR Dark Noise — ตรวจสอบ Dark Noise ระบบ CR</td></tr>
+    <tr><td><strong>F8.2</strong></td><td>DR Dark Noise — ตรวจสอบ Dark Noise ระบบ DR</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2 id="ch5-5">5.5 PM Schedule — ตารางบำรุงรักษาเชิงป้องกัน</h2>
+<p><span class="badge badge-blue">เส้นทาง: /pm-schedule</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้า PM Schedule แสดง<strong>ปฏิทิน</strong>สำหรับจัดการตารางบำรุงรักษาเชิงป้องกัน (Preventive Maintenance)</p>
+
+<h3>5.5.1 องค์ประกอบหน้าจอ</h3>
+<ul>
+  <li><strong>การ์ดวันที่</strong> — แสดงวันที่และวันในสัปดาห์ปัจจุบัน</li>
+  <li><strong>ปฏิทิน</strong> — แสดงปฏิทินเดือนปัจจุบัน เลื่อนเดือนด้วยปุ่ม <strong>&lt;</strong> และ <strong>&gt;</strong></li>
+  <li><strong>เครื่องหมาย ★</strong> — วันที่มีกำหนดการตรวจสอบจะแสดงดาวสีเหลืองเป็นสัญลักษณ์</li>
+</ul>
+
+<h3>5.5.2 การตั้งค่ารอบ PM</h3>
+<ol class="steps">
+  <li>คลิกที่วันที่ต้องการในปฏิทิน — ระบบจะแสดง Popup</li>
+  <li>คลิกไอคอน <strong>ตั้งค่ารอบ</strong> (รูปเฟือง) เพื่อเปิดหน้าต่างตั้งค่า</li>
+  <li>กำหนดรายละเอียดตารางบำรุงรักษา ดังนี้:
+    <table>
+      <thead><tr><th style="width:25%">ช่องข้อมูล</th><th>คำอธิบาย</th></tr></thead>
+      <tbody>
+        <tr><td><strong>วันเริ่มต้น</strong></td><td>วันที่เริ่มต้นรอบการตรวจสอบ PM</td></tr>
+        <tr><td><strong>ความถี่</strong></td><td>เลือกรอบการตรวจ: 1 เดือน / 3 เดือน / 6 เดือน</td></tr>
+        <tr><td><strong>คำอธิบาย</strong></td><td>รายละเอียดของงานบำรุงรักษา</td></tr>
+        <tr><td><strong>ประเภทแบบบันทึก</strong></td><td>เลือกแบบบันทึกที่ต้องดำเนินการ (F1/F2, F3–F6, F7–F8 ฯลฯ)</td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>คลิก <strong>"Save"</strong> เพื่อบันทึกตารางบำรุงรักษา</li>
+</ol>
+
+<h3>5.5.3 ระบบแจ้งเตือนอัตโนมัติ</h3>
+<p>เมื่อมีกำหนด PM ใกล้ถึง ระบบจะคำนวณวันที่ตรวจสอบถัดไปจาก <code>วันเริ่มต้น + ความถี่</code> และแสดงการแจ้งเตือนบน Dashboard โดยอัตโนมัติ ตามระดับความเร่งด่วนที่ระบุไว้ในหัวข้อ 5.1.1</p>
+
+<hr>
+
+<h2 id="ch5-6">5.6 Export PDF — ส่งออกรายงาน</h2>
+<p><span class="badge badge-blue">เส้นทาง: /export-pdf</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้า Export PDF ใช้สำหรับ<strong>ค้นหา กรอง และส่งออกรายงาน Checklist</strong> เป็นเอกสาร PDF</p>
+
+<h3>5.6.1 ส่วนที่ 1 — รายการบันทึก Checklist</h3>
+
+<h4>ตัวกรองข้อมูล</h4>
+<table>
+  <thead><tr><th style="width:25%">ตัวกรอง</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>เครื่อง X-ray</strong></td><td>เลือกเครื่องเอกซเรย์ที่ต้องการ หรือเลือก "ทั้งหมด"</td></tr>
+    <tr><td><strong>ประเภทแบบฟอร์ม</strong></td><td>เลือกประเภทแบบบันทึก (F1–F13) หรือเลือก "ทั้งหมด"</td></tr>
+    <tr><td><strong>จากวันที่</strong></td><td>กำหนดวันที่เริ่มต้นของช่วงเวลา</td></tr>
+    <tr><td><strong>ถึงวันที่</strong></td><td>กำหนดวันที่สิ้นสุดของช่วงเวลา</td></tr>
+  </tbody>
+</table>
+
+<h4>ตารางรายการ</h4>
+<p>แสดงรายการ Checklist ตามเงื่อนไขที่กรอง ประกอบด้วย: ลำดับ, ประเภทแบบฟอร์ม, เครื่อง, ห้อง, วันที่ตรวจ, ผู้ตรวจ และปุ่ม <strong>"ตัวอย่างไฟล์"</strong></p>
+
+<h4>ขั้นตอนการส่งออก PDF</h4>
+<ol class="steps">
+  <li>กรองข้อมูลตามเงื่อนไขที่ต้องการ</li>
+  <li>คลิกปุ่ม <strong>"ตัวอย่างไฟล์"</strong> ในคอลัมน์จัดการ</li>
+  <li>ระบบจะเปิดหน้า Print View ของแบบบันทึกนั้น</li>
+  <li>กดคีย์ <kbd>Ctrl</kbd> + <kbd>P</kbd> (หรือ <kbd>Cmd</kbd> + <kbd>P</kbd> บน Mac)</li>
+  <li>เลือก <strong>"Save as PDF"</strong> จากเมนูเครื่องพิมพ์ หรือเลือกเครื่องพิมพ์เพื่อพิมพ์โดยตรง</li>
+</ol>
+
+<h3>5.6.2 ส่วนที่ 2 — Export PDF รายเดือน (F1/F2)</h3>
+<p>สำหรับส่งออกรายงานรายเดือนของ F1 และ F2 โดยเฉพาะ:</p>
+<table>
+  <thead><tr><th style="width:25%">ช่อง</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>แบบฟอร์ม</strong></td><td>เลือก F1 (การดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ รายเดือน) หรือ F2 (การลบแผ่นเพลท รายเดือน)</td></tr>
+    <tr><td><strong>เดือน / ปี</strong></td><td>เลือกเดือนและปีที่ต้องการ</td></tr>
+    <tr><td><strong>เครื่อง X-ray</strong></td><td>เลือกเครื่องเอกซเรย์</td></tr>
+  </tbody>
+</table>
+<p>คลิก <strong>"ส่งออก PDF รายเดือน"</strong> เพื่อเปิดหน้า Print View</p>
+
+<hr>
+
+<h2 id="ch5-7">5.7 Analytical — ศูนย์วิเคราะห์ความเสี่ยง</h2>
+<p><span class="badge badge-blue">เส้นทาง: /analytics</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้าศูนย์วิเคราะห์ความเสี่ยง (Risk Prevention Analytics) แสดงผลวิเคราะห์ข้อมูลที่ครอบคลุมสำหรับแผนกเอกซเรย์</p>
+
+<h3>5.7.1 ตัวกรองข้อมูล</h3>
+<p>ด้านขวาบนของหน้ามีเมนูเลือก <strong>"ปี พ.ศ."</strong> สำหรับกรองข้อมูลแสดงผลตามปีที่ต้องการ</p>
+
+<h3>5.7.2 การ์ด KPI (Key Performance Indicators)</h3>
+<table>
+  <thead><tr><th style="width:28%">KPI</th><th>คำอธิบาย</th><th style="width:28%">เกณฑ์สี</th></tr></thead>
+  <tbody>
+    <tr><td><strong>เครื่องเอกซเรย์ทั้งหมด</strong></td><td>จำนวนเครื่องที่ลงทะเบียนในระบบ</td><td><span class="badge badge-blue">น้ำเงิน (ข้อมูล)</span></td></tr>
+    <tr><td><strong>อัตราผ่าน QC ทั้งปี</strong></td><td>ร้อยละ Checklist ที่ผ่านเกณฑ์</td><td><span class="badge badge-green">≥80%</span> <span class="badge badge-yellow">60–79%</span> <span class="badge badge-red">&lt;60%</span></td></tr>
+    <tr><td><strong>แจ้งซ่อมรอดำเนินการ</strong></td><td>จำนวนคำขอแจ้งซ่อมที่ยังไม่ดำเนินการ</td><td><span class="badge badge-green">0</span> <span class="badge badge-yellow">1–3</span> <span class="badge badge-red">&gt;3</span></td></tr>
+    <tr><td><strong>ระดับความเสี่ยงรวม</strong></td><td>การประเมินความเสี่ยงโดยรวม</td><td>เขียว / เหลือง / แดง (ตามการคำนวณ)</td></tr>
+  </tbody>
+</table>
+
+<h3>5.7.3 กราฟและแผนภูมิ</h3>
+<ul>
+  <li><strong>กราฟเส้น (Line Chart)</strong> — แนวโน้มการแจ้งซ่อมและผล QC รายเดือน</li>
+  <li><strong>แผนภูมิวงกลม (Donut Chart)</strong> — สัดส่วนการแจ้งซ่อมจำแนกตามเครื่อง</li>
+  <li><strong>แผนภูมิแท่ง (Bar Chart)</strong> — สถานะการตรวจ QC จำแนกตามประเภทแบบฟอร์ม</li>
+</ul>
+
+<h3>5.7.4 การประเมินความเสี่ยงรายเครื่อง</h3>
+<p>แสดงการ์ดรายเครื่องพร้อมข้อมูล: คะแนนสุขภาพ (Health Score), จำนวนการแจ้งซ่อม, QC ไม่ผ่าน, เกินกำหนด และข้อความระดับความเสี่ยง เช่น:</p>
+<ul>
+  <li><span class="badge badge-red">วิกฤต</span> — ต้องดำเนินการแก้ไขทันที</li>
+  <li><span class="badge badge-yellow">เฝ้าระวัง</span> — ต้องติดตามอย่างใกล้ชิด</li>
+  <li><span class="badge badge-blue">ติดตาม</span> — สถานะปกติแต่ต้องติดตามต่อเนื่อง</li>
+</ul>
+
+<hr>
+
+<h2 id="ch5-8">5.8 Request — ระบบแจ้งซ่อม</h2>
+<p><span class="badge badge-blue">เส้นทาง: /requests</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<h3>5.8.1 รายการแจ้งซ่อม</h3>
+<p>แสดงตาราง<strong>รายการแจ้งซ่อม</strong>ทั้งหมด ประกอบด้วยคอลัมน์:</p>
+<table>
+  <thead><tr><th style="width:18%">คอลัมน์</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>#</strong></td><td>ลำดับ</td></tr>
+    <tr><td><strong>อุปกรณ์</strong></td><td>ชื่อเครื่อง/อุปกรณ์ที่แจ้งซ่อม</td></tr>
+    <tr><td><strong>ห้อง</strong></td><td>ห้องที่ตั้งอุปกรณ์</td></tr>
+    <tr><td><strong>วันที่แจ้ง</strong></td><td>วันที่ส่งคำขอแจ้งซ่อม</td></tr>
+    <tr><td><strong>เวลา</strong></td><td>เวลาที่แจ้ง</td></tr>
+    <tr><td><strong>ผู้ทำ</strong></td><td>ชื่อผู้แจ้ง</td></tr>
+    <tr><td><strong>รายละเอียด</strong></td><td>รายละเอียดอาการเสีย</td></tr>
+    <tr><td><strong>สถานะ</strong></td><td>สถานะปัจจุบัน: รอซ่อม / อยู่ระหว่างดำเนินการ / ดำเนินการแล้ว</td></tr>
+    <tr><td><strong>การจัดการ</strong></td><td>ปุ่ม "ดูรายละเอียด" และ "ลบ"</td></tr>
+  </tbody>
+</table>
+
+<h3>5.8.2 การสร้างคำขอแจ้งซ่อมใหม่</h3>
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"เพิ่มรายการ"</strong> ที่มุมขวาบนของตาราง</li>
+  <li>ระบบจะเปิดหน้าต่าง (Modal) ฟอร์มแจ้งซ่อม กรอกข้อมูลดังนี้:
+    <table>
+      <thead><tr><th style="width:22%">ช่อง</th><th>คำอธิบาย</th></tr></thead>
+      <tbody>
+        <tr><td><strong>อุปกรณ์</strong></td><td>เลือกเครื่อง/อุปกรณ์จากรายการแบบเลื่อนลง</td></tr>
+        <tr><td><strong>ห้องตรวจ</strong></td><td>ห้องที่ตั้งอุปกรณ์ (กรอกอัตโนมัติเมื่อเลือกอุปกรณ์)</td></tr>
+        <tr><td><strong>วันที่แจ้งซ่อม</strong></td><td>วันที่แจ้ง (ตั้งค่าอัตโนมัติเป็นวันปัจจุบัน)</td></tr>
+        <tr><td><strong>ชื่อผู้แจ้ง</strong></td><td>ชื่อผู้แจ้งซ่อม</td></tr>
+        <tr><td><strong>รายละเอียด</strong></td><td>เลือกประเภทปัญหาจากรายการ:<br>• สายไฟ<br>• ระบบล็อกและเบรก<br>• เตียง หลอดเอกซเรย์ และบักกี้<br>• X-ray tube warm-up<br>• ส่วนอื่นเพิ่มเติม</td></tr>
+        <tr><td><strong>หมายเหตุ</strong></td><td>รายละเอียดเพิ่มเติม (ไม่บังคับ)</td></tr>
+        <tr><td><strong>แนบไฟล์ภาพ</strong></td><td>แนบรูปภาพประกอบ (ไม่บังคับ, รองรับ JPG/PNG)</td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>คลิก <strong>"บันทึก"</strong> เพื่อส่งคำขอแจ้งซ่อม</li>
+</ol>
+
+<h3>5.8.3 การดูรายละเอียดแจ้งซ่อม</h3>
+<p>คลิกปุ่ม <strong>"ดูรายละเอียด"</strong> จะแสดงข้อมูลเต็มรูปแบบ ประกอบด้วย: อุปกรณ์, รายละเอียด, หมายเหตุ, วันที่แจ้ง, เวลา, ผู้แจ้ง, ไฟล์ภาพ (หากมี) และสถานะปัจจุบัน</p>
+
+<hr>
+
+<h2 id="ch5-9">5.9 QC Forms — แบบบันทึกเพิ่มเติม</h2>
+<p><span class="badge badge-blue">เส้นทาง: /qc-forms</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Radiological Technologist</span></p>
+
+<p>หน้า QC Forms Hub รวบรวม<strong>แบบบันทึกคุณภาพเพิ่มเติม</strong>ทั้งหมดในรูปแบบการ์ดที่เข้าถึงง่าย</p>
+
+<h3>5.9.1 แบบบันทึกมาตรฐาน (Built-in Forms)</h3>
+<table>
+  <thead><tr><th style="width:10%">รหัส</th><th style="width:32%">ชื่อแบบบันทึก</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>F9</strong></td><td>แบบบันทึกตรวจสอบคุณภาพเสื้อตะกั่ว</td><td>ตรวจสอบสภาพเสื้อตะกั่วและอุปกรณ์ป้องกันรังสี</td></tr>
+    <tr><td><strong>F11</strong></td><td>แบบบันทึกผลการวัดความหนาผู้ป่วย</td><td>บันทึกค่าความหนาของผู้ป่วยและเทคนิคที่ใช้ในการถ่ายภาพ</td></tr>
+    <tr><td><strong>F12</strong></td><td>แบบบันทึกอัตราการถ่ายภาพซ้ำ</td><td>ประเมินสาเหตุและอัตราการถ่ายภาพซ้ำ (Retake/Reject Rate)</td></tr>
+    <tr><td><strong>F13</strong></td><td>B-mode QC Test เครื่องอัลตราซาวด์</td><td>ตรวจสอบคุณภาพเครื่องอัลตราซาวด์</td></tr>
+  </tbody>
+</table>
+
+<h3>5.9.2 ขั้นตอนการใช้งาน</h3>
+<ol class="steps">
+  <li>คลิกเมนู <strong>"QC Forms"</strong> ที่แถบเมนูด้านข้าง</li>
+  <li>เลือกแบบบันทึกที่ต้องการจากการ์ดที่แสดง</li>
+  <li>คลิก <strong>"เปิดแบบบันทึก"</strong></li>
+  <li>กรอกข้อมูลตามแบบฟอร์ม</li>
+  <li>คลิก <strong>"บันทึก"</strong> เพื่อจัดเก็บข้อมูลเข้าสู่ระบบ</li>
+</ol>
+
+<h3>5.9.3 การสร้างแบบบันทึกกำหนดเอง (Custom Form Builder)</h3>
+<p>ระบบรองรับการ<strong>สร้างแบบบันทึกแบบกำหนดเอง</strong>:</p>
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"+ สร้างแบบบันทึก"</strong> ที่มุมขวาบน</li>
+  <li>ระบบจะเปิดหน้า Custom Form Builder พร้อมตัวแก้ไขแบบ Visual, HTML และ Preview</li>
+  <li>กำหนดรายละเอียดของแบบบันทึก แทรกฟิลด์ที่ต้องการ</li>
+  <li>บันทึกแบบบันทึก — แบบบันทึกจะปรากฏเป็นการ์ดใหม่ใน QC Forms Hub</li>
+</ol>
+
+<div class="info-box info-note">
+  <div class="info-box-title">&#9432; หมายเหตุ</div>
+  แบบบันทึกกำหนดเองจะถูกจัดเก็บใน Local Storage ของเบราว์เซอร์ หากต้องการใช้งานบนเครื่องคอมพิวเตอร์เครื่องอื่น จะต้องสร้างแบบบันทึกใหม่
+</div>
+
+<p><strong>การลบแบบบันทึกกำหนดเอง:</strong> คลิกปุ่ม <strong>&#10005;</strong> ที่มุมขวาบนของการ์ด (ปุ่มนี้แสดงเฉพาะแบบบันทึกที่สร้างเอง ไม่แสดงกับแบบบันทึกมาตรฐาน F9, F11, F12, F13)</p>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 6: ADMIN MENU                                          -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch6" class="section-break">เมนูผู้ดูแลระบบ (Admin)</h1>
+
+<h2 id="ch6-1">6.1 Admin Dashboard</h2>
+<p><span class="badge badge-blue">เส้นทาง: /admindashboard</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, SuperAdmin, Root Admin</span></p>
+
+<p>หน้า Admin Dashboard มีโครงสร้างเช่นเดียวกับ Dashboard ของนักรังสีเทคนิค ประกอบด้วย:</p>
+<ul>
+  <li><strong>ระบบแจ้งเตือน</strong> — การแจ้งเตือน PM Schedule ที่ใกล้ถึงกำหนด (แบ่งระดับ TODAY / เร่งด่วน / เตือนล่วงหน้า / ข้อมูล)</li>
+  <li><strong>การ์ดสรุปข้อมูล</strong> — DATE, EQUIPMENT, PM SCHEDULE, CHECKLIST</li>
+  <li><strong>ตารางรายการเครื่อง</strong> — รายการเครื่องเอกซเรย์ทั้งหมดพร้อมปุ่มเข้าสู่ Daily Check</li>
+  <li><strong>ปฏิทินกิจกรรม</strong> — ปฏิทินแสดงกำหนดการ Daily/Monthly Check</li>
+  <li><strong>สถานะเครื่อง</strong> — แสดงความพร้อมของเครื่องเอกซเรย์</li>
+</ul>
+
+<div class="info-box info-note">
+  <div class="info-box-title">&#9432; หมายเหตุ</div>
+  ผู้ดูแลระบบสามารถมองเห็นเมนูนักรังสีเทคนิคเกือบทั้งหมด (ยกเว้น Dashboard ของ Tech ซึ่งถูกแทนที่ด้วย Admin Dashboard) รวมถึงสามารถเข้าถึงเมนูวิศวกร (ยกเว้น Engineer Dashboard)
+</div>
+
+<hr>
+
+<h2 id="ch6-2">6.2 User Accounts — จัดการผู้ใช้งานและโรงพยาบาล</h2>
+<p><span class="badge badge-blue">เส้นทาง: /adminuseraccount</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, SuperAdmin, Root Admin</span></p>
+
+<p>หน้าจัดการบัญชีผู้ใช้งานแบ่งออกเป็น <strong>2 แท็บ</strong>:</p>
+
+<h3>6.2.1 แท็บ User Management — จัดการผู้ใช้</h3>
+
+<h4>ตารางรายชื่อผู้ใช้</h4>
+<table>
+  <thead><tr><th style="width:20%">คอลัมน์</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Username</strong></td><td>ชื่อผู้ใช้งาน</td></tr>
+    <tr><td><strong>Role</strong></td><td>บทบาท พร้อมคำอธิบายสิทธิ์โดยย่อ</td></tr>
+    <tr><td><strong>Hospital</strong></td><td>โรงพยาบาลที่สังกัด</td></tr>
+    <tr><td><strong>Password</strong></td><td>รหัสผ่าน (คลิกไอคอนตาเพื่อแสดง/ซ่อน)</td></tr>
+    <tr><td><strong>Action</strong></td><td>ปุ่มแก้ไขและลบ</td></tr>
+  </tbody>
+</table>
+
+<h4>การเพิ่มผู้ใช้ใหม่</h4>
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"Add User"</strong> ที่มุมขวาบน</li>
+  <li>กรอกข้อมูลในหน้าต่าง "Sign Up":
+    <table>
+      <thead><tr><th style="width:25%">ช่อง</th><th>คำอธิบาย</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Username</strong></td><td>กำหนดชื่อผู้ใช้งาน</td></tr>
+        <tr><td><strong>Password</strong></td><td>กำหนดรหัสผ่าน</td></tr>
+        <tr><td><strong>Confirm Password</strong></td><td>ยืนยันรหัสผ่านอีกครั้ง</td></tr>
+        <tr><td><strong>Hospital</strong></td><td>เลือกโรงพยาบาลที่สังกัด (Root Admin สามารถเลือกได้ทุกโรงพยาบาล)</td></tr>
+        <tr><td><strong>Role</strong></td><td>เลือกบทบาท (ดูตารางด้านล่าง)</td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>คลิก <strong>"Create Account"</strong> เพื่อสร้างบัญชี</li>
+</ol>
+
+<h4>บทบาทที่สามารถกำหนดได้</h4>
+<table>
+  <thead><tr><th style="width:25%">บทบาท</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Root Admin</strong></td><td>มองเห็นและจัดการได้ทุกโรงพยาบาล (กำหนดได้โดย Root Admin เท่านั้น)</td></tr>
+    <tr><td><strong>SuperAdmin</strong></td><td>จัดการบัญชีในโรงพยาบาลของตนเอง</td></tr>
+    <tr><td><strong>Admin</strong></td><td>เข้าถึงเมนู Admin ได้ จำกัดเฉพาะโรงพยาบาลที่สังกัด</td></tr>
+    <tr><td><strong>Radiological Technologist</strong></td><td>เข้าถึงเมนูงานตรวจสอบ QC</td></tr>
+    <tr><td><strong>Engineer</strong></td><td>เข้าถึงเมนูวิศวกร</td></tr>
+  </tbody>
+</table>
+
+<h4>การแก้ไขผู้ใช้</h4>
+<ol class="steps">
+  <li>คลิกไอคอนแก้ไข (ดินสอ) ในคอลัมน์ Action ของผู้ใช้ที่ต้องการ</li>
+  <li>แก้ไขข้อมูลที่ต้องการ: โรงพยาบาล, บทบาท, รหัสผ่าน (เว้นว่างเพื่อคงรหัสเดิม)</li>
+  <li>คลิก <strong>"Save changes"</strong> เพื่อยืนยันการแก้ไข</li>
+</ol>
+
+<h4>การลบผู้ใช้</h4>
+<p>คลิกไอคอนลบ (ถังขยะ) ในคอลัมน์ Action ระบบจะขอการยืนยันก่อนลบบัญชีผู้ใช้</p>
+
+<h4>การกรองผู้ใช้ (สำหรับ Root Admin)</h4>
+<p>Root Admin สามารถกรองรายชื่อผู้ใช้ตามโรงพยาบาลได้ที่เมนู <strong>"แสดงผู้ใช้ของ"</strong> — เลือก "ทุกโรงพยาบาล" หรือเลือกโรงพยาบาลเฉพาะ นอกจากนี้ยังใช้ช่อง <strong>"Search"</strong> เพื่อค้นหาตามชื่อผู้ใช้ได้</p>
+
+<h3>6.2.2 แท็บ Hospital Management — จัดการโรงพยาบาล</h3>
+<p><span class="badge badge-gray">สิทธิ์การเพิ่ม/ลบ: Root Admin เท่านั้น</span></p>
+
+<h4>การเพิ่มโรงพยาบาล</h4>
+<ol class="steps">
+  <li>คลิกแท็บ <strong>"Hospital Management"</strong></li>
+  <li>คลิกปุ่ม <strong>"Add Hospital"</strong></li>
+  <li>กรอกข้อมูล:
+    <table>
+      <thead><tr><th style="width:25%">ช่อง</th><th>คำอธิบาย</th><th style="width:22%">ตัวอย่าง</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ชื่อโรงพยาบาล</strong></td><td>ชื่อเต็มของโรงพยาบาล (จำเป็น)</td><td><code>โรงพยาบาลศูนย์ A</code></td></tr>
+        <tr><td><strong>รหัสโรงพยาบาล</strong></td><td>รหัสย่อ (ไม่จำเป็น)</td><td><code>HOSP-A</code></td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>คลิก <strong>"บันทึก"</strong></li>
+</ol>
+
+<h4>การแก้ไขและลบโรงพยาบาล</h4>
+<ul>
+  <li><strong>การแก้ไข</strong> — Root Admin สามารถแก้ไขโรงพยาบาลใดก็ได้ Admin ทั่วไปแก้ไขได้เฉพาะโรงพยาบาลของตน</li>
+  <li><strong>การลบ</strong> — เฉพาะ Root Admin เท่านั้น และไม่สามารถลบโรงพยาบาลที่ยังมีผู้ใช้งานหรือเครื่องเอกซเรย์ลงทะเบียนอยู่ได้</li>
+</ul>
+
+<hr>
+
+<h2 id="ch6-3">6.3 Admin Analytics — วิเคราะห์ข้อมูลระดับผู้ดูแล</h2>
+<p><span class="badge badge-blue">เส้นทาง: /adminanalytical</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin</span></p>
+
+<p>หน้า Admin Analytics มีเนื้อหาเหมือนกับหน้า Analytical ของนักรังสีเทคนิค (ดูรายละเอียดในหัวข้อ 5.7) ครอบคลุม: การ์ด KPI, กราฟแนวโน้ม, แผนภูมิสัดส่วน, แผนภูมิแท่ง และการประเมินความเสี่ยงรายเครื่อง</p>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 7: ENGINEER MENU                                       -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch7" class="section-break">เมนูวิศวกร (Engineer)</h1>
+
+<h2 id="ch7-1">7.1 Engineer Dashboard</h2>
+<p><span class="badge badge-blue">เส้นทาง: /engineerdashboard</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Engineer</span></p>
+
+<p>หน้า Dashboard สำหรับวิศวกร เน้นการแสดงข้อมูล<strong>คำขอแจ้งซ่อมและสถานะเครื่อง</strong></p>
+
+<h3>การ์ดสรุปข้อมูล</h3>
+<table>
+  <thead><tr><th style="width:25%">การ์ด</th><th>ข้อมูลที่แสดง</th></tr></thead>
+  <tbody>
+    <tr><td><strong>DATE</strong></td><td>วันที่ปัจจุบัน</td></tr>
+    <tr><td><strong>EQUIPMENT</strong></td><td>จำนวนเครื่องเอกซเรย์ทั้งหมด</td></tr>
+    <tr><td><strong>PENDING REPAIR</strong></td><td>จำนวนคำขอแจ้งซ่อมที่ <span class="badge badge-yellow">รอดำเนินการ</span></td></tr>
+    <tr><td><strong>IN PROGRESS</strong></td><td>จำนวนคำขอที่ <span class="badge badge-blue">กำลังดำเนินการ</span></td></tr>
+    <tr><td><strong>COMPLETED</strong></td><td>จำนวนคำขอที่ <span class="badge badge-green">ดำเนินการเสร็จสิ้น</span></td></tr>
+  </tbody>
+</table>
+
+<h3>ตาราง REQUESTS</h3>
+<p>แสดงรายการคำขอแจ้งซ่อมทั้งหมดในรูปแบบตาราง: ลำดับ, ชื่อเครื่อง (Equipment Brand/Model), ห้อง (Room), ผู้แจ้ง (Reporter) และสถานะ (Repair Status)</p>
+
+<hr>
+
+<h2 id="ch7-2">7.2 Engineer Analytics — วิเคราะห์ข้อมูลวิศวกร</h2>
+<p><span class="badge badge-blue">เส้นทาง: /analyticalen</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Engineer</span></p>
+
+<p>หน้าวิเคราะห์ข้อมูลสำหรับวิศวกร แสดงข้อมูลเช่นเดียวกับศูนย์วิเคราะห์ความเสี่ยง ครอบคลุม: การ์ด KPI, กราฟแนวโน้มรายเดือน, แผนภูมิสัดส่วนการแจ้งซ่อม และการประเมินความเสี่ยง</p>
+
+<hr>
+
+<h2 id="ch7-3">7.3 Engineer Request — จัดการคำขอแจ้งซ่อม</h2>
+<p><span class="badge badge-blue">เส้นทาง: /requesten</span> &nbsp; <span class="badge badge-gray">สิทธิ์: Admin, Engineer</span></p>
+
+<p>หน้านี้ให้วิศวกร<strong>จัดการและอัปเดตสถานะ</strong>คำขอแจ้งซ่อมจากนักรังสีเทคนิค</p>
+
+<h3>ตารางคำขอแจ้งซ่อม</h3>
+<p>แสดงคอลัมน์: วันที่ได้รับแจ้ง, ผู้แจ้งซ่อม และปุ่ม <strong>"ตรวจสอบ"</strong> / <strong>"ลบ"</strong></p>
+
+<h3>สถานะของคำขอแจ้งซ่อม</h3>
+<table>
+  <thead><tr><th style="width:25%">สถานะ</th><th style="width:25%">ข้อความ (ไทย)</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-yellow">Pending</span></td><td>รอซ่อม</td><td>เพิ่งแจ้งเข้ามา ยังไม่ได้รับการดำเนินการ</td></tr>
+    <tr><td><span class="badge badge-blue">In Progress</span></td><td>อยู่ระหว่างดำเนินการ</td><td>วิศวกรกำลังดำเนินการซ่อม</td></tr>
+    <tr><td><span class="badge badge-green">Completed</span></td><td>ดำเนินการแล้ว</td><td>ซ่อมเสร็จเรียบร้อยแล้ว</td></tr>
+  </tbody>
+</table>
+
+<h3>ขั้นตอนการอัปเดตสถานะ</h3>
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"ตรวจสอบ"</strong> ของรายการที่ต้องการ</li>
+  <li>ระบบแสดงรายละเอียดคำขอแจ้งซ่อม พร้อมรูปภาพจากนักรังสีเทคนิค (หากมี)</li>
+  <li>เลือกสถานะใหม่จากเมนูแบบเลื่อนลง: <strong>รอซ่อม / อยู่ระหว่างดำเนินการ / ดำเนินการแล้ว</strong></li>
+  <li>คลิก <strong>"บันทึก"</strong> เพื่อยืนยันการเปลี่ยนสถานะ</li>
+</ol>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 8: PROFILE                                             -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch8" class="section-break">โปรไฟล์ผู้ใช้งาน (User Profile)</h1>
+
+<p><span class="badge badge-blue">เส้นทาง: /profile</span> &nbsp; <span class="badge badge-gray">สิทธิ์: ทุกบทบาท</span></p>
+
+<p>หน้า User Profile ใช้สำหรับ<strong>ดูข้อมูลส่วนตัว</strong>ของผู้ใช้งาน</p>
+
+<h2>ข้อมูลที่แสดง</h2>
+<table>
+  <thead><tr><th style="width:25%">ช่อง</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Username</strong></td><td>ชื่อผู้ใช้งานของท่าน</td></tr>
+    <tr><td><strong>Password</strong></td><td>รหัสผ่าน (คลิกไอคอนตาเพื่อแสดง/ซ่อน)</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box info-tip">
+  <div class="info-box-title">&#10003; เคล็ดลับ</div>
+  หากท่านต้องการเปลี่ยนรหัสผ่าน ให้ติดต่อผู้ดูแลระบบ (Admin) เพื่อดำเนินการผ่านหน้า User Accounts
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 9: QC FORMS                                            -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch9" class="section-break">แบบบันทึก QC ทั้งหมดในระบบ</h1>
+
+<h2 id="ch9-1">9.1 ตารางสรุปแบบบันทึก</h2>
+<p>ระบบประกอบด้วยแบบบันทึก QC ทั้งสิ้น <strong>13 แบบบันทึกหลัก</strong> ดังนี้:</p>
+
+<table>
+  <thead><tr><th style="width:8%">รหัส</th><th style="width:38%">ชื่อแบบบันทึก</th><th style="width:18%">ความถี่</th><th>การเข้าถึง</th></tr></thead>
+  <tbody>
+    <tr><td><strong>F1</strong></td><td>แบบบันทึกการดูแลรักษาและตรวจสอบเครื่องเอกซเรย์ (ส่วนที่ 1)</td><td>ทุกวัน</td><td>Daily Check</td></tr>
+    <tr><td><strong>F2</strong></td><td>แบบบันทึกการลบแผ่นเพลท (ส่วนที่ 2)</td><td>ทุกวัน</td><td>Daily Check</td></tr>
+    <tr><td><strong>F3</strong></td><td>แบบบันทึกตรวจสอบคุณภาพจอแสดงผล (Monitor Performance)</td><td>ทุก 3 เดือน</td><td>Monthly Check</td></tr>
+    <tr><td><strong>F4</strong></td><td>แบบบันทึกตรวจสอบคุณภาพเครื่องเอกซเรย์ (X-ray Check)</td><td>ทุก 3 เดือน</td><td>Monthly Check</td></tr>
+    <tr><td><strong>F5</strong></td><td>แบบบันทึกทดสอบความสม่ำเสมอของภาพ (Uniformity Test)</td><td>ทุก 3 เดือน</td><td>Monthly Check</td></tr>
+    <tr><td><strong>F6</strong></td><td>แบบบันทึกตรวจสอบค่า EI (EI Consistency)</td><td>ทุก 3 เดือน</td><td>Monthly Check</td></tr>
+    <tr><td><strong>F7.1</strong></td><td>แบบบันทึก Collimator Check</td><td>ทุก 6 เดือน</td><td>Monthly Check All</td></tr>
+    <tr><td><strong>F7.2</strong></td><td>แบบบันทึก Collimator Bucky Check</td><td>ทุก 6 เดือน</td><td>Monthly Check All</td></tr>
+    <tr><td><strong>F8.1</strong></td><td>แบบบันทึก CR Dark Noise</td><td>ทุก 6 เดือน</td><td>Monthly Check All</td></tr>
+    <tr><td><strong>F8.2</strong></td><td>แบบบันทึก DR Dark Noise</td><td>ทุก 6 เดือน</td><td>Monthly Check All</td></tr>
+    <tr><td><strong>F9</strong></td><td>แบบบันทึกตรวจสอบคุณภาพเสื้อตะกั่ว</td><td>ตามกำหนด</td><td>QC Forms Hub</td></tr>
+    <tr><td><strong>F10</strong></td><td>แบบบันทึกตรวจสอบ Light Field</td><td>ทุก 1 เดือน</td><td>Monthly Check Light</td></tr>
+    <tr><td><strong>F11</strong></td><td>แบบบันทึกผลการวัดความหนาผู้ป่วย</td><td>ตามกำหนด</td><td>QC Forms Hub</td></tr>
+    <tr><td><strong>F12</strong></td><td>แบบบันทึกอัตราการถ่ายภาพซ้ำ</td><td>ตามกำหนด</td><td>QC Forms Hub</td></tr>
+    <tr><td><strong>F13</strong></td><td>แบบบันทึกตรวจ QC อัลตราซาวด์ B-mode</td><td>ตามกำหนด</td><td>QC Forms Hub</td></tr>
+  </tbody>
+</table>
+
+<h2 id="ch9-2">9.2 ขั้นตอนการทำงานตามรอบ (Workflow)</h2>
+
+<div class="workflow-box">
+  <div class="workflow-row">
+    <div class="workflow-item active">เข้าสู่ระบบ</div>
+  </div>
+  <div class="workflow-arrow">&#9660;</div>
+  <div class="workflow-row">
+    <div class="workflow-item active">Dashboard — ดูการแจ้งเตือน</div>
+  </div>
+  <div class="workflow-arrow">&#9660;</div>
+  <div class="workflow-row">
+    <div class="workflow-item">Daily Check<br><span style="font-size:8pt">(F1/F2 — ทุกวัน)</span></div>
+    <div class="workflow-item secondary">ตาม PM Schedule</div>
+    <div class="workflow-item">แจ้งซ่อม<br><span style="font-size:8pt">(Request)</span></div>
+  </div>
+  <div class="workflow-arrow">&#9660;</div>
+  <div class="workflow-row">
+    <div class="workflow-item">Monthly 1 เดือน<br><span style="font-size:8pt">(F10)</span></div>
+    <div class="workflow-item">Monthly 3 เดือน<br><span style="font-size:8pt">(F3–F6)</span></div>
+    <div class="workflow-item">Monthly 6 เดือน<br><span style="font-size:8pt">(F7–F8)</span></div>
+  </div>
+  <div class="workflow-arrow">&#9660;</div>
+  <div class="workflow-row">
+    <div class="workflow-item active">Export PDF — พิมพ์รายงาน</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 10: LOGOUT                                             -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch10" class="section-break">การออกจากระบบ (Logout)</h1>
+
+<ol class="steps">
+  <li>คลิกปุ่ม <strong>"Log out"</strong> ที่ด้านล่างสุดของแถบเมนูด้านข้าง (Sidebar)</li>
+  <li>ระบบจะล้างข้อมูลเซสชันออกจากเบราว์เซอร์โดยอัตโนมัติ</li>
+  <li>ท่านจะถูกนำกลับไปยังหน้าเข้าสู่ระบบ (Login) ทันที</li>
+</ol>
+
+<div class="info-box info-note">
+  <div class="info-box-title">&#9432; หมายเหตุ</div>
+  หลังจากออกจากระบบแล้ว ท่านจะไม่สามารถเข้าถึงหน้าใดๆ ในระบบได้จนกว่าจะเข้าสู่ระบบใหม่ หากพยายามเข้าถึง URL โดยตรง ระบบจะเปลี่ยนเส้นทางกลับไปยังหน้า Login โดยอัตโนมัติ
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 11: TECHNICAL                                          -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch11" class="section-break">ข้อมูลทางเทคนิคสำหรับผู้ดูแลระบบ</h1>
+
+<h2 id="ch11-1">11.1 สถาปัตยกรรมระบบ</h2>
+
+<div class="workflow-box">
+  <table style="border:none; margin:0;">
+    <tr style="background:none">
+      <td style="width:30%; border:2px solid #3B82F6; background:#EFF6FF; text-align:center; padding:12px; border-radius:8px;">
+        <strong>Browser</strong><br>
+        <span style="font-size:9pt; color:#64748B;">Vue 3 SPA<br>Port: 5173</span>
+      </td>
+      <td style="width:5%; border:none; text-align:center; color:#94A3B8; font-size:16pt;">&#8594;</td>
+      <td style="width:30%; border:2px solid #22C55E; background:#F0FDF4; text-align:center; padding:12px; border-radius:8px;">
+        <strong>ASP.NET Core API</strong><br>
+        <span style="font-size:9pt; color:#64748B;">Web API<br>Port: 8001</span>
+      </td>
+      <td style="width:5%; border:none; text-align:center; color:#94A3B8; font-size:16pt;">&#8594;</td>
+      <td style="width:30%; border:2px solid #F59E0B; background:#FFFBEB; text-align:center; padding:12px; border-radius:8px;">
+        <strong>PostgreSQL</strong><br>
+        <span style="font-size:9pt; color:#64748B;">Database<br>Port: 5433</span>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>Vite Development Server ทำหน้าที่เป็น Proxy สำหรับ API โดย Forward Request จาก <code>/api/Xraycare</code> ไปยัง Backend ที่ <code>http://localhost:8001</code></p>
+
+<h2 id="ch11-2">11.2 ฐานข้อมูล</h2>
+<table>
+  <thead><tr><th style="width:22%">ตาราง</th><th>คำอธิบาย</th><th style="width:35%">ฟิลด์สำคัญ</th></tr></thead>
+  <tbody>
+    <tr><td><code>Hospitals</code></td><td>ข้อมูลโรงพยาบาล</td><td>RID, Name, Code</td></tr>
+    <tr><td><code>Machines</code></td><td>เครื่องเอกซเรย์</td><td>RID, HospitalId, Machine_name, Room, Register_date, Caretaker</td></tr>
+    <tr><td><code>Users</code></td><td>บัญชีผู้ใช้</td><td>RID, HospitalId, Username, Password, Position, IsSuperAdmin</td></tr>
+    <tr><td><code>RepairRequests</code></td><td>คำขอแจ้งซ่อม</td><td>RID, HospitalId, Equipment, Room, StatusText, ImageData</td></tr>
+    <tr><td><code>ChecklistRecords</code></td><td>บันทึก Checklist</td><td>RID, HospitalId, FormType, MachineName, CheckDate, JsonData</td></tr>
+    <tr><td><code>ScheduleConfigs</code></td><td>ตั้งค่าตาราง PM</td><td>RID, HospitalId, StartDate, FrequencyType, FormTypes</td></tr>
+  </tbody>
+</table>
+
+<h2 id="ch11-3">11.3 API Endpoints</h2>
+<p><strong>Base URL:</strong> <code>/api/Xraycare</code></p>
+
+<table>
+  <thead><tr><th style="width:22%">กลุ่ม</th><th>Endpoints</th></tr></thead>
+  <tbody>
+    <tr><td><strong>สุขภาพระบบ</strong></td><td><code>GET /Ping</code></td></tr>
+    <tr><td><strong>โรงพยาบาล</strong></td><td><code>GET /GetHospitals</code>, <code>POST /AddHospital</code>, <code>PUT /UpdateHospital/{id}</code>, <code>DELETE /DeleteHospital/{id}</code></td></tr>
+    <tr><td><strong>เครื่องเอกซเรย์</strong></td><td><code>GET /GetAllMachines</code>, <code>POST /AddMachine</code>, <code>DELETE /DeleteMachine/{id}</code></td></tr>
+    <tr><td><strong>บัญชีผู้ใช้</strong></td><td><code>POST /Login</code>, <code>GET /GetAllUsers</code>, <code>POST /AddUser</code>, <code>PUT /UpdateUser/{id}</code>, <code>DELETE /DeleteUser/{id}</code></td></tr>
+    <tr><td><strong>แจ้งซ่อม</strong></td><td><code>GET /GetAllRepairRequests</code>, <code>POST /AddRepairRequest</code>, <code>PUT /UpdateRepairStatus/{id}</code>, <code>DELETE /DeleteRepairRequest/{id}</code></td></tr>
+    <tr><td><strong>Checklist</strong></td><td><code>GET /GetAllChecklistRecords</code>, <code>GET /GetChecklistRecord/{id}</code>, <code>POST /SaveChecklist</code></td></tr>
+    <tr><td><strong>PM Schedule</strong></td><td><code>GET /GetAllScheduleConfigs</code>, <code>POST /AddScheduleConfig</code>, <code>PUT /UpdateScheduleConfig/{id}</code>, <code>DELETE /DeleteScheduleConfig/{id}</code></td></tr>
+    <tr><td><strong>การแจ้งเตือน</strong></td><td><code>GET /GetNotifications</code></td></tr>
+  </tbody>
+</table>
+
+<h3>HTTP Headers ที่ใช้</h3>
+<table>
+  <thead><tr><th style="width:28%">Header</th><th>คำอธิบาย</th></tr></thead>
+  <tbody>
+    <tr><td><code>X-Hospital-Id</code></td><td>รหัสโรงพยาบาลของผู้ใช้ (ส่งทุก Request)</td></tr>
+    <tr><td><code>X-User-Id</code></td><td>รหัสผู้ใช้ (ส่งทุก Request)</td></tr>
+    <tr><td><code>Content-Type</code></td><td><code>application/json</code></td></tr>
+  </tbody>
+</table>
+
+<h3>การรันระบบด้วย Docker Compose</h3>
+<pre><code>docker-compose up -d</code></pre>
+<p>บริการที่เกี่ยวข้อง:</p>
+<ul>
+  <li><strong>api.xraycare</strong> — Web API (.NET 10) ที่พอร์ต 8001</li>
+  <li><strong>postgres</strong> — PostgreSQL 16 ที่พอร์ต 5433</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 12: FAQ                                                -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<h1 id="ch12" class="section-break">คำถามที่พบบ่อย (FAQ)</h1>
+
+<h3>Q1: ลืมรหัสผ่านต้องทำอย่างไร?</h3>
+<p><strong>A:</strong> ติดต่อผู้ดูแลระบบ (Admin) ของโรงพยาบาลเพื่อให้ตั้งรหัสผ่านใหม่ผ่านหน้า User Accounts ระบบไม่มีฟังก์ชันรีเซ็ตรหัสผ่านด้วยตนเอง</p>
+
+<h3>Q2: ไม่สามารถเข้าสู่ระบบได้ แม้กรอกข้อมูลถูกต้อง</h3>
+<p><strong>A:</strong> ตรวจสอบว่าท่านเลือก<strong>โรงพยาบาล</strong>ที่ถูกต้องตรงกับบัญชีผู้ใช้ เนื่องจากระบบตรวจสอบทั้งชื่อผู้ใช้ รหัสผ่าน และโรงพยาบาลพร้อมกัน</p>
+
+<h3>Q3: เครื่องเอกซเรย์ที่ลงทะเบียนแล้วไม่แสดงบน Dashboard</h3>
+<p><strong>A:</strong> เครื่องที่ลงทะเบียนผ่านหน้า Equipment จะแสดงบน Dashboard โดยอัตโนมัติ หากไม่แสดง ให้รีเฟรชหน้าเว็บโดยกดคีย์ <kbd>F5</kbd> หรือ <kbd>Ctrl</kbd> + <kbd>R</kbd></p>
+
+<h3>Q4: การแจ้งเตือน PM Schedule ทำงานอย่างไร?</h3>
+<p><strong>A:</strong> ระบบคำนวณวันที่ตรวจสอบถัดไปจาก <code>วันเริ่มต้น + ความถี่</code> เมื่อวันที่ถัดไปใกล้ถึงจะแสดงการแจ้งเตือนบน Dashboard ตามระดับดังนี้:</p>
+<ul>
+  <li>มากกว่า 7 วัน → <span class="badge badge-green">เขียว</span> (ข้อมูล)</li>
+  <li>4–7 วัน → <span class="badge badge-yellow">เหลือง</span> (เตือนล่วงหน้า)</li>
+  <li>1–3 วัน → <span class="badge badge-red">แดง</span> (เร่งด่วน)</li>
+  <li>วันนี้ → <span class="badge badge-red">แดง + Pulse</span> (TODAY)</li>
+</ul>
+
+<h3>Q5: วิธีพิมพ์รายงานเป็น PDF</h3>
+<p><strong>A:</strong> ไปที่เมนู <strong>Export PDF</strong> → กรองข้อมูลตามเงื่อนไข → คลิก "ตัวอย่างไฟล์" → ระบบเปิดหน้า Print View → กดคีย์ <kbd>Ctrl</kbd> + <kbd>P</kbd> → เลือก <strong>"Save as PDF"</strong> จากเมนูเครื่องพิมพ์</p>
+
+<h3>Q6: Root Admin ต่างจาก Admin อย่างไร?</h3>
+<p><strong>A:</strong></p>
+<ul>
+  <li><strong>Root Admin</strong> — เข้าถึงได้ทุกโรงพยาบาล สามารถเพิ่ม/ลบโรงพยาบาล สร้างบัญชี Root Admin อื่นได้ และสลับโรงพยาบาลจาก Top Bar</li>
+  <li><strong>Admin</strong> — เข้าถึงได้เฉพาะโรงพยาบาลที่สังกัดเท่านั้น</li>
+</ul>
+
+<h3>Q7: วิศวกรสามารถเข้าถึงแบบบันทึก QC ได้หรือไม่?</h3>
+<p><strong>A:</strong> ไม่สามารถเข้าถึงได้โดยตรง วิศวกรมีสิทธิ์เข้าถึงเฉพาะ Engineer Dashboard, Engineer Analytics และ Engineer Request เท่านั้น หากต้องการดูข้อมูล QC ให้ติดต่อ Admin หรือนักรังสีเทคนิค</p>
+
+<h3>Q8: สามารถใช้งานบนมือถือได้หรือไม่?</h3>
+<p><strong>A:</strong> ได้ ระบบรองรับการแสดงผลแบบ Responsive Design สามารถใช้งานผ่านเบราว์เซอร์บนมือถือและแท็บเล็ต แถบเมนูด้านข้างจะเปลี่ยนเป็นโหมด Overlay สามารถเปิด/ปิดได้ด้วยปุ่ม ☰ ที่แถบด้านบน</p>
+
+<h3>Q9: ภาพที่แนบในระบบจัดเก็บอย่างไร?</h3>
+<p><strong>A:</strong> ภาพจะถูกแปลงเป็นรูปแบบ Base64 String และจัดเก็บในฐานข้อมูล PostgreSQL โดยตรง ไม่มีการอัปโหลดเป็นไฟล์แยกต่างหาก</p>
+
+<h3>Q10: สามารถลบโรงพยาบาลได้เมื่อไร?</h3>
+<p><strong>A:</strong> สามารถลบได้เฉพาะเมื่อโรงพยาบาลนั้น<strong>ไม่มีผู้ใช้งานและไม่มีเครื่องเอกซเรย์ลงทะเบียนอยู่</strong> จำเป็นต้องย้ายหรือลบข้อมูลเหล่านั้นให้หมดก่อนจึงจะดำเนินการลบโรงพยาบาลได้</p>
+
+<hr>
+
+<div style="text-align:center; padding:30px 0; color:#64748B; font-size:10pt;">
+  <p><strong>X-RayCare QC Management System — คู่มือการใช้งาน เวอร์ชัน 1.0</strong></p>
+  <p>จัดทำเมื่อ 27 มีนาคม 2569 &nbsp;|&nbsp; เอกสารภายในองค์กร</p>
+</div>
+
+</body>
+</html>
