@@ -34,8 +34,7 @@
     .legend .sh-process{background:#dbeafe;border-color:#3b82f6}
     .legend .sh-decision{background:#fef3c7;border-color:#f59e0b;transform:rotate(45deg);width:12px;height:12px;border-radius:2px}
     .legend .sh-db{background:#fce7f3;border-color:#ec4899;border-radius:6px 6px 3px 3px;display:none}
-    #s21 .er.relationshipLabel rect{fill:#fff!important;stroke:#94a3b8!important;stroke-width:1.5px!important;rx:6!important;ry:6!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.08))}
-    #s21 .er.relationshipLabel text{font-weight:700!important;fill:#4f6ef7!important;font-size:12px!important}
+    
     .footer{text-align:center;padding:18px;color:var(--muted);font-size:11px}
     @media print{
       @page{size:A4 landscape;margin:8mm}
@@ -101,79 +100,108 @@
   </div>
   <div class="section-body">
     <pre class="mermaid">
+%%{init:{'theme':'default','themeVariables':{'fontSize':'15px','fontFamily':'Segoe UI, Noto Sans Thai, sans-serif'},'flowchart':{'curve':'linear','rankSpacing':50,'nodeSpacing':30}}}%%
 flowchart TD
-  START(["เปิดเว็บ xrayCare"]) --> LOGIN["หน้า Login\nเลือกโรงพยาบาล\nกรอก Username Password"]
-  LOGIN --> AUTH{"Login\nสำเร็จ?"}
-  AUTH -- ไม่สำเร็จ --> LOGIN
-  AUTH -- สำเร็จ --> ROLE{"ตรวจสอบ Role"}
+  START(["fa:fa-play เริ่มต้นใช้งานระบบ xrayCare"])
+  START --> LOGIN["เปิดหน้า Login\nเลือกโรงพยาบาล\nกรอก Username / Password"]
+  LOGIN --> AUTH{"Login สำเร็จ?"}
+  AUTH -- "ไม่สำเร็จ" --> LOGIN
+  AUTH -- "สำเร็จ" --> ROLE{"ตรวจสอบ Role\nของผู้ใช้"}
 
-  ROLE -- "SuperAdmin" --> SA_ZONE
-  ROLE -- "Admin" --> ADM_ZONE
-  ROLE -- "Technologist" --> TECH_ZONE
-  ROLE -- "Engineer" --> ENG_ZONE
+  ROLE -- "SuperAdmin" --> SA_DASH
+  ROLE -- "Admin" --> AD_DASH
+  ROLE -- "Technologist" --> T_DASH
+  ROLE -- "Engineer" --> EN_DASH
 
-  subgraph TECH_ZONE["Technologist"]
+  %% ─── SuperAdmin ───
+  subgraph SA_ZONE["SuperAdmin - ผู้ดูแลระบบสูงสุด"]
     direction TB
-    TD1["Tech Dashboard\nNotification - Summary Cards\nCalendar - Equipment Status\nChecklist Table - Repair Table"]
-    TD1 --> CHK["คลิก Check บนเครื่อง"]
-    CHK --> DAILY["Daily Check F1/F2\nตรวจรายการ Pass/Fail\nแนบรูป หมายเหตุ"]
-    DAILY --> SAVED["บันทึก F1/F2"]
-    SAVED --> FAIL{"มีรายการหลัก Fail?"}
-    FAIL -- มี --> AREP["สร้าง Repair\nอัตโนมัติ"]
-    FAIL -- ไม่มี --> NXT{"มี Form ถัดไป?"}
-    AREP --> NXT
-    NXT -- "F10 ทุก 1 เดือน" --> MF10["F10 Light Field Check"]
-    NXT -- "F3-F6 ทุก 3 เดือน" --> M3M["Monthly Check 3 เดือน\nF3-F4-F5-F6"]
-    NXT -- "F7/F8 ทุก 6 เดือน" --> M6M["Monthly Check 6 เดือน\nF7-F8"]
-    NXT -- ไม่มี --> BACK["กลับ Dashboard"]
-    MF10 --> BACK
-    M3M --> BACK
-    M6M --> BACK
-    TD1 --> QCHUB["QC Forms Hub\nF9 ทุก 6 เดือน\nF11 F12 F13 ตามความจำเป็น\n+ Custom Form Builder"]
-    QCHUB --> BACK
-    TD1 --> EQM["Equipment Management\nเพิ่ม/ลบ เครื่อง"]
-    TD1 --> PMS["PM Schedule\nจัดการตาราง Check"]
-    TD1 --> REQ["Repair Request List\nดู/เพิ่ม รายการซ่อม"]
-    TD1 --> ANA["Analytics กราฟสถิติ"]
-    TD1 --> EXP["Export PDF F1-F13"]
+    SA_DASH["Admin Dashboard\nภาพรวมทุกโรงพยาบาล"]
+    SA_DASH --> SA_USER["จัดการผู้ใช้ทั้งหมด\nเพิ่ม / แก้ไข / ลบ"]
+    SA_DASH --> SA_HOSP["จัดการโรงพยาบาล\nเพิ่ม / แก้ไข / ลบ"]
+    SA_DASH --> SA_STAT["Admin Analytics\nรายงานสรุปภาพรวม"]
+    SA_DASH --> SA_ALL["เข้าถึง Tech + Engineer Features"]
+    SA_USER --> SA_DONE["เสร็จสิ้นงาน"]
+    SA_HOSP --> SA_DONE
+    SA_STAT --> SA_DONE
+    SA_ALL --> SA_DONE
   end
 
-  subgraph SA_ZONE["SuperAdmin"]
+  %% ─── Admin ───
+  subgraph AD_ZONE["Admin - ผู้ดูแลโรงพยาบาล"]
     direction TB
-    SA1["Admin Dashboard"]
-    SA1 --> SA2["จัดการผู้ใช้\nเพิ่ม/แก้ไข/ลบ User"]
-    SA1 --> SA3["จัดการโรงพยาบาล\nเพิ่ม/แก้ไข/ลบ Hospital"]
-    SA1 --> SA4["Admin Analytics"]
-    SA1 --> SA5["เข้าถึง Tech Features ทั้งหมด"]
-    SA1 --> SA6["เข้าถึง Engineer Features"]
+    AD_DASH["Admin Dashboard\nภาพรวมเฉพาะ รพ."]
+    AD_DASH --> AD_USER["จัดการผู้ใช้เฉพาะ รพ."]
+    AD_DASH --> AD_STAT["Admin Analytics\nรายงานเฉพาะ รพ."]
+    AD_DASH --> AD_ALL["เข้าถึง Tech + Engineer Features"]
+    AD_USER --> AD_DONE["เสร็จสิ้นงาน"]
+    AD_STAT --> AD_DONE
+    AD_ALL --> AD_DONE
   end
 
-  subgraph ADM_ZONE["Admin"]
+  %% ─── Technologist ───
+  subgraph T_ZONE["Technologist - นักรังสีเทคนิค"]
     direction TB
-    AD1["Admin Dashboard"]
-    AD1 --> AD2["จัดการผู้ใช้เฉพาะ รพ.นี้"]
-    AD1 --> AD3["Admin Analytics\nเฉพาะ รพ.นี้"]
-    AD1 --> AD4["เข้าถึง Tech Features"]
-    AD1 --> AD5["เข้าถึง Engineer Features"]
+    T_DASH["Tech Dashboard\nปฏิทิน / สถานะเครื่อง / สรุปข้อมูล"]
+    T_DASH --> T_CHK["เลือกเครื่องที่ต้องตรวจ"]
+    T_CHK --> T_DAILY["ตรวจ Daily Check F1 หรือ F2\nกรอกผล Pass / Fail\nแนบรูป + หมายเหตุ"]
+    T_DAILY --> T_SAVE["บันทึกผลตรวจ"]
+    T_SAVE --> T_FAIL{"มีรายการ Fail?"}
+    T_FAIL -- "มี" --> T_AREP["สร้างใบแจ้งซ่อมอัตโนมัติ"]
+    T_FAIL -- "ไม่มี" --> T_NXT{"มี Form ถัดไป?"}
+    T_AREP --> T_NXT
+    T_NXT -- "F10 ทุก 1 เดือน" --> T_F10["ตรวจ F10 Light Field"]
+    T_NXT -- "F3-F6 ทุก 3 เดือน" --> T_3M["ตรวจ F3 F4 F5 F6"]
+    T_NXT -- "F7/F8 ทุก 6 เดือน" --> T_6M["ตรวจ F7 F8"]
+    T_NXT -- "ไม่มี" --> T_BACK["กลับ Dashboard"]
+    T_F10 --> T_BACK
+    T_3M --> T_BACK
+    T_6M --> T_BACK
+    T_DASH --> T_QC["QC Forms Hub\nF9 F11 F12 F13\nCustom Form Builder"]
+    T_DASH --> T_EQ["จัดการเครื่องเอกซเรย์"]
+    T_DASH --> T_PM["PM Schedule ตารางตรวจ"]
+    T_DASH --> T_REQ["รายการแจ้งซ่อม"]
+    T_DASH --> T_ANA["Analytics สถิติ"]
+    T_DASH --> T_PDF["Export PDF F1-F13"]
+    T_QC --> T_BACK
+    T_EQ --> T_BACK
+    T_PM --> T_BACK
+    T_REQ --> T_BACK
+    T_ANA --> T_BACK
+    T_PDF --> T_BACK
+    T_BACK --> T_DONE["เสร็จสิ้นงาน"]
   end
 
-  subgraph ENG_ZONE["Engineer"]
+  %% ─── Engineer ───
+  subgraph EN_ZONE["Engineer - ช่างซ่อมบำรุง"]
     direction TB
-    EN1["Engineer Dashboard\nPending - In Progress - Completed"]
-    EN1 --> EN2["จัดการสถานะซ่อม\nPending >> In Progress >> Completed"]
-    EN1 --> EN3["Engineer Analytics"]
+    EN_DASH["Engineer Dashboard\nรายการซ่อมทั้งหมด"]
+    EN_DASH --> EN_FIX["อัปเดตสถานะซ่อม\nPending >> In Progress >> Completed"]
+    EN_DASH --> EN_STAT["Engineer Analytics\nสถิติการซ่อม"]
+    EN_FIX --> EN_DONE["เสร็จสิ้นงาน"]
+    EN_STAT --> EN_DONE
   end
 
-  style START fill:#d1fae5,stroke:#10b981,stroke-width:2px
+  %% ─── Logout / End ───
+  SA_DONE --> LOGOUT["Logout ออกจากระบบ"]
+  AD_DONE --> LOGOUT
+  T_DONE --> LOGOUT
+  EN_DONE --> LOGOUT
+  LOGOUT --> ENDNODE(["fa:fa-stop จบการใช้งาน"])
+
+  %% ─── Styles ───
+  style START fill:#d1fae5,stroke:#10b981,stroke-width:2px,color:#065f46
+  style ENDNODE fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b
   style AUTH fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
   style ROLE fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
-  style FAIL fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
-  style NXT fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
-  style TECH_ZONE fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+  style T_FAIL fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style T_NXT fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+  style T_AREP fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+  style LOGOUT fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#334155
   style SA_ZONE fill:#fff7ed,stroke:#ea580c,stroke-width:2px
-  style ADM_ZONE fill:#fffbeb,stroke:#d97706,stroke-width:2px
-  style ENG_ZONE fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-  style AREP fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+  style AD_ZONE fill:#fffbeb,stroke:#d97706,stroke-width:2px
+  style T_ZONE fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+  style EN_ZONE fill:#eff6ff,stroke:#2563eb,stroke-width:2px
     </pre>
     <div class="legend">
       <span><span class="shape sh-start"></span> Start/End</span>
@@ -1002,155 +1030,240 @@ flowchart TB
     <div><h2>Entity Relationship Diagram (ER Diagram)</h2><p>แผนภาพความสัมพันธ์ระหว่าง Entity ทั้งหมดในฐานข้อมูล PostgreSQL ของระบบ xrayCare</p></div>
   </div>
   <div class="section-body">
-    <pre class="mermaid">
-erDiagram
-  Hospital {
-    int RID PK
-    text Name
-    text Code
-  }
+    <svg viewBox="0 0 1200 900" style="width:100%;max-width:1200px;margin:0 auto;display:block;font-family:'Segoe UI','Noto Sans Thai',sans-serif" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .er-hdr{fill:#d4956b;stroke:#c07b4e;stroke-width:1.2}
+          .er-body{fill:#fff;stroke:#c8c8c8;stroke-width:1}
+          .er-sep{stroke:#e2e2e2;stroke-width:.6}
+          .er-ht{fill:#fff;font-size:14px;font-weight:700;text-anchor:middle}
+          .er-f{fill:#333;font-size:11.5px;font-weight:600}
+          .er-t{fill:#999;font-size:11px}
+          .er-b{font-size:10px;font-weight:700}
+          .er-pk{fill:#2563eb}.er-fk{fill:#dc2626}
+          .er-ln{stroke:#aaa;stroke-width:1.3;fill:none}
+          .er-c{fill:#555;font-size:11px;font-weight:600}
+          .er-lb{fill:#f8f6f2;stroke:#c8c8c8;stroke-width:.8}
+          .er-lt{fill:#555;font-size:10.5px;font-weight:600;text-anchor:middle}
+        </style>
+      </defs>
 
-  UserAccount {
-    int RID PK
-    int HospitalId FK
-    text Username
-    text Password
-    text Position
-    boolean IsSuperAdmin
-  }
+      <!-- ====== RELATIONSHIP LINES (drawn first, behind entities) ====== -->
 
-  Machine {
-    int RID PK
-    int HospitalId FK
-    text Machine_name
-    text Room
-    text Register_date
-    text Caretaker
-  }
+      <!-- Hospital(bottom:116) � ScheduleConfig(top:255) -->
+      <line x1="490" y1="116" x2="150" y2="255" class="er-ln"/>
+      <text x="475" y="138" class="er-c">1</text>
+      <text x="160" y="252" class="er-c">*</text>
 
-  ScheduleConfig {
-    int RID PK
-    int HospitalId FK
-    text StartDate
-    text FrequencyType
-    text Description
-    text FormTypes
-  }
+      <!-- Hospital(bottom:116) � Machine(top:255) -->
+      <line x1="565" y1="116" x2="515" y2="255" class="er-ln"/>
+      <text x="560" y="138" class="er-c">1</text>
+      <text x="518" y="252" class="er-c">*</text>
 
-  ChecklistRecord {
-    int RID PK
-    int HospitalId FK
-    text FormType
-    text MachineName
-    text Room
-    text CheckDate
-    text Tester
-    text JsonData
-  }
+      <!-- Hospital(bottom:116) � UserAccount(top:255) -->
+      <line x1="680" y1="116" x2="1005" y2="255" class="er-ln"/>
+      <text x="700" y="148" class="er-c">1</text>
+      <text x="985" y="252" class="er-c">*</text>
 
-  RepairRequest {
-    int RID PK
-    int HospitalId FK
-    text Equipment
-    text Room
-    text RequestDate
-    text ReporterName
-    text Detail
-    text Remarks
-    text StatusText
-    text ImageData
-  }
+      <!-- Hospital(bottom:116) � ChecklistRecord(top:565) routed -->
+      <path d="M535,116 V195 H330 V565" class="er-ln"/>
+      <text x="540" y="142" class="er-c">1</text>
+      <text x="335" y="560" class="er-c">*</text>
 
-  Hospital ||--o{ UserAccount : "1-N"
-  Hospital ||--o{ Machine : "1-N"
-  Hospital ||--o{ ScheduleConfig : "1-N"
-  Hospital ||--o{ ChecklistRecord : "1-N"
-  Hospital ||--o{ RepairRequest : "1-N"
-  ScheduleConfig ||--o{ ChecklistRecord : "triggers"
-  Machine ||--o{ ChecklistRecord : "checked"
-  Machine ||--o{ RepairRequest : "repaired"
-  UserAccount ||--o{ ChecklistRecord : "tested"
-  UserAccount ||--o{ RepairRequest : "reported"
-    </pre>
-    <div style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid var(--border)">
-      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text)">Entity Details</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;font-size:12px">
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#4f6ef7">Hospital</strong> <span style="color:var(--muted)">(Hospitals)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK, int, auto-increment)<br>
-            Name (text) - ชื่อโรงพยาบาล<br>
-            Code (text) - รหัสโรงพยาบาล
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#10b981">Machine</strong> <span style="color:var(--muted)">(Machines)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK), HospitalId (FK)<br>
-            Machine_name - ชื่อเครื่อง<br>
-            Room - ห้อง<br>
-            Register_date - วันที่ลงทะเบียน<br>
-            Caretaker - ผู้ดูแล
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#ea580c">UserAccount</strong> <span style="color:var(--muted)">(Users)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK), HospitalId (FK)<br>
-            Username (unique per hospital)<br>
-            Password, Position<br>
-            IsSuperAdmin (boolean)
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#7c3aed">ChecklistRecord</strong> <span style="color:var(--muted)">(ChecklistRecords)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK), HospitalId (FK)<br>
-            FormType - F1_F2, F10, F3_F6, F7_F8, F9, F11, F12, F13<br>
-            MachineName, Room, CheckDate<br>
-            Tester - ผู้ทดสอบ<br>
-            JsonData - ข้อมูลผลตรวจ JSON
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#ef4444">RepairRequest</strong> <span style="color:var(--muted)">(RepairRequests)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK), HospitalId (FK)<br>
-            Equipment, Room, RequestDate<br>
-            ReporterName - ผู้แจ้งซ่อม<br>
-            Detail, Remarks, StatusText<br>
-            ImageData - รูปภาพ Base64
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid var(--border)">
-          <strong style="color:#3b82f6">ScheduleConfig</strong> <span style="color:var(--muted)">(ScheduleConfigs)</span>
-          <div style="margin-top:6px;color:var(--muted);line-height:1.8">
-            RID (PK), HospitalId (FK)<br>
-            StartDate - วันเริ่มต้น<br>
-            FrequencyType - 1m, 3m, 6m<br>
-            Description - รายละเอียด<br>
-            FormTypes - JSON array เช่น ["F10","F12"]
-          </div>
-        </div>
-        <div style="background:linear-gradient(135deg,#eef2ff,#f0f4ff);padding:12px;border-radius:8px;border:1px solid #c7d2fe;grid-column:1/-1">
-          <strong style="color:#4f6ef7">Relationship Labels (ความหมายของป้ายบนเส้นเชื่อม)</strong>
-          <div style="margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 16px;font-size:12px;color:var(--muted);line-height:1.7">
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">1-N</span> Hospital มีข้อมูลลูกหลายรายการ (One-to-Many)</div>
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">triggers</span> ScheduleConfig กำหนดเวลาตรวจให้ ChecklistRecord</div>
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">checked</span> Machine ถูกตรวจสอบ บันทึกใน ChecklistRecord</div>
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">repaired</span> Machine ถูกแจ้งซ่อมผ่าน RepairRequest</div>
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">tested</span> UserAccount เป็นผู้ทดสอบ บันทึกใน ChecklistRecord</div>
-            <div><span style="display:inline-block;background:#fff;border:1.5px solid #94a3b8;border-radius:6px;padding:1px 8px;color:#4f6ef7;font-weight:700;font-size:11px;margin-right:4px">reported</span> UserAccount เป็นผู้แจ้งซ่อม สร้าง RepairRequest</div>
-          </div>
-          <div style="margin-top:8px;font-size:11px;color:#818cf8">
-            <strong>สัญลักษณ์:</strong> <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">||--o{</code> = One-to-Many (1 ต่อ หลาย) | <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">PK</code> = Primary Key | <code style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #c7d2fe">FK</code> = Foreign Key
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:12px;font-size:11px;color:var(--muted)">
-        <strong>หมายเหตุ:</strong> ทุก Entity สืบทอด RID (Primary Key, auto-increment) จาก BaseTable | HospitalId เป็น Foreign Key อ้างอิงไปยัง Hospital.RID | ChecklistRecord เชื่อมกับ Machine ผ่าน MachineName + Room (denormalized) | Unique constraint: UserAccount(HospitalId, Username) | Database: PostgreSQL via Entity Framework Core + Npgsql
-      </div>
-    </div>
+      <!-- Hospital(bottom:116) � RepairRequest(top:565) routed -->
+      <path d="M645,116 V205 H760 V565" class="er-ln"/>
+      <text x="650" y="142" class="er-c">1</text>
+      <text x="755" y="560" class="er-c">*</text>
+
+      <!-- ScheduleConfig(bottom:417) � ChecklistRecord(top:565) -->
+      <line x1="150" y1="417" x2="190" y2="565" class="er-ln"/>
+      <text x="145" y="433" class="er-c">1</text>
+      <text x="193" y="560" class="er-c">*</text>
+
+      <!-- Machine(bottom:417) � ChecklistRecord(top:565) -->
+      <line x1="450" y1="417" x2="300" y2="565" class="er-ln"/>
+      <text x="446" y="433" class="er-c">1</text>
+      <text x="305" y="560" class="er-c">*</text>
+
+      <!-- Machine(bottom:417) � RepairRequest(top:565) -->
+      <line x1="580" y1="417" x2="650" y2="565" class="er-ln"/>
+      <text x="575" y="433" class="er-c">1</text>
+      <text x="655" y="560" class="er-c">*</text>
+
+      <!-- UserAccount(bottom:417) � ChecklistRecord(top:565) -->
+      <line x1="935" y1="417" x2="345" y2="565" class="er-ln"/>
+      <text x="920" y="433" class="er-c">1</text>
+      <text x="355" y="560" class="er-c">*</text>
+
+      <!-- UserAccount(bottom:417) � RepairRequest(top:565) -->
+      <line x1="1050" y1="417" x2="810" y2="565" class="er-ln"/>
+      <text x="1040" y="433" class="er-c">1</text>
+      <text x="815" y="560" class="er-c">*</text>
+
+      <!-- ====== HOSPITAL (top center) ====== -->
+      <!-- translate(440,20), w=310, rows=3, body=66, total=96, bottom=116 -->
+      <g transform="translate(440,20)">
+        <rect x="0" y="0" width="310" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="310" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="310" height="66" class="er-body"/>
+        <text x="155" y="21" class="er-ht">Hospital</text>
+        <line x1="55" y1="30" x2="55" y2="96" class="er-sep"/>
+        <line x1="260" y1="30" x2="260" y2="96" class="er-sep"/>
+        <line x1="0" y1="52" x2="310" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="310" y2="74" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="268" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">text</text><text x="63" y="69" class="er-f">Name</text>
+        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Code</text>
+      </g>
+
+      <!-- ====== SCHEDULECONFIG (left middle) ====== -->
+      <!-- translate(20,255), w=260, rows=6, body=132, total=162, bottom=417 -->
+      <g transform="translate(20,255)">
+        <rect x="0" y="0" width="260" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="260" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="260" height="132" class="er-body"/>
+        <text x="130" y="21" class="er-ht">ScheduleConfig</text>
+        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/>
+        <line x1="210" y1="30" x2="210" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="260" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="260" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="260" y2="96" class="er-sep"/>
+        <line x1="0" y1="118" x2="260" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="260" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="218" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="218" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">StartDate</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">FrequencyType</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Description</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">FormTypes</text>
+      </g>
+
+      <!-- ====== MACHINE (center middle) ====== -->
+      <!-- translate(380,255), w=270, rows=6, body=132, total=162, bottom=417 -->
+      <g transform="translate(380,255)">
+        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="270" height="132" class="er-body"/>
+        <text x="135" y="21" class="er-ht">Machine</text>
+        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/>
+        <line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/>
+        <line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Machine_name</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Register_date</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">Caretaker</text>
+      </g>
+
+      <!-- ====== USERACCOUNT (right middle) ====== -->
+      <!-- translate(870,255), w=270, rows=6, body=132, total=162, bottom=417 -->
+      <g transform="translate(870,255)">
+        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="270" height="132" class="er-body"/>
+        <text x="135" y="21" class="er-ht">UserAccount</text>
+        <line x1="55" y1="30" x2="55" y2="162" class="er-sep"/>
+        <line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/>
+        <line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="63" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Username</text>
+        <text x="8" y="113" class="er-t">text</text><text x="63" y="113" class="er-f">Password</text>
+        <text x="8" y="135" class="er-t">text</text><text x="63" y="135" class="er-f">Position</text>
+        <text x="8" y="157" class="er-t">bool</text><text x="63" y="157" class="er-f">IsSuperAdmin</text>
+      </g>
+
+      <!-- ====== CHECKLISTRECORD (bottom left) ====== -->
+      <!-- translate(100,565), w=275, rows=8, body=176, total=206, bottom=771 -->
+      <g transform="translate(100,565)">
+        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="275" height="176" class="er-body"/>
+        <text x="137" y="21" class="er-ht">ChecklistRecord</text>
+        <line x1="50" y1="30" x2="50" y2="206" class="er-sep"/>
+        <line x1="225" y1="30" x2="225" y2="206" class="er-sep"/>
+        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/>
+        <line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/>
+        <line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
+        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">FormType</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">MachineName</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Room</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">CheckDate</text>
+        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Tester</text>
+        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">JsonData</text>
+      </g>
+
+      <!-- ====== REPAIRREQUEST (bottom right) ====== -->
+      <!-- translate(580,565), w=275, rows=10, body=220, total=250, bottom=815 -->
+      <g transform="translate(580,565)">
+        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="275" height="220" class="er-body"/>
+        <text x="137" y="21" class="er-ht">RepairRequest</text>
+        <line x1="50" y1="30" x2="50" y2="250" class="er-sep"/>
+        <line x1="225" y1="30" x2="225" y2="250" class="er-sep"/>
+        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/>
+        <line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/>
+        <line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/>
+        <line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
+        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/>
+        <line x1="0" y1="206" x2="275" y2="206" class="er-sep"/>
+        <line x1="0" y1="228" x2="275" y2="228" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Equipment</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">RequestDate</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">ReporterName</text>
+        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Detail</text>
+        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">Remarks</text>
+        <text x="8" y="223" class="er-t">text</text><text x="58" y="223" class="er-f">StatusText</text>
+        <text x="8" y="245" class="er-t">text</text><text x="58" y="245" class="er-f">ImageData</text>
+      </g>
+
+      <!-- ====== RELATIONSHIP LABELS (on top of lines) ====== -->
+      <rect x="125" y="483" width="62" height="18" rx="4" class="er-lb"/>
+      <text x="156" y="496" class="er-lt">triggers</text>
+
+      <rect x="348" y="483" width="60" height="18" rx="4" class="er-lb"/>
+      <text x="378" y="496" class="er-lt">checked</text>
+
+      <rect x="583" y="478" width="66" height="18" rx="4" class="er-lb"/>
+      <text x="616" y="491" class="er-lt">repaired</text>
+
+      <rect x="591" y="502" width="50" height="18" rx="4" class="er-lb"/>
+      <text x="616" y="515" class="er-lt">tested</text>
+
+      <rect x="902" y="483" width="66" height="18" rx="4" class="er-lb"/>
+      <text x="935" y="496" class="er-lt">reported</text>
+
+      <!-- ====== LEGEND ====== -->
+      <g transform="translate(25,840)">
+        <rect x="0" y="0" width="560" height="45" rx="6" fill="#f8f6f2" stroke="#e0ddd8" stroke-width="1"/>
+        <rect x="15" y="9" width="24" height="13" rx="3" fill="#d4956b" stroke="#c07b4e" stroke-width="1"/>
+        <text x="46" y="20" fill="#555" font-size="11">Entity Header</text>
+        <text x="150" y="20" fill="#2563eb" font-size="10" font-weight="700">PK</text><text x="168" y="20" fill="#555" font-size="11">= Primary Key</text>
+        <text x="278" y="20" fill="#dc2626" font-size="10" font-weight="700">FK</text><text x="296" y="20" fill="#555" font-size="11">= Foreign Key</text>
+        <text x="15" y="37" fill="#555" font-size="10.5">1 = One side | * = Many side | Database: PostgreSQL via Entity Framework Core</text>
+      </g>
+    </svg>
   </div>
 </div>
 
@@ -1161,183 +1274,151 @@ erDiagram
     <div><h2>Context Diagram</h2><p>แผนภาพบริบทของระบบ xrayCare แสดงความสัมพันธ์ระหว่างระบบกับ External Entity ทั้งหมด</p></div>
   </div>
   <div class="section-body">
-    <svg viewBox="0 0 1400 830" style="width:100%;max-width:1400px;margin:0 auto;display:block;font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 1100 1050" style="width:100%;max-width:1100px;margin:0 auto;display:block;font-family:'Segoe UI','Noto Sans Thai',sans-serif" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="arw" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7 Z" fill="#64748b"/></marker>
+        <style>
+          .cb{fill:#fff;stroke:#333;stroke-width:1.5}
+          .cs{fill:#fff;stroke:#333;stroke-width:2}
+          .cl{stroke:#444;stroke-width:1.2}
+          .ct{fill:#1e293b;font-size:13px;font-weight:700;text-anchor:middle}
+          .cs2{fill:#64748b;font-size:11px;text-anchor:middle}
+          .df{fill:#333;font-size:10.5px}
+        </style>
       </defs>
 
-      <!-- ===== LINES (behind everything) ===== -->
-      <!-- SA → SYS -->
-      <line x1="215" y1="75" x2="448" y2="310" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- SYS → SA -->
-      <line x1="455" y1="305" x2="220" y2="70" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- AD → SYS -->
-      <line x1="1085" y1="75" x2="752" y2="310" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- SYS → AD -->
-      <line x1="745" y1="305" x2="1080" y2="70" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- TECH → SYS -->
-      <line x1="260" y1="725" x2="448" y2="420" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- SYS → TECH -->
-      <line x1="455" y1="425" x2="265" y2="730" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- ENG → SYS -->
-      <line x1="1040" y1="725" x2="752" y2="420" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- SYS → ENG -->
-      <line x1="745" y1="425" x2="1035" y2="730" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- SYS → DB -->
-      <line x1="590" y1="440" x2="590" y2="642" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
-      <!-- DB → SYS -->
-      <line x1="610" y1="645" x2="610" y2="440" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arw)"/>
+      <!-- ========== LINES (behind boxes) ========== -->
+      <!-- SuperAdmin → System (top-left to left side of process) -->
+      <line x1="135" y1="90" x2="235" y2="430" class="cl"/>
+      <!-- Admin → System (top-right to right side of process) -->
+      <line x1="960" y1="90" x2="860" y2="430" class="cl"/>
+      <!-- Technologist → System (bottom-left to left side of process) -->
+      <line x1="135" y1="910" x2="235" y2="600" class="cl"/>
+      <!-- Engineer → System (bottom-right to right side of process) -->
+      <line x1="960" y1="910" x2="860" y2="600" class="cl"/>
+      <!-- System → Database (bottom center) -->
+      <line x1="550" y1="600" x2="550" y2="820" class="cl"/>
 
-      <!-- ===== CENTER SYSTEM BOX ===== -->
-      <rect x="450" y="295" width="300" height="145" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="3"/>
-      <text x="600" y="345" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">ระบบจัดการคุณภาพ</text>
-      <text x="600" y="370" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">เครื่องเอกซเรย์</text>
-      <text x="600" y="395" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="700" font-style="italic">xrayCare</text>
+      <!-- ========== CENTRAL PROCESS BOX ========== -->
+      <!-- Outer box -->
+      <rect x="235" y="420" width="625" height="180" class="cs"/>
+      <!-- "0" partition on the left -->
+      <line x1="305" y1="420" x2="305" y2="600" stroke="#333" stroke-width="1.5"/>
+      <text x="270" y="518" text-anchor="middle" fill="#333" font-size="26" font-weight="700">0</text>
+      <!-- System name in main area -->
+      <text x="573" y="480" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">ระบบจัดการคุณภาพเครื่องเอกซเรย์</text>
+      <text x="573" y="505" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="700">xrayCare</text>
+      <text x="573" y="535" text-anchor="middle" fill="#94a3b8" font-size="11">Vue 3 + ASP.NET Core + PostgreSQL</text>
+      <text x="573" y="555" text-anchor="middle" fill="#94a3b8" font-size="11">QC Management System</text>
 
-      <!-- ===== SUPERADMIN (top-left) ===== -->
-      <rect x="80" y="20" width="190" height="55" rx="6" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
-      <text x="175" y="44" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">SuperAdmin</text>
-      <text x="175" y="63" text-anchor="middle" fill="#64748b" font-size="11">ผู้ดูแลระบบ</text>
-      <!-- SA→SYS Input (far left, clear of line) -->
-      <text fill="#1e293b" font-size="10.5">
-        <tspan x="15" dy="120">- Login เข้าสู่ระบบ</tspan>
-        <tspan x="15" dy="15">- ข้อมูลผู้ใช้งาน</tspan>
-        <tspan x="15" dy="15">- ข้อมูลโรงพยาบาล</tspan>
-        <tspan x="15" dy="15">- ข้อมูลการตั้งค่า</tspan>
+      <!-- ========== SUPERADMIN (top-left) ========== -->
+      <rect x="30" y="25" width="210" height="65" class="cb"/>
+      <text x="135" y="55" class="ct">SuperAdmin</text>
+      <text x="135" y="75" class="cs2">ผู้ดูแลระบบสูงสุด</text>
+
+      <!-- SA Input → (left of line) -->
+      <text class="df">
+        <tspan x="18" y="130">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="18" dy="15">- ข้อมูลผู้ใช้งาน</tspan>
+        <tspan x="18" dy="15">- ข้อมูลโรงพยาบาล</tspan>
+        <tspan x="18" dy="15">- ข้อมูลการตั้งค่า</tspan>
       </text>
-      <!-- SYS→SA Output (right of line, clear) -->
-      <text fill="#64748b" font-size="10.5">
-        <tspan x="310" dy="105">- ผลการจัดการผู้ใช้</tspan>
-        <tspan x="310" dy="15">- ผลการจัดการ รพ.</tspan>
-        <tspan x="310" dy="15">- รายงานภาพรวมทุก รพ.</tspan>
-        <tspan x="310" dy="15">- Admin Analytics</tspan>
+      <!-- SA Output ← (right of line) -->
+      <text class="df" fill="#666">
+        <tspan x="200" y="220">- ผลการจัดการผู้ใช้</tspan>
+        <tspan x="200" dy="15">- ผลการจัดการ รพ.</tspan>
+        <tspan x="200" dy="15">- รายงานภาพรวมทุก รพ.</tspan>
+        <tspan x="200" dy="15">- Admin Analytics</tspan>
       </text>
 
-      <!-- ===== ADMIN (top-right) ===== -->
-      <rect x="1030" y="20" width="190" height="55" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
-      <text x="1125" y="44" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">Admin</text>
-      <text x="1125" y="63" text-anchor="middle" fill="#64748b" font-size="11">ผู้ดูแล รพ.</text>
-      <!-- AD→SYS Input (left of line) -->
-      <text fill="#1e293b" font-size="10.5">
-        <tspan x="770" dy="110">- Login เข้าสู่ระบบ</tspan>
-        <tspan x="770" dy="15">- จัดการ User เฉพาะ รพ.</tspan>
-        <tspan x="770" dy="15">- ข้อมูลการตั้งค่า</tspan>
+      <!-- ========== ADMIN (top-right) ========== -->
+      <rect x="855" y="25" width="210" height="65" class="cb"/>
+      <text x="960" y="55" class="ct">Admin</text>
+      <text x="960" y="75" class="cs2">ผู้ดูแลโรงพยาบาล</text>
+
+      <!-- AD Input → (right of line) -->
+      <text class="df" text-anchor="end">
+        <tspan x="1080" y="130">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="1080" dy="15">- จัดการ User เฉพาะ รพ.</tspan>
+        <tspan x="1080" dy="15">- ข้อมูลการตั้งค่า</tspan>
       </text>
-      <!-- SYS→AD Output (far right) -->
-      <text fill="#64748b" font-size="10.5">
-        <tspan x="1105" dy="115">- ผลการจัดการผู้ใช้</tspan>
-        <tspan x="1105" dy="15">- รายงานสรุปเฉพาะ รพ.</tspan>
-        <tspan x="1105" dy="15">- Admin Analytics</tspan>
+      <!-- AD Output ← (left of line) -->
+      <text class="df" fill="#666" text-anchor="end">
+        <tspan x="830" y="210">- ผลการจัดการผู้ใช้</tspan>
+        <tspan x="830" dy="15">- รายงานสรุปเฉพาะ รพ.</tspan>
+        <tspan x="830" dy="15">- Admin Analytics</tspan>
       </text>
 
-      <!-- ===== TECHNOLOGIST (bottom-left) ===== -->
-      <rect x="25" y="720" width="250" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-      <text x="150" y="743" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="700">Radiological Technologist</text>
-      <text x="150" y="762" text-anchor="middle" fill="#64748b" font-size="11">นักรังสีเทคนิค</text>
-      <!-- TECH→SYS Input (far left, stacked above output) -->
-      <text fill="#1e293b" font-size="10.5">
-        <tspan x="15" dy="475">- Login เข้าสู่ระบบ</tspan>
-        <tspan x="15" dy="15">- ข้อมูลการตรวจ F1-F13</tspan>
-        <tspan x="15" dy="15">- ข้อมูลเครื่องเอกซเรย์</tspan>
-        <tspan x="15" dy="15">- ข้อมูลแจ้งซ่อม</tspan>
-        <tspan x="15" dy="15">- ข้อมูลตาราง PM Schedule</tspan>
-        <tspan x="15" dy="15">- แนบรูปภาพ หมายเหตุ</tspan>
+      <!-- ========== TECHNOLOGIST (bottom-left) ========== -->
+      <rect x="15" y="900" width="240" height="65" class="cb"/>
+      <text x="135" y="930" class="ct">Radiological Technologist</text>
+      <text x="135" y="948" class="cs2">นักรังสีเทคนิค</text>
+
+      <!-- TECH Input → (left of line) -->
+      <text class="df">
+        <tspan x="18" y="640">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="18" dy="15">- ข้อมูลการตรวจ F1-F13</tspan>
+        <tspan x="18" dy="15">- ข้อมูลเครื่องเอกซเรย์</tspan>
+        <tspan x="18" dy="15">- ข้อมูลแจ้งซ่อม</tspan>
+        <tspan x="18" dy="15">- ข้อมูลตาราง PM Schedule</tspan>
+        <tspan x="18" dy="15">- แนบรูปภาพ หมายเหตุ</tspan>
       </text>
-      <!-- SYS→TECH Output (far left, below input) -->
-      <text fill="#64748b" font-size="10.5">
-        <tspan x="15" dy="580">- ผลตรวจสอบ Pass/Fail</tspan>
-        <tspan x="15" dy="15">- สถานะเครื่อง พร้อม/ไม่พร้อม</tspan>
-        <tspan x="15" dy="15">- รายการซ่อมอัตโนมัติ</tspan>
-        <tspan x="15" dy="15">- แจ้งเตือน Schedule</tspan>
-        <tspan x="15" dy="15">- รายงานสถิติ Analytics</tspan>
-        <tspan x="15" dy="15">- Export PDF F1-F13</tspan>
+      <!-- TECH Output ← (right of line, below input) -->
+      <text class="df" fill="#666">
+        <tspan x="18" y="760">- ผลตรวจสอบ Pass/Fail</tspan>
+        <tspan x="18" dy="15">- สถานะเครื่อง พร้อม/ไม่พร้อม</tspan>
+        <tspan x="18" dy="15">- รายการซ่อมอัตโนมัติ</tspan>
+        <tspan x="18" dy="15">- แจ้งเตือน Schedule</tspan>
+        <tspan x="18" dy="15">- รายงานสถิติ Analytics</tspan>
+        <tspan x="18" dy="15">- Export PDF F1-F13</tspan>
       </text>
 
-      <!-- ===== ENGINEER (bottom-right) ===== -->
-      <rect x="980" y="720" width="210" height="55" rx="6" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2"/>
-      <text x="1085" y="743" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">Engineer</text>
-      <text x="1085" y="762" text-anchor="middle" fill="#64748b" font-size="11">ช่างซ่อมบำรุง</text>
-      <!-- ENG→SYS Input (far right, stacked above output) -->
-      <text fill="#1e293b" font-size="10.5">
-        <tspan x="1100" dy="490">- Login เข้าสู่ระบบ</tspan>
-        <tspan x="1100" dy="15">- อัปเดตสถานะซ่อม</tspan>
-        <tspan x="1100" dy="15">  Pending/InProgress/Completed</tspan>
+      <!-- ========== ENGINEER (bottom-right) ========== -->
+      <rect x="855" y="900" width="210" height="65" class="cb"/>
+      <text x="960" y="930" class="ct">Engineer</text>
+      <text x="960" y="948" class="cs2">ช่างซ่อมบำรุง</text>
+
+      <!-- ENG Input → (right of line) -->
+      <text class="df" text-anchor="end">
+        <tspan x="1080" y="660">- Login เข้าสู่ระบบ</tspan>
+        <tspan x="1080" dy="15">- อัปเดตสถานะซ่อม</tspan>
+        <tspan x="1080" dy="15">  Pending/InProgress/Completed</tspan>
       </text>
-      <!-- SYS→ENG Output (far right, below input) -->
-      <text fill="#64748b" font-size="10.5">
-        <tspan x="1100" dy="555">- รายการแจ้งซ่อมทั้งหมด</tspan>
-        <tspan x="1100" dy="15">- สถิติการซ่อม</tspan>
-        <tspan x="1100" dy="15">- Engineer Analytics</tspan>
+      <!-- ENG Output ← (left of line) -->
+      <text class="df" fill="#666" text-anchor="end">
+        <tspan x="830" y="750">- รายการแจ้งซ่อมทั้งหมด</tspan>
+        <tspan x="830" dy="15">- สถิติการซ่อม</tspan>
+        <tspan x="830" dy="15">- Engineer Analytics</tspan>
       </text>
 
-      <!-- ===== DATABASE (bottom-center) ===== -->
-      <ellipse cx="600" cy="660" rx="82" ry="16" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
-      <rect x="518" y="660" width="164" height="38" fill="#fce7f3" stroke="none"/>
-      <line x1="518" y1="660" x2="518" y2="698" stroke="#ec4899" stroke-width="2"/>
-      <line x1="682" y1="660" x2="682" y2="698" stroke="#ec4899" stroke-width="2"/>
-      <ellipse cx="600" cy="698" rx="82" ry="16" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
-      <text x="600" y="680" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="700">PostgreSQL</text>
-      <text x="600" y="696" text-anchor="middle" fill="#64748b" font-size="10">Database</text>
-      <!-- SYS→DB Input (left of vertical line) -->
-      <text fill="#1e293b" font-size="10" text-anchor="end">
-        <tspan x="570" dy="475">- CRUD Hospitals/Users</tspan>
-        <tspan x="570" dy="14">- CRUD Machines/Schedules</tspan>
-        <tspan x="570" dy="14">- Save/Get Checklists</tspan>
-        <tspan x="570" dy="14">- CRUD RepairRequests</tspan>
-        <tspan x="570" dy="14">- Get Notifications</tspan>
+      <!-- ========== DATABASE (bottom-center) ========== -->
+      <rect x="435" y="820" width="230" height="55" class="cb"/>
+      <text x="550" y="852" class="ct">PostgreSQL Database</text>
+
+      <!-- DB Input → (left of vertical line) -->
+      <text class="df" text-anchor="end">
+        <tspan x="520" y="630">- CRUD Hospitals/Users</tspan>
+        <tspan x="520" dy="15">- CRUD Machines/Schedules</tspan>
+        <tspan x="520" dy="15">- Save/Get Checklists</tspan>
+        <tspan x="520" dy="15">- CRUD RepairRequests</tspan>
+        <tspan x="520" dy="15">- Get Notifications</tspan>
       </text>
-      <!-- DB→SYS Output (right of vertical line) -->
-      <text fill="#64748b" font-size="10">
-        <tspan x="635" dy="475">- ข้อมูลโรงพยาบาล</tspan>
-        <tspan x="635" dy="14">- ข้อมูลผู้ใช้งาน/เครื่อง</tspan>
-        <tspan x="635" dy="14">- ข้อมูลผลตรวจ</tspan>
-        <tspan x="635" dy="14">- ข้อมูลแจ้งซ่อม</tspan>
-        <tspan x="635" dy="14">- ข้อมูลตาราง Schedule</tspan>
+      <!-- DB Output ← (right of vertical line) -->
+      <text class="df" fill="#666">
+        <tspan x="580" y="630">- ข้อมูลโรงพยาบาล</tspan>
+        <tspan x="580" dy="15">- ข้อมูลผู้ใช้งาน/เครื่อง</tspan>
+        <tspan x="580" dy="15">- ข้อมูลผลตรวจ</tspan>
+        <tspan x="580" dy="15">- ข้อมูลแจ้งซ่อม</tspan>
+        <tspan x="580" dy="15">- ข้อมูลตาราง Schedule</tspan>
       </text>
+
+      <!-- ========== LEGEND ========== -->
+      <g transform="translate(30,1005)">
+        <text fill="#555" font-size="10.5">
+          <tspan font-weight="700">สัญลักษณ์:</tspan>
+          <tspan dx="5">สี่เหลี่ยม = External Entity | กล่อง "0" = Process (ระบบหลัก) | เส้นตรง = Data Flow | สีเข้ม = ข้อมูลเข้า (Input) | สีจาง = ข้อมูลออก (Output)</tspan>
+        </text>
+      </g>
     </svg>
-    <div style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid var(--border)">
-      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text)">External Entities and Data Flows</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;font-size:12px">
-        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #ea580c">
-          <strong>SuperAdmin</strong>
-          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
-            <u>Input:</u> Login, จัดการผู้ใช้ทุก รพ., จัดการโรงพยาบาล, ตั้งค่าระบบ<br>
-            <u>Output:</u> ผลจัดการ User/Hospital, Admin Analytics, รายงานภาพรวม
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #d97706">
-          <strong>Admin</strong>
-          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
-            <u>Input:</u> Login, จัดการผู้ใช้เฉพาะ รพ.<br>
-            <u>Output:</u> ผลจัดการ User, Admin Analytics เฉพาะ รพ.
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #10b981">
-          <strong>Radiological Technologist</strong>
-          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
-            <u>Input:</u> Login, บันทึกผลตรวจ F1-F13, จัดการเครื่อง, แจ้งซ่อม, PM Schedule, แนบรูปภาพ<br>
-            <u>Output:</u> ผลตรวจ Pass/Fail, สถานะเครื่อง, Repair อัตโนมัติ, แจ้งเตือน, Analytics, Export PDF
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #3b82f6">
-          <strong>Engineer</strong>
-          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
-            <u>Input:</u> Login, อัปเดตสถานะซ่อม (Pending/In Progress/Completed)<br>
-            <u>Output:</u> รายการแจ้งซ่อม, สถิติการซ่อม, Engineer Analytics
-          </div>
-        </div>
-        <div style="background:#fff;padding:12px;border-radius:8px;border-left:4px solid #ec4899">
-          <strong>PostgreSQL Database</strong>
-          <div style="color:var(--muted);margin-top:4px;line-height:1.7">
-            <u>Input:</u> CRUD operations ผ่าน REST API (Hospitals, Users, Machines, Checklists, Repairs, Schedules)<br>
-            <u>Output:</u> ข้อมูลทั้งหมดของระบบ, Notifications (คำนวณจาก ScheduleConfigs)
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:12px;font-size:11px;color:var(--muted)">
-        <strong>Architecture:</strong> Vue 3 SPA (port 5173) → Vite Proxy → ASP.NET Core API (port 8001) → PostgreSQL via EF Core + Npgsql | Headers: X-User-Id, X-Hospital-Id | CORS: localhost:5173
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1376,38 +1457,7 @@ erDiagram
       head.appendChild(btn);
     });
 
-    setTimeout(() => {
-      const svg = document.querySelector('#s21 .mermaid svg');
-      if (!svg) return;
-      const labels = svg.querySelectorAll('g');
-      labels.forEach(g => {
-        if (!g.classList.contains('er') || !g.querySelector('text')) return;
-        const cl = Array.from(g.classList);
-        if (!cl.includes('relationshipLabel')) return;
-        const t = g.getAttribute('transform');
-        if (!t) return;
-        const m = t.match(/translate\(\s*([\d.\-e]+)\s*,\s*([\d.\-e]+)\s*\)/);
-        if (!m) return;
-        const x = parseFloat(m[1]), y = parseFloat(m[2]);
-        g.setAttribute('transform', 'translate(' + x + ',' + (y - 20) + ')');
-        const rect = g.querySelector('rect');
-        if (rect) {
-          rect.setAttribute('fill', '#ffffff');
-          rect.setAttribute('stroke', '#4f6ef7');
-          rect.setAttribute('stroke-width', '2');
-          rect.setAttribute('rx', '8');
-          rect.setAttribute('ry', '8');
-          const rh = parseFloat(rect.getAttribute('height') || 20);
-          rect.setAttribute('height', rh + 8);
-          const rw = parseFloat(rect.getAttribute('width') || 40);
-          rect.setAttribute('width', rw + 12);
-          const rx = parseFloat(rect.getAttribute('x') || 0);
-          rect.setAttribute('x', rx - 6);
-          const ry2 = parseFloat(rect.getAttribute('y') || 0);
-          rect.setAttribute('y', ry2 - 4);
-        }
-      });
-    }, 2000);
+    
   });
 
   async function exportSectionPDF(section, btn) {
