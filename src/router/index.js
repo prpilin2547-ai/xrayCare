@@ -73,6 +73,7 @@ const routes = [
   { path: '/f13', name: 'F13', component: F13, meta: { roles: ADMIN_TECH } },
   { path: '/qc-forms', name: 'QCFormsHub', component: QCFormsHub, meta: { roles: ADMIN_TECH } },
   { path: '/custom-form-builder', name: 'CustomFormBuilder', component: CustomFormBuilder, meta: { roles: ADMIN_TECH } },
+  { path: '/custom-forms/:id', name: 'CustomFormView', component: CustomFormBuilder, props: true, meta: { roles: ADMIN_TECH } },
 
   // === ADMIN pages ===
   { path: '/admindashboard', component: Dashboarddmin, meta: { roles: ADMIN } },
