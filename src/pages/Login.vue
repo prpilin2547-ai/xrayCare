@@ -223,11 +223,10 @@ const handleLogin = async () => {
 
 .login-card {
   position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(18, 14, 40, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 40px 36px 32px;
@@ -276,6 +275,8 @@ const handleLogin = async () => {
 
 .form-group {
   margin-bottom: 18px;
+  position: relative;
+  z-index: 20;
 }
 
 label {
@@ -295,6 +296,8 @@ label {
   border-radius: 12px;
   padding: 0 14px;
   transition: all 200ms ease;
+  position: relative;
+  z-index: 20;
 }
 
 .input-wrapper:focus-within {
@@ -335,12 +338,17 @@ label {
   padding: 12px 0;
   font-size: 0.9rem;
   color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
   outline: none;
   cursor: pointer;
+  position: relative;
+  z-index: 30;
+  font-family: inherit;
 }
 
 .login-select option {
-  color: #0f172a;
+  color: #1e293b;
+  background: #ffffff;
 }
 
 .eye-btn {
