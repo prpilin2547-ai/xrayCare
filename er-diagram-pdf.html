@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<title>ER Diagram - xrayCare System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif;background:#f0f0f0;display:flex;flex-direction:column;align-items:center;padding:20px}
+  #pdf-content{background:#fff;width:297mm;padding:12mm 10mm;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+  .header{text-align:center;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #d4956b}
+  .header h1{font-size:22px;color:#1e293b;margin-bottom:2px}
+  .header p{font-size:12px;color:#666}
+  .diagram-wrap{display:flex;justify-content:center;margin:10px 0}
+  .diagram-wrap svg{width:100%;max-width:100%}
+  .info-section{margin-top:12px;page-break-inside:avoid}
+  .info-section h2{font-size:15px;color:#d4956b;border-bottom:1.5px solid #e8d5c4;padding-bottom:4px;margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
+  th{background:#d4956b;color:#fff;padding:6px 8px;text-align:left;font-weight:600}
+  td{padding:5px 8px;border-bottom:1px solid #e8e8e8;color:#333}
+  tr:nth-child(even) td{background:#faf8f6}
+  .rel-table th{font-size:10.5px}
+  .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;color:#fff}
+  .badge-pk{background:#2563eb}
+  .badge-fk{background:#dc2626}
+  .footer{text-align:center;margin-top:10px;font-size:10px;color:#999;border-top:1px solid #e0e0e0;padding-top:6px}
+  .btn-bar{margin:16px 0;display:flex;gap:10px;justify-content:center}
+  .btn{padding:10px 28px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn-pdf{background:#d4956b;color:#fff}
+  .btn-pdf:hover{background:#c07b4e;box-shadow:0 4px 12px rgba(212,149,107,.4)}
+  .btn-print{background:#2563eb;color:#fff}
+  .btn-print:hover{background:#1d4ed8}
+  .status{font-size:13px;color:#666;margin-top:8px;min-height:20px;text-align:center}
+  @media print{
+    body{background:#fff;padding:0}
+    .btn-bar,.status{display:none!important}
+    #pdf-content{box-shadow:none;padding:8mm}
+    @page{size:A4 landscape;margin:8mm}
+  }
+</style>
+</head>
+<body>
+
+<div class="btn-bar">
+  <button class="btn btn-pdf" onclick="savePDF()">Save as PDF</button>
+  <button class="btn btn-print" onclick="window.print()">Print (Ctrl+P)</button>
+</div>
+<div class="status" id="status"></div>
+
+<div id="pdf-content">
+  <div class="header">
+    <h1>Entity Relationship Diagram (ER Diagram)</h1>
+    <p>ระบบจัดการคุณภาพเครื่องเอกซเรย์ xrayCare | Database: PostgreSQL via Entity Framework Core</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1200 900" style="width:100%;font-family:'Segoe UI','Noto Sans Thai',sans-serif" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .er-hdr{fill:#d4956b;stroke:#c07b4e;stroke-width:1.2}
+          .er-body{fill:#fff;stroke:#c8c8c8;stroke-width:1}
+          .er-sep{stroke:#e2e2e2;stroke-width:.6}
+          .er-ht{fill:#fff;font-size:14px;font-weight:700;text-anchor:middle}
+          .er-f{fill:#333;font-size:11.5px;font-weight:600}
+          .er-t{fill:#999;font-size:11px}
+          .er-b{font-size:10px;font-weight:700}
+          .er-pk{fill:#2563eb}.er-fk{fill:#dc2626}
+          .er-ln{stroke:#aaa;stroke-width:1.3;fill:none}
+          .er-c{fill:#555;font-size:11px;font-weight:600}
+          .er-lb{fill:#f8f6f2;stroke:#c8c8c8;stroke-width:.8}
+          .er-lt{fill:#555;font-size:10.5px;font-weight:600;text-anchor:middle}
+        </style>
+      </defs>
+
+      <!-- RELATIONSHIP LINES -->
+      <line x1="490" y1="116" x2="150" y2="255" class="er-ln"/>
+      <text x="475" y="138" class="er-c">1</text><text x="160" y="252" class="er-c">*</text>
+      <line x1="565" y1="116" x2="515" y2="255" class="er-ln"/>
+      <text x="560" y="138" class="er-c">1</text><text x="518" y="252" class="er-c">*</text>
+      <line x1="680" y1="116" x2="1005" y2="255" class="er-ln"/>
+      <text x="700" y="148" class="er-c">1</text><text x="985" y="252" class="er-c">*</text>
+      <path d="M535,116 V195 H330 V565" class="er-ln"/>
+      <text x="540" y="142" class="er-c">1</text><text x="335" y="560" class="er-c">*</text>
+      <path d="M645,116 V205 H760 V565" class="er-ln"/>
+      <text x="650" y="142" class="er-c">1</text><text x="755" y="560" class="er-c">*</text>
+      <line x1="150" y1="417" x2="190" y2="565" class="er-ln"/>
+      <text x="145" y="433" class="er-c">1</text><text x="193" y="560" class="er-c">*</text>
+      <line x1="450" y1="417" x2="300" y2="565" class="er-ln"/>
+      <text x="446" y="433" class="er-c">1</text><text x="305" y="560" class="er-c">*</text>
+      <line x1="580" y1="417" x2="650" y2="565" class="er-ln"/>
+      <text x="575" y="433" class="er-c">1</text><text x="655" y="560" class="er-c">*</text>
+      <line x1="935" y1="417" x2="345" y2="565" class="er-ln"/>
+      <text x="920" y="433" class="er-c">1</text><text x="355" y="560" class="er-c">*</text>
+      <line x1="1050" y1="417" x2="810" y2="565" class="er-ln"/>
+      <text x="1040" y="433" class="er-c">1</text><text x="815" y="560" class="er-c">*</text>
+
+      <!-- HOSPITAL -->
+      <g transform="translate(440,20)">
+        <rect x="0" y="0" width="310" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="310" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="310" height="66" class="er-body"/>
+        <text x="155" y="21" class="er-ht">Hospital</text>
+        <line x1="55" y1="30" x2="55" y2="96" class="er-sep"/><line x1="260" y1="30" x2="260" y2="96" class="er-sep"/>
+        <line x1="0" y1="52" x2="310" y2="52" class="er-sep"/><line x1="0" y1="74" x2="310" y2="74" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="268" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">text</text><text x="63" y="69" class="er-f">Name</text>
+        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Code</text>
+      </g>
+
+      <!-- SCHEDULECONFIG -->
+      <g transform="translate(20,255)">
+        <rect x="0" y="0" width="260" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="260" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="260" height="132" class="er-body"/>
+        <text x="130" y="21" class="er-ht">ScheduleConfig</text>
+        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/><line x1="210" y1="30" x2="210" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="260" y2="52" class="er-sep"/><line x1="0" y1="74" x2="260" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="260" y2="96" class="er-sep"/><line x1="0" y1="118" x2="260" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="260" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="218" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="218" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">StartDate</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">FrequencyType</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Description</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">FormTypes</text>
+      </g>
+
+      <!-- MACHINE -->
+      <g transform="translate(380,255)">
+        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="270" height="132" class="er-body"/>
+        <text x="135" y="21" class="er-ht">Machine</text>
+        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/><line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/><line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/><line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Machine_name</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Register_date</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">Caretaker</text>
+      </g>
+
+      <!-- USERACCOUNT -->
+      <g transform="translate(870,255)">
+        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="270" height="132" class="er-body"/>
+        <text x="135" y="21" class="er-ht">UserAccount</text>
+        <line x1="55" y1="30" x2="55" y2="162" class="er-sep"/><line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
+        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/><line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/><line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="63" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Username</text>
+        <text x="8" y="113" class="er-t">text</text><text x="63" y="113" class="er-f">Password</text>
+        <text x="8" y="135" class="er-t">text</text><text x="63" y="135" class="er-f">Position</text>
+        <text x="8" y="157" class="er-t">bool</text><text x="63" y="157" class="er-f">IsSuperAdmin</text>
+      </g>
+
+      <!-- CHECKLISTRECORD -->
+      <g transform="translate(100,565)">
+        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="275" height="176" class="er-body"/>
+        <text x="137" y="21" class="er-ht">ChecklistRecord</text>
+        <line x1="50" y1="30" x2="50" y2="206" class="er-sep"/><line x1="225" y1="30" x2="225" y2="206" class="er-sep"/>
+        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/><line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/><line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/><line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
+        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">FormType</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">MachineName</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Room</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">CheckDate</text>
+        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Tester</text>
+        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">JsonData</text>
+      </g>
+
+      <!-- REPAIRREQUEST -->
+      <g transform="translate(580,565)">
+        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
+        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="30" width="275" height="220" class="er-body"/>
+        <text x="137" y="21" class="er-ht">RepairRequest</text>
+        <line x1="50" y1="30" x2="50" y2="250" class="er-sep"/><line x1="225" y1="30" x2="225" y2="250" class="er-sep"/>
+        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/><line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
+        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/><line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
+        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/><line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
+        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/><line x1="0" y1="206" x2="275" y2="206" class="er-sep"/>
+        <line x1="0" y1="228" x2="275" y2="228" class="er-sep"/>
+        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
+        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
+        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Equipment</text>
+        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
+        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">RequestDate</text>
+        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">ReporterName</text>
+        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Detail</text>
+        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">Remarks</text>
+        <text x="8" y="223" class="er-t">text</text><text x="58" y="223" class="er-f">StatusText</text>
+        <text x="8" y="245" class="er-t">text</text><text x="58" y="245" class="er-f">ImageData</text>
+      </g>
+
+      <!-- RELATIONSHIP LABELS -->
+      <rect x="125" y="483" width="62" height="18" rx="4" class="er-lb"/>
+      <text x="156" y="496" class="er-lt">triggers</text>
+      <rect x="348" y="483" width="60" height="18" rx="4" class="er-lb"/>
+      <text x="378" y="496" class="er-lt">checked</text>
+      <rect x="583" y="478" width="66" height="18" rx="4" class="er-lb"/>
+      <text x="616" y="491" class="er-lt">repaired</text>
+      <rect x="591" y="502" width="50" height="18" rx="4" class="er-lb"/>
+      <text x="616" y="515" class="er-lt">tested</text>
+      <rect x="902" y="483" width="66" height="18" rx="4" class="er-lb"/>
+      <text x="935" y="496" class="er-lt">reported</text>
+
+      <!-- LEGEND -->
+      <g transform="translate(25,840)">
+        <rect x="0" y="0" width="560" height="45" rx="6" fill="#f8f6f2" stroke="#e0ddd8" stroke-width="1"/>
+        <rect x="15" y="9" width="24" height="13" rx="3" fill="#d4956b" stroke="#c07b4e" stroke-width="1"/>
+        <text x="46" y="20" fill="#555" font-size="11">Entity Header</text>
+        <text x="150" y="20" fill="#2563eb" font-size="10" font-weight="700">PK</text><text x="168" y="20" fill="#555" font-size="11">= Primary Key</text>
+        <text x="278" y="20" fill="#dc2626" font-size="10" font-weight="700">FK</text><text x="296" y="20" fill="#555" font-size="11">= Foreign Key</text>
+        <text x="15" y="37" fill="#555" font-size="10.5">1 = One side | * = Many side | Database: PostgreSQL via Entity Framework Core</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ENTITY DETAILS TABLE -->
+  <div class="info-section">
+    <h2>Entity Details</h2>
+    <table>
+      <thead><tr><th>Entity</th><th>Table Name</th><th>Fields</th><th>PK</th><th>FK</th></tr></thead>
+      <tbody>
+        <tr><td><b>Hospital</b></td><td>Hospitals</td><td>RID (int), Name (text), Code (text)</td><td>RID</td><td>-</td></tr>
+        <tr><td><b>ScheduleConfig</b></td><td>ScheduleConfigs</td><td>RID (int), HospitalId (int), StartDate (text), FrequencyType (text), Description (text), FormTypes (text)</td><td>RID</td><td>HospitalId</td></tr>
+        <tr><td><b>Machine</b></td><td>Machines</td><td>RID (int), HospitalId (int), Machine_name (text), Room (text), Register_date (text), Caretaker (text)</td><td>RID</td><td>HospitalId</td></tr>
+        <tr><td><b>UserAccount</b></td><td>Users</td><td>RID (int), HospitalId (int), Username (text), Password (text), Position (text), IsSuperAdmin (bool)</td><td>RID</td><td>HospitalId</td></tr>
+        <tr><td><b>ChecklistRecord</b></td><td>ChecklistRecords</td><td>RID (int), HospitalId (int), FormType (text), MachineName (text), Room (text), CheckDate (text), Tester (text), JsonData (text)</td><td>RID</td><td>HospitalId</td></tr>
+        <tr><td><b>RepairRequest</b></td><td>RepairRequests</td><td>RID (int), HospitalId (int), Equipment (text), Room (text), RequestDate (text), ReporterName (text), Detail (text), Remarks (text), StatusText (text), ImageData (text)</td><td>RID</td><td>HospitalId</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RELATIONSHIP TABLE -->
+  <div class="info-section">
+    <h2>Relationships</h2>
+    <table class="rel-table">
+      <thead><tr><th>From Entity</th><th>To Entity</th><th>Cardinality</th><th>Label</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Hospital</td><td>ScheduleConfig</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลาย ScheduleConfig ผ่าน HospitalId</td></tr>
+        <tr><td>Hospital</td><td>Machine</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายเครื่องเอกซเรย์ ผ่าน HospitalId</td></tr>
+        <tr><td>Hospital</td><td>UserAccount</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายผู้ใช้งาน ผ่าน HospitalId</td></tr>
+        <tr><td>Hospital</td><td>ChecklistRecord</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายรายการตรวจ ผ่าน HospitalId</td></tr>
+        <tr><td>Hospital</td><td>RepairRequest</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายรายการแจ้งซ่อม ผ่าน HospitalId</td></tr>
+        <tr><td>ScheduleConfig</td><td>ChecklistRecord</td><td>1 : *</td><td>triggers</td><td>ตารางกำหนดการ trigger การสร้างรายการตรวจ</td></tr>
+        <tr><td>Machine</td><td>ChecklistRecord</td><td>1 : *</td><td>checked</td><td>เครื่องเอกซเรย์ถูกตรวจสอบ สร้างรายการตรวจ</td></tr>
+        <tr><td>Machine</td><td>RepairRequest</td><td>1 : *</td><td>repaired</td><td>เครื่องเอกซเรย์มีหลายรายการแจ้งซ่อม</td></tr>
+        <tr><td>UserAccount</td><td>ChecklistRecord</td><td>1 : *</td><td>tested</td><td>ผู้ใช้งานบันทึกผลการตรวจสอบ</td></tr>
+        <tr><td>UserAccount</td><td>RepairRequest</td><td>1 : *</td><td>reported</td><td>ผู้ใช้งานแจ้งซ่อมเครื่อง</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    xrayCare System - Entity Relationship Diagram | Generated: <span id="gen-date"></span> | Vue 3 + ASP.NET Core + PostgreSQL
+  </div>
+</div>
+
+<script>
+document.getElementById('gen-date').textContent = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+
+function savePDF(){
+  var st = document.getElementById('status');
+  st.textContent = 'Generating PDF...';
+  var el = document.getElementById('pdf-content');
+  var svgs = el.querySelectorAll('svg');
+  svgs.forEach(function(s){
+    if(!s.getAttribute('width')){
+      var vb = s.getAttribute('viewBox');
+      if(vb){var p=vb.split(/\s+/); s.setAttribute('width',p[2]); s.setAttribute('height',p[3]);}
+    }
+  });
+  var opt = {
+    margin: [5,5,5,5],
+    filename: 'xrayCare-ER-Diagram.pdf',
+    image: {type:'jpeg',quality:0.98},
+    html2canvas: {scale:2, useCORS:true, windowWidth:1200},
+    jsPDF: {unit:'mm',format:'a4',orientation:'landscape'},
+    pagebreak: {mode:['css'],avoid:'.info-section'}
+  };
+  html2pdf().set(opt).from(el).save().then(function(){
+    st.textContent = 'PDF saved: xrayCare-ER-Diagram.pdf';
+  }).catch(function(e){
+    st.textContent = 'Error: ' + e.message;
+  });
+}
+</script>
+</body>
+</html>
