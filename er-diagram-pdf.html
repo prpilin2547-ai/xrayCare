@@ -6,37 +6,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif;background:#f0f0f0;display:flex;flex-direction:column;align-items:center;padding:20px}
-  #pdf-content{background:#fff;width:297mm;padding:12mm 10mm;box-shadow:0 2px 12px rgba(0,0,0,.12)}
-  .header{text-align:center;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid #d4956b}
-  .header h1{font-size:22px;color:#1e293b;margin-bottom:2px}
-  .header p{font-size:12px;color:#666}
-  .diagram-wrap{display:flex;justify-content:center;margin:10px 0}
+  body{font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif;background:#eee;display:flex;flex-direction:column;align-items:center;padding:20px}
+  #pdf-content{background:#fff;width:297mm;padding:10mm 8mm;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+  .header{text-align:center;margin-bottom:6px;padding-bottom:8px;border-bottom:2px solid #d4956b}
+  .header h1{font-size:20px;color:#1e293b;margin-bottom:2px}
+  .header p{font-size:11px;color:#666}
+  .diagram-wrap{display:flex;justify-content:center;margin:6px 0}
   .diagram-wrap svg{width:100%;max-width:100%}
-  .info-section{margin-top:12px;page-break-inside:avoid}
-  .info-section h2{font-size:15px;color:#d4956b;border-bottom:1.5px solid #e8d5c4;padding-bottom:4px;margin-bottom:8px}
-  table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
-  th{background:#d4956b;color:#fff;padding:6px 8px;text-align:left;font-weight:600}
-  td{padding:5px 8px;border-bottom:1px solid #e8e8e8;color:#333}
+  .info-section{margin-top:10px;page-break-inside:avoid}
+  .info-section h2{font-size:14px;color:#d4956b;border-bottom:1.5px solid #e8d5c4;padding-bottom:3px;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:8px}
+  th{background:#d4956b;color:#fff;padding:5px 7px;text-align:left;font-weight:600}
+  td{padding:4px 7px;border-bottom:1px solid #e8e8e8;color:#333}
   tr:nth-child(even) td{background:#faf8f6}
-  .rel-table th{font-size:10.5px}
-  .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;color:#fff}
-  .badge-pk{background:#2563eb}
-  .badge-fk{background:#dc2626}
-  .footer{text-align:center;margin-top:10px;font-size:10px;color:#999;border-top:1px solid #e0e0e0;padding-top:6px}
-  .btn-bar{margin:16px 0;display:flex;gap:10px;justify-content:center}
+  .footer{text-align:center;margin-top:8px;font-size:9.5px;color:#999;border-top:1px solid #e0e0e0;padding-top:5px}
+  .btn-bar{margin:14px 0;display:flex;gap:10px;justify-content:center}
   .btn{padding:10px 28px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
-  .btn-pdf{background:#d4956b;color:#fff}
-  .btn-pdf:hover{background:#c07b4e;box-shadow:0 4px 12px rgba(212,149,107,.4)}
-  .btn-print{background:#2563eb;color:#fff}
-  .btn-print:hover{background:#1d4ed8}
-  .status{font-size:13px;color:#666;margin-top:8px;min-height:20px;text-align:center}
-  @media print{
-    body{background:#fff;padding:0}
-    .btn-bar,.status{display:none!important}
-    #pdf-content{box-shadow:none;padding:8mm}
-    @page{size:A4 landscape;margin:8mm}
-  }
+  .btn-pdf{background:#d4956b;color:#fff}.btn-pdf:hover{background:#c07b4e}
+  .btn-print{background:#2563eb;color:#fff}.btn-print:hover{background:#1d4ed8}
+  .status{font-size:13px;color:#666;margin-top:6px;min-height:20px;text-align:center}
+  @media print{body{background:#fff;padding:0}.btn-bar,.status{display:none!important}#pdf-content{box-shadow:none;padding:6mm}@page{size:A4 landscape;margin:6mm}}
 </style>
 </head>
 <body>
@@ -50,254 +39,301 @@
 <div id="pdf-content">
   <div class="header">
     <h1>Entity Relationship Diagram (ER Diagram)</h1>
-    <p>ระบบจัดการคุณภาพเครื่องเอกซเรย์ xrayCare | Database: PostgreSQL via Entity Framework Core</p>
+    <p>xrayCare - X-ray Quality Management System | Crow's Foot Notation | PostgreSQL + Entity Framework Core</p>
   </div>
 
   <div class="diagram-wrap">
-    <svg viewBox="0 0 1200 900" style="width:100%;font-family:'Segoe UI','Noto Sans Thai',sans-serif" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 1300 860" style="width:100%;font-family:'Segoe UI','Noto Sans Thai',sans-serif" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <style>
-          .er-hdr{fill:#d4956b;stroke:#c07b4e;stroke-width:1.2}
-          .er-body{fill:#fff;stroke:#c8c8c8;stroke-width:1}
-          .er-sep{stroke:#e2e2e2;stroke-width:.6}
-          .er-ht{fill:#fff;font-size:14px;font-weight:700;text-anchor:middle}
-          .er-f{fill:#333;font-size:11.5px;font-weight:600}
-          .er-t{fill:#999;font-size:11px}
-          .er-b{font-size:10px;font-weight:700}
-          .er-pk{fill:#2563eb}.er-fk{fill:#dc2626}
-          .er-ln{stroke:#aaa;stroke-width:1.3;fill:none}
-          .er-c{fill:#555;font-size:11px;font-weight:600}
-          .er-lb{fill:#f8f6f2;stroke:#c8c8c8;stroke-width:.8}
-          .er-lt{fill:#555;font-size:10.5px;font-weight:600;text-anchor:middle}
+          .eh{fill:#d4956b;stroke:#c07b4e;stroke-width:1.2}
+          .eb{fill:#fff;stroke:#bbb;stroke-width:1}
+          .es{stroke:#ddd;stroke-width:.5}
+          .eht{fill:#fff;font-size:13.5px;font-weight:700;text-anchor:middle}
+          .ef{fill:#333;font-size:11px;font-weight:600}
+          .efu{fill:#333;font-size:11px;font-weight:700;text-decoration:underline}
+          .et{fill:#888;font-size:10.5px}
+          .epk{fill:#2563eb;font-size:9.5px;font-weight:700}
+          .efk{fill:#dc2626;font-size:9.5px;font-weight:700}
+          .rl{stroke:#555;stroke-width:1.4;fill:none}
+          .cf{stroke:#555;stroke-width:1.4;fill:none}
+          .cb{stroke:#555;stroke-width:1.4}
+          .lbl{fill:#fff;stroke:#bbb;stroke-width:.7}
+          .lt{fill:#555;font-size:9.5px;font-weight:600;text-anchor:middle}
+          .note{fill:#999;font-size:9px;font-style:italic}
         </style>
       </defs>
 
-      <!-- RELATIONSHIP LINES -->
-      <line x1="490" y1="116" x2="150" y2="255" class="er-ln"/>
-      <text x="475" y="138" class="er-c">1</text><text x="160" y="252" class="er-c">*</text>
-      <line x1="565" y1="116" x2="515" y2="255" class="er-ln"/>
-      <text x="560" y="138" class="er-c">1</text><text x="518" y="252" class="er-c">*</text>
-      <line x1="680" y1="116" x2="1005" y2="255" class="er-ln"/>
-      <text x="700" y="148" class="er-c">1</text><text x="985" y="252" class="er-c">*</text>
-      <path d="M535,116 V195 H330 V565" class="er-ln"/>
-      <text x="540" y="142" class="er-c">1</text><text x="335" y="560" class="er-c">*</text>
-      <path d="M645,116 V205 H760 V565" class="er-ln"/>
-      <text x="650" y="142" class="er-c">1</text><text x="755" y="560" class="er-c">*</text>
-      <line x1="150" y1="417" x2="190" y2="565" class="er-ln"/>
-      <text x="145" y="433" class="er-c">1</text><text x="193" y="560" class="er-c">*</text>
-      <line x1="450" y1="417" x2="300" y2="565" class="er-ln"/>
-      <text x="446" y="433" class="er-c">1</text><text x="305" y="560" class="er-c">*</text>
-      <line x1="580" y1="417" x2="650" y2="565" class="er-ln"/>
-      <text x="575" y="433" class="er-c">1</text><text x="655" y="560" class="er-c">*</text>
-      <line x1="935" y1="417" x2="345" y2="565" class="er-ln"/>
-      <text x="920" y="433" class="er-c">1</text><text x="355" y="560" class="er-c">*</text>
-      <line x1="1050" y1="417" x2="810" y2="565" class="er-ln"/>
-      <text x="1040" y="433" class="er-c">1</text><text x="815" y="560" class="er-c">*</text>
+      <!-- ══════════════ RELATIONSHIP LINES ══════════════ -->
 
-      <!-- HOSPITAL -->
-      <g transform="translate(440,20)">
-        <rect x="0" y="0" width="310" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="310" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="310" height="66" class="er-body"/>
-        <text x="155" y="21" class="er-ht">Hospital</text>
-        <line x1="55" y1="30" x2="55" y2="96" class="er-sep"/><line x1="260" y1="30" x2="260" y2="96" class="er-sep"/>
-        <line x1="0" y1="52" x2="310" y2="52" class="er-sep"/><line x1="0" y1="74" x2="310" y2="74" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="268" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">text</text><text x="63" y="69" class="er-f">Name</text>
-        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Code</text>
+      <!-- 1. Hospital → ScheduleConfig (1:M) via HospitalId -->
+      <path d="M470,51 H378 V309 H285" class="rl"/>
+      <line x1="465" y1="44" x2="465" y2="58" class="cb"/>
+      <path d="M295,309 L285,302 M295,309 L285,309 M295,309 L285,316" class="cf"/>
+
+      <!-- 2. Hospital → Machine (1:M) via HospitalId -->
+      <path d="M555,106 V248" class="rl"/>
+      <line x1="548" y1="111" x2="562" y2="111" class="cb"/>
+      <path d="M555,238 L548,248 M555,238 L555,248 M555,238 L562,248" class="cf"/>
+
+      <!-- 3. Hospital → UserAccount (1:M) via HospitalId -->
+      <path d="M790,51 H865 V309 H940" class="rl"/>
+      <line x1="795" y1="44" x2="795" y2="58" class="cb"/>
+      <path d="M930,309 L940,302 M930,309 L940,309 M930,309 L940,316" class="cf"/>
+
+      <!-- 4. Hospital → ChecklistRecord (1:M) routed -->
+      <path d="M525,106 V190 H340 V555" class="rl"/>
+      <line x1="518" y1="111" x2="532" y2="111" class="cb"/>
+      <path d="M340,545 L333,555 M340,545 L340,555 M340,545 L347,555" class="cf"/>
+
+      <!-- 5. Hospital → RepairRequest (1:M) routed -->
+      <path d="M635,106 V200 H810 V555" class="rl"/>
+      <line x1="628" y1="111" x2="642" y2="111" class="cb"/>
+      <path d="M810,545 L803,555 M810,545 L810,555 M810,545 L817,555" class="cf"/>
+
+      <!-- 6. ScheduleConfig → ChecklistRecord (1:M) triggers -->
+      <path d="M148,408 V555" class="rl"/>
+      <line x1="141" y1="413" x2="155" y2="413" class="cb"/>
+      <path d="M148,545 L141,555 M148,545 L148,555 M148,545 L155,555" class="cf"/>
+
+      <!-- 7. Machine → ChecklistRecord (1:M) checked -->
+      <path d="M470,408 V472 H280 V555" class="rl"/>
+      <line x1="463" y1="413" x2="477" y2="413" class="cb"/>
+      <path d="M280,545 L273,555 M280,545 L280,555 M280,545 L287,555" class="cf"/>
+
+      <!-- 8. Machine → RepairRequest (1:M) repaired -->
+      <path d="M600,408 V472 H700 V555" class="rl"/>
+      <line x1="593" y1="413" x2="607" y2="413" class="cb"/>
+      <path d="M700,545 L693,555 M700,545 L700,555 M700,545 L707,555" class="cf"/>
+
+      <!-- 9. UserAccount → ChecklistRecord (1:M) tested -->
+      <path d="M1010,408 V492 H360 V555" class="rl"/>
+      <line x1="1003" y1="413" x2="1017" y2="413" class="cb"/>
+      <path d="M360,545 L353,555 M360,545 L360,555 M360,545 L367,555" class="cf"/>
+
+      <!-- 10. UserAccount → RepairRequest (1:M) reported -->
+      <path d="M1110,408 V508 H860 V555" class="rl"/>
+      <line x1="1103" y1="413" x2="1117" y2="413" class="cb"/>
+      <path d="M860,545 L853,555 M860,545 L860,555 M860,545 L867,555" class="cf"/>
+
+      <!-- ══════════════ RELATIONSHIP LABELS ══════════════ -->
+      <rect x="115" y="470" width="58" height="16" rx="3" class="lbl"/>
+      <text x="144" y="481" class="lt">triggers</text>
+
+      <rect x="340" y="462" width="55" height="16" rx="3" class="lbl"/>
+      <text x="367" y="473" class="lt">checked</text>
+
+      <rect x="622" y="462" width="58" height="16" rx="3" class="lbl"/>
+      <text x="651" y="473" class="lt">repaired</text>
+
+      <rect x="650" y="484" width="46" height="16" rx="3" class="lbl"/>
+      <text x="673" y="495" class="lt">tested</text>
+
+      <rect x="958" y="500" width="58" height="16" rx="3" class="lbl"/>
+      <text x="987" y="511" class="lt">reported</text>
+
+      <!-- ══════════════ ENTITIES ══════════════ -->
+
+      <!-- ═══ HOSPITAL (top center) ═══ -->
+      <!-- translate(470,12), w=320, h=94 -->
+      <g transform="translate(470,12)">
+        <rect x="0" y="0" width="320" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="320" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="320" height="66" class="eb"/>
+        <text x="160" y="20" class="eht">Hospital</text>
+        <line x1="50" y1="28" x2="50" y2="94" class="es"/>
+        <line x1="270" y1="28" x2="270" y2="94" class="es"/>
+        <line x1="0" y1="50" x2="320" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="320" y2="72" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="278" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">text</text><text x="58" y="67" class="ef">Name</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">Code</text>
       </g>
 
-      <!-- SCHEDULECONFIG -->
-      <g transform="translate(20,255)">
-        <rect x="0" y="0" width="260" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="260" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="260" height="132" class="er-body"/>
-        <text x="130" y="21" class="er-ht">ScheduleConfig</text>
-        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/><line x1="210" y1="30" x2="210" y2="162" class="er-sep"/>
-        <line x1="0" y1="52" x2="260" y2="52" class="er-sep"/><line x1="0" y1="74" x2="260" y2="74" class="er-sep"/>
-        <line x1="0" y1="96" x2="260" y2="96" class="er-sep"/><line x1="0" y1="118" x2="260" y2="118" class="er-sep"/>
-        <line x1="0" y1="140" x2="260" y2="140" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="218" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="218" y="69" class="er-b er-fk">FK</text>
-        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">StartDate</text>
-        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">FrequencyType</text>
-        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Description</text>
-        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">FormTypes</text>
+      <!-- ═══ SCHEDULECONFIG (left mid) ═══ -->
+      <!-- translate(10,248), w=275, h=160 -->
+      <g transform="translate(10,248)">
+        <rect x="0" y="0" width="275" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="275" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="275" height="132" class="eb"/>
+        <text x="137" y="20" class="eht">ScheduleConfig</text>
+        <line x1="50" y1="28" x2="50" y2="160" class="es"/>
+        <line x1="225" y1="28" x2="225" y2="160" class="es"/>
+        <line x1="0" y1="50" x2="275" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="275" y2="72" class="es"/>
+        <line x1="0" y1="94" x2="275" y2="94" class="es"/>
+        <line x1="0" y1="116" x2="275" y2="116" class="es"/>
+        <line x1="0" y1="138" x2="275" y2="138" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="233" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">int</text><text x="58" y="67" class="ef">HospitalId</text><text x="233" y="67" class="efk">FK</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">StartDate</text>
+        <text x="8" y="111" class="et">text</text><text x="58" y="111" class="ef">FrequencyType</text>
+        <text x="8" y="133" class="et">text</text><text x="58" y="133" class="ef">Description</text>
+        <text x="8" y="155" class="et">text</text><text x="58" y="155" class="ef">FormTypes</text>
       </g>
 
-      <!-- MACHINE -->
-      <g transform="translate(380,255)">
-        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="270" height="132" class="er-body"/>
-        <text x="135" y="21" class="er-ht">Machine</text>
-        <line x1="50" y1="30" x2="50" y2="162" class="er-sep"/><line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
-        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/><line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
-        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/><line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
-        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
-        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Machine_name</text>
-        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
-        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Register_date</text>
-        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">Caretaker</text>
+      <!-- ═══ MACHINE (center mid) ═══ -->
+      <!-- translate(400,248), w=280, h=160 -->
+      <g transform="translate(400,248)">
+        <rect x="0" y="0" width="280" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="280" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="280" height="132" class="eb"/>
+        <text x="140" y="20" class="eht">Machine</text>
+        <line x1="50" y1="28" x2="50" y2="160" class="es"/>
+        <line x1="230" y1="28" x2="230" y2="160" class="es"/>
+        <line x1="0" y1="50" x2="280" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="280" y2="72" class="es"/>
+        <line x1="0" y1="94" x2="280" y2="94" class="es"/>
+        <line x1="0" y1="116" x2="280" y2="116" class="es"/>
+        <line x1="0" y1="138" x2="280" y2="138" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="238" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">int</text><text x="58" y="67" class="ef">HospitalId</text><text x="238" y="67" class="efk">FK</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">Machine_name</text>
+        <text x="8" y="111" class="et">text</text><text x="58" y="111" class="ef">Room</text>
+        <text x="8" y="133" class="et">text</text><text x="58" y="133" class="ef">Register_date</text>
+        <text x="8" y="155" class="et">text</text><text x="58" y="155" class="ef">Caretaker</text>
       </g>
 
-      <!-- USERACCOUNT -->
-      <g transform="translate(870,255)">
-        <rect x="0" y="0" width="270" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="270" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="270" height="132" class="er-body"/>
-        <text x="135" y="21" class="er-ht">UserAccount</text>
-        <line x1="55" y1="30" x2="55" y2="162" class="er-sep"/><line x1="220" y1="30" x2="220" y2="162" class="er-sep"/>
-        <line x1="0" y1="52" x2="270" y2="52" class="er-sep"/><line x1="0" y1="74" x2="270" y2="74" class="er-sep"/>
-        <line x1="0" y1="96" x2="270" y2="96" class="er-sep"/><line x1="0" y1="118" x2="270" y2="118" class="er-sep"/>
-        <line x1="0" y1="140" x2="270" y2="140" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="63" y="47" class="er-f">RID</text><text x="228" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">int</text><text x="63" y="69" class="er-f">HospitalId</text><text x="228" y="69" class="er-b er-fk">FK</text>
-        <text x="8" y="91" class="er-t">text</text><text x="63" y="91" class="er-f">Username</text>
-        <text x="8" y="113" class="er-t">text</text><text x="63" y="113" class="er-f">Password</text>
-        <text x="8" y="135" class="er-t">text</text><text x="63" y="135" class="er-f">Position</text>
-        <text x="8" y="157" class="er-t">bool</text><text x="63" y="157" class="er-f">IsSuperAdmin</text>
+      <!-- ═══ USERACCOUNT (right mid) ═══ -->
+      <!-- translate(940,248), w=290, h=160 -->
+      <g transform="translate(940,248)">
+        <rect x="0" y="0" width="290" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="290" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="290" height="132" class="eb"/>
+        <text x="145" y="20" class="eht">UserAccount</text>
+        <line x1="50" y1="28" x2="50" y2="160" class="es"/>
+        <line x1="240" y1="28" x2="240" y2="160" class="es"/>
+        <line x1="0" y1="50" x2="290" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="290" y2="72" class="es"/>
+        <line x1="0" y1="94" x2="290" y2="94" class="es"/>
+        <line x1="0" y1="116" x2="290" y2="116" class="es"/>
+        <line x1="0" y1="138" x2="290" y2="138" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="248" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">int</text><text x="58" y="67" class="ef">HospitalId</text><text x="248" y="67" class="efk">FK</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">Username</text>
+        <text x="8" y="111" class="et">text</text><text x="58" y="111" class="ef">Password</text>
+        <text x="8" y="133" class="et">text</text><text x="58" y="133" class="ef">Position</text>
+        <text x="8" y="155" class="et">bool</text><text x="58" y="155" class="ef">IsSuperAdmin</text>
       </g>
 
-      <!-- CHECKLISTRECORD -->
-      <g transform="translate(100,565)">
-        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="275" height="176" class="er-body"/>
-        <text x="137" y="21" class="er-ht">ChecklistRecord</text>
-        <line x1="50" y1="30" x2="50" y2="206" class="er-sep"/><line x1="225" y1="30" x2="225" y2="206" class="er-sep"/>
-        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/><line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
-        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/><line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
-        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/><line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
-        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
-        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">FormType</text>
-        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">MachineName</text>
-        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">Room</text>
-        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">CheckDate</text>
-        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Tester</text>
-        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">JsonData</text>
+      <!-- ═══ CHECKLISTRECORD (bottom left) ═══ -->
+      <!-- translate(85,555), w=290, h=204 -->
+      <g transform="translate(85,555)">
+        <rect x="0" y="0" width="290" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="290" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="290" height="176" class="eb"/>
+        <text x="145" y="20" class="eht">ChecklistRecord</text>
+        <line x1="50" y1="28" x2="50" y2="204" class="es"/>
+        <line x1="240" y1="28" x2="240" y2="204" class="es"/>
+        <line x1="0" y1="50" x2="290" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="290" y2="72" class="es"/>
+        <line x1="0" y1="94" x2="290" y2="94" class="es"/>
+        <line x1="0" y1="116" x2="290" y2="116" class="es"/>
+        <line x1="0" y1="138" x2="290" y2="138" class="es"/>
+        <line x1="0" y1="160" x2="290" y2="160" class="es"/>
+        <line x1="0" y1="182" x2="290" y2="182" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="248" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">int</text><text x="58" y="67" class="ef">HospitalId</text><text x="248" y="67" class="efk">FK</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">FormType</text>
+        <text x="8" y="111" class="et">text</text><text x="58" y="111" class="ef">MachineName</text>
+        <text x="8" y="133" class="et">text</text><text x="58" y="133" class="ef">Room</text>
+        <text x="8" y="155" class="et">text</text><text x="58" y="155" class="ef">CheckDate</text>
+        <text x="8" y="177" class="et">text</text><text x="58" y="177" class="ef">Tester</text>
+        <text x="8" y="199" class="et">text</text><text x="58" y="199" class="ef">JsonData</text>
       </g>
 
-      <!-- REPAIRREQUEST -->
-      <g transform="translate(580,565)">
-        <rect x="0" y="0" width="275" height="30" rx="5" class="er-hdr"/>
-        <rect x="0" y="16" width="275" height="14" fill="#d4956b" stroke="none"/>
-        <rect x="0" y="30" width="275" height="220" class="er-body"/>
-        <text x="137" y="21" class="er-ht">RepairRequest</text>
-        <line x1="50" y1="30" x2="50" y2="250" class="er-sep"/><line x1="225" y1="30" x2="225" y2="250" class="er-sep"/>
-        <line x1="0" y1="52" x2="275" y2="52" class="er-sep"/><line x1="0" y1="74" x2="275" y2="74" class="er-sep"/>
-        <line x1="0" y1="96" x2="275" y2="96" class="er-sep"/><line x1="0" y1="118" x2="275" y2="118" class="er-sep"/>
-        <line x1="0" y1="140" x2="275" y2="140" class="er-sep"/><line x1="0" y1="162" x2="275" y2="162" class="er-sep"/>
-        <line x1="0" y1="184" x2="275" y2="184" class="er-sep"/><line x1="0" y1="206" x2="275" y2="206" class="er-sep"/>
-        <line x1="0" y1="228" x2="275" y2="228" class="er-sep"/>
-        <text x="8" y="47" class="er-t">int</text><text x="58" y="47" class="er-f">RID</text><text x="233" y="47" class="er-b er-pk">PK</text>
-        <text x="8" y="69" class="er-t">int</text><text x="58" y="69" class="er-f">HospitalId</text><text x="233" y="69" class="er-b er-fk">FK</text>
-        <text x="8" y="91" class="er-t">text</text><text x="58" y="91" class="er-f">Equipment</text>
-        <text x="8" y="113" class="er-t">text</text><text x="58" y="113" class="er-f">Room</text>
-        <text x="8" y="135" class="er-t">text</text><text x="58" y="135" class="er-f">RequestDate</text>
-        <text x="8" y="157" class="er-t">text</text><text x="58" y="157" class="er-f">ReporterName</text>
-        <text x="8" y="179" class="er-t">text</text><text x="58" y="179" class="er-f">Detail</text>
-        <text x="8" y="201" class="er-t">text</text><text x="58" y="201" class="er-f">Remarks</text>
-        <text x="8" y="223" class="er-t">text</text><text x="58" y="223" class="er-f">StatusText</text>
-        <text x="8" y="245" class="er-t">text</text><text x="58" y="245" class="er-f">ImageData</text>
+      <!-- ═══ REPAIRREQUEST (bottom right) ═══ -->
+      <!-- translate(615,555), w=290, h=248 -->
+      <g transform="translate(615,555)">
+        <rect x="0" y="0" width="290" height="28" rx="5" class="eh"/>
+        <rect x="0" y="15" width="290" height="13" fill="#d4956b" stroke="none"/>
+        <rect x="0" y="28" width="290" height="220" class="eb"/>
+        <text x="145" y="20" class="eht">RepairRequest</text>
+        <line x1="50" y1="28" x2="50" y2="248" class="es"/>
+        <line x1="240" y1="28" x2="240" y2="248" class="es"/>
+        <line x1="0" y1="50" x2="290" y2="50" class="es"/>
+        <line x1="0" y1="72" x2="290" y2="72" class="es"/>
+        <line x1="0" y1="94" x2="290" y2="94" class="es"/>
+        <line x1="0" y1="116" x2="290" y2="116" class="es"/>
+        <line x1="0" y1="138" x2="290" y2="138" class="es"/>
+        <line x1="0" y1="160" x2="290" y2="160" class="es"/>
+        <line x1="0" y1="182" x2="290" y2="182" class="es"/>
+        <line x1="0" y1="204" x2="290" y2="204" class="es"/>
+        <line x1="0" y1="226" x2="290" y2="226" class="es"/>
+        <text x="8" y="45" class="et">int</text><text x="58" y="45" class="efu">RID</text><text x="248" y="45" class="epk">PK</text>
+        <text x="8" y="67" class="et">int</text><text x="58" y="67" class="ef">HospitalId</text><text x="248" y="67" class="efk">FK</text>
+        <text x="8" y="89" class="et">text</text><text x="58" y="89" class="ef">Equipment</text>
+        <text x="8" y="111" class="et">text</text><text x="58" y="111" class="ef">Room</text>
+        <text x="8" y="133" class="et">text</text><text x="58" y="133" class="ef">RequestDate</text>
+        <text x="8" y="155" class="et">text</text><text x="58" y="155" class="ef">ReporterName</text>
+        <text x="8" y="177" class="et">text</text><text x="58" y="177" class="ef">Detail</text>
+        <text x="8" y="199" class="et">text</text><text x="58" y="199" class="ef">Remarks</text>
+        <text x="8" y="221" class="et">text</text><text x="58" y="221" class="ef">StatusText</text>
+        <text x="8" y="243" class="et">text</text><text x="58" y="243" class="ef">ImageData</text>
       </g>
 
-      <!-- RELATIONSHIP LABELS -->
-      <rect x="125" y="483" width="62" height="18" rx="4" class="er-lb"/>
-      <text x="156" y="496" class="er-lt">triggers</text>
-      <rect x="348" y="483" width="60" height="18" rx="4" class="er-lb"/>
-      <text x="378" y="496" class="er-lt">checked</text>
-      <rect x="583" y="478" width="66" height="18" rx="4" class="er-lb"/>
-      <text x="616" y="491" class="er-lt">repaired</text>
-      <rect x="591" y="502" width="50" height="18" rx="4" class="er-lb"/>
-      <text x="616" y="515" class="er-lt">tested</text>
-      <rect x="902" y="483" width="66" height="18" rx="4" class="er-lb"/>
-      <text x="935" y="496" class="er-lt">reported</text>
+      <!-- ══════════════ LEGEND ══════════════ -->
+      <g transform="translate(15,820)">
+        <rect x="0" y="0" width="1270" height="32" rx="5" fill="#f8f6f2" stroke="#e0ddd8" stroke-width="1"/>
 
-      <!-- LEGEND -->
-      <g transform="translate(25,840)">
-        <rect x="0" y="0" width="560" height="45" rx="6" fill="#f8f6f2" stroke="#e0ddd8" stroke-width="1"/>
-        <rect x="15" y="9" width="24" height="13" rx="3" fill="#d4956b" stroke="#c07b4e" stroke-width="1"/>
-        <text x="46" y="20" fill="#555" font-size="11">Entity Header</text>
-        <text x="150" y="20" fill="#2563eb" font-size="10" font-weight="700">PK</text><text x="168" y="20" fill="#555" font-size="11">= Primary Key</text>
-        <text x="278" y="20" fill="#dc2626" font-size="10" font-weight="700">FK</text><text x="296" y="20" fill="#555" font-size="11">= Foreign Key</text>
-        <text x="15" y="37" fill="#555" font-size="10.5">1 = One side | * = Many side | Database: PostgreSQL via Entity Framework Core</text>
+        <rect x="12" y="6" width="20" height="10" rx="2" fill="#d4956b" stroke="#c07b4e" stroke-width=".8"/>
+        <text x="38" y="15" fill="#555" font-size="10">Entity</text>
+
+        <text x="85" y="15" fill="#333" font-size="10" font-weight="700" text-decoration="underline">RID</text>
+        <text x="106" y="15" fill="#555" font-size="10">= PK (underline)</text>
+
+        <text x="202" y="15" fill="#dc2626" font-size="10" font-weight="700">FK</text>
+        <text x="218" y="15" fill="#555" font-size="10">= Foreign Key</text>
+
+        <!-- One symbol example -->
+        <line x1="320" y1="10" x2="350" y2="10" stroke="#555" stroke-width="1.4"/>
+        <line x1="325" y1="4" x2="325" y2="16" stroke="#555" stroke-width="1.4"/>
+        <text x="356" y="14" fill="#555" font-size="10">= One (1)</text>
+
+        <!-- Many symbol example -->
+        <line x1="430" y1="10" x2="460" y2="10" stroke="#555" stroke-width="1.4"/>
+        <path d="M450,10 L460,4 M450,10 L460,10 M450,10 L460,16" stroke="#555" stroke-width="1.4" fill="none"/>
+        <text x="468" y="14" fill="#555" font-size="10">= Many (*)</text>
+
+        <text x="555" y="14" fill="#555" font-size="10">Notation: Crow's Foot | DB: PostgreSQL via Entity Framework Core</text>
+
+        <text x="950" y="14" fill="#555" font-size="10">Total: 6 Tables, 39 Columns, 10 Relationships</text>
       </g>
     </svg>
   </div>
 
-  <!-- ENTITY DETAILS TABLE -->
-  <div class="info-section">
-    <h2>Entity Details</h2>
-    <table>
-      <thead><tr><th>Entity</th><th>Table Name</th><th>Fields</th><th>PK</th><th>FK</th></tr></thead>
-      <tbody>
-        <tr><td><b>Hospital</b></td><td>Hospitals</td><td>RID (int), Name (text), Code (text)</td><td>RID</td><td>-</td></tr>
-        <tr><td><b>ScheduleConfig</b></td><td>ScheduleConfigs</td><td>RID (int), HospitalId (int), StartDate (text), FrequencyType (text), Description (text), FormTypes (text)</td><td>RID</td><td>HospitalId</td></tr>
-        <tr><td><b>Machine</b></td><td>Machines</td><td>RID (int), HospitalId (int), Machine_name (text), Room (text), Register_date (text), Caretaker (text)</td><td>RID</td><td>HospitalId</td></tr>
-        <tr><td><b>UserAccount</b></td><td>Users</td><td>RID (int), HospitalId (int), Username (text), Password (text), Position (text), IsSuperAdmin (bool)</td><td>RID</td><td>HospitalId</td></tr>
-        <tr><td><b>ChecklistRecord</b></td><td>ChecklistRecords</td><td>RID (int), HospitalId (int), FormType (text), MachineName (text), Room (text), CheckDate (text), Tester (text), JsonData (text)</td><td>RID</td><td>HospitalId</td></tr>
-        <tr><td><b>RepairRequest</b></td><td>RepairRequests</td><td>RID (int), HospitalId (int), Equipment (text), Room (text), RequestDate (text), ReporterName (text), Detail (text), Remarks (text), StatusText (text), ImageData (text)</td><td>RID</td><td>HospitalId</td></tr>
-      </tbody>
-    </table>
-  </div>
-
   <!-- RELATIONSHIP TABLE -->
   <div class="info-section">
-    <h2>Relationships</h2>
-    <table class="rel-table">
-      <thead><tr><th>From Entity</th><th>To Entity</th><th>Cardinality</th><th>Label</th><th>Description</th></tr></thead>
+    <h2>Relationships (Crow's Foot Notation)</h2>
+    <table>
+      <thead><tr><th>From (One)</th><th>PK Field</th><th>To (Many)</th><th>FK Field</th><th>Cardinality</th><th>Label</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>Hospital</td><td>ScheduleConfig</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลาย ScheduleConfig ผ่าน HospitalId</td></tr>
-        <tr><td>Hospital</td><td>Machine</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายเครื่องเอกซเรย์ ผ่าน HospitalId</td></tr>
-        <tr><td>Hospital</td><td>UserAccount</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายผู้ใช้งาน ผ่าน HospitalId</td></tr>
-        <tr><td>Hospital</td><td>ChecklistRecord</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายรายการตรวจ ผ่าน HospitalId</td></tr>
-        <tr><td>Hospital</td><td>RepairRequest</td><td>1 : *</td><td>-</td><td>โรงพยาบาลมีหลายรายการแจ้งซ่อม ผ่าน HospitalId</td></tr>
-        <tr><td>ScheduleConfig</td><td>ChecklistRecord</td><td>1 : *</td><td>triggers</td><td>ตารางกำหนดการ trigger การสร้างรายการตรวจ</td></tr>
-        <tr><td>Machine</td><td>ChecklistRecord</td><td>1 : *</td><td>checked</td><td>เครื่องเอกซเรย์ถูกตรวจสอบ สร้างรายการตรวจ</td></tr>
-        <tr><td>Machine</td><td>RepairRequest</td><td>1 : *</td><td>repaired</td><td>เครื่องเอกซเรย์มีหลายรายการแจ้งซ่อม</td></tr>
-        <tr><td>UserAccount</td><td>ChecklistRecord</td><td>1 : *</td><td>tested</td><td>ผู้ใช้งานบันทึกผลการตรวจสอบ</td></tr>
-        <tr><td>UserAccount</td><td>RepairRequest</td><td>1 : *</td><td>reported</td><td>ผู้ใช้งานแจ้งซ่อมเครื่อง</td></tr>
+        <tr><td>Hospital</td><td>RID</td><td>ScheduleConfig</td><td>HospitalId</td><td>1 : 0..*</td><td>-</td><td>โรงพยาบาลมีหลาย ScheduleConfig</td></tr>
+        <tr><td>Hospital</td><td>RID</td><td>Machine</td><td>HospitalId</td><td>1 : 0..*</td><td>-</td><td>โรงพยาบาลมีหลายเครื่องเอกซเรย์</td></tr>
+        <tr><td>Hospital</td><td>RID</td><td>UserAccount</td><td>HospitalId</td><td>1 : 0..*</td><td>-</td><td>โรงพยาบาลมีหลายผู้ใช้งาน</td></tr>
+        <tr><td>Hospital</td><td>RID</td><td>ChecklistRecord</td><td>HospitalId</td><td>1 : 0..*</td><td>-</td><td>โรงพยาบาลมีหลายรายการตรวจ</td></tr>
+        <tr><td>Hospital</td><td>RID</td><td>RepairRequest</td><td>HospitalId</td><td>1 : 0..*</td><td>-</td><td>โรงพยาบาลมีหลายรายการแจ้งซ่อม</td></tr>
+        <tr><td>ScheduleConfig</td><td>RID</td><td>ChecklistRecord</td><td>(logical)</td><td>1 : 0..*</td><td>triggers</td><td>ตารางกำหนดการ trigger สร้างรายการตรวจ</td></tr>
+        <tr><td>Machine</td><td>RID</td><td>ChecklistRecord</td><td>(logical)</td><td>1 : 0..*</td><td>checked</td><td>เครื่องเอกซเรย์ถูกตรวจสอบ</td></tr>
+        <tr><td>Machine</td><td>RID</td><td>RepairRequest</td><td>(logical)</td><td>1 : 0..*</td><td>repaired</td><td>เครื่องเอกซเรย์มีรายการแจ้งซ่อม</td></tr>
+        <tr><td>UserAccount</td><td>RID</td><td>ChecklistRecord</td><td>(logical)</td><td>1 : 0..*</td><td>tested</td><td>ผู้ใช้งานบันทึกผลการตรวจสอบ</td></tr>
+        <tr><td>UserAccount</td><td>RID</td><td>RepairRequest</td><td>(logical)</td><td>1 : 0..*</td><td>reported</td><td>ผู้ใช้งานแจ้งซ่อมเครื่อง</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="footer">
-    xrayCare System - Entity Relationship Diagram | Generated: <span id="gen-date"></span> | Vue 3 + ASP.NET Core + PostgreSQL
+    xrayCare System - Entity Relationship Diagram (Crow's Foot Notation) | Generated: <span id="gen-date"></span> | Vue 3 + ASP.NET Core + PostgreSQL
   </div>
 </div>
 
 <script>
-document.getElementById('gen-date').textContent = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
-
+document.getElementById('gen-date').textContent=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
 function savePDF(){
-  var st = document.getElementById('status');
-  st.textContent = 'Generating PDF...';
-  var el = document.getElementById('pdf-content');
-  var svgs = el.querySelectorAll('svg');
-  svgs.forEach(function(s){
-    if(!s.getAttribute('width')){
-      var vb = s.getAttribute('viewBox');
-      if(vb){var p=vb.split(/\s+/); s.setAttribute('width',p[2]); s.setAttribute('height',p[3]);}
-    }
-  });
-  var opt = {
-    margin: [5,5,5,5],
-    filename: 'xrayCare-ER-Diagram.pdf',
-    image: {type:'jpeg',quality:0.98},
-    html2canvas: {scale:2, useCORS:true, windowWidth:1200},
-    jsPDF: {unit:'mm',format:'a4',orientation:'landscape'},
-    pagebreak: {mode:['css'],avoid:'.info-section'}
-  };
-  html2pdf().set(opt).from(el).save().then(function(){
-    st.textContent = 'PDF saved: xrayCare-ER-Diagram.pdf';
-  }).catch(function(e){
-    st.textContent = 'Error: ' + e.message;
-  });
+  var st=document.getElementById('status');st.textContent='Generating PDF...';
+  var el=document.getElementById('pdf-content');
+  el.querySelectorAll('svg').forEach(function(s){if(!s.getAttribute('width')){var v=s.getAttribute('viewBox');if(v){var p=v.split(/\s+/);s.setAttribute('width',p[2]);s.setAttribute('height',p[3]);}}});
+  html2pdf().set({margin:[4,4,4,4],filename:'xrayCare-ER-Diagram.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,windowWidth:1300},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['css'],avoid:'.info-section'}}).from(el).save().then(function(){st.textContent='PDF saved: xrayCare-ER-Diagram.pdf';}).catch(function(e){st.textContent='Error: '+e.message;});
 }
 </script>
 </body>
