@@ -8,7 +8,7 @@
 
     <div class="login-card">
       <div class="login-avatar">
-        <i class="fa-solid fa-shield-halved"></i>
+        <BrandXrayMark :size="40" />
       </div>
 
       <h1 class="login-title">Welcome</h1>
@@ -76,6 +76,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_BASE } from '../api/client'
+import BrandXrayMark from '../components/BrandXrayMark.vue'
 
 const router = useRouter()
 
@@ -249,9 +250,8 @@ const handleLogin = async () => {
   box-shadow: 0 8px 24px rgba(3, 105, 161, 0.4);
 }
 
-.login-avatar i {
-  font-size: 28px;
-  color: #ffffff;
+.login-avatar :deep(.brand-xray-mark) {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
 }
 
 .login-title {

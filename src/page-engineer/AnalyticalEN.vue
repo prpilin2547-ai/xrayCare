@@ -522,17 +522,17 @@ const machineRisks = computed(() => {
     )
     const failCount = machineChecks.filter(r => !isRecordPassed(r)).length
 
+    // Overdue: Daily F1/F2 (F1_F2) only — never-checked F10/etc. not counted; no fallback from other QC/repairs
     let overdueCount = 0
     const now = new Date()
-    formTypeGroups.forEach(ft => {
-      const lastCheck = getLastCheckDate(name, room, ft.key)
-      if (lastCheck) {
-        const daysSince = Math.floor((now - lastCheck) / 86400000)
-        if (daysSince > ft.maxDays) overdueCount++
-      } else if (machineChecks.length > 0 || repairCount > 0) {
-        overdueCount++
+    const dailyFt = formTypeGroups.find(ft => ft.key === 'F1_F2')
+    if (dailyFt) {
+      const lastDaily = getLastCheckDate(name, room, dailyFt.key)
+      if (lastDaily) {
+        const daysSince = Math.floor((now - lastDaily) / 86400000)
+        if (daysSince > dailyFt.maxDays) overdueCount = 1
       }
-    })
+    }
 
     let score = 100
     score -= Math.min(repairCount * 3, 30)

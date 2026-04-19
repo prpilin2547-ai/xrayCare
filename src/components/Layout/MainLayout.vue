@@ -33,6 +33,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getStoredUser } from '../../api/client'
+import { bumpHospitalScope } from '../../hospitalScope'
 import SidebarNav from './SidebarNav.vue'
 import TopBar from './TopBar.vue'
 
@@ -88,6 +89,7 @@ function onSwitchHospital({ id, name }) {
   localStorage.setItem('xraycare-user', JSON.stringify(updated))
   hospitalName.value = name || ''
   hospitalId.value = id
+  bumpHospitalScope()
 }
 
 onMounted(() => {
