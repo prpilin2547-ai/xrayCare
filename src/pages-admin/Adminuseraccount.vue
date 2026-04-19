@@ -7,7 +7,7 @@
         <div class="blue-dot"></div>
         <h3 class="fw-bold m-0">User & Hospital Management</h3>
       </div>
-      <p class="text-muted small mb-2">ระดับสิทธิ์: Root Admin (ทุกโรงพยาบาล) → SuperAdmin (โรงพยาบาลนี้) → User (Admin / Tech / Engineer)</p>
+      <p class="text-muted small mb-2">ระดับสิทธิ์: User (Admin / Tech / Engineer) ตามโรงพยาบาล</p>
 
       <!-- Tabs -->
       <div class="tabs-row">
@@ -131,7 +131,7 @@
                 </option>
               </select>
               <p v-if="newUser.position" class="role-desc mt-1 mb-0 small text-muted">
-                {{ getRolePermissionHint(newUser.position === ROOT_ADMIN_VALUE ? 'Admin' : newUser.position, newUser.position === ROOT_ADMIN_VALUE) }}
+                {{ getRolePermissionHint(newUser.position, false) }}
               </p>
               <div v-if="errors.position" class="alert alert-danger mt-2 py-2" role="alert">
                 <i class="bi bi-exclamation-circle-fill me-2"></i>กรุณาเลือก Role
@@ -141,7 +141,7 @@
             <div class="mb-3">
               <label class="form-label">Hospital</label>
               <select class="form-select" v-model.number="newUser.hospitalId">
-                <option v-for="h in hospitals" :key="h.id" :value="h.id">{{ h.name }}</option>
+                <option v-for="h in hospitalsForUserForms" :key="h.id" :value="h.id">{{ h.name }}</option>
               </select>
               <p class="small text-muted mt-1 mb-0">ผู้ใช้จะสามารถเข้าสู่ระบบได้เฉพาะโรงพยาบาลที่เลือก</p>
             </div>
@@ -194,14 +194,14 @@
             <div class="mb-3">
               <label class="form-label">Hospital</label>
               <select class="form-select" v-model.number="editForm.hospitalId">
-                <option v-for="h in hospitals" :key="h.id" :value="h.id">{{ h.name }}</option>
+                <option v-for="h in hospitalsForUserForms" :key="h.id" :value="h.id">{{ h.name }}</option>
               </select>
             </div>
 
             <div class="mb-3">
               <label class="form-label">Role</label>
               <select class="form-select" v-model="editForm.position">
-                <option v-for="opt in roleOptionsForSelect" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                <option v-for="opt in roleOptionsForEdit" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
               </select>
             </div>
 
@@ -327,37 +327,68 @@ const sessionMissingHospital = ref(false)
 /** When SuperAdmin: 0 = all hospitals, else filter by hospital id */
 const filterHospitalIdForAdmin = ref(0)
 
+/** Add/Edit user modals: SuperAdmin (platform) sees all hospitals; hospital Admin sees only their hospital. */
+const hospitalsForUserForms = computed(() => {
+  const list = hospitals.value
+  const u = getStoredUser()
+  if (!u) return []
+  if (u.isSuperAdmin === true) return list
+  const hid = u.hospitalId
+  if (hid == null || hid === undefined) return []
+  return list.filter(h => Number(h.id) === Number(hid))
+})
+
 // Sentinel value for "Root Admin" in dropdown (stores as position=Admin + isSuperAdmin=true)
 const ROOT_ADMIN_VALUE = '__RootAdmin__'
 
-// Role hierarchy: Root Admin (all hospitals) → SuperAdmin (this hospital) → User (Admin/Tech/Engineer)
-// Roles & permissions: label, value, permission description
+// Roles & permissions: label, value, permission description. Root Admin is not assignable via Add User (legacy users keep via Edit).
 const ROLE_OPTIONS = [
-  { value: 'SuperAdmin', label: 'SuperAdmin (Hospital)', permissions: 'Manage users and hospital settings for this hospital only' },
   { value: 'Admin', label: 'Admin', permissions: 'Manage users & view analytics for this hospital' },
   { value: 'Radiological Technologist', label: 'Radiological Technologist (Tech)', permissions: 'Daily/monthly checks, Machines, Requests, Export PDF, QC forms' },
   { value: 'Engineer', label: 'Engineer', permissions: 'Repair requests, Analytics, Engineer dashboard' }
 ]
 
-// Dropdown options: include Root Admin when current user is SuperAdmin
-const roleOptionsForSelect = computed(() => {
-  const list = ROLE_OPTIONS.map(o => ({ ...o }))
-  if (getStoredUser()?.isSuperAdmin) {
-    list.push({ value: ROOT_ADMIN_VALUE, label: 'Root Admin', permissions: 'Manage users & hospitals across all hospitals' })
+const LEGACY_SUPERADMIN_LABEL = 'SuperAdmin (Hospital)'
+const LEGACY_SUPERADMIN_PERMISSIONS = 'Manage users and hospital settings for this hospital only'
+const LEGACY_ROOT_ADMIN_PERMISSIONS = 'Manage users & hospitals across all hospitals'
+
+// Add User / Sign Up: Admin, Tech, Engineer only (no Root Admin)
+const roleOptionsForSelect = computed(() => ROLE_OPTIONS.map(o => ({ ...o })))
+
+// Edit: include legacy roles only for users who already have them
+const roleOptionsForEdit = computed(() => {
+  const base = roleOptionsForSelect.value.map(o => ({ ...o }))
+  const u = editingUser.value
+  if (u && u.isSuperAdmin && (u.position || '').trim() === 'Admin' && !base.some(o => o.value === ROOT_ADMIN_VALUE)) {
+    base.unshift({
+      value: ROOT_ADMIN_VALUE,
+      label: 'Root Admin',
+      permissions: LEGACY_ROOT_ADMIN_PERMISSIONS
+    })
   }
-  return list
+  if (u && (u.position || '').trim() === 'SuperAdmin' && !base.some(o => o.value === 'SuperAdmin')) {
+    base.unshift({
+      value: 'SuperAdmin',
+      label: LEGACY_SUPERADMIN_LABEL,
+      permissions: LEGACY_SUPERADMIN_PERMISSIONS
+    })
+  }
+  return base
 })
 
 function getRoleLabel(position, isSuperAdmin) {
   if (isSuperAdmin && (position || '').trim() === 'Admin') return 'Root Admin'
   const p = (position || '').trim()
+  if (p === 'SuperAdmin') return LEGACY_SUPERADMIN_LABEL
   const opt = ROLE_OPTIONS.find(o => o.value === p)
   return opt ? opt.label : (p || '-')
 }
 
 function getRolePermissionHint(position, isSuperAdmin) {
   if (isSuperAdmin && (position || '').trim() === 'Admin') return 'Manage users & hospitals across all hospitals'
-  const opt = ROLE_OPTIONS.find(o => o.value === (position || '').trim())
+  const p = (position || '').trim()
+  if (p === 'SuperAdmin') return LEGACY_SUPERADMIN_PERMISSIONS
+  const opt = ROLE_OPTIONS.find(o => o.value === p)
   return opt ? opt.permissions : ''
 }
 
@@ -459,19 +490,24 @@ const filteredUsers = computed(() => {
 
 const getPositionClass = (position) => {
   const p = (position || '').trim()
-  if (p === 'Admin') return 'position-admin'
+  if (p === 'Admin' || p === 'SuperAdmin') return 'position-admin'
   if (p === 'Engineer') return 'position-engineer'
   return 'position-rt'
 }
 
 function openModal() {
   const stored = JSON.parse(localStorage.getItem('xraycare-user') || '{}')
+  const opts = hospitalsForUserForms.value
+  let hid = stored.hospitalId != null ? stored.hospitalId : (opts[0]?.id ?? null)
+  if (!opts.some(h => Number(h.id) === Number(hid))) {
+    hid = opts[0]?.id ?? null
+  }
   newUser.value = {
     username: '',
     password: '',
     confirmPassword: '',
     position: '',
-    hospitalId: stored.hospitalId != null ? stored.hospitalId : (hospitals.value[0]?.id ?? null),
+    hospitalId: hid,
     showPass: false,
     showConfirm: false
   }
@@ -493,8 +529,8 @@ async function createAccount() {
     errors.value.confirmPassword = true
     isValid = false
   }
-  if (!newUser.value.hospitalId && hospitals.value.length > 0) {
-    newUser.value.hospitalId = hospitals.value[0].id
+  if (!newUser.value.hospitalId && hospitalsForUserForms.value.length > 0) {
+    newUser.value.hospitalId = hospitalsForUserForms.value[0].id
   }
   if (getStoredUser()?.isSuperAdmin && !newUser.value.hospitalId) {
     alert('SuperAdmin must select a hospital for the new user.')
@@ -551,9 +587,15 @@ function toggleVisibility(user) {
 
 function openEditModal(user) {
   editingUser.value = user
+  const rawUsername = user.username ?? ''
+  const opts = hospitalsForUserForms.value
+  let hId = user.hospitalId ?? null
+  if (opts.length && hId != null && !opts.some(h => Number(h.id) === Number(hId))) {
+    hId = opts[0]?.id ?? hId
+  }
   editForm.value = {
-    username: user.username,
-    hospitalId: user.hospitalId ?? null,
+    username: rawUsername === 'Superadmin1' ? 'Root admin' : rawUsername,
+    hospitalId: hId,
     position: (user.isSuperAdmin && (user.position || '').trim() === 'Admin') ? ROOT_ADMIN_VALUE : (user.position ?? ''),
     password: '',
     showPass: false

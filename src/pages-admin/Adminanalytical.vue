@@ -522,17 +522,19 @@ const machineRisks = computed(() => {
     )
     const failCount = machineChecks.filter(r => !isRecordPassed(r)).length
 
+    // เกินกำหนด: เฉพาะ Daily F1/F2 (F1_F2) เท่านั้น — ตรงคอลัมน์ F1/F2 ใน Compliance Matrix
+    // - F10 / F3-F6 / F7-F8 ถ้ายังไม่เคยตรวจ (เครื่องหมาย —) ไม่นับเป็นเกินกำหนด
+    // - ไม่บวกเมื่อมี QC แบบอื่นหรือแจ้งซ่อน (ยกเลิกเงื่อนไขเก่า)
     let overdueCount = 0
     const now = new Date()
-    formTypeGroups.forEach(ft => {
-      const lastCheck = getLastCheckDate(name, room, ft.key)
-      if (lastCheck) {
-        const daysSince = Math.floor((now - lastCheck) / 86400000)
-        if (daysSince > ft.maxDays) overdueCount++
-      } else if (machineChecks.length > 0 || repairCount > 0) {
-        overdueCount++
+    const dailyFt = formTypeGroups.find(ft => ft.key === 'F1_F2')
+    if (dailyFt) {
+      const lastDaily = getLastCheckDate(name, room, dailyFt.key)
+      if (lastDaily) {
+        const daysSince = Math.floor((now - lastDaily) / 86400000)
+        if (daysSince > dailyFt.maxDays) overdueCount = 1
       }
-    })
+    }
 
     let score = 100
     score -= Math.min(repairCount * 3, 30)

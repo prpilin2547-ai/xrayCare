@@ -82,7 +82,7 @@
           </div>
           <div class="card-content">
             <p class="card-label">EQUIPMENT</p>
-            <p class="card-value">{{ hasMachines ? equipmentCount : '-' }}</p>
+            <p class="card-value">{{ hasHospitalMachines ? equipmentCount : '-' }}</p>
           </div>
         </div>
         <div class="card summary-card card-pending">
@@ -91,7 +91,7 @@
           </div>
           <div class="card-content">
             <p class="card-label">PENDING</p>
-            <p class="card-value">{{ hasMachines ? pendingCount : '-' }}</p>
+            <p class="card-value">{{ hasHospitalMachines ? pendingCount : '-' }}</p>
           </div>
         </div>
         <div class="card summary-card card-repair">
@@ -110,7 +110,7 @@
         <div class="section-left">
           <div class="section-dot"></div>
           <span class="section-text">Checklist</span>
-          <span class="section-badge" v-if="hasMachines">{{ pendingCount }} pending</span>
+          <span class="section-badge" v-if="hasHospitalMachines && pendingCount > 0">{{ pendingCount }} pending</span>
         </div>
         <button class="btn-add" @click="goToMachinesCreate">
           <i class="fa-solid fa-plus"></i>
@@ -132,7 +132,7 @@
             </tr>
           </thead>
 
-          <tbody v-if="hasMachines">
+          <tbody v-if="hasPendingDailyChecks">
             <tr v-for="row in sampleRows" :key="row.no">
               <td><span class="row-num">{{ row.rid }}</span></td>
               <td class="fw-500">{{ row.machine_name }}</td>
@@ -150,6 +150,12 @@
                   Check
                 </button>
               </td>
+            </tr>
+          </tbody>
+
+          <tbody v-else-if="hasHospitalMachines">
+            <tr class="checklist-complete-row">
+              <td colspan="6">เครื่องได้ทำการตรวจสอบครบหมดแล้ว</td>
             </tr>
           </tbody>
 
@@ -438,7 +444,8 @@ const machines = ref([]);
 const repairRequests = ref([]);
 const loading = ref(false);
 
-const hasMachines = computed(() => pendingMachines.value.length > 0);
+const hasHospitalMachines = computed(() => machines.value.length > 0);
+const hasPendingDailyChecks = computed(() => pendingMachines.value.length > 0);
 
 const monthNamesShort = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -1480,6 +1487,14 @@ onMounted(async () => {
 .empty-row td {
   color: var(--text-muted, #94a3b8);
   text-align: center;
+}
+
+.checklist-complete-row td {
+  text-align: center;
+  padding: 20px 16px;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  border-bottom: none;
 }
 
 .status-badge {

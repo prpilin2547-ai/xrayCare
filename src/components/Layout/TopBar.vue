@@ -5,8 +5,8 @@
         <i class="fa-solid fa-bars"></i>
       </button>
       <div class="brand-group">
-        <div class="brand-icon">
-          <i class="fa-solid fa-shield-halved"></i>
+        <div class="brand-icon" title="X-RayCare">
+          <BrandXrayMark :size="24" decorative />
         </div>
         <div class="brand-text">
           <span class="brand-name">X-RayCare</span>
@@ -61,6 +61,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import BrandXrayMark from '../BrandXrayMark.vue'
 
 const emit = defineEmits(['toggle-sidebar', 'switch-hospital'])
 
@@ -172,9 +173,12 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  color: #7DD3FC;
+  color: #7dd3fc;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-icon :deep(.brand-xray-mark) {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
 }
 
 .brand-text {
