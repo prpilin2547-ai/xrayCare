@@ -432,12 +432,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import MainLayout from "../components/Layout/MainLayout.vue";
 import { apiFetch } from "../api/client";
+import { getHospitalUiState, loadAndMigrateHospitalUiState } from "../api/hospitalUiState.js";
 
 const router = useRouter();
+const route = useRoute();
 
 /* ---------------- Table Data (จาก API) ---------------- */
 const machines = ref([]);
@@ -460,30 +462,49 @@ const displayDate = computed(() => {
   return `${day} ${month} ${year}`;
 });
 
-/* ---------- Daily Check ---------- */
-const DAILY_CHECK_KEY = 'xraycare-dailyChecked';
-
-function getTodayKey() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
+/* ---------- Daily Check (hospital-wide via API) ---------- */
+async function applySharedHospitalState(state) {
+  eventsByDate.value = { ...(state.pmEventsByDate || {}) };
+  monthlyTypeByStartDate.value = { ...(state.pmMonthlyRules || {}) };
+  hiddenMonthlyTasksByDate.value = { ...(state.pmHiddenMonthlyTasks || {}) };
+  disabledDailyDates.value = { ...(state.pmDisabledDailyDates || {}) };
 }
 
-const todayCheckedMachines = ref([]);
-
-function loadDailyChecked() {
+async function refreshSharedHospitalState() {
   try {
-    const stored = JSON.parse(localStorage.getItem(DAILY_CHECK_KEY) || '{}');
-    todayCheckedMachines.value = stored[getTodayKey()] || [];
+    const state = await getHospitalUiState();
+    await applySharedHospitalState(state);
   } catch (e) {
-    todayCheckedMachines.value = [];
+    console.error("refreshSharedHospitalState", e);
   }
 }
 
+/** yyyy-MM-dd วันนี้ (Asia/Bangkok) ให้ตรงกับ StatusDateKey จาก API */
+function getBangkokDateKeyJs() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
+function isMachineDailyChecked(m) {
+  if (!m) return false;
+  const raw = m.status ?? m.Status;
+  const key = String(m.statusDateKey ?? m.StatusDateKey ?? "").trim();
+  const todayBk = getBangkokDateKeyJs();
+  const checked =
+    raw === 1 ||
+    raw === "1" ||
+    (typeof raw === "string" && raw.toLowerCase() === "checked");
+  if (!checked) return false;
+  if (!key) return true;
+  return key === todayBk;
+}
+
 const pendingMachines = computed(() =>
-  machines.value.filter(m => !todayCheckedMachines.value.includes(m.machineName))
+  machines.value.filter(m => !isMachineDailyChecked(m))
 );
 
 const equipmentCount = computed(() => machines.value.length);
@@ -614,7 +635,7 @@ async function loadNotifications() {
   }
 
   try {
-    const savedRules = JSON.parse(localStorage.getItem('pmMonthlyRules') || '{}');
+    const savedRules = monthlyTypeByStartDate.value || {};
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
@@ -662,7 +683,7 @@ async function loadNotifications() {
       });
     }
   } catch (e) {
-    console.error('loadNotifications localStorage error:', e);
+    console.error('loadNotifications pm rules error:', e);
   }
 
   allNotifs.sort((a, b) => a.daysRemaining - b.daysRemaining);
@@ -755,7 +776,13 @@ async function loadMachines() {
     const res = await apiFetch('/GetAllMachines');
     if (!res.ok) throw new Error('โหลดข้อมูลเครื่องไม่สำเร็จ');
     const data = await res.json();
-    machines.value = Array.isArray(data) ? data : [];
+    machines.value = Array.isArray(data)
+      ? data.map((row) => ({
+          ...row,
+          status: row.status ?? row.Status,
+          statusDateKey: String(row.statusDateKey ?? row.StatusDateKey ?? "").trim()
+        }))
+      : [];
   } catch (e) {
     console.error('loadMachines error:', e);
     machines.value = [];
@@ -776,8 +803,9 @@ async function loadRepairRequests() {
 
 function goToDairyCheck(equipmentName) {
   const formTypes = getFormTypesDueToday();
-  const query = formTypes.length > 0 ? { formTypes: formTypes.join(',') } : {};
-  router.push({ name: "DairyCheckPage", params: { equipmentName }, query });
+  const query = { equipmentName };
+  if (formTypes.length > 0) query.formTypes = formTypes.join(',');
+  router.push({ name: 'DairyCheckPage', query });
 }
 function goToMachinesCreate() {
   router.push("/machines/create");
@@ -846,12 +874,7 @@ const isToday = (day) => {
   );
 };
 
-/* ---------- localStorage shared with PM Schedule ---------- */
-const STORAGE_EVENTS_KEY = "pmEventsByDate";
-const STORAGE_RULES_KEY = "pmMonthlyRules";
-const STORAGE_HIDDEN_MONTHLY_KEY = "pmHiddenMonthlyTasks";
-const STORAGE_DAILY_DISABLED_KEY = "pmDisabledDailyDates";
-
+/* ---------- PM calendar overlays (hospital-wide via API) ---------- */
 const eventsByDate = ref({});
 const monthlyTypeByStartDate = ref({});
 const hiddenMonthlyTasksByDate = ref({});
@@ -1043,49 +1066,38 @@ const popupFullDate = computed(() => {
   return `${w} ${d} ${m} ${y}`;
 });
 
+function onVisibilityForSharedState() {
+  if (document.hidden) return;
+  void Promise.all([refreshSharedHospitalState(), loadMachines()]).then(() =>
+    loadNotifications()
+  );
+}
+
 /* ---------- onMounted ---------- */
 onMounted(async () => {
-  loadDailyChecked();
-
   try {
-    const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY);
-    if (savedEvents) {
-      eventsByDate.value = JSON.parse(savedEvents);
-    }
+    const state = await loadAndMigrateHospitalUiState();
+    await applySharedHospitalState(state);
   } catch (e) {
-    console.error("Cannot load events from storage", e);
+    console.error("load hospital UI state", e);
   }
 
-  try {
-    const savedRules = localStorage.getItem(STORAGE_RULES_KEY);
-    if (savedRules) {
-      monthlyTypeByStartDate.value = JSON.parse(savedRules);
-    }
-  } catch (e) {
-    console.error("Cannot load monthly rules from storage", e);
-  }
-
-  try {
-    const savedHiddenMonthly = localStorage.getItem(STORAGE_HIDDEN_MONTHLY_KEY);
-    if (savedHiddenMonthly) {
-      hiddenMonthlyTasksByDate.value = JSON.parse(savedHiddenMonthly);
-    }
-  } catch (e) {
-    console.error("Cannot load hidden monthly tasks from storage", e);
-  }
-
-  try {
-    const savedDisabledDaily = localStorage.getItem(STORAGE_DAILY_DISABLED_KEY);
-    if (savedDisabledDaily) {
-      disabledDailyDates.value = JSON.parse(savedDisabledDaily);
-    }
-  } catch (e) {
-    console.error("Cannot load disabled daily dates from storage", e);
-  }
+  document.addEventListener("visibilitychange", onVisibilityForSharedState);
 
   loading.value = true;
   await Promise.all([loadMachines(), loadRepairRequests(), loadNotifications(), loadScheduleConfigs(), loadChecklistRecords()]);
   loading.value = false;
+});
+
+watch(
+  () => route.path,
+  (path, prevPath) => {
+    if (path === "/admindashboard" && prevPath && prevPath !== path) void loadMachines();
+  }
+);
+
+onUnmounted(() => {
+  document.removeEventListener("visibilitychange", onVisibilityForSharedState);
 });
 </script>
 

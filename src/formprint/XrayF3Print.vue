@@ -1,5 +1,5 @@
 <template>
-  <div class="print-root">
+  <div class="print-root xray-f3f6-print-page">
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
@@ -9,9 +9,9 @@
       </button>
     </div>
 
-    <div class="sheet-inner combined-sheet">
-      <!-- ========== F3 : การควบคุมคุณภาพจอภาพ ========== -->
-      <div class="print-section">
+    <div class="combined-stack">
+      <!-- ========== F3 : การควบคุมคุณภาพจอภาพ — หน้า 1 ========== -->
+      <section class="form-print-page form-print-page--f3">
         <div class="header-main">
           <div class="title-main">แบบบันทึก F3 : การควบคุมคุณภาพจอภาพ (Display monitor)</div>
           <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน (หรือ 1 เดือน)</div>
@@ -79,10 +79,10 @@
             <tr><td colspan="5" class="value-cell align-left">{{ f3Record.remark }}</td></tr>
           </tbody>
         </table>
-      </div>
+      </section>
 
-      <!-- ========== F4 : แบบบันทึกการตรวจสอบเครื่องเอกซเรย์ ========== -->
-      <div class="print-section section-f4">
+      <!-- ========== F4 : แบบบันทึกการตรวจสอบเครื่องเอกซเรย์ — หน้า 2 ========== -->
+      <section class="form-print-page form-print-page--f4">
         <div class="header-main">
           <div class="title-main">แบบบันทึก F4 : แบบบันทึกการตรวจสอบเครื่องเอกซเรย์</div>
           <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน</div>
@@ -119,10 +119,10 @@
           <div class="note-line">**ไม่ต้องทดสอบสำหรับเครื่องเอกซเรย์เคลื่อนที่</div>
         </div>
         <div class="footer-note" v-if="f4Record.remark">{{ f4Record.remark }}</div>
-      </div>
+      </section>
 
-      <!-- ========== F5 : ความสม่ำเสมอของภาพ ========== -->
-      <div class="print-section section-f5">
+      <!-- ========== F5 : ความสม่ำเสมอของภาพ — หน้า 3 ========== -->
+      <section class="form-print-page form-print-page--f5">
         <div class="header-main">
           <div class="title-main">แบบบันทึก F5 : ความสม่ำเสมอของภาพ (Measured Uniformity)</div>
           <div class="title-sub"><span class="bold-text">ความถี่ :</span> ทุก 3 เดือน</div>
@@ -162,10 +162,10 @@
             </tr>
           </tbody>
         </table>
-      </div>
+      </section>
 
-      <!-- ========== F6 : ความคงที่ของค่าดัชนีปริมาณรังสี ========== -->
-      <div class="print-section section-f6">
+      <!-- ========== F6 : ความคงที่ของค่าดัชนีปริมาณรังสี — หน้า 4 ========== -->
+      <section class="form-print-page form-print-page--f6">
         <div class="header-main">
           <div class="title-main">แบบบันทึก F6 : ความคงที่ของค่าดัชนีปริมาณรังสี (Consistency of Exposure Index)</div>
           <div class="title-sub"><span class="freq-label">ความถี่ :</span> <span class="freq-value">ทุก 3 เดือน</span></div>
@@ -264,17 +264,171 @@
           <div class="sig-line sig-row">( ................................................................. )</div>
           <div class="sig-line sig-row">ตำแหน่ง ..........................................................</div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { apiFetch } from '../api/client'
 
 const route = useRoute()
-import { apiFetch } from '../api/client'
+
+const PRINT_STYLE_ID = 'xray-f3f6-print-page-style'
+
+function installPrintPageStyle(options = {}) {
+  const moveToEnd = options.moveToEnd === true
+  if (typeof document === 'undefined') return
+  if (moveToEnd) {
+    removePrintPageStyle()
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return
+  }
+  const el = document.createElement('style')
+  el.id = PRINT_STYLE_ID
+  el.textContent = `
+@page { size: A4 portrait; margin: 3.5mm; }
+@media print {
+  html, body {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f3f6-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .xray-f3f6-print-page .print-toolbar { display: none !important; }
+  .xray-f3f6-print-page .combined-stack {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f3f6-print-page .form-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    padding: 2mm 3mm !important;
+    margin: 0 !important;
+    break-after: page;
+    page-break-after: always;
+    page-break-inside: auto;
+  }
+  .xray-f3f6-print-page .form-print-page:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .xray-f3f6-print-page .section-block {
+    page-break-inside: auto !important;
+  }
+  .xray-f3f6-print-page .title-main {
+    font-size: 18pt !important;
+    text-align: center !important;
+    margin-bottom: 1.2mm !important;
+  }
+  .xray-f3f6-print-page .header-main { text-align: center !important; margin-bottom: 2.5mm !important; }
+  .xray-f3f6-print-page .title-sub { font-size: 13.5pt !important; line-height: 1.28 !important; }
+  .xray-f3f6-print-page .form-print-page--f3 .header-main { margin-bottom: 2mm !important; }
+  .xray-f3f6-print-page .form-print-page--f3 .f3-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 10.5pt !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f3 .f3-table td,
+  .xray-f3f6-print-page .form-print-page--f3 .f3-table th {
+    padding: 1.35mm 0.75mm !important;
+    font-size: 10.5pt !important;
+    line-height: 1.2 !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f3 .section-title {
+    padding-top: 1.2mm !important;
+    padding-bottom: 0.4mm !important;
+    font-size: 10.5pt !important;
+    line-height: 1.18 !important;
+  }
+  .xray-f3f6-print-page .label-col { width: 62% !important; }
+  .xray-f3f6-print-page .check-cell { width: 9.5% !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table { font-size: 10.5pt !important; width: 100% !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table thead th {
+    padding: 2.8mm 1.2mm !important;
+    font-size: 10.5pt !important;
+    line-height: 1.25 !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table tbody tr { min-height: 12mm !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table tbody td {
+    padding: 2.5mm 1.2mm !important;
+    font-size: 10.5pt !important;
+    line-height: 1.32 !important;
+    vertical-align: middle !important;
+  }
+  .xray-f3f6-print-page .col-no { width: 8% !important; }
+  .xray-f3f6-print-page .col-desc { width: 62% !important; }
+  .xray-f3f6-print-page .col-result { width: 12% !important; }
+  .xray-f3f6-print-page .col-remark { width: 18% !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .note-block { margin-top: 4mm !important; font-size: 10.5pt !important; line-height: 1.45 !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .footer-note { font-size: 10.5pt !important; margin-top: 3mm !important; }
+  .xray-f3f6-print-page .form-print-page--f5 .summary-box { min-height: 42mm !important; }
+  .xray-f3f6-print-page .form-print-page--f5 .summary-box td {
+    padding: 5mm 4mm !important;
+    font-size: 11.5pt !important;
+    line-height: 1.55 !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f5 .f5-table td {
+    padding: 3.8mm 2.2mm !important;
+    font-size: 11.5pt !important;
+    line-height: 1.45 !important;
+  }
+  .xray-f3f6-print-page .col-label { width: 48% !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .header-main { margin-bottom: 1.8mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .title-main { font-size: 17pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table td,
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table th {
+    padding: 1.25mm 0.9mm !important;
+    font-size: 9.75pt !important;
+    line-height: 1.16 !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table th { font-size: 10pt !important; padding: 1.4mm 0.9mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell { padding: 1.5mm 1.2mm !important; line-height: 1.22 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell div { margin-bottom: 0 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .device-info-row { gap: 2mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .signature-block {
+    margin-top: 2mm !important;
+    font-size: 10pt !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f6 .sig-line { margin-bottom: 1mm !important; font-size: 10pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .empty-row td { height: 3mm !important; padding: 0 !important; }
+}
+`
+  document.head.appendChild(el)
+}
+
+function removePrintPageStyle() {
+  if (typeof document === 'undefined') return
+  document.getElementById(PRINT_STYLE_ID)?.remove()
+}
 
 // F3 – โครงสร้างตรงกับ jsonData.F3
 const f3Record = ref({
@@ -345,6 +499,7 @@ function resolveTester(saved) {
 }
 
 onMounted(async () => {
+  installPrintPageStyle()
   const id = route.query.id || route.params.id
   if (!id) return
   try {
@@ -415,43 +570,73 @@ onMounted(async () => {
   }
 })
 
+onBeforeUnmount(() => {
+  removePrintPageStyle()
+})
+
 function handlePrint() {
+  installPrintPageStyle({ moveToEnd: true })
   window.print()
 }
 </script>
 
-<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-* { font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif !important; font-size: 16pt !important; font-weight: 400; }
-
-/* หน้ารวม F3–F6: ยกเลิกความสูงคงที่ ให้ scroll ดูทุกฟอร์มได้ และพิมพ์แยกหน้าตาม section */
-.print-root > .sheet-inner.combined-sheet {
-  height: auto !important;
-  min-height: 277mm;
-  max-height: none !important;
-  aspect-ratio: auto;
-  overflow: visible !important;
-}
-.print-root:has(.combined-sheet) {
-  overflow-x: hidden;
-  overflow-y: auto;
+.xray-f3f6-print-page {
+  font-family: 'TH Sarabun New', 'Sarabun', Tahoma, sans-serif;
+  font-size: 15pt;
+  font-weight: 400;
+  background: #e5e7eb;
+  min-height: 100vh;
+  padding: 8px 0 16px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-}
-.sheet-inner.combined-sheet {
-  width: 190mm;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
   box-sizing: border-box;
 }
-/* แบ่งหน้าตามหัวข้อ: แต่ละบล็อกไม่ขาดกลางหน้า */
+
+.xray-f3f6-print-page .print-toolbar {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.xray-f3f6-print-page .print-toolbar .btn-print {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.combined-stack {
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  padding: 0 6px;
+}
+
+.form-print-page {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 8mm 10mm;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  min-height: 120mm;
+}
+
+/* tbody กลุ่มหัวข้อ F3 — ห้าม page-break-inside: avoid ต่อกลุ่ม (ทำให้พิมพ์หลายหน้า) */
 .section-block {
   display: table-row-group;
-  page-break-inside: avoid;
 }
+
 .section-title {
   border-top: 1pt solid #000;
   padding-top: 3mm !important;
@@ -460,90 +645,81 @@ function handlePrint() {
 .section-block:first-child .section-title,
 .section-block .section-title:first-child { border-top: none; padding-top: 0; margin-top: 0; }
 .section-block + .section-block .section-title { border-top-color: #333; }
-.print-section { margin-bottom: 8mm; }
-.print-section.section-f4,
-.print-section.section-f5,
-.print-section.section-f6 { page-break-before: always; }
-@media print {
-  .print-root > .sheet-inner.combined-sheet {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    page-break-after: auto;
-    width: 190mm !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  .print-section.section-f4,
-  .print-section.section-f5,
-  .print-section.section-f6 { page-break-before: always; }
-  .section-block { page-break-inside: avoid; }
+
+@page {
+  size: A4 portrait;
+  margin: 3.5mm;
 }
 
 /* F3 */
-.header-main { margin-bottom: 6mm; }
-.title-main { font-weight: 700; font-size: 18pt !important; margin-bottom: 2mm; }
-.title-sub { font-size: 16pt !important; }
-.f3-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 16pt !important; }
-.f3-table td { border: 0.4pt solid #000; padding: 1.5mm 2mm; vertical-align: middle; font-size: 16pt !important; }
-.label-col { width: 65mm; }
-.check-cell { width: 25mm; }
+.header-main { margin-bottom: 5mm; text-align: center; }
+.title-main { font-weight: 700; font-size: 19pt; margin-bottom: 2.5mm; text-align: center; }
+.title-sub { font-size: 15pt; line-height: 1.35; }
+.f3-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt; }
+.f3-table td { border: 0.4pt solid #000; padding: 1.8mm 1.5mm; vertical-align: middle; }
+.label-col { width: 62%; }
+.check-cell { width: 9.5%; }
 .center-cell { text-align: center; }
 .section-title { font-weight: 700; text-align: left; padding-left: 2mm; }
 .bold-text { font-weight: 700; }
 .value-cell { text-align: left; }
 .merged-left { font-weight: 700; text-align: left !important; padding-left: 2mm !important; border: 0.4pt solid #000; }
-.underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 50mm; min-height: 6mm; }
-.f3-table td, .f3-table th { padding-top: 0.2mm !important; padding-bottom: 0.2mm !important; }
-.right-label { text-align: right !important; padding-right: 3mm !important; }
+.underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 40%; min-height: 5mm; }
+.f3-table td, .f3-table th { padding-top: 1.5mm !important; padding-bottom: 1.5mm !important; }
+.right-label { text-align: right !important; padding-right: 2mm !important; }
 .check-cell.result-p { font-weight: 700; text-align: center; }
 .check-cell.result-f { font-weight: 700; text-align: center; }
 .align-left { text-align: left !important; }
 
 /* F4 */
-.header-row-inline { display: flex; align-items: center; gap: 4mm; width: 100%; }
-.underline.long { flex: 1; min-width: 40mm; border-bottom: 0.4pt solid #000; min-height: 6mm; display: inline-block; }
-.underline.short { flex: 0 0 40mm; border-bottom: 0.4pt solid #000; min-height: 6mm; display: inline-block; }
-.f4-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt !important; }
-.f4-table th, .f4-table td { border: 0.4pt solid #000; padding: 1.5mm 1mm; vertical-align: middle; font-size: 14pt !important; }
-.f4-table th { text-align: center; font-weight: 700 !important; }
+.header-row-inline { display: flex; align-items: center; gap: 4mm; width: 100%; flex-wrap: wrap; }
+.underline.long { flex: 1; min-width: 30mm; border-bottom: 0.4pt solid #000; min-height: 5mm; display: inline-block; }
+.underline.short { flex: 0 0 36mm; border-bottom: 0.4pt solid #000; min-height: 5mm; display: inline-block; }
+.f4-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt; }
+.f4-table th, .f4-table td { border: 0.4pt solid #000; padding: 2.2mm 1.2mm; vertical-align: middle; font-size: 14pt; }
+.f4-table tbody tr { min-height: 10mm; }
+.f4-table th { text-align: center; font-weight: 700; }
 .f4-table td { text-align: left !important; }
 .f4-table td.col-no { text-align: center !important; vertical-align: top !important; padding-top: 1mm; }
 .f4-table td.col-result { text-align: center !important; font-weight: 700; }
-.col-no { width: 14mm; } .col-desc { width: 75mm; } .col-result { width: 30mm; } .col-remark { width: auto; }
-.note-block { margin-top: 4mm; font-size: 16pt !important; }
-.note-line { line-height: 1.4 !important; }
-.footer-note { margin-top: 3mm; font-size: 16pt !important; }
-.freq-label { font-weight: 700; } .freq-value { font-weight: 400; }
-.align-left { text-align: left !important; }
+.col-no { width: 8%; }
+.col-desc { width: 62%; }
+.col-result { width: 12%; }
+.col-remark { width: 18%; }
+.note-block { margin-top: 3mm; font-size: 14pt; }
+.note-line { line-height: 1.35; }
+.footer-note { margin-top: 2mm; font-size: 14pt; }
+.freq-label { font-weight: 700; }
+.freq-value { font-weight: 400; }
 
 /* F5 */
-.summary-box { width: 100%; border-collapse: collapse; border: 0.4pt solid #000; margin-bottom: 8mm; }
-.summary-box td { padding: 4mm; text-align: left; line-height: 2.5; }
+.summary-box { width: 100%; border-collapse: collapse; border: 0.4pt solid #000; margin-bottom: 5mm; min-height: 36mm; }
+.summary-box td { padding: 4mm; text-align: left; line-height: 1.5; }
 .f5-table { width: 100%; border-collapse: collapse; }
-.f5-table td { border: 0.4pt solid #000; padding: 3mm 2mm; vertical-align: middle; }
-.col-label { width: 90mm; } .col-right-4 { width: auto; } .small-box { width: auto; border: 0.4pt solid #000; }
-.merged-text { line-height: 2.5 !important; }
+.f5-table td { border: 0.4pt solid #000; padding: 3.2mm 2mm; vertical-align: middle; }
+.col-label { width: 48%; }
+.col-right-4 { width: auto; }
+.small-box { width: auto; border: 0.4pt solid #000; }
+.merged-text { line-height: 1.45 !important; }
 
 /* F6 */
 .f6-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.f6-table td, .f6-table th { border: 1px solid #000; padding: 2mm; width: 25%; vertical-align: middle; font-weight: 400 !important; }
-.f6-table th { font-weight: 700; text-align: center; font-size: 16pt !important; }
+.f6-table td, .f6-table th { border: 1px solid #000; padding: 2mm 1.5mm; width: 25%; vertical-align: middle; font-weight: 400 !important; }
+.f6-table th { font-weight: 700; text-align: center; font-size: 14pt; }
 .align-center { text-align: center !important; }
-.multi-line-cell { padding: 3mm 2mm; line-height: 1.4; }
-.multi-line-cell div { margin-bottom: 1mm; }
-/* ช่องค่า CR/DR (คาสเซท + เครื่องอ่าน) ไม่ให้มีเส้นขีด แสดงเหมือนข้อมูลเบื้องต้น */
+.multi-line-cell { padding: 2mm 1.5mm; line-height: 1.35; }
+.multi-line-cell div { margin-bottom: 0.8mm; }
 .multi-line-cell .underline.short { text-decoration: none !important; }
 .full-underline { display: inline-block; border-bottom: 0.4pt solid #000; width: 40mm; height: 4mm; vertical-align: middle; }
 .short-line { width: 25mm; }
 .device-info-row { display: flex; flex-wrap: wrap; gap: 4mm; align-items: baseline; }
-.val-underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 25mm; padding: 0 2mm 0.5mm; vertical-align: baseline; }
-.val-underline.wide { min-width: 40mm; }
+.val-underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 22mm; padding: 0 2mm 0.5mm; vertical-align: baseline; }
+.val-underline.wide { min-width: 36mm; }
 .section-header td { font-weight: 700; }
 .ei-header th { font-weight: 700; }
-.empty-row td { height: 10mm; }
-.signature-block { margin-top: 20mm; text-align: right; font-size: 16pt !important; }
-.sig-line { margin-bottom: 3mm; font-size: 16pt !important; }
+.empty-row td { height: 12mm; }
+.signature-block { margin-top: 14mm; text-align: right; font-size: 14pt; }
+.sig-line { margin-bottom: 2.5mm; font-size: 14pt; }
 
 @media print {
   .f3-table td, .f4-table th, .f4-table td, .f5-table td, .summary-box td, .f6-table td, .f6-table th { border: 1px solid #000 !important; }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using api.xraycare.Database;
 using api.xraycare.Services;
@@ -25,6 +26,17 @@ namespace api.xraycare.Controllers
         }
 
         private int? GetHospitalId() => _hospital.HospitalId;
+
+        /// <summary>Calendar date yyyy-MM-dd in Asia/Bangkok (matches daily checklist reset).</summary>
+        private static string GetBangkokDateKey()
+        {
+            var tz = TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok");
+            var local = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+            return local.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
+        private static string? NormalizeDateKey(string? key) =>
+            string.IsNullOrWhiteSpace(key) ? null : key.Trim();
 
         // ===================== Health (no auth required) =====================
 
@@ -150,18 +162,37 @@ namespace api.xraycare.Controllers
         {
             var hid = GetHospitalId();
             if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
-            var list = await _db.Machines
+            var todayKey = GetBangkokDateKey();
+            var machines = await _db.Machines
                 .Where(m => m.HospitalId == hid)
                 .OrderBy(m => m.RID)
-                .Select(m => new
-                {
-                    id = m.RID,
-                    machineName = m.Machine_name,
-                    room = m.Room,
-                    registerDate = m.Register_date,
-                    caretaker = m.Caretaker
-                })
                 .ToListAsync();
+
+            var changed = false;
+            foreach (var m in machines)
+            {
+                var dk = NormalizeDateKey(m.StatusDateKey);
+                if (dk != todayKey)
+                {
+                    m.Status = ChecklistMachineStatus.unCheck;
+                    m.StatusDateKey = todayKey;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+                await _db.SaveChangesAsync();
+
+            var list = machines.Select(m => new
+            {
+                id = m.RID,
+                machineName = m.Machine_name,
+                room = m.Room,
+                registerDate = m.Register_date,
+                caretaker = m.Caretaker,
+                status = m.Status.ToString(),
+                statusDateKey = m.StatusDateKey
+            }).ToList();
             return Ok(list);
         }
 
@@ -193,7 +224,9 @@ namespace api.xraycare.Controllers
                     machineName = machine.Machine_name,
                     room = machine.Room,
                     registerDate = machine.Register_date,
-                    caretaker = machine.Caretaker
+                    caretaker = machine.Caretaker,
+                    status = machine.Status.ToString(),
+                    statusDateKey = machine.StatusDateKey
                 });
             }
             catch (Exception ex)
@@ -710,6 +743,27 @@ namespace api.xraycare.Controllers
                     JsonData = request.jsonData ?? ""
                 };
                 _db.ChecklistRecords.Add(record);
+
+                if (string.Equals(request.formType?.Trim(), "F1_F2", StringComparison.Ordinal))
+                {
+                    var machineName = (request.machineName ?? "").Trim();
+                    if (!string.IsNullOrEmpty(machineName))
+                    {
+                        var hospitalMachines = await _db.Machines
+                            .Where(m => m.HospitalId == hid.Value)
+                            .ToListAsync();
+                        var machine = hospitalMachines.FirstOrDefault(m =>
+                            !string.IsNullOrWhiteSpace(m.Machine_name) &&
+                            string.Equals(m.Machine_name.Trim(), machineName, StringComparison.OrdinalIgnoreCase));
+                        if (machine != null)
+                        {
+                            var todayKey = GetBangkokDateKey();
+                            machine.Status = ChecklistMachineStatus.Checked;
+                            machine.StatusDateKey = todayKey;
+                        }
+                    }
+                }
+
                 await _db.SaveChangesAsync();
 
                 return Ok(new
@@ -981,6 +1035,153 @@ namespace api.xraycare.Controllers
                 return StatusCode(500, new { message = message });
             }
         }
+
+        // ===================== Hospital shared UI state (daily checklist + PM calendar) =====================
+
+        private static readonly JsonSerializerOptions HospitalUiJsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        private async Task<HospitalUiState> GetOrCreateHospitalUiStateRow(int hospitalId)
+        {
+            var row = await _db.HospitalUiStates.FirstOrDefaultAsync(x => x.HospitalId == hospitalId);
+            if (row != null)
+                return row;
+
+            var created = new HospitalUiState
+            {
+                HospitalId = hospitalId,
+                JsonData = "{}"
+            };
+            _db.HospitalUiStates.Add(created);
+            await _db.SaveChangesAsync();
+            return created;
+        }
+
+        private static HospitalUiStateBlob ParseHospitalUiBlob(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return new HospitalUiStateBlob();
+            try
+            {
+                return JsonSerializer.Deserialize<HospitalUiStateBlob>(json, HospitalUiJsonOptions) ?? new HospitalUiStateBlob();
+            }
+            catch
+            {
+                return new HospitalUiStateBlob();
+            }
+        }
+
+        // GET: api/xraycare/GetHospitalUiState
+        [HttpGet("GetHospitalUiState")]
+        public async Task<IActionResult> GetHospitalUiState()
+        {
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
+            try
+            {
+                var row = await _db.HospitalUiStates.AsNoTracking().FirstOrDefaultAsync(x => x.HospitalId == hid.Value);
+                var blob = row == null ? new HospitalUiStateBlob() : ParseHospitalUiBlob(row.JsonData);
+                return Ok(new
+                {
+                    dailyChecked = blob.DailyChecked ?? new Dictionary<string, List<string>>(),
+                    pmEventsByDate = blob.PmEventsByDate ?? new Dictionary<string, List<string>>(),
+                    pmMonthlyRules = blob.PmMonthlyRules ?? new Dictionary<string, string>(),
+                    pmHiddenMonthlyTasks = blob.PmHiddenMonthlyTasks ?? new Dictionary<string, List<string>>(),
+                    pmDisabledDailyDates = blob.PmDisabledDailyDates ?? new Dictionary<string, bool>()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetHospitalUiState failed");
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
+        // POST: api/xraycare/AppendDailyCheckedMachine
+        [HttpPost("AppendDailyCheckedMachine")]
+        public async Task<IActionResult> AppendDailyCheckedMachine([FromBody] AppendDailyCheckedMachineRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.machineName))
+                return BadRequest(new { message = "machineName is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
+            try
+            {
+                var todayKey = GetBangkokDateKey();
+                var name = request.machineName.Trim();
+                var hospitalMachines = await _db.Machines
+                    .Where(m => m.HospitalId == hid.Value)
+                    .ToListAsync();
+                var machine = hospitalMachines.FirstOrDefault(m =>
+                    !string.IsNullOrWhiteSpace(m.Machine_name) &&
+                    string.Equals(m.Machine_name.Trim(), name, StringComparison.OrdinalIgnoreCase));
+                if (machine == null)
+                    return Ok(new { ok = true, message = "Machine not found; nothing updated." });
+
+                machine.Status = ChecklistMachineStatus.Checked;
+                machine.StatusDateKey = todayKey;
+                await _db.SaveChangesAsync();
+                return Ok(new { ok = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AppendDailyCheckedMachine failed");
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
+        // PUT: api/xraycare/SaveHospitalPmCalendar
+        [HttpPut("SaveHospitalPmCalendar")]
+        public async Task<IActionResult> SaveHospitalPmCalendar([FromBody] SaveHospitalPmCalendarRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { message = "Request body is required." });
+            var hid = GetHospitalId();
+            if (hid == null) return BadRequest(new { message = "X-Hospital-Id header is required." });
+            try
+            {
+                var row = await GetOrCreateHospitalUiStateRow(hid.Value);
+                var blob = ParseHospitalUiBlob(row.JsonData);
+                blob.PmEventsByDate = request.pmEventsByDate ?? new Dictionary<string, List<string>>();
+                blob.PmMonthlyRules = request.pmMonthlyRules ?? new Dictionary<string, string>();
+                blob.PmHiddenMonthlyTasks = request.pmHiddenMonthlyTasks ?? new Dictionary<string, List<string>>();
+                blob.PmDisabledDailyDates = request.pmDisabledDailyDates ?? new Dictionary<string, bool>();
+                row.JsonData = JsonSerializer.Serialize(blob, HospitalUiJsonOptions);
+                await _db.SaveChangesAsync();
+                return Ok(new { ok = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SaveHospitalPmCalendar failed");
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+    }
+
+    internal class HospitalUiStateBlob
+    {
+        public Dictionary<string, List<string>>? DailyChecked { get; set; }
+        public Dictionary<string, List<string>>? PmEventsByDate { get; set; }
+        public Dictionary<string, string>? PmMonthlyRules { get; set; }
+        public Dictionary<string, List<string>>? PmHiddenMonthlyTasks { get; set; }
+        public Dictionary<string, bool>? PmDisabledDailyDates { get; set; }
+    }
+
+    public class AppendDailyCheckedMachineRequest
+    {
+        public string dateKey { get; set; } = "";
+        public string machineName { get; set; } = "";
+    }
+
+    public class SaveHospitalPmCalendarRequest
+    {
+        public Dictionary<string, List<string>>? pmEventsByDate { get; set; }
+        public Dictionary<string, string>? pmMonthlyRules { get; set; }
+        public Dictionary<string, List<string>>? pmHiddenMonthlyTasks { get; set; }
+        public Dictionary<string, bool>? pmDisabledDailyDates { get; set; }
     }
 
     // ===================== Request DTOs =====================
