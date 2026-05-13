@@ -1,6 +1,6 @@
 <template>
   <!-- หน้าโล่ง ใช้สำหรับปริ้นเท่านั้น -->
-  <div class="print-root">
+  <div class="print-root xray-f11-print-page">
     <!-- ปุ่ม Print (จะถูกซ่อนตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- กระดาษ A4 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--f11full">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -203,6 +203,18 @@ onMounted(async () => {
   font-weight: 400;
 }
 
+/* แผ่น A4 — เต็มความกว้าง ไม่ให้ aspect-ratio บีบแคบกลางกระดาษ */
+.xray-f11-print-page > .sheet-inner--f11full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto !important;
+  height: auto;
+  min-height: 277mm;
+  max-height: none !important;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
 /* หัวฟอร์ม */
 .header-main {
   text-align: left;
@@ -247,13 +259,13 @@ onMounted(async () => {
 }
 
 
-/* คอลัมน์ตามฟอร์มราชการ */
+/* คอลัมน์แบ่งตาม % ให้เต็มความกว้างตาราง */
 .col-region {
-  width: 45mm;
+  width: 34%;
 }
 
 .col-small {
-  width: 26mm;
+  width: 13.2%;
 }
 
 .align-left {
@@ -298,5 +310,36 @@ onMounted(async () => {
 
 @media print {
   .f11-table th, .f11-table td { border: 1px solid #000 !important; }
+
+  .xray-f11-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+  }
+  .xray-f11-print-page > .sheet-inner--f11full {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 8mm 6mm !important;
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 277mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .xray-f11-print-page .f11-table {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+  .xray-f11-print-page .header-main {
+    width: 100% !important;
+  }
+  .xray-f11-print-page .sign-block {
+    width: 100% !important;
+    max-width: none !important;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <!-- หน้าโล่ง มีแค่ปุ่ม Print + แผ่น A4 -->
-  <div class="print-root">
+  <div class="print-root xray-f71-print-page">
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- แผ่น A4 หน้า 1: F7-1 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--f71full">
         <div class="header-main">
           <div class="title-main">
             แบบบันทึก F7-1 : การทดสอบ Collimator and Beam Alignment
@@ -121,7 +121,7 @@
     </div>
 
     <!-- แผ่น A4 หน้า 2: F7-2 (ถ้าเนื้อหาเกินหน้าก็ต่อหน้าใหม่ได้) -->
-    <div class="sheet-inner sheet-inner--flow f72-print-sheet">
+    <div class="sheet-inner sheet-inner--flow f72-print-sheet sheet-inner--f71full">
           <div class="header-main">
             <div class="title-main">
               แบบบันทึก F7-2 : การทดสอบ Collimator and Beam Alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)
@@ -202,7 +202,7 @@
     </div>
 
     <!-- แผ่น A4 หน้า 3: F8-1 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--f71full">
           <div class="header-main">
             <div class="title-main">แบบบันทึก F8-1 : การทดสอบสัญญาณรบกวนมืด (Dark Noise) ระบบ CR</div>
             <div class="title-sub">
@@ -264,7 +264,7 @@
     </div>
 
     <!-- แผ่น A4 หน้า 4: F8-2 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--f71full">
           <div class="header-main">
             <div class="title-main">{{ f82FormTitle }}</div>
             <div class="title-sub">
@@ -547,6 +547,20 @@ onMounted(async () => {
   font-weight: 400;
 }
 
+/* ทุกแผ่น (F7-1 / F7-2 / F8-1 / F8-2) — เต็มความกว้าง ไม่ให้ aspect-ratio บีบแคบกลางกระดาษ */
+.xray-f71-print-page > .sheet-inner--f71full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto !important;
+  height: auto;
+  max-height: none !important;
+  overflow: visible;
+  box-sizing: border-box;
+}
+.xray-f71-print-page > .sheet-inner--f71full:not(.sheet-inner--flow) {
+  min-height: 277mm;
+}
+
 /* Header */
 .header-main {
   text-align: left;
@@ -726,6 +740,45 @@ onMounted(async () => {
 
 @media print {
   .main-table th, .main-table td { border: 1px solid #000 !important; }
+
+  .xray-f71-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+  }
+  .xray-f71-print-page > .sheet-inner--f71full {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 8mm 6mm !important;
+    aspect-ratio: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .xray-f71-print-page > .sheet-inner--f71full:not(.sheet-inner--flow) {
+    height: auto !important;
+    min-height: 277mm !important;
+  }
+  .xray-f71-print-page > .sheet-inner--f71full.sheet-inner--flow {
+    min-height: 277mm !important;
+    height: auto !important;
+  }
+  .xray-f71-print-page .main-table,
+  .xray-f71-print-page .table-wrapper,
+  .xray-f71-print-page .f81-table,
+  .xray-f71-print-page .f82-table {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  .xray-f71-print-page .header-main {
+    width: 100% !important;
+  }
+  .xray-f71-print-page .signature-block {
+    width: 100% !important;
+    max-width: none !important;
+  }
 }
 
 /* F7-2: อนุญาตให้เนื้อหาเกิน 1 หน้าแล้วต่อหน้าใหม่ได้ มีขนาดเหมาะสม */

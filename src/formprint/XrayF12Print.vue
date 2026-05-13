@@ -1,6 +1,6 @@
 <template>
   <!-- หน้าโล่ง ใช้สำหรับปริ้นเท่านั้น -->
-  <div class="print-root">
+  <div class="print-root xray-f12-print-page">
     <!-- ปุ่มสั่งพิมพ์ (จะไม่แสดงตอน print) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-inner sheet-inner--flow">
+    <div class="sheet-inner sheet-inner--f12full">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -320,10 +320,23 @@ onMounted(async () => {
   font-size: 16pt;
 }
 
+/* แผ่น A4 — เต็มความกว้าง + สูงตามเนื้อหา (หน้าจอ) ไม่บีบด้วย aspect-ratio */
+.xray-f12-print-page > .sheet-inner--f12full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 277mm;
+  max-height: none !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
 /* Header */
 .header-main {
   text-align: left;
   margin-bottom: 2mm;
+  width: 100%;
 }
 
 /* คำว่า "แบบบันทึก F12 : ..." ให้เป็น 13pt */
@@ -341,6 +354,7 @@ onMounted(async () => {
 /* meta block */
 .meta-block {
   margin-bottom: 6mm;
+  width: 100%;
 }
 
 .meta-row {
@@ -372,15 +386,17 @@ onMounted(async () => {
 /* ตารางหลัก */
 .f12-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  margin-bottom: 6mm;
+  margin-bottom: 8mm;
 }
 
 .f12-table th,
 .f12-table td {
   border: 0.4pt solid #000;
-  padding: 1.5mm 1mm;
+  padding: 3mm 1.2mm;
+  vertical-align: middle;
 }
 
 /* ทำให้ "จำนวนครั้ง" อยู่กึ่งกลาง */
@@ -408,9 +424,11 @@ onMounted(async () => {
   font-weight: 400;
 }
 
-/* ข้อเสนอแนะ */
+/* ข้อเสนอแนะ — เว้นห่างจากตารางด้านบน */
 .comment-block {
+  margin-top: 6mm;
   margin-bottom: 6mm;
+  width: 100%;
 }
 
 .comment-title {
@@ -424,6 +442,7 @@ onMounted(async () => {
 /* หมายเหตุ */
 .note-block {
   margin-bottom: 10mm;
+  width: 100%;
 }
 
 .note-title {
@@ -438,6 +457,7 @@ onMounted(async () => {
 /* ลายเซ็น */
 .sign-block {
   margin-top: 8mm;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
 }
@@ -472,12 +492,124 @@ onMounted(async () => {
 
   .f12-table th, .f12-table td { border: 1px solid #000 !important; }
 
-  .meta-block,
-  .f12-table,
-  .comment-block,
-  .note-block,
-  .sign-block {
+  /* บีบให้พอหนึ่งหน้า — ไม่ใช้ page-break-inside: avoid ทั้งก้อน (Chrome อาจดันบล็อกไปหน้า 2) */
+  .xray-f12-print-page,
+  .xray-f12-print-page * {
+    font-size: 13.5pt !important;
+  }
+
+  .xray-f12-print-page .title-main {
+    font-size: 16pt !important;
+    margin-bottom: 1mm !important;
+  }
+
+  .xray-f12-print-page .title-sub {
+    font-size: 13.5pt !important;
+  }
+
+  .xray-f12-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+  }
+
+  .xray-f12-print-page > .sheet-inner--f12full {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 5mm 5.5mm !important;
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+  }
+
+  .xray-f12-print-page .header-main {
+    margin-bottom: 1mm !important;
+    width: 100% !important;
+  }
+
+  .xray-f12-print-page .meta-block {
+    margin-bottom: 2mm !important;
+    width: 100% !important;
+  }
+
+  .xray-f12-print-page .meta-row {
+    margin-bottom: 0.65mm !important;
+  }
+
+  .xray-f12-print-page .fill-line {
+    min-height: 4mm !important;
+  }
+
+  .xray-f12-print-page .f12-table {
+    width: 100% !important;
+    max-width: none !important;
+    margin-bottom: 3.5mm !important;
+    table-layout: fixed !important;
+    page-break-inside: auto;
+  }
+
+  .xray-f12-print-page .f12-table th,
+  .xray-f12-print-page .f12-table td {
+    padding: 1.75mm 1mm !important;
+    line-height: 1.22 !important;
+    vertical-align: middle !important;
+  }
+
+  /* แถวข้อมูลให้สูงขึ้นชัดเจน โดยไม่ดันบล็อกล่างเกิน 1 หน้า */
+  .xray-f12-print-page .f12-table tbody td,
+  .xray-f12-print-page .f12-table tbody th {
+    min-height: 5.8mm;
+    box-sizing: border-box;
+  }
+
+  .xray-f12-print-page .f12-table thead th {
+    padding-top: 2mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .xray-f12-print-page .comment-block {
+    margin-top: 4mm !important;
+    margin-bottom: 1.5mm !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  .xray-f12-print-page .comment-title {
+    margin-bottom: 1mm !important;
+  }
+
+  .xray-f12-print-page .comment-dot-line {
+    margin-bottom: 0.8mm !important;
+  }
+
+  .xray-f12-print-page .note-block {
+    margin-bottom: 2mm !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  .xray-f12-print-page .note-title {
+    margin-bottom: 1mm !important;
+  }
+
+  .xray-f12-print-page .note-line {
+    line-height: 1.06 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .xray-f12-print-page .sign-block {
+    margin-top: 1.5mm !important;
+    width: 100% !important;
     page-break-inside: avoid;
+  }
+
+  .xray-f12-print-page .sign-row {
+    margin-bottom: 0.5mm !important;
   }
 }
 </style>
