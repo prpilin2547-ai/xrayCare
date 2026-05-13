@@ -11,12 +11,12 @@ export default defineConfig({
     proxy: {
       // สองแบบ: บางเบราว์เซอร์/ลิงก์อาจใช้ path เป็นตัวพิมพ์เล็ก — ถ้าไม่ตรง proxy จะได้ 404 จาก Vite
       '/api/Xraycare': {
-        target: 'http://localhost:8002',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false
       },
       '/api/xraycare': {
-        target: 'http://localhost:8002',
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false
       }
