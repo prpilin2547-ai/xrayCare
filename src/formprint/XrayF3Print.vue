@@ -395,17 +395,31 @@ function installPrintPageStyle(options = {}) {
     line-height: 1.45 !important;
   }
   .xray-f3f6-print-page .col-label { width: 48% !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .header-main { margin-bottom: 1.8mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .title-main { font-size: 17pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
   .xray-f3f6-print-page .form-print-page--f6 .f6-table td,
   .xray-f3f6-print-page .form-print-page--f6 .f6-table th {
-    padding: 2.2mm 1.4mm !important;
-    font-size: 10.5pt !important;
-    line-height: 1.38 !important;
+    padding: 1.25mm 0.9mm !important;
+    font-size: 9.75pt !important;
+    line-height: 1.16 !important;
   }
-  .xray-f3f6-print-page .form-print-page--f6 .f6-table th { font-size: 11pt !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell { padding: 3mm 2.2mm !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .signature-block { margin-top: 12mm !important; font-size: 11pt !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .sig-line { margin-bottom: 2.5mm !important; font-size: 11pt !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .empty-row td { height: 12mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table th { font-size: 10pt !important; padding: 1.4mm 0.9mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell { padding: 1.5mm 1.2mm !important; line-height: 1.22 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell div { margin-bottom: 0 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .device-info-row { gap: 2mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .signature-block {
+    margin-top: 2mm !important;
+    font-size: 10pt !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .xray-f3f6-print-page .form-print-page--f6 .sig-line { margin-bottom: 1mm !important; font-size: 10pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .empty-row td { height: 3mm !important; padding: 0 !important; }
 }
 `
   document.head.appendChild(el)
@@ -634,7 +648,7 @@ function handlePrint() {
 
 @page {
   size: A4 portrait;
-  margin: 5mm;
+  margin: 3.5mm;
 }
 
 /* F3 */
