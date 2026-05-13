@@ -1,5 +1,5 @@
 <template>
-  <div class="print-root">
+  <div class="print-root xray-f1-print-page">
 
     <!-- แถบปุ่มด้านบน (จะหายไปตอนสั่งปริ้น) -->
     <div class="print-toolbar">
@@ -13,7 +13,7 @@
       </button>
     </div>
 
-      <!-- ส่วนเนื้อหาด้านขวา (ตัวแบบฟอร์มจริง) -->
+      <!-- แผ่นฟอร์ม A4 -->
       <div class="form-area">
         <!-- แถบหัวสีเทาแนวนอนด้านบน (แบบบันทึก) -->
         <div class="form-main-title">
@@ -119,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 
 /**
@@ -188,10 +188,119 @@ function formatMonthOnly(dateStr) {
 const record = ref(defaultRecord());
 
 function handlePrint() {
+  installPrintPageStyle({ moveToEnd: true });
   window.print();
 }
 
+/** ทับ @page ของ printLayout เฉพาะตอนอยู่หน้านี้ + คลาย #app/.small ไม่ให้บีบ/ชิดขวาใน preview */
+const PRINT_STYLE_ID = "xray-f1-print-page-style";
+
+function installPrintPageStyle(options = {}) {
+  const moveToEnd = options.moveToEnd === true;
+  if (typeof document === "undefined") return;
+  if (moveToEnd) {
+    removePrintPageStyle();
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return;
+  }
+  const el = document.createElement("style");
+  el.id = PRINT_STYLE_ID;
+  el.textContent = `
+@page { size: A4 portrait; margin: 0 !important; }
+@media print {
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  /* ไม่ใช้ flex ตอนพิมพ์ — กันบีบ + กล่องเต็มความกว้างจริงของหน้า */
+  .xray-f1-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    min-height: 0 !important;
+  }
+  .xray-f1-print-page .print-toolbar {
+    display: none !important;
+  }
+  .xray-f1-print-page .form-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 14mm 10mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  .xray-f1-print-page .table-wrapper,
+  .xray-f1-print-page .qc-table,
+  .xray-f1-print-page .f2-table {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .xray-f1-print-page .qc-table,
+  .xray-f1-print-page .qc-table td,
+  .xray-f1-print-page .qc-table th,
+  .xray-f1-print-page .f2-table,
+  .xray-f1-print-page .f2-table td,
+  .xray-f1-print-page .f2-table th {
+    font-size: 18pt !important;
+    line-height: 1.35 !important;
+  }
+  .xray-f1-print-page .qc-table td,
+  .xray-f1-print-page .qc-table th,
+  .xray-f1-print-page .f2-table td,
+  .xray-f1-print-page .f2-table th {
+    padding: 3mm 3.5mm !important;
+  }
+  .xray-f1-print-page .form-main-title {
+    font-size: 26pt !important;
+    padding: 4mm 0 !important;
+  }
+  .xray-f1-print-page .form-meta,
+  .xray-f1-print-page .f2-meta-row {
+    font-size: 19pt !important;
+  }
+  .xray-f1-print-page .meta-strong {
+    font-size: 20pt !important;
+  }
+  .xray-f1-print-page .f2-main-title {
+    font-size: 19pt !important;
+  }
+  .xray-f1-print-page .f2-subtitle {
+    font-size: 18pt !important;
+  }
+  .xray-f1-print-page .f2-table thead th {
+    font-size: 18pt !important;
+  }
+}`;
+  document.head.appendChild(el);
+}
+
+function removePrintPageStyle() {
+  document.getElementById(PRINT_STYLE_ID)?.remove();
+}
+
 onMounted(async () => {
+  installPrintPageStyle();
   const id = route.query.id;
   if (!id) return;
   try {
@@ -230,6 +339,10 @@ onMounted(async () => {
   } catch (e) {
     console.error('Load checklist record error:', e);
   }
+});
+
+onBeforeUnmount(() => {
+  removePrintPageStyle();
 });
 </script>
 
@@ -607,41 +720,10 @@ onMounted(async () => {
   padding-left: 2mm !important;
 }
 
-/* ----------------- print CSS ----------------- */
-@page {
-  size: A4 portrait;
-  margin: 0;
-}
-
+/* ----------------- print CSS -----------------
+   ขนาดเต็มหน้า + ขยายตัวหนังสือถูกใส่ใน installPrintPageStyle() (ไม่ผ่าน scoped) เพื่อชนทุก global sheet
+   ที่นี่เหลือเฉพาะสิ่งที่ inject ไม่ครอบ */
 @media print {
-  .print-root {
-    padding: 0 !important;
-    margin: 0 !important;
-    background: white;
-    max-width: none;
-    overflow: visible;
-  }
-
-  /* form-area = พื้นที่พิมพ์ A4 แนวตั้ง เท่ากันทุกหน้า */
-  .form-area {
-    width: 190mm !important;
-    height: 277mm !important;
-    min-height: 277mm !important;
-    max-width: 190mm !important;
-    max-height: none !important;
-    aspect-ratio: auto !important;
-    padding: 10mm !important;
-  }
-
-  .print-toolbar {
-    display: none;
-  }
-
-  .title-main {
-    font-size: 14pt !important;
-    font-weight: 700;
-  }
-
   /* บังคับให้ขอบตารางแสดงชัดตอนพิมพ์ */
   .qc-table,
   .qc-table td,

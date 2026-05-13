@@ -1,6 +1,6 @@
 <template>
-  <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม print + A4 -->
-  <div class="print-root">
+  <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม print + A4 (ไม่ใช้ printLayout — ใช้ inject พิมพ์แนวนอน) -->
+  <div class="print-root xray-f2-print-page">
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--flow">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <!-- บรรทัดแรก -->
@@ -61,7 +61,7 @@
 
         <!-- ตาราง 3 ชุด -->
         <div
-          v-for="(section, index) in monthSections"
+          v-for="(section, index) in displayMonthSections"
           :key="index"
           class="month-block"
         >
@@ -135,12 +135,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { apiFetch } from '../api/client'
 
 const route = useRoute()
-
-import { apiFetch } from '../api/client'
 
 const record = ref({
   fiscalYear: '',      // ปีงบประมาณ พ.ศ.
@@ -156,11 +155,134 @@ const monthSections = ref([
   { monthLabel: '', results: {}, appearance: {}, inspector: '', summaryResult: '' }
 ])
 
-function handlePrint () {
+/** พิมพ์เฉพาะบล็อกที่มีเดือน — ลดตารางว่างช่วยให้เหลือหนึ่งหน้า */
+const displayMonthSections = computed(() => {
+  const list = monthSections.value.filter((s) => (s.monthLabel || '').trim().length > 0)
+  return list.length > 0 ? list : monthSections.value
+})
+
+const PRINT_STYLE_ID = 'xray-f2-print-page-style'
+
+function installPrintPageStyle(options = {}) {
+  const moveToEnd = options.moveToEnd === true
+  if (typeof document === 'undefined') return
+  if (moveToEnd) {
+    removePrintPageStyle()
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return
+  }
+  const el = document.createElement('style')
+  el.id = PRINT_STYLE_ID
+  el.textContent = `
+@page { size: A4 landscape; margin: 4mm; }
+@media print {
+  html, body {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f2-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .xray-f2-print-page .print-toolbar { display: none !important; }
+  .xray-f2-print-page > .sheet-inner.sheet-inner--flow {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 3mm 4mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  .xray-f2-print-page .header-main {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 1mm !important;
+  }
+  .xray-f2-print-page .title-main {
+    font-size: 17pt !important;
+    text-align: center !important;
+    margin-bottom: 0.5mm !important;
+  }
+  .xray-f2-print-page .title-center-block {
+    margin-top: 1.5mm !important;
+  }
+  .xray-f2-print-page .title-sub {
+    font-size: 13pt !important;
+    margin-bottom: 0.2mm !important;
+    line-height: 1.2 !important;
+  }
+  .xray-f2-print-page .meta-inline {
+    margin-top: 2mm !important;
+    margin-bottom: 2mm !important;
+    font-size: 12pt !important;
+  }
+  .xray-f2-print-page .meta-inline * { font-size: 12pt !important; }
+  .xray-f2-print-page .month-block {
+    margin-bottom: 2mm !important;
+    page-break-inside: avoid !important;
+  }
+  .xray-f2-print-page .f2-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 10pt !important;
+  }
+  .xray-f2-print-page .f2-table th,
+  .xray-f2-print-page .f2-table td {
+    border: 1px solid #000 !important;
+    padding: 0.55mm 0.25mm !important;
+    font-size: 10pt !important;
+    line-height: 1.1 !important;
+  }
+  .xray-f2-print-page .col-left { width: 10% !important; font-size: 10pt !important; }
+  .xray-f2-print-page .col-month { width: 4% !important; font-size: 9pt !important; padding: 0.3mm !important; }
+  .xray-f2-print-page .col-second {
+    width: 12% !important;
+    font-size: 9pt !important;
+    line-height: 1.1 !important;
+    padding: 0.4mm 0.35mm !important;
+  }
+  .xray-f2-print-page .col-day {
+    width: auto !important;
+    min-width: 0 !important;
+    font-size: 9pt !important;
+    padding: 0.45mm 0.1mm !important;
+  }
+  .xray-f2-print-page .month-label { font-size: 9pt !important; }
+  .xray-f2-print-page .month-line { margin-top: 0.2mm !important; min-width: 8mm !important; }
+}`
+  document.head.appendChild(el)
+}
+
+function removePrintPageStyle() {
+  document.getElementById(PRINT_STYLE_ID)?.remove()
+}
+
+function handlePrint() {
+  installPrintPageStyle({ moveToEnd: true })
   window.print()
 }
 
 onMounted(async () => {
+  installPrintPageStyle()
   const id = route.query.id || route.params.id
   if (!id) return
   try {
@@ -184,9 +306,12 @@ onMounted(async () => {
     console.error('Load checklist record error:', e)
   }
 })
+
+onBeforeUnmount(() => {
+  removePrintPageStyle()
+})
 </script>
 
-<style src="./printLayout.css"></style>
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
@@ -196,10 +321,43 @@ onMounted(async () => {
   font-size: 16pt !important;
 }
 
+.print-root {
+  background: #e5e7eb;
+  min-height: 100vh;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.print-toolbar { margin-bottom: 8px; }
+.btn-print {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.print-root > .sheet-inner.sheet-inner--flow {
+  width: 100%;
+  max-width: 297mm;
+  margin: 0 auto;
+  padding: 6mm 8mm;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.header-main {
+  width: 100%;
+  text-align: center;
+}
+
 .title-main {
   font-weight: 700;
-  font-size: 18pt !important;   /* ← เฉพาะบรรทัดนี้ */
-  text-align: left;
+  font-size: 18pt !important;
+  text-align: center;
   margin-bottom: 1mm;
 }
 
@@ -261,7 +419,7 @@ onMounted(async () => {
 
 /* ตาราง */
 .month-block {
-  margin-bottom: 12mm;
+  margin-bottom: 5mm;
 }
 
 .f2-table {
@@ -364,7 +522,16 @@ onMounted(async () => {
 }
 
 
+@page { size: A4 landscape; margin: 4mm; }
+
 @media print {
+  .print-root {
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .print-toolbar {
+    display: none !important;
+  }
   .f2-table th,
   .f2-table td {
     border: 1px solid #000 !important;

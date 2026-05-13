@@ -1,5 +1,5 @@
 <template>
-  <div class="print-root">
+  <div class="print-root xray-f2-monthly-print-page">
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { apiFetch } from '../api/client'
@@ -86,10 +86,9 @@ const monthLabel = ref('')
 const plateByDay = ref({})
 const daysInMonth = ref(31)
 const daySections = computed(() => {
-  const d = daysInMonth.value
-  const s1 = { monthLabel: monthLabel.value, days: d >= 20 ? 20 : d, start: 1 }
-  const s2 = { monthLabel: monthLabel.value, days: d > 20 ? d - 20 : 0, start: 21 }
-  return s2.days > 0 ? [s1, s2] : [s1]
+  const d = Math.min(Math.max(daysInMonth.value, 1), 31)
+  /* ตารางเดียว 1–N วัน — แนวนอน A4 ใช้ความกว้างเต็มแผ่น (ไม่แบ่ง 20+11) */
+  return [{ monthLabel: monthLabel.value, days: d, start: 1 }]
 })
 
 function parseCheckDate(str) {
@@ -140,10 +139,170 @@ function getInspector(dayCol, blockIndex) {
 }
 
 function handlePrint() {
+  installPrintPageStyle({ moveToEnd: true })
   window.print()
 }
 
+/** A4 แนวนอน — inject ท้าย head ตอนพิมพ์; ไม่โหลด printLayout เพื่อไม่ให้ @page portrait ทับ */
+const PRINT_STYLE_ID = 'xray-f2-monthly-print-page-style'
+
+function installPrintPageStyle(options = {}) {
+  const moveToEnd = options.moveToEnd === true
+  if (typeof document === 'undefined') return
+  if (moveToEnd) {
+    removePrintPageStyle()
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return
+  }
+  const el = document.createElement('style')
+  el.id = PRINT_STYLE_ID
+  el.textContent = `
+@page {
+  size: A4 landscape;
+  margin: 4mm;
+}
+@media print {
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f2-monthly-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    align-items: stretch !important;
+  }
+  .xray-f2-monthly-print-page .print-toolbar {
+    display: none !important;
+  }
+  .xray-f2-monthly-print-page > .sheet-inner.sheet-inner--flow {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 auto !important;
+    padding: 4mm 5mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+  }
+  .xray-f2-monthly-print-page .header-main {
+    margin-bottom: 1.5mm !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .xray-f2-monthly-print-page .title-center-block {
+    margin-top: 2mm !important;
+  }
+  .xray-f2-monthly-print-page .title-main {
+    font-size: 22pt !important;
+    margin-bottom: 1mm !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+  .xray-f2-monthly-print-page .title-sub {
+    font-size: 16pt !important;
+    margin-bottom: 0.4mm !important;
+    line-height: 1.25 !important;
+  }
+  .xray-f2-monthly-print-page .meta-inline {
+    margin-top: 2.5mm !important;
+    margin-bottom: 3mm !important;
+    font-size: 15pt !important;
+    padding-left: 0 !important;
+  }
+  .xray-f2-monthly-print-page .meta-inline * {
+    font-size: 15pt !important;
+  }
+  .xray-f2-monthly-print-page .month-block {
+    margin-bottom: 3mm !important;
+  }
+  .xray-f2-monthly-print-page col.col-day {
+    width: auto !important;
+  }
+  .xray-f2-monthly-print-page .f2-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 13pt !important;
+    margin: 0 !important;
+  }
+  .xray-f2-monthly-print-page .f2-table th,
+  .xray-f2-monthly-print-page .f2-table td {
+    border: 1px solid #000 !important;
+    padding: 1.2mm 0.45mm !important;
+    font-size: 13pt !important;
+    line-height: 1.2 !important;
+  }
+  .xray-f2-monthly-print-page .col-month {
+    width: 4% !important;
+    padding: 0.6mm !important;
+    font-size: 12pt !important;
+  }
+  .xray-f2-monthly-print-page .col-second {
+    width: 11% !important;
+    font-size: 12pt !important;
+    line-height: 1.2 !important;
+    padding: 0.8mm 0.6mm !important;
+  }
+  .xray-f2-monthly-print-page .col-left {
+    width: 15% !important;
+    font-size: 13pt !important;
+  }
+  .xray-f2-monthly-print-page .col-day {
+    width: auto !important;
+    min-width: 0 !important;
+    font-size: 12pt !important;
+    padding: 0.9mm 0.3mm !important;
+  }
+  .xray-f2-monthly-print-page .cell-small {
+    font-size: 11pt !important;
+    padding: 0.7mm 0.3mm !important;
+  }
+  .xray-f2-monthly-print-page .month-label {
+    font-size: 12pt !important;
+  }
+  .xray-f2-monthly-print-page .month-line {
+    margin-top: 0.3mm !important;
+    min-width: 8mm !important;
+  }
+  .xray-f2-monthly-print-page .signature-block {
+    margin-top: 14mm !important;
+    font-size: 14pt !important;
+    line-height: 1.4 !important;
+    page-break-inside: avoid !important;
+  }
+  .xray-f2-monthly-print-page .sig-line {
+    font-size: 14pt !important;
+    margin-bottom: 0.6mm !important;
+  }
+}`
+  document.head.appendChild(el)
+}
+
+function removePrintPageStyle() {
+  document.getElementById(PRINT_STYLE_ID)?.remove()
+}
+
 onMounted(async () => {
+  installPrintPageStyle()
   const monthParam = route.query.month
   const machineQuery = route.query.machine || ''
   if (!monthParam) return
@@ -219,12 +378,25 @@ onMounted(async () => {
   })
   plateByDay.value = byDay
 })
+
+onBeforeUnmount(() => {
+  removePrintPageStyle()
+})
 </script>
 
-<style src="./printLayout.css"></style>
 <style scoped>
 * {
   font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif !important;
+  box-sizing: border-box;
+}
+
+/* ไม่ใช้ printLayout — กำหนดแผ่นเองให้กว้างแนวนอน (หลีกเลี่ยง @page portrait จาก printLayout.css) */
+.print-root > .sheet-inner.sheet-inner--flow {
+  width: 100%;
+  max-width: 297mm;
+  margin: 0 auto;
+  padding: 6mm 8mm;
+  background: #fff;
   box-sizing: border-box;
 }
 
@@ -247,10 +419,15 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+.header-main {
+  width: 100%;
+  text-align: center;
+}
+
 .title-main {
   font-weight: 700;
   font-size: 22pt !important;
-  text-align: left;
+  text-align: center;
   margin-bottom: 1.5mm;
 }
 
@@ -281,7 +458,7 @@ onMounted(async () => {
 }
 .inline { min-width: 20mm; }
 
-.month-block { margin-bottom: 12mm; }
+.month-block { margin-bottom: 6mm; }
 
 .f2-table {
   width: 100%;
@@ -340,7 +517,7 @@ onMounted(async () => {
 }
 
 .signature-block {
-  margin-top: 10mm;
+  margin-top: 18mm;
   text-align: right;
   font-size: 16pt !important;
   line-height: 1.8;
@@ -349,68 +526,11 @@ onMounted(async () => {
   font-size: 16pt !important;
 }
 
-@page { size: A4 portrait; margin: 10mm; }
+@page { size: A4 landscape; margin: 4mm; }
 @media print {
   .print-root { padding: 0; background: white; }
   .print-toolbar { display: none; }
   .f2-table th, .f2-table td { border: 1px solid #000 !important; }
-  .sheet-inner--flow .title-main { font-size: 22pt !important; }
-  .sheet-inner--flow .title-sub { font-size: 17pt !important; }
-  .sheet-inner--flow .meta-inline { font-size: 16pt !important; }
-  .sheet-inner--flow .f2-table { font-size: 14pt !important; }
-  .sheet-inner--flow .f2-table th,
-  .sheet-inner--flow .f2-table td { padding: 1.5mm 0.8mm !important; font-size: 14pt !important; }
-  .sheet-inner--flow .col-left { font-size: 14pt !important; }
-  .sheet-inner--flow .col-day { font-size: 14pt !important; padding: 1mm 0.4mm !important; }
-  .sheet-inner--flow .col-second { font-size: 14pt !important; line-height: 1.3 !important; }
-  .sheet-inner--flow .cell-small { font-size: 13pt !important; }
-  .sheet-inner--flow .month-label { font-size: 14pt !important; }
 }
 </style>
 
-<style>
-/* สไตล์พิมพ์ไม่ใช้ scoped + บังคับ scale 100% เพื่อไม่ให้เบราว์เซอร์ย่อข้อความ */
-@media print {
-  html, body {
-    width: 210mm !important;
-    min-width: 210mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    zoom: 1 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  .print-root,
-  .print-root > .sheet-inner.sheet-inner--flow {
-    transform: none !important;
-    zoom: 1 !important;
-  }
-  .print-root > .sheet-inner.sheet-inner--flow {
-    width: 190mm !important;
-    max-width: 190mm !important;
-    min-width: 190mm !important;
-    padding: 10mm !important;
-    box-sizing: border-box !important;
-  }
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table { width: 100% !important; table-layout: fixed !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-month { width: 15mm !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-second { width: 42mm !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-day { width: auto !important; min-width: 5mm !important; padding: 2.5mm 1.2mm !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .title-main { font-size: 28pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .title-sub { font-size: 20pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .meta-inline,
-  .print-root > .sheet-inner.sheet-inner--flow .meta-inline * { font-size: 19pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table,
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table th,
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table td { font-size: 18pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-left { font-size: 18pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-day { font-size: 18pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .col-second { font-size: 18pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .cell-small { font-size: 17pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .month-label { font-size: 18pt !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table th,
-  .print-root > .sheet-inner.sheet-inner--flow .f2-table td { padding: 2.5mm 1.2mm !important; }
-  .print-root > .sheet-inner.sheet-inner--flow .signature-block { font-size: 18pt !important; margin-top: 10mm; }
-  .print-root > .sheet-inner.sheet-inner--flow .sig-line { font-size: 18pt !important; }
-}
-</style>

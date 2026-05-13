@@ -74,6 +74,10 @@
     max-width: none;
     overflow: visible;
     gap: 0;
+    /* กลางหน้าจอใช้ align-items:center — ตอนพิมพ์ไม่ให้ flex จำกัดความกว้างลูก */
+    align-items: flex-start !important;
+    width: 100%;
+    min-height: 0;
   }
 
   .form-area,
@@ -86,6 +90,7 @@
        ไม่งั้น Chrome ใช้ความสูงแม่จำกัดแล้วบีบความกว้างตาม ratio → ฟอร์มเล็กกลางกระดาษ */
     max-height: none !important;
     aspect-ratio: auto !important;
+    overflow: visible !important;
     padding: 10mm;
     page-break-after: always;
   }

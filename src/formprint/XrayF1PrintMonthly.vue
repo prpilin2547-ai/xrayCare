@@ -1,5 +1,5 @@
 <template>
-  <div class="print-root">
+  <div class="print-root xray-f1-monthly-print-page">
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;">
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { apiFetch } from '../api/client'
@@ -116,10 +116,129 @@ function getCellResult(day, rowIndex) {
 }
 
 function handlePrint() {
+  installPrintPageStyle({ moveToEnd: true })
   window.print()
 }
 
+/** A4 แนวนอน + เต็มหน้า + ไม่ย่อแบบ portrait (ลบ scale ออกจาก CSS เดิม) */
+const PRINT_STYLE_ID = 'xray-f1-monthly-print-page-style'
+
+function installPrintPageStyle(options = {}) {
+  const moveToEnd = options.moveToEnd === true
+  if (typeof document === 'undefined') return
+  if (moveToEnd) {
+    removePrintPageStyle()
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return
+  }
+  const el = document.createElement('style')
+  el.id = PRINT_STYLE_ID
+  el.textContent = `
+@page {
+  size: A4 landscape;
+  margin: 5mm;
+}
+@media print {
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f1-monthly-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    transform: none !important;
+  }
+  .xray-f1-monthly-print-page .print-toolbar {
+    display: none !important;
+  }
+  .xray-f1-monthly-print-page .form-area--f1-monthly {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 4mm 5mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    page-break-inside: avoid;
+  }
+  .xray-f1-monthly-print-page .table-wrapper {
+    overflow: visible !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+  .xray-f1-monthly-print-page .qc-table-monthly {
+    width: 100% !important;
+    table-layout: fixed !important;
+    page-break-inside: avoid;
+  }
+  .xray-f1-monthly-print-page .qc-table-monthly td,
+  .xray-f1-monthly-print-page .qc-table-monthly th {
+    border: 1px solid #000 !important;
+  }
+  .xray-f1-monthly-print-page .col-item-width {
+    width: 20% !important;
+  }
+  .xray-f1-monthly-print-page .col-day-width {
+    width: calc(80% / 31) !important;
+    min-width: 0 !important;
+  }
+  .xray-f1-monthly-print-page .form-main-title {
+    font-size: 24pt !important;
+    padding: 3mm 0 !important;
+  }
+  .xray-f1-monthly-print-page .form-meta {
+    font-size: 17pt !important;
+    margin-bottom: 2mm !important;
+  }
+  .xray-f1-monthly-print-page .meta-strong {
+    font-size: 18pt !important;
+  }
+  .xray-f1-monthly-print-page .meta-row {
+    margin-bottom: 1.2mm !important;
+  }
+  .xray-f1-monthly-print-page .qc-table-monthly {
+    font-size: 14pt !important;
+    margin-top: 3mm !important;
+    line-height: 1.3 !important;
+  }
+  .xray-f1-monthly-print-page .qc-table-monthly td,
+  .xray-f1-monthly-print-page .qc-table-monthly th {
+    font-size: 14pt !important;
+    padding: 1.5mm 0.6mm !important;
+    line-height: 1.25 !important;
+  }
+  .xray-f1-monthly-print-page .day-cell,
+  .xray-f1-monthly-print-page .col-day-head {
+    font-size: 13pt !important;
+  }
+}`
+  document.head.appendChild(el)
+}
+
+function removePrintPageStyle() {
+  document.getElementById(PRINT_STYLE_ID)?.remove()
+}
+
 onMounted(async () => {
+  installPrintPageStyle()
   const monthParam = route.query.month
   const machineQuery = route.query.machine || ''
   if (!monthParam) return
@@ -202,6 +321,10 @@ onMounted(async () => {
   })
   recordsByDay.value = byDay
   testerNames.value = [...testers].join(', ') || '–'
+})
+
+onBeforeUnmount(() => {
+  removePrintPageStyle()
 })
 </script>
 
@@ -289,84 +412,3 @@ onMounted(async () => {
 .day-cell { font-size: 12pt !important; }
 </style>
 
-<style>
-/* บังคับ A4 แนวนอน เพื่อให้ตาราง 31 วันแสดงครบ */
-@page {
-  size: A4 landscape;
-  size: 297mm 210mm;
-  margin: 6mm;
-}
-
-@media print {
-  /* บังคับความกว้างเอกสารให้ต้องใช้แนวตั้งแนวนอน */
-  html, body, #app {
-    overflow: visible !important;
-    height: auto !important;
-    min-width: 282mm !important;
-    width: 282mm !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .print-root {
-    padding: 0 !important;
-    margin: 0 !important;
-    background: white !important;
-    overflow: visible !important;
-    max-width: none !important;
-    width: 282mm !important;
-    min-width: 282mm !important;
-    min-height: 0 !important;
-    height: auto !important;
-  }
-  .form-area--f1-monthly {
-    width: 280mm !important;
-    min-width: 280mm !important;
-    max-width: 280mm !important;
-    min-height: 0 !important;
-    height: auto !important;
-    padding: 4mm 5mm !important;
-    overflow: visible !important;
-    box-sizing: border-box !important;
-    page-break-inside: avoid;
-  }
-  .print-toolbar { display: none !important; }
-  .table-wrapper {
-    overflow: visible !important;
-    max-width: none !important;
-    width: 100% !important;
-  }
-  .qc-table-monthly {
-    width: 100% !important;
-    table-layout: fixed !important;
-    page-break-inside: avoid;
-  }
-  .qc-table-monthly td, .qc-table-monthly th { border: 1px solid #000 !important; }
-  /* ความกว้างคอลัมน์: รายการ 18%, 31 วัน = 82% (2.65% ต่อวัน) */
-  .form-area--f1-monthly .col-item-width { width: 18% !important; }
-  .form-area--f1-monthly .col-day-width { width: 2.65% !important; min-width: 0 !important; }
-  /* ขนาดตัวอักษรเหมาะสม อ่านง่าย ครบ 31 วัน ในหนึ่งหน้าแนวนอน */
-  .form-area--f1-monthly .form-main-title { font-size: 18pt !important; padding: 2.5mm 0 !important; }
-  .form-area--f1-monthly .form-meta { font-size: 14pt !important; margin-bottom: 1.5mm !important; }
-  .form-area--f1-monthly .meta-strong { font-size: 15pt !important; }
-  .form-area--f1-monthly .meta-row { margin-bottom: 1mm !important; }
-  .form-area--f1-monthly .qc-table-monthly { font-size: 12pt !important; margin-top: 2.5mm !important; line-height: 1.25 !important; }
-  .form-area--f1-monthly .qc-table-monthly td,
-  .form-area--f1-monthly .qc-table-monthly th { padding: 1mm 0.5mm !important; font-size: 12pt !important; line-height: 1.25 !important; }
-  .form-area--f1-monthly .day-cell { font-size: 12pt !important; }
-  .form-area--f1-monthly .col-day-head { font-size: 12pt !important; }
-}
-
-/* กรณีเลือกพิมพ์แนวตั้ง: ย่อพอดีหน้ากว้าง 190mm ยังอ่านได้ */
-@media print and (orientation: portrait) {
-  .print-root {
-    transform: scale(0.68);
-    transform-origin: top left;
-    width: 282mm !important;
-  }
-  html, body, #app {
-    width: 192mm !important;
-    min-width: 192mm !important;
-  }
-}
-</style>

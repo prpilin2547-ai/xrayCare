@@ -1,6 +1,6 @@
 <template>
-  <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม Print + A4 -->
-  <div class="print-root">
+  <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม Print + A4 (คลาส xray-f10-print-page ใช้กับ inject พิมพ์) -->
+  <div class="print-root xray-f10-print-page">
     <!-- ปุ่มพิมพ์ (จะหายไปตอนสั่ง Print) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -175,8 +175,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { apiFetch } from '../api/client'
 
 const route = useRoute()
 
@@ -223,12 +224,129 @@ function rowIndices (meas) {
 }
 
 function handlePrint () {
+  installPrintPageStyle({ moveToEnd: true })
   window.print()
 }
 
-import { apiFetch } from '../api/client'
+/** เหมือน XrayF1Print: ทับ printLayout + คลาย #app/.small + ตารางกว้างเต็มแผ่น */
+const PRINT_STYLE_ID = 'xray-f10-print-page-style'
+
+function installPrintPageStyle (options = {}) {
+  const moveToEnd = options.moveToEnd === true
+  if (typeof document === 'undefined') return
+  if (moveToEnd) {
+    removePrintPageStyle()
+  } else if (document.getElementById(PRINT_STYLE_ID)) {
+    return
+  }
+  const el = document.createElement('style')
+  el.id = PRINT_STYLE_ID
+  el.textContent = `
+@page { size: A4 portrait; margin: 0 !important; }
+@media print {
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  #app, #app > .small {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .xray-f10-print-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    min-height: 0 !important;
+  }
+  .xray-f10-print-page .print-toolbar {
+    display: none !important;
+  }
+  .xray-f10-print-page > .sheet-inner.sheet-inner--flow {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 12mm 12mm !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    page-break-inside: auto !important;
+  }
+  .xray-f10-print-page .header-main,
+  .xray-f10-print-page .meta-block,
+  .xray-f10-print-page .formula-block,
+  .xray-f10-print-page .remark-block {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  .xray-f10-print-page .formula-block {
+    margin-left: 0 !important;
+  }
+  .xray-f10-print-page .meta-row-grid,
+  .xray-f10-print-page .meta-row-grid-4 {
+    width: 100% !important;
+  }
+  .xray-f10-print-page .f10-table {
+    width: 100% !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+  }
+  /* ยกเลิกความกว้างแบบ mm ใน scoped — แถว rowspan ทำให้ nth-child ไม่ตรงคอลัมน์ */
+  .xray-f10-print-page .f10-table th,
+  .xray-f10-print-page .f10-table td {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .xray-f10-print-page .f10-table td.col-run {
+    width: 12% !important;
+  }
+  .xray-f10-print-page * {
+    font-size: 17pt !important;
+  }
+  .xray-f10-print-page .title-main {
+    font-size: 22pt !important;
+  }
+  .xray-f10-print-page .title-sub {
+    font-size: 18pt !important;
+  }
+  .xray-f10-print-page .f10-table th,
+  .xray-f10-print-page .f10-table td {
+    font-size: 17pt !important;
+    padding: 3mm 2.5mm !important;
+  }
+  .xray-f10-print-page .formula-row,
+  .xray-f10-print-page .remark-block {
+    font-size: 17pt !important;
+  }
+  .xray-f10-print-page .signature-block {
+    font-size: 16pt !important;
+  }
+}`
+  document.head.appendChild(el)
+}
+
+function removePrintPageStyle () {
+  document.getElementById(PRINT_STYLE_ID)?.remove()
+}
 
 onMounted(async () => {
+  installPrintPageStyle()
   const id = route.query.id || route.params.id
   if (!id) return
   try {
@@ -282,6 +400,10 @@ onMounted(async () => {
   } catch (e) {
     console.error('Load checklist record error:', e)
   }
+})
+
+onBeforeUnmount(() => {
+  removePrintPageStyle()
 })
 </script>
 
