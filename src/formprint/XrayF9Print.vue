@@ -1,6 +1,6 @@
 <template>
   <!-- หน้าโล่ง ไม่มีเมนู มีแค่ปุ่ม Print + A4 -->
-  <div class="print-root">
+  <div class="print-root xray-f9-print-page">
     <!-- ปุ่ม Print (จะหายไปตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- แผ่น A4 -->
-    <div class="sheet-inner">
+    <div class="sheet-inner sheet-inner--f9full">
         <!-- หัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -344,6 +344,7 @@ onMounted(async () => {
 /* TABLE */
 .f9-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 16pt;
@@ -373,7 +374,19 @@ onMounted(async () => {
 }
 
 .col-no {
-  width: 12mm;
+  width: 6%;
+}
+
+/* แผ่น F9: เต็มความกว้าง (หน้าจอ — ไม่ให้ aspect-ratio บีบแคบกลางกระดาษ) */
+.xray-f9-print-page > .sheet-inner--f9full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto;
+  height: auto;
+  min-height: 277mm;
+  max-height: none;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 /* ลายเซ็น */
@@ -431,6 +444,37 @@ onMounted(async () => {
     box-shadow: none;
     width: auto;
     min-height: auto;
+  }
+
+  /* เต็มความกว้างพื้นที่พิมพ์ — ชิดซ้าย–ขวาเท่ากัน (ไม่เหลือแถบว่างขวา) */
+  .xray-f9-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+  }
+  .xray-f9-print-page > .sheet-inner--f9full {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 8mm 6mm !important;
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 277mm !important;
+    max-height: none !important;
+  }
+  .xray-f9-print-page .f9-table {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+  .xray-f9-print-page .header-main {
+    width: 100% !important;
+  }
+  .xray-f9-print-page .signature-block {
+    width: 100% !important;
+    max-width: none !important;
   }
 
   .section-title { text-align: left !important; padding-left: 3mm; }

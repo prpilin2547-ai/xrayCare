@@ -121,7 +121,7 @@
     </div>
 
     <!-- แผ่น A4 หน้า 2: F7-2 (ถ้าเนื้อหาเกินหน้าก็ต่อหน้าใหม่ได้) -->
-    <div class="sheet-inner sheet-inner--flow">
+    <div class="sheet-inner sheet-inner--flow f72-print-sheet">
           <div class="header-main">
             <div class="title-main">
               แบบบันทึก F7-2 : การทดสอบ Collimator and Beam Alignment สำหรับ กรณีแผ่น DR ติดกับ Bucky (ไม่สามารถถอดออกได้)
@@ -182,7 +182,7 @@
               <td class="pass-fail-cell">{{ row.fail ? '✓' : '' }}</td>
               <td class="note-cell">{{ row.note || '' }}</td>
             </tr>
-            <tr><td colspan="5">&nbsp;</td></tr>
+            <tr class="f72-gap-row"><td colspan="5" class="f72-gap-cell"></td></tr>
             <tr class="section-row">
               <td class="section-title" colspan="5">Beam Alignment ต้องมีความเบี่ยงเบนไม่เกิน 3 องศา</td>
             </tr>
@@ -755,6 +755,103 @@ onMounted(async () => {
   }
   .sheet-inner--flow .main-table tr {
     page-break-inside: avoid;
+  }
+}
+
+/* F7-2 (DR+Bucky): ขยายแนวตั้งให้ใช้พื้นที่หน้า A4 มากขึ้น — ยังคงหนึ่งหน้าต่อฟอร์ม */
+.f72-print-sheet .header-main {
+  margin-bottom: 5mm;
+}
+.f72-print-sheet .title-main {
+  font-size: 18pt !important;
+  line-height: 1.28;
+  margin-bottom: 2mm;
+}
+.f72-print-sheet .title-sub {
+  margin-bottom: 1.8mm;
+  line-height: 1.32;
+}
+.f72-print-sheet .machine-row {
+  margin-top: 2mm;
+}
+.f72-print-sheet .main-table {
+  margin-top: 3.5mm;
+  margin-bottom: 0;
+}
+.f72-print-sheet .main-table td,
+.f72-print-sheet .main-table th {
+  padding: 2.6mm 2mm !important;
+  font-size: 16pt !important;
+  line-height: 1.38 !important;
+}
+.f72-print-sheet .note-row {
+  padding-top: 4mm !important;
+  padding-bottom: 4mm !important;
+  line-height: 1.42;
+}
+.f72-print-sheet .note-row strong {
+  margin-bottom: 1mm;
+}
+.f72-print-sheet .f72-gap-cell {
+  padding: 2mm 2mm !important;
+  line-height: 1.2 !important;
+  font-size: 8pt !important;
+}
+.f72-print-sheet .section-row .section-title {
+  padding-top: 2.2mm !important;
+  padding-bottom: 2.2mm !important;
+  line-height: 1.3 !important;
+}
+.f72-print-sheet .sub-header td {
+  padding-top: 2.4mm !important;
+  padding-bottom: 2.4mm !important;
+}
+.f72-print-sheet .align-left {
+  vertical-align: middle !important;
+}
+
+@media print {
+  .f72-print-sheet .header-main {
+    margin-bottom: 4mm !important;
+  }
+  .f72-print-sheet .title-main {
+    font-size: 17pt !important;
+    margin-bottom: 1.5mm !important;
+    line-height: 1.26 !important;
+  }
+  .f72-print-sheet .title-sub {
+    margin-bottom: 1.4mm !important;
+    line-height: 1.3 !important;
+  }
+  .f72-print-sheet .machine-row {
+    margin-top: 1.5mm !important;
+  }
+  .f72-print-sheet .main-table {
+    margin-top: 3mm !important;
+  }
+  .f72-print-sheet .main-table td,
+  .f72-print-sheet .main-table th {
+    padding: 2.2mm 1.6mm !important;
+    font-size: 14.5pt !important;
+    line-height: 1.34 !important;
+  }
+  .f72-print-sheet .note-row {
+    padding-top: 3.2mm !important;
+    padding-bottom: 3.2mm !important;
+    line-height: 1.36 !important;
+  }
+  .f72-print-sheet .f72-gap-cell {
+    padding: 1.8mm 1.6mm !important;
+    font-size: 7pt !important;
+  }
+  .f72-print-sheet .section-row .section-title {
+    padding-top: 1.8mm !important;
+    padding-bottom: 1.8mm !important;
+    line-height: 1.28 !important;
+  }
+  .f72-print-sheet .sub-header td {
+    padding-top: 2mm !important;
+    padding-bottom: 2mm !important;
   }
 }
 

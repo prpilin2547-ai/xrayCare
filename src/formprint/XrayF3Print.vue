@@ -338,88 +338,90 @@ function installPrintPageStyle(options = {}) {
     page-break-inside: auto !important;
   }
   .xray-f3f6-print-page .title-main {
-    font-size: 18pt !important;
+    font-size: 18.5pt !important;
     text-align: center !important;
-    margin-bottom: 1.2mm !important;
+    margin-bottom: 1.8mm !important;
   }
-  .xray-f3f6-print-page .header-main { text-align: center !important; margin-bottom: 2.5mm !important; }
-  .xray-f3f6-print-page .title-sub { font-size: 13.5pt !important; line-height: 1.28 !important; }
-  .xray-f3f6-print-page .form-print-page--f3 .header-main { margin-bottom: 2mm !important; }
+  .xray-f3f6-print-page .header-main { text-align: center !important; margin-bottom: 3.2mm !important; }
+  .xray-f3f6-print-page .title-sub { font-size: 14pt !important; line-height: 1.38 !important; }
+  .xray-f3f6-print-page .form-print-page--f3 .header-main { margin-bottom: 2.8mm !important; }
   .xray-f3f6-print-page .form-print-page--f3 .f3-table {
     width: 100% !important;
     table-layout: fixed !important;
-    font-size: 10.5pt !important;
+    font-size: 11pt !important;
   }
   .xray-f3f6-print-page .form-print-page--f3 .f3-table td,
   .xray-f3f6-print-page .form-print-page--f3 .f3-table th {
-    padding: 1.35mm 0.75mm !important;
-    font-size: 10.5pt !important;
-    line-height: 1.2 !important;
+    padding: 1.95mm 0.85mm !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
   }
   .xray-f3f6-print-page .form-print-page--f3 .section-title {
-    padding-top: 1.2mm !important;
-    padding-bottom: 0.4mm !important;
-    font-size: 10.5pt !important;
-    line-height: 1.18 !important;
+    padding-top: 2mm !important;
+    padding-bottom: 0.7mm !important;
+    font-size: 11pt !important;
+    line-height: 1.25 !important;
   }
   .xray-f3f6-print-page .label-col { width: 62% !important; }
   .xray-f3f6-print-page .check-cell { width: 9.5% !important; }
-  .xray-f3f6-print-page .form-print-page--f4 .f4-table { font-size: 10.5pt !important; width: 100% !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .header-main { margin-bottom: 3.5mm !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table { font-size: 11pt !important; width: 100% !important; }
   .xray-f3f6-print-page .form-print-page--f4 .f4-table thead th {
-    padding: 2.8mm 1.2mm !important;
-    font-size: 10.5pt !important;
-    line-height: 1.25 !important;
+    padding: 3.5mm 1.4mm !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
   }
-  .xray-f3f6-print-page .form-print-page--f4 .f4-table tbody tr { min-height: 12mm !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .f4-table tbody tr { min-height: 15.5mm !important; }
   .xray-f3f6-print-page .form-print-page--f4 .f4-table tbody td {
-    padding: 2.5mm 1.2mm !important;
-    font-size: 10.5pt !important;
-    line-height: 1.32 !important;
+    padding: 3.2mm 1.3mm !important;
+    font-size: 11pt !important;
+    line-height: 1.36 !important;
     vertical-align: middle !important;
   }
   .xray-f3f6-print-page .col-no { width: 8% !important; }
   .xray-f3f6-print-page .col-desc { width: 62% !important; }
   .xray-f3f6-print-page .col-result { width: 12% !important; }
   .xray-f3f6-print-page .col-remark { width: 18% !important; }
-  .xray-f3f6-print-page .form-print-page--f4 .note-block { margin-top: 4mm !important; font-size: 10.5pt !important; line-height: 1.45 !important; }
-  .xray-f3f6-print-page .form-print-page--f4 .footer-note { font-size: 10.5pt !important; margin-top: 3mm !important; }
-  .xray-f3f6-print-page .form-print-page--f5 .summary-box { min-height: 42mm !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .note-block { margin-top: 7mm !important; font-size: 11pt !important; line-height: 1.5 !important; }
+  .xray-f3f6-print-page .form-print-page--f4 .footer-note { font-size: 11pt !important; margin-top: 4mm !important; }
+  .xray-f3f6-print-page .form-print-page--f5 .header-main { margin-bottom: 3.5mm !important; }
+  .xray-f3f6-print-page .form-print-page--f5 .summary-box { min-height: 58mm !important; }
   .xray-f3f6-print-page .form-print-page--f5 .summary-box td {
-    padding: 5mm 4mm !important;
-    font-size: 11.5pt !important;
-    line-height: 1.55 !important;
+    padding: 7mm 4.5mm !important;
+    font-size: 12pt !important;
+    line-height: 1.65 !important;
   }
   .xray-f3f6-print-page .form-print-page--f5 .f5-table td {
-    padding: 3.8mm 2.2mm !important;
-    font-size: 11.5pt !important;
-    line-height: 1.45 !important;
+    padding: 5mm 2.4mm !important;
+    font-size: 12pt !important;
+    line-height: 1.52 !important;
   }
   .xray-f3f6-print-page .col-label { width: 48% !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .header-main { margin-bottom: 1.8mm !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .title-main { font-size: 17pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .header-main { margin-bottom: 2.8mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .title-main { font-size: 17.5pt !important; }
   .xray-f3f6-print-page .form-print-page--f6 .f6-table {
     page-break-after: avoid !important;
     break-after: avoid !important;
   }
   .xray-f3f6-print-page .form-print-page--f6 .f6-table td,
   .xray-f3f6-print-page .form-print-page--f6 .f6-table th {
-    padding: 1.25mm 0.9mm !important;
-    font-size: 9.75pt !important;
-    line-height: 1.16 !important;
+    padding: 1.75mm 1mm !important;
+    font-size: 10.25pt !important;
+    line-height: 1.28 !important;
   }
-  .xray-f3f6-print-page .form-print-page--f6 .f6-table th { font-size: 10pt !important; padding: 1.4mm 0.9mm !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell { padding: 1.5mm 1.2mm !important; line-height: 1.22 !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell div { margin-bottom: 0 !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .device-info-row { gap: 2mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .f6-table th { font-size: 10.5pt !important; padding: 2mm 1mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell { padding: 2.2mm 1.4mm !important; line-height: 1.3 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .multi-line-cell div { margin-bottom: 0.35mm !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .device-info-row { gap: 2.5mm !important; }
   .xray-f3f6-print-page .form-print-page--f6 .signature-block {
-    margin-top: 2mm !important;
-    font-size: 10pt !important;
+    margin-top: 12mm !important;
+    font-size: 10.5pt !important;
     page-break-before: avoid !important;
     break-before: avoid !important;
     page-break-inside: avoid !important;
   }
-  .xray-f3f6-print-page .form-print-page--f6 .sig-line { margin-bottom: 1mm !important; font-size: 10pt !important; }
-  .xray-f3f6-print-page .form-print-page--f6 .empty-row td { height: 3mm !important; padding: 0 !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .sig-line { margin-bottom: 1.8mm !important; font-size: 10.5pt !important; }
+  .xray-f3f6-print-page .form-print-page--f6 .empty-row td { height: 6mm !important; padding: 0 !important; }
 }
 `
   document.head.appendChild(el)
@@ -629,7 +631,7 @@ function handlePrint() {
   padding: 8mm 10mm;
   border-radius: 2px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  min-height: 120mm;
+  min-height: 140mm;
 }
 
 /* tbody กลุ่มหัวข้อ F3 — ห้าม page-break-inside: avoid ต่อกลุ่ม (ทำให้พิมพ์หลายหน้า) */
@@ -652,11 +654,11 @@ function handlePrint() {
 }
 
 /* F3 */
-.header-main { margin-bottom: 5mm; text-align: center; }
-.title-main { font-weight: 700; font-size: 19pt; margin-bottom: 2.5mm; text-align: center; }
-.title-sub { font-size: 15pt; line-height: 1.35; }
-.f3-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt; }
-.f3-table td { border: 0.4pt solid #000; padding: 1.8mm 1.5mm; vertical-align: middle; }
+.header-main { margin-bottom: 6mm; text-align: center; }
+.title-main { font-weight: 700; font-size: 19.5pt; margin-bottom: 3mm; text-align: center; }
+.title-sub { font-size: 15pt; line-height: 1.38; }
+.f3-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14.5pt; }
+.f3-table td { border: 0.4pt solid #000; padding: 2.2mm 1.5mm; vertical-align: middle; }
 .label-col { width: 62%; }
 .check-cell { width: 9.5%; }
 .center-cell { text-align: center; }
@@ -665,7 +667,7 @@ function handlePrint() {
 .value-cell { text-align: left; }
 .merged-left { font-weight: 700; text-align: left !important; padding-left: 2mm !important; border: 0.4pt solid #000; }
 .underline { display: inline-block; border-bottom: 0.4pt solid #000; min-width: 40%; min-height: 5mm; }
-.f3-table td, .f3-table th { padding-top: 1.5mm !important; padding-bottom: 1.5mm !important; }
+.f3-table td, .f3-table th { padding-top: 2mm !important; padding-bottom: 2mm !important; }
 .right-label { text-align: right !important; padding-right: 2mm !important; }
 .check-cell.result-p { font-weight: 700; text-align: center; }
 .check-cell.result-f { font-weight: 700; text-align: center; }
@@ -675,28 +677,28 @@ function handlePrint() {
 .header-row-inline { display: flex; align-items: center; gap: 4mm; width: 100%; flex-wrap: wrap; }
 .underline.long { flex: 1; min-width: 30mm; border-bottom: 0.4pt solid #000; min-height: 5mm; display: inline-block; }
 .underline.short { flex: 0 0 36mm; border-bottom: 0.4pt solid #000; min-height: 5mm; display: inline-block; }
-.f4-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14pt; }
-.f4-table th, .f4-table td { border: 0.4pt solid #000; padding: 2.2mm 1.2mm; vertical-align: middle; font-size: 14pt; }
-.f4-table tbody tr { min-height: 10mm; }
+.f4-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14.5pt; }
+.f4-table th, .f4-table td { border: 0.4pt solid #000; padding: 2.8mm 1.3mm; vertical-align: middle; font-size: 14.5pt; }
+.f4-table tbody tr { min-height: 13mm; }
 .f4-table th { text-align: center; font-weight: 700; }
 .f4-table td { text-align: left !important; }
-.f4-table td.col-no { text-align: center !important; vertical-align: top !important; padding-top: 1mm; }
+.f4-table td.col-no { text-align: center !important; vertical-align: middle !important; padding-top: 1.2mm; }
 .f4-table td.col-result { text-align: center !important; font-weight: 700; }
 .col-no { width: 8%; }
 .col-desc { width: 62%; }
 .col-result { width: 12%; }
 .col-remark { width: 18%; }
-.note-block { margin-top: 3mm; font-size: 14pt; }
-.note-line { line-height: 1.35; }
-.footer-note { margin-top: 2mm; font-size: 14pt; }
+.note-block { margin-top: 5mm; font-size: 14.5pt; }
+.note-line { line-height: 1.45; }
+.footer-note { margin-top: 3.5mm; font-size: 14.5pt; }
 .freq-label { font-weight: 700; }
 .freq-value { font-weight: 400; }
 
 /* F5 */
-.summary-box { width: 100%; border-collapse: collapse; border: 0.4pt solid #000; margin-bottom: 5mm; min-height: 36mm; }
-.summary-box td { padding: 4mm; text-align: left; line-height: 1.5; }
+.summary-box { width: 100%; border-collapse: collapse; border: 0.4pt solid #000; margin-bottom: 6mm; min-height: 52mm; }
+.summary-box td { padding: 5.5mm; text-align: left; line-height: 1.58; }
 .f5-table { width: 100%; border-collapse: collapse; }
-.f5-table td { border: 0.4pt solid #000; padding: 3.2mm 2mm; vertical-align: middle; }
+.f5-table td { border: 0.4pt solid #000; padding: 4.2mm 2.2mm; vertical-align: middle; }
 .col-label { width: 48%; }
 .col-right-4 { width: auto; }
 .small-box { width: auto; border: 0.4pt solid #000; }
@@ -704,11 +706,11 @@ function handlePrint() {
 
 /* F6 */
 .f6-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.f6-table td, .f6-table th { border: 1px solid #000; padding: 2mm 1.5mm; width: 25%; vertical-align: middle; font-weight: 400 !important; }
-.f6-table th { font-weight: 700; text-align: center; font-size: 14pt; }
+.f6-table td, .f6-table th { border: 1px solid #000; padding: 2.4mm 1.6mm; width: 25%; vertical-align: middle; font-weight: 400 !important; }
+.f6-table th { font-weight: 700; text-align: center; font-size: 14.5pt; }
 .align-center { text-align: center !important; }
-.multi-line-cell { padding: 2mm 1.5mm; line-height: 1.35; }
-.multi-line-cell div { margin-bottom: 0.8mm; }
+.multi-line-cell { padding: 2.4mm 1.6mm; line-height: 1.38; }
+.multi-line-cell div { margin-bottom: 0.5mm; }
 .multi-line-cell .underline.short { text-decoration: none !important; }
 .full-underline { display: inline-block; border-bottom: 0.4pt solid #000; width: 40mm; height: 4mm; vertical-align: middle; }
 .short-line { width: 25mm; }
@@ -718,8 +720,8 @@ function handlePrint() {
 .section-header td { font-weight: 700; }
 .ei-header th { font-weight: 700; }
 .empty-row td { height: 12mm; }
-.signature-block { margin-top: 14mm; text-align: right; font-size: 14pt; }
-.sig-line { margin-bottom: 2.5mm; font-size: 14pt; }
+.signature-block { margin-top: 18mm; text-align: right; font-size: 14pt; }
+.sig-line { margin-bottom: 2.8mm; font-size: 14pt; }
 
 @media print {
   .f3-table td, .f4-table th, .f4-table td, .f5-table td, .summary-box td, .f6-table td, .f6-table th { border: 1px solid #000 !important; }
