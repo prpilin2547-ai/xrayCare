@@ -56,7 +56,16 @@ const routes = [
 
   // === MAIN pages (Tech + Admin) ===
   { path: '/dashboard', component: Dashboard, meta: { roles: TECH } },
-  { path: '/dairy-check/:equipmentName', name: 'DairyCheckPage', component: DairyCheckPage, props: true, meta: { roles: ADMIN_TECH } },
+  // Daily checklist: ใช้ query equipmentName เพื่อรองรับชื่อที่มี "/" (เช่น BrandA/ModelX) โดยไม่แตก path
+  {
+    path: '/dairy-check/:equipmentName+',
+    redirect: (to) => {
+      const raw = to.params.equipmentName
+      const name = Array.isArray(raw) ? raw.map(String).join('/') : String(raw ?? '')
+      return { path: '/dairy-check', query: { ...to.query, equipmentName: name } }
+    }
+  },
+  { path: '/dairy-check', name: 'DairyCheckPage', component: DairyCheckPage, meta: { roles: ADMIN_TECH } },
   { path: '/machines/create', component: MachinesCreate, meta: { roles: ADMIN_TECH } },
   { path: '/analytics', component: Analytical, meta: { roles: ADMIN_TECH } },
   { path: '/pm-schedule', component: PMSchedule, meta: { roles: ADMIN_TECH } },

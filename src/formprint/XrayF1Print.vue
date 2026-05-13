@@ -610,12 +610,13 @@ onMounted(async () => {
 /* ----------------- print CSS ----------------- */
 @page {
   size: A4 portrait;
-  margin: 10mm;
+  margin: 0;
 }
 
 @media print {
   .print-root {
-    padding: 0;
+    padding: 0 !important;
+    margin: 0 !important;
     background: white;
     max-width: none;
     overflow: visible;
@@ -627,7 +628,9 @@ onMounted(async () => {
     height: 277mm !important;
     min-height: 277mm !important;
     max-width: 190mm !important;
-    padding: 10mm;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    padding: 10mm !important;
   }
 
   .print-toolbar {

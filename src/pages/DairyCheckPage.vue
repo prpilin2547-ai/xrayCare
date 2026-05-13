@@ -189,7 +189,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import MainLayout from '../components/Layout/MainLayout.vue'
 
@@ -211,6 +211,55 @@ const props = defineProps({
 const router = useRouter();
 const route = useRoute();
 
+/** ชื่อเครื่องจาก URL — route เป็น /dairy-check แบบ query (ไม่มี path param) */
+function equipmentNameFromRoute() {
+  const q = route.query.equipmentName;
+  if (typeof q === 'string' && q.trim()) return q.trim();
+  if (Array.isArray(q) && q[0]) return String(q[0]).trim();
+  const p = route.params.equipmentName;
+  if (typeof p === 'string' && p.trim()) return p.trim();
+  if (Array.isArray(p) && p.length) return p.map(String).join('/').trim();
+  return '';
+}
+
+function defaultChecklistHome() {
+  try {
+    const u = JSON.parse(localStorage.getItem('xraycare-user') || '{}');
+    const position = (u.position || '').toLowerCase();
+    if (position === 'admin' || position === 'superadmin') return '/admindashboard';
+    if (position === 'engineer') return '/engineerdashboard';
+  } catch {}
+  return '/dashboard';
+}
+
+async function loadDeviceFromMachines() {
+  try {
+    const res = await apiFetch('/GetAllMachines');
+    if (!res.ok) return;
+    const machines = await res.json();
+    const equipmentName = equipmentNameFromRoute();
+    const found = equipmentName
+      ? machines.find(m => m.machineName === equipmentName)
+      : null;
+    if (found) {
+      deviceInfo.value = {
+        name: found.machineName,
+        model: found.machineName,
+        room: found.room || ''
+      };
+    } else if (machines.length > 0) {
+      const m = machines[0];
+      deviceInfo.value = {
+        name: m.machineName,
+        model: m.machineName,
+        room: m.room || ''
+      };
+    }
+  } catch (e) {
+    console.error('Failed to load machines', e);
+  }
+}
+
 /* ---------- ข้อมูลเครื่องจาก API + ผู้ใช้จาก localStorage ---------- */
 const deviceInfo = ref({ name: '', model: '', room: '' })
 const userName = ref('')
@@ -231,30 +280,15 @@ onMounted(async () => {
   updateTime()
   timeInterval = setInterval(updateTime, 1000)
 
-  try {
-    const res = await apiFetch('/GetAllMachines');
-    if (!res.ok) return;
-    const machines = await res.json();
-    const equipmentName = route.params.equipmentName || '';
-    const found = machines.find(m => m.machineName === equipmentName);
-    if (found) {
-      deviceInfo.value = {
-        name: found.machineName,
-        model: found.machineName,
-        room: found.room || ''
-      };
-    } else if (machines.length > 0) {
-      const m = machines[0];
-      deviceInfo.value = {
-        name: m.machineName,
-        model: m.machineName,
-        room: m.room || ''
-      };
-    }
-  } catch (e) {
-    console.error('Failed to load machines', e);
-  }
+  await loadDeviceFromMachines();
 });
+
+watch(
+  () => route.query.equipmentName,
+  () => {
+    loadDeviceFromMachines();
+  }
+);
 
 // วันเริ่มต้นที่กำหนด
 const startDate = ref(new Date("2025-08-21"))
@@ -500,17 +534,6 @@ const markAllPass = () => {
   plateEraseResult.value = 'pass'
 }
 
-/* ---------- Helper: today key สำหรับ localStorage ---------- */
-const DAILY_CHECK_KEY = 'xraycare-dailyChecked'
-
-function getTodayKey() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${dd}`
-}
-
 /* รายการ form ตาม Schedule ที่ส่งมาจาก Dashboard (query.formTypes) */
 const formTypesDueToday = computed(() => {
   const q = route.query.formTypes
@@ -554,11 +577,14 @@ const firstNextFormLabel = computed(() => {
   return first ? formTypeLabel(first) : ''
 })
 
-/** บันทึก F1/F2 ลง API + localStorage (ใช้ร่วมกับ saveChecklist และ goToNextForm) */
+/** บันทึก F1/F2 ลง API (สถานะเครื่องรายวันอัปเดตที่ Machine ผ่าน SaveChecklist) — คืน true เมื่อบันทึกสำเร็จ */
 async function performSaveChecklist() {
+  const machineName = (
+    (selectedDevice.value?.name || equipmentNameFromRoute() || '') + ''
+  ).trim();
   const payload = {
     formType: 'F1_F2',
-    machineName: selectedDevice.value.name,
+    machineName,
     room: selectedDevice.value.room,
     checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
@@ -578,38 +604,30 @@ async function performSaveChecklist() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-    if (!res.ok) console.error('SaveChecklist failed:', await res.text())
+    if (!res.ok) {
+      console.error('SaveChecklist failed:', await res.text())
+      return false
+    }
+    return true
   } catch (e) {
     console.error('SaveChecklist error:', e)
+    return false
   }
-
-  try {
-    const todayKey = getTodayKey()
-    const stored = JSON.parse(localStorage.getItem(DAILY_CHECK_KEY) || '{}')
-    const todayChecked = stored[todayKey] || []
-    const equipmentName = route.params.equipmentName || ''
-    if (equipmentName && !todayChecked.includes(equipmentName)) {
-      todayChecked.push(equipmentName)
-    }
-    localStorage.setItem(DAILY_CHECK_KEY, JSON.stringify({ [todayKey]: todayChecked }))
-  } catch (e) {
-    console.error('Cannot save daily check to localStorage', e)
-  }
-
-  await createRepairRequestsForFailedItems()
 }
 
 /** บันทึกแล้วไปหน้าถัดไป (เมื่อมีฟอร์มที่ต้องทำในวันเดียวกัน) — ส่งชื่อเครื่องไปด้วยเพื่อให้หน้าถัดไปแสดงเครื่องเดิม */
 async function goToNextForm() {
-  await performSaveChecklist()
+  const saved = await performSaveChecklist()
+  await createRepairRequestsForFailedItems()
+  if (!saved) return
   const next = nextFormsAfterCurrent.value
   if (next.length === 0) {
-    router.push('/dashboard')
+    router.push(defaultChecklistHome())
     return
   }
   const path = formTypeRoute(next[0])
   if (!path) {
-    router.push('/dashboard')
+    router.push(defaultChecklistHome())
     return
   }
   const query = { formTypes: next.join(',') }
@@ -621,8 +639,9 @@ async function goToNextForm() {
 }
 
 const saveChecklist = async () => {
-  await performSaveChecklist()
-  router.push('/dashboard')
+  const saved = await performSaveChecklist()
+  await createRepairRequestsForFailedItems()
+  if (saved) router.push(defaultChecklistHome())
 }
 </script>
 

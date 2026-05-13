@@ -1,10 +1,16 @@
+using System.Text.Json;
 using api.xraycare.Middleware;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // CORS: ให้ frontend (Vite localhost:5173) เรียก API ได้
 builder.Services.AddCors(options =>

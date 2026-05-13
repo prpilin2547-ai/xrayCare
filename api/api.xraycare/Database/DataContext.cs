@@ -21,9 +21,11 @@ public class DataContext : DbContext
     public DbSet<RepairRequest> RepairRequests { get; set; }
     public DbSet<ChecklistRecord> ChecklistRecords { get; set; }
     public DbSet<ScheduleConfig> ScheduleConfigs { get; set; }
+    public DbSet<HospitalUiState> HospitalUiStates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserAccount>().HasIndex(u => new { u.HospitalId, u.Username }).IsUnique();
+        modelBuilder.Entity<HospitalUiState>().HasIndex(x => x.HospitalId).IsUnique();
     }
 }

@@ -82,6 +82,10 @@
     height: 277mm !important;
     min-height: 277mm !important;
     max-width: 190mm !important;
+    /* หน้าจอใช้ aspect-ratio + max-height:100% เพื่อย่อใน viewport — ตอนพิมพ์ต้องปิด
+       ไม่งั้น Chrome ใช้ความสูงแม่จำกัดแล้วบีบความกว้างตาม ratio → ฟอร์มเล็กกลางกระดาษ */
+    max-height: none !important;
+    aspect-ratio: auto !important;
     padding: 10mm;
     page-break-after: always;
   }

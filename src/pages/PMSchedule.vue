@@ -269,9 +269,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import MainLayout from '../components/Layout/MainLayout.vue'
 import { apiFetch } from '../api/client'
+import { getHospitalUiState, loadAndMigrateHospitalUiState, saveHospitalPmCalendar } from '../api/hospitalUiState.js'
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
@@ -301,12 +302,6 @@ const monthNames = [
   'November',
   'December'
 ]
-
-/** key สำหรับเก็บใน localStorage */
-const STORAGE_EVENTS_KEY = 'pmEventsByDate'
-const STORAGE_RULES_KEY = 'pmMonthlyRules'
-const STORAGE_HIDDEN_MONTHLY_KEY = 'pmHiddenMonthlyTasks'
-const STORAGE_DAILY_DISABLED_KEY = 'pmDisabledDailyDates'
 
 const headerDateText = computed(() => {
   const d = today.getDate()
@@ -811,98 +806,84 @@ const closeAllPopups = () => {
   showSettingsPopup.value = false
 }
 
-/* ---------- API + localStorage ---------- */
+/* ---------- Hospital-wide PM calendar (API) ---------- */
+const suppressPmRemoteSave = ref(true)
+let pmSaveTimer = null
+
+async function applyPmCalendarFromServer(state) {
+  eventsByDate.value = { ...(state.pmEventsByDate || {}) }
+  hiddenMonthlyTasksByDate.value = { ...(state.pmHiddenMonthlyTasks || {}) }
+  disabledDailyDates.value = { ...(state.pmDisabledDailyDates || {}) }
+  monthlyTypeByStartDate.value = {
+    ...(state.pmMonthlyRules || {}),
+    ...monthlyTypeByStartDate.value
+  }
+}
+
+async function refreshPmCalendarFromServer() {
+  try {
+    suppressPmRemoteSave.value = true
+    const state = await getHospitalUiState()
+    await applyPmCalendarFromServer(state)
+    await nextTick()
+    suppressPmRemoteSave.value = false
+  } catch (e) {
+    console.error('refreshPmCalendarFromServer', e)
+    suppressPmRemoteSave.value = false
+  }
+}
+
+function schedulePersistPmCalendar() {
+  if (suppressPmRemoteSave.value) return
+  clearTimeout(pmSaveTimer)
+  pmSaveTimer = setTimeout(async () => {
+    try {
+      await saveHospitalPmCalendar({
+        pmEventsByDate: eventsByDate.value,
+        pmMonthlyRules: monthlyTypeByStartDate.value,
+        pmHiddenMonthlyTasks: hiddenMonthlyTasksByDate.value,
+        pmDisabledDailyDates: disabledDailyDates.value
+      })
+    } catch (e) {
+      console.error('saveHospitalPmCalendar', e)
+    }
+  }, 700)
+}
+
+function onPmVisibility() {
+  if (document.hidden) return
+  refreshPmCalendarFromServer()
+}
+
 onMounted(async () => {
   await loadScheduleConfigs()
 
   try {
-    const savedEvents = localStorage.getItem(STORAGE_EVENTS_KEY)
-    if (savedEvents) {
-      eventsByDate.value = JSON.parse(savedEvents)
-    }
+    const state = await loadAndMigrateHospitalUiState()
+    await applyPmCalendarFromServer(state)
   } catch (e) {
-    console.error('Cannot load events from storage', e)
+    console.error('load hospital PM calendar state', e)
   }
 
-  try {
-    const savedRules = localStorage.getItem(STORAGE_RULES_KEY)
-    if (savedRules) {
-      const parsed = JSON.parse(savedRules)
-      monthlyTypeByStartDate.value = { ...parsed, ...monthlyTypeByStartDate.value }
-    }
-  } catch (e) {
-    console.error('Cannot load monthly rules from storage', e)
-  }
+  await nextTick()
+  suppressPmRemoteSave.value = false
+  document.addEventListener('visibilitychange', onPmVisibility)
+})
 
-  try {
-    const savedHiddenMonthly = localStorage.getItem(STORAGE_HIDDEN_MONTHLY_KEY)
-    if (savedHiddenMonthly) {
-      hiddenMonthlyTasksByDate.value = JSON.parse(savedHiddenMonthly)
-    }
-  } catch (e) {
-    console.error('Cannot load hidden monthly tasks from storage', e)
-  }
-
-  try {
-    const savedDisabledDaily = localStorage.getItem(STORAGE_DAILY_DISABLED_KEY)
-    if (savedDisabledDaily) {
-      disabledDailyDates.value = JSON.parse(savedDisabledDaily)
-    }
-  } catch (e) {
-    console.error('Cannot load disabled daily dates from storage', e)
-  }
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', onPmVisibility)
+  clearTimeout(pmSaveTimer)
 })
 
 watch(
-  eventsByDate,
-  (val) => {
-    try {
-      localStorage.setItem(STORAGE_EVENTS_KEY, JSON.stringify(val))
-    } catch (e) {
-      console.error('Cannot save events to storage', e)
-    }
-  },
-  { deep: true }
-)
-
-watch(
-  monthlyTypeByStartDate,
-  (val) => {
-    try {
-      localStorage.setItem(STORAGE_RULES_KEY, JSON.stringify(val))
-    } catch (e) {
-      console.error('Cannot save monthly rules to storage', e)
-    }
-  },
-  { deep: true }
-)
-
-watch(
-  hiddenMonthlyTasksByDate,
-  (val) => {
-    try {
-      localStorage.setItem(
-        STORAGE_HIDDEN_MONTHLY_KEY,
-        JSON.stringify(val)
-      )
-    } catch (e) {
-      console.error('Cannot save hidden monthly tasks to storage', e)
-    }
-  },
-  { deep: true }
-)
-
-watch(
-  disabledDailyDates,
-  (val) => {
-    try {
-      localStorage.setItem(
-        STORAGE_DAILY_DISABLED_KEY,
-        JSON.stringify(val)
-      )
-    } catch (e) {
-      console.error('Cannot save disabled daily dates to storage', e)
-    }
+  () => ({
+    e: eventsByDate.value,
+    m: monthlyTypeByStartDate.value,
+    h: hiddenMonthlyTasksByDate.value,
+    d: disabledDailyDates.value
+  }),
+  () => {
+    schedulePersistPmCalendar()
   },
   { deep: true }
 )
