@@ -1,6 +1,6 @@
 <template>
   <!-- หน้าโล่ง ใช้สำหรับปริ้นอย่างเดียว -->
-  <div class="print-root">
+  <div class="print-root xray-f13-print-page">
     <!-- ปุ่ม Print (หายตอนสั่งพิมพ์) -->
     <div class="print-toolbar">
       <button class="btn-print" @click="handlePrint">
@@ -18,8 +18,8 @@
     </button>
     </div>
 
-    <!-- แผ่น A4 (เนื้อหายาวให้ต่อหลายหน้า) -->
-    <div class="sheet-inner sheet-inner--flow">
+    <!-- แผ่น A4 — เต็มความกว้าง + จูนให้พอ 1 หน้าเมื่อพิมพ์ -->
+    <div class="sheet-inner sheet-inner--f13full">
         <!-- ===== หัวฟอร์ม ===== -->
         <div class="header-main align-with-table">
         <div class="title-main">
@@ -435,10 +435,23 @@ onMounted(async () => {
   font-weight: 400;
 }
 
+/* แผ่น A4 — เต็มความกว้าง ไม่ให้ printLayout บีบกลางกระดาษ */
+.xray-f13-print-page > .sheet-inner--f13full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 277mm;
+  max-height: none !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
 /* Header */
 .header-main {
   text-align: center;
   margin-bottom: 8mm;
+  width: 100%;
 }
 
 /* << ตัวเดียวที่ใหญ่กว่า = 13pt >> */
@@ -456,6 +469,7 @@ onMounted(async () => {
 /* ข้อมูลเครื่อง */
 .machine-block {
   margin-bottom: 6mm;
+  width: 100%;
 }
 
 .machine-row {
@@ -482,6 +496,7 @@ onMounted(async () => {
 /* ตาราง QC */
 .qc-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   margin-bottom: 6mm;
@@ -587,8 +602,104 @@ onMounted(async () => {
 
 @media print {
   .qc-table th, .qc-table td { border: 1px solid #000 !important; }
-  /* ให้ตารางและเนื้อหาสามารถแบ่งข้ามหน้า A4 ได้ */
-  .qc-table { page-break-inside: auto; }
-  .sheet-inner--flow { overflow: visible !important; }
+
+  .qc-table {
+    page-break-inside: auto;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .xray-f13-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+  }
+
+  .xray-f13-print-page > .sheet-inner--f13full {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 4.5mm 5mm !important;
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+  }
+
+  /* บีบแนวตั้งให้พอ 1 หน้า (ตาราง F13 แถวเยอะ) */
+  .xray-f13-print-page,
+  .xray-f13-print-page * {
+    font-size: 11.5pt !important;
+  }
+
+  .xray-f13-print-page .title-main {
+    font-size: 14pt !important;
+    margin-bottom: 1mm !important;
+  }
+
+  .xray-f13-print-page .header-main {
+    margin-bottom: 2.5mm !important;
+    width: 100% !important;
+  }
+
+  .xray-f13-print-page .machine-block {
+    margin-bottom: 2mm !important;
+    width: 100% !important;
+  }
+
+  .xray-f13-print-page .machine-row {
+    margin-bottom: 0.7mm !important;
+  }
+
+  .xray-f13-print-page .underline {
+    min-height: 3.5mm !important;
+  }
+
+  .xray-f13-print-page .underline.long {
+    min-width: 22mm !important;
+  }
+
+  .xray-f13-print-page .qc-table,
+  .xray-f13-print-page .qc-table th,
+  .xray-f13-print-page .qc-table td {
+    font-size: 10.25pt !important;
+    line-height: 1.14 !important;
+  }
+
+  /* ขยายความสูงแถวให้เต็มหน้า (มีช่องว่างด้านล่าง) — อย่าเพิ่มฟอนต์เพื่อไม่ให้ล้นหน้า 2 */
+  .xray-f13-print-page .qc-table th,
+  .xray-f13-print-page .qc-table td {
+    padding: 1.45mm 0.65mm !important;
+    vertical-align: middle !important;
+  }
+
+  .xray-f13-print-page .qc-table thead th {
+    padding-top: 1.65mm !important;
+    padding-bottom: 1.65mm !important;
+  }
+
+  .xray-f13-print-page .qc-table tbody td,
+  .xray-f13-print-page .qc-table tbody th {
+    min-height: 4.5mm;
+    box-sizing: border-box;
+  }
+
+  /* คอลัมน์แรกยืดตาม % แทน 50mm บีบความกว้างตาราง */
+  .xray-f13-print-page .qc-table td:first-child,
+  .xray-f13-print-page .qc-table th:first-child {
+    width: 30% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  .xray-f13-print-page .qc-table th:nth-child(6),
+  .xray-f13-print-page .qc-table td:nth-child(6),
+  .xray-f13-print-page .qc-table th:nth-child(7),
+  .xray-f13-print-page .qc-table td:nth-child(7) {
+    width: 14% !important;
+  }
 }
 </style>

@@ -20,8 +20,8 @@
       </button>
     </div>
 
-    <!-- แผ่น A4 (อนุญาตต่อหน้าใหม่เมื่อเนื้อหาไม่พอ) -->
-    <div class="sheet-inner sheet-inner--flow">
+    <!-- แผ่น A4 — เต็มความกว้าง + พอ 1 หน้าเมื่อพิมพ์ -->
+    <div class="sheet-inner sheet-inner--f10full">
         <!-- ส่วนหัวฟอร์ม -->
         <div class="header-main">
           <div class="title-main">
@@ -272,7 +272,7 @@ function installPrintPageStyle (options = {}) {
   .xray-f10-print-page .print-toolbar {
     display: none !important;
   }
-  .xray-f10-print-page > .sheet-inner.sheet-inner--flow {
+  .xray-f10-print-page > .sheet-inner.sheet-inner--f10full {
     display: block !important;
     width: 100% !important;
     max-width: none !important;
@@ -281,10 +281,11 @@ function installPrintPageStyle (options = {}) {
     max-height: none !important;
     aspect-ratio: auto !important;
     margin: 0 !important;
-    padding: 12mm 12mm !important;
+    padding: 6mm 8mm !important;
     box-sizing: border-box !important;
     overflow: visible !important;
     page-break-inside: auto !important;
+    page-break-after: auto !important;
   }
   .xray-f10-print-page .header-main,
   .xray-f10-print-page .meta-block,
@@ -305,6 +306,7 @@ function installPrintPageStyle (options = {}) {
     width: 100% !important;
     max-width: none !important;
     table-layout: fixed !important;
+    margin-bottom: 4mm !important;
   }
   /* ยกเลิกความกว้างแบบ mm ใน scoped — แถว rowspan ทำให้ nth-child ไม่ตรงคอลัมน์ */
   .xray-f10-print-page .f10-table th,
@@ -317,25 +319,48 @@ function installPrintPageStyle (options = {}) {
     width: 12% !important;
   }
   .xray-f10-print-page * {
-    font-size: 17pt !important;
+    font-size: 12.5pt !important;
   }
   .xray-f10-print-page .title-main {
-    font-size: 22pt !important;
+    font-size: 16pt !important;
   }
   .xray-f10-print-page .title-sub {
-    font-size: 18pt !important;
+    font-size: 13pt !important;
   }
   .xray-f10-print-page .f10-table th,
   .xray-f10-print-page .f10-table td {
-    font-size: 17pt !important;
-    padding: 3mm 2.5mm !important;
+    font-size: 12pt !important;
+    padding: 3mm 2mm !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+  }
+  .xray-f10-print-page .f10-table thead th {
+    padding-top: 3.4mm !important;
+    padding-bottom: 3.4mm !important;
   }
   .xray-f10-print-page .formula-row,
   .xray-f10-print-page .remark-block {
-    font-size: 17pt !important;
+    font-size: 12.5pt !important;
   }
   .xray-f10-print-page .signature-block {
-    font-size: 16pt !important;
+    font-size: 12pt !important;
+    page-break-inside: avoid !important;
+    margin-top: 3mm !important;
+    width: 100% !important;
+    text-align: right !important;
+    box-sizing: border-box !important;
+  }
+  .xray-f10-print-page .sig-row {
+    margin-bottom: 1mm !important;
+  }
+  .xray-f10-print-page .formula-block {
+    margin-bottom: 3mm !important;
+  }
+  .xray-f10-print-page .meta-block {
+    margin-bottom: 2mm !important;
+  }
+  .xray-f10-print-page .meta-row {
+    margin-bottom: 0.6mm !important;
   }
 }`
   document.head.appendChild(el)
@@ -418,11 +443,24 @@ onBeforeUnmount(() => {
   font-weight: 400;
 }
 
+/* แผ่น A4 — เต็มความกว้างหน้าจอ (ไม่บีบ aspect-ratio กลางกระดาษ) */
+.xray-f10-print-page > .sheet-inner--f10full {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 277mm;
+  max-height: none !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
 /* ===== พื้นหลัง & ปุ่ม ===== */
 /* ===== HEADER & META ให้เว้นบรรทัดเท่ากัน ===== */
 .header-main {
   text-align: left;
   margin-bottom: 0;
+  width: 100%;
 }
 
 .title-main {
@@ -439,6 +477,7 @@ onBeforeUnmount(() => {
 .meta-block {
   margin-left: 0;
   margin-bottom: 4mm;
+  width: 100%;
 }
 
 .meta-row {
@@ -479,6 +518,7 @@ onBeforeUnmount(() => {
 /* ===== ตาราง F10 ===== */
 .f10-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   margin-bottom: 10mm;
@@ -541,8 +581,9 @@ onBeforeUnmount(() => {
 
 /* ===== block ค่าคำนวณ ===== */
 .formula-block {
-  margin-left: 10mm;
+  margin-left: 0;
   margin-bottom: 10mm;
+  width: 100%;
 }
 
 .formula-row {
@@ -595,19 +636,20 @@ onBeforeUnmount(() => {
 }
 
 
-/* ===== PRINT — แสดงตารางครบ ถ้าไม่พอต่อหน้าใหม่ ===== */
+/* ===== PRINT — 1 หน้า (รายละเอียดหลักอยู่ใน inject xray-f10-print-page-style) ===== */
 @media print {
-  .sheet-inner--flow {
+  .sheet-inner--f10full {
     overflow: visible !important;
   }
 
-  /* หัวตารางซ้ำทุกหน้าเมื่อตารางข้ามหน้า */
-  .f10-table thead {
-    display: table-header-group;
+  .xray-f10-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
   }
 
-  .f10-table tr.f10-data-row {
-    page-break-inside: avoid;
+  .f10-table thead {
+    display: table-header-group;
   }
 
   .header-main .title-main {
@@ -628,18 +670,21 @@ onBeforeUnmount(() => {
   }
 
   .f10-table {
-    margin-bottom: 8mm;
+    margin-bottom: 5mm;
     page-break-inside: auto;
+    width: 100% !important;
+    max-width: none !important;
   }
 
   .f10-table th,
   .f10-table td {
-    padding: 4mm 2mm;
-    font-size: 14pt;
+    padding: 3mm 1.5mm;
+    font-size: 12pt;
   }
 
   .formula-block {
-    margin-bottom: 6mm;
+    margin-left: 0 !important;
+    margin-bottom: 4mm;
   }
 
   .formula-row {
@@ -652,11 +697,12 @@ onBeforeUnmount(() => {
   }
 
   .signature-block {
-    margin-top: 6mm;
+    margin-top: 4mm;
+    page-break-inside: avoid;
   }
 
   .sig-row {
-    margin-bottom: 2mm;
+    margin-bottom: 1.5mm;
   }
 
   .col-iav-group,
