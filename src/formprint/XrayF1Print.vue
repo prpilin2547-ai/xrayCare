@@ -70,6 +70,10 @@
                   </td>
                   <td class="day-cell">{{ getDailyResult(row) }}</td>
                 </tr>
+                <!-- แถวเติมความสูงเฉพาะตอนพิมพ์ ให้ฟอร์มกินพื้นที่แนวตั้งเต็มแผ่น -->
+                <tr class="qc-print-fill-row" aria-hidden="true">
+                  <td colspan="2"></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -210,6 +214,7 @@ function installPrintPageStyle(options = {}) {
 @media print {
   html, body {
     width: 100% !important;
+    min-height: 297mm !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -220,11 +225,11 @@ function installPrintPageStyle(options = {}) {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
+    min-height: 297mm !important;
     margin: 0 !important;
     padding: 0 !important;
     display: block !important;
   }
-  /* ไม่ใช้ flex ตอนพิมพ์ — กันบีบ + กล่องเต็มความกว้างจริงของหน้า */
   .xray-f1-print-page {
     display: block !important;
     width: 100% !important;
@@ -232,23 +237,65 @@ function installPrintPageStyle(options = {}) {
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
-    min-height: 0 !important;
+    min-height: 297mm !important;
   }
   .xray-f1-print-page .print-toolbar {
     display: none !important;
   }
   .xray-f1-print-page .form-area {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
     width: 100% !important;
     max-width: none !important;
     min-height: 297mm !important;
-    height: auto !important;
+    height: 297mm !important;
     max-height: none !important;
     aspect-ratio: auto !important;
     margin: 0 !important;
-    padding: 14mm 10mm !important;
+    padding: 10mm 10mm 10mm 10mm !important;
     box-sizing: border-box !important;
     overflow: visible !important;
+  }
+  .xray-f1-print-page .form-main-title {
+    flex: 0 0 auto !important;
+  }
+  .xray-f1-print-page .form-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .xray-f1-print-page .form-meta > .meta-row {
+    flex: 0 0 auto !important;
+  }
+  .xray-f1-print-page .table-wrapper.table-daily {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  .xray-f1-print-page .qc-table.qc-table-daily {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin-top: 4mm !important;
+  }
+  .xray-f1-print-page .f2-section {
+    flex: 0 0 auto !important;
+    margin-top: 4mm !important;
+  }
+  .xray-f1-print-page tr.qc-print-fill-row {
+    display: table-row !important;
+    height: 100% !important;
+  }
+  .xray-f1-print-page tr.qc-print-fill-row td {
+    border: none !important;
+    border-top: none !important;
+    height: 100% !important;
+    padding: 0 !important;
+    vertical-align: top !important;
   }
   .xray-f1-print-page .table-wrapper,
   .xray-f1-print-page .qc-table,
@@ -371,6 +418,11 @@ onBeforeUnmount(() => {
 /* แถบปุ่มด้านบน */
 .print-toolbar {
   margin-bottom: 8px;
+}
+
+/* แถวเติมความสูง — ไม่แสดงบนจอ ใช้เฉพาะตอนพิมพ์ (รายละเอียด display ใน inject) */
+.qc-print-fill-row {
+  display: none !important;
 }
 
 .bold-only {
