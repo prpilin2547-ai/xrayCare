@@ -426,7 +426,7 @@ onBeforeUnmount(() => {
 
 .title-main {
   font-weight: 700;
-  font-size: 22pt !important;
+  font-size: 22pt !important; 
   text-align: center;
   margin-bottom: 1.5mm;
 }
