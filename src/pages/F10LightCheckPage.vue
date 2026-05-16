@@ -596,6 +596,7 @@ const saveForm = async () => {
     checkDate: `${todayText.value} ${currentTime.value}`,
     tester: currentUserName.value,
     jsonData: JSON.stringify({
+      summaryResult: 'pass',
       header: formHeader.value,
       measurements: measurements.value,
       iavAvg: iavAvg.value,
@@ -606,13 +607,18 @@ const saveForm = async () => {
   }
 
   try {
-    await apiFetch('/SaveChecklist', {
+    const res = await apiFetch('/SaveChecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
+    if (!res.ok) {
+      console.error('SaveChecklist failed:', await res.text())
+      return
+    }
   } catch (e) {
     console.error('SaveChecklist error:', e)
+    return
   }
 
   router.push('/dashboard')

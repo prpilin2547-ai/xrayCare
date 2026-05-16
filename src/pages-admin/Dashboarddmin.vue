@@ -730,6 +730,8 @@ function deriveCheckStatus(record) {
     const raw = (record.jsonData || '').toLowerCase();
     if (raw.includes('"fail"')) return 'fail';
     if (raw.includes('"pass"')) return 'pass';
+    const formType = (record.formType || '').trim();
+    if (formType === 'F10') return 'pass';
   } catch (_) {}
   return 'unknown';
 }
